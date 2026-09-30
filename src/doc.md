@@ -263,6 +263,12 @@ Hősképesség-ötletek a táblázatban (még nem zöldek, nincsenek beépítve)
 - Utána azonnal a vezetett gyakorló meccs, „Kihagyom” gomb nélkül; a ⚑ gomb sem visz ki. Csak ezután jön a főmenü, egy záróképernyővel és az üdvözlő ajándékkal (10 booster + 1 Shiny pack).
 - Ha közben bezárja az appot, legközelebb a bemutatótól folytatja.
 
+## Barátok (2026-09-30, csak a saját appban)
+- Menü → 👥 Barátok. Mindenkinek van egy 6 jegyű barátkódja; a barát kódjával jelölsz, ő elfogadja. Látszik, ki van online és hány győzelme van.
+- ⚔️ Kihívás: élő meccsre hívod a barátot (csak ő csatlakozhat, idegen nem); nála felugrik „X kihívott!” – Elfogadom / Most nem. Ha nemet mond, nálad jelzi.
+- 🔄 Lapcsere: kiválasztod, melyik lapját kéred, és hogy melyik saját lapodat adod érte. Csak azonos ritkaság, Full Art csak Full Artért (változat-lapok, arany és Full Art hősök nem cserélhetők). Naponta egy csere. A felajánlott lap félre van téve, amíg a barát dönt; ha elutasítja vagy visszavonod, visszakapod, és aznap újra próbálhatsz. Figyelmeztet, ha az utolsó példányodat adnád vagy paklidban van.
+- Adatok: pub/<uid> (név, kód, győzelmek, cserélhető lapok listája), friends/<a_b>, trades/<id>.
+
 ## Saját appá alakítás (terv, 2026-09-30)
 - Cél: telepíthető webapp (PWA) iPhone-ra és Androidra, 0 Ft-os szerverrel; App Store / Play Store nincs.
 - Kód: privát GitHub-tároló (clash-of-us) → Cloudflare Pages automatikusan kiteszi minden feltöltés után (~1 perc). Külön teszt link az éles előtt.

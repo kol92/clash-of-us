@@ -115,6 +115,7 @@ async function save() {
         toast('A felhőbe mentés nem sikerült, ezen az eszközön mentem');
       }
     });
+    if (window.APP_MODE) { if (!FR.unsubF) frStart(); else frPubSync(); }
     return Store.saving;
   }
   lsSet(snap);
@@ -141,7 +142,7 @@ async function bootProfile() {
   if (Store.dupeMsg) { const m = Store.dupeMsg; Store.dupeMsg = null; setTimeout(() => toast(m), Store.giftMsg === null ? 2400 : 600); }
   renderProfileBar(); if (Store.p && GOLD_HEROES.some(ownsHeroGold)) renderMenuFan();
   if (!Store.p) showCreate(); else if (Store.p.onboard) startOnboarding();
-  pvpStart(); renderPvpBadge(); pvpRoomInit();
+  pvpStart(); renderPvpBadge(); pvpRoomInit(); frStart(); frRefresh();
 }
 function migrate(p) {
   if (!p) return null;
@@ -1179,6 +1180,7 @@ function pvpStart() {   // egyetlen feliratkozás az összes PvP-meccsre (lobbi,
     const sr = PVP.searching && PVP.list.find(d => d.id === PVP.searching);
     if (sr && sr.status === 'mull' && sr.state) { pvpStopSearch(); pvpEnter(sr.id, sr); }
     if (PVP.id && PVP.mullSeen !== undefined) pvpTryFinalize(PVP.id);
+    frOnPvpList();
   };
   if (window.APP_MODE) {   // saját szerveren: csak a saját meccseimet és a nyitott kihívásokat figyelem (kevesebb adatforgalom)
     const parts = { mine: [], open: [] };
@@ -1195,7 +1197,7 @@ const pvpVerOk = d => !window.APP_MODE || ((d.host?.ver || '') === (window.APP_V
 function renderPvpBadge() {
   const b = $('#pvpBadge'), sub = $('#pvpSub'); if (!b) return;
   if (!Store.db || !Store.uid) { b.hidden = true; if (sub) sub.textContent = 'Felhőmentés kell hozzá'; return; }
-  const turn = PVP.list.filter(pvpMyTurn).length, open = PVP.list.filter(d => d.status === 'open' && !pvpMine(d) && (!d.live || Date.now() - (d.seen || 0) < 20000)).length;
+  const turn = PVP.list.filter(pvpMyTurn).length, open = PVP.list.filter(d => d.status === 'open' && !pvpMine(d) && (!d.to || d.to === Store.uid) && (!d.live || Date.now() - (d.seen || 0) < 20000)).length;
   b.hidden = !(turn || open); b.textContent = turn ? `${turn} – te jössz!` : `${open} kihívás`;
   b.classList.toggle('hot', !!turn);
   if (sub) sub.textContent = turn ? 'Valaki vár a lépésedre' : open ? 'Nyitott kihívás vár rád' : 'Játssz a barátaid ellen';
@@ -1207,7 +1209,7 @@ function renderPvp() {
   const now = Date.now(), L = PVP.list;
   const mine = L.filter(d => pvpMine(d) && (d.status === 'mull' || d.status === 'play')).sort((a, b) => pvpMyTurn(b) - pvpMyTurn(a) || (b.updated || 0) - (a.updated || 0));
   const myOpen = L.filter(d => d.status === 'open' && d.host?.uid === Store.uid);
-  const others = L.filter(d => d.status === 'open' && d.host?.uid !== Store.uid && (d.live ? now - (d.seen || 0) < 20000 : now - (d.created || 0) < 3 * 864e5));
+  const others = L.filter(d => d.status === 'open' && d.host?.uid !== Store.uid && (!d.to || d.to === Store.uid) && (d.live ? now - (d.seen || 0) < 20000 : now - (d.created || 0) < 3 * 864e5));
   const done = L.filter(d => pvpMine(d) && d.status === 'done').sort((a, b) => (b.updated || 0) - (a.updated || 0)).slice(0, 5);
   const ago = t => { const m = Math.round((now - (t || now)) / 60000); return m < 1 ? 'most' : m < 60 ? `${m} perce` : m < 1440 ? `${Math.round(m / 60)} órája` : `${Math.round(m / 1440)} napja`; };
   const heroOf = p => p ? heroPortrait(p.hero, 'pv-hero') : '';
@@ -1495,7 +1497,7 @@ function pvpEmoteMenu() {
 function pvpQuick(dk) {
   PVP.searchDeck = dk; PVP.searchT0 = Date.now();
   const o = document.createElement('div'); o.className = 'overlay pv-search';
-  o.innerHTML = `<div class="modal"><div class="pv-spin">⚔️</div><h3>Ellenfél keresése…</h3><p class="live" id="pvSearchT">0:00</p><p class="live">Amint valaki más is élő meccset keres, indul a játék. Szólj a haveroknak, hogy nyomják meg ők is az „Élő meccs keresése” gombot!</p><button class="btn" data-x>Mégse</button></div>`;
+  o.innerHTML = `<div class="modal"><div class="pv-spin">⚔️</div><h3>${PVP.friendTo ? `Várjuk: ${escH(PVP.friendTo.name)}` : 'Ellenfél keresése…'}</h3><p class="live" id="pvSearchT">0:00</p><p class="live">${PVP.friendTo ? 'Elküldtük neki a kihívást – amint elfogadja, indul a meccs.' : 'Amint valaki más is élő meccset keres, indul a játék. Szólj a haveroknak, hogy nyomják meg ők is az „Élő meccs keresése” gombot!'}</p><button class="btn" data-x>Mégse</button></div>`;
   o.onclick = e => { if (e.target.closest('[data-x]')) pvpStopSearch(true); };
   $('#layer').appendChild(o);
   pvpSearchTick(); PVP.hb = setInterval(pvpSearchTick, 4000);
@@ -1506,7 +1508,7 @@ async function pvpSearchTick() {
   if (!PVP.searchDeck) return;
   const now = Date.now(), mine = PVP.searching && PVP.list.find(d => d.id === PVP.searching);
   if (mine && mine.status !== 'open') return;
-  const cands = PVP.list.filter(d => d.live && d.status === 'open' && !d.guest && pvpVerOk(d) && d.host?.uid !== Store.uid && now - (d.seen || 0) < 20000).sort((a, b) => (a.created || 0) - (b.created || 0));
+  const cands = PVP.friendTo ? [] : PVP.list.filter(d => d.live && d.status === 'open' && !d.guest && !d.to && pvpVerOk(d) && d.host?.uid !== Store.uid && now - (d.seen || 0) < 20000).sort((a, b) => (a.created || 0) - (b.created || 0));
   const target = cands.find(d => !mine || (d.created || 0) < (mine.created || 0));   // a később indult keresés csatlakozik a korábbihoz
   if (target) {
     const dk = PVP.searchDeck;
@@ -1519,15 +1521,17 @@ async function pvpSearchTick() {
   }
   if (!mine && !PVP.creating && !PVP.searching) {
     PVP.creating = true;
-    try { const ref = await Store.db.collection('pvp').add({ parts: [Store.uid], status: 'open', live: true, created: now, seen: now, updated: now, host: pvpMe(PVP.searchDeck), guest: null, v: 0 }); PVP.searching = ref.id; }
+    const ft = PVP.friendTo, extra = ft ? { to: ft.uid, toName: ft.name } : {};
+    try { const ref = await Store.db.collection('pvp').add({ parts: ft ? [Store.uid, ft.uid] : [Store.uid], status: 'open', live: true, created: now, seen: now, updated: now, host: pvpMe(PVP.searchDeck), guest: null, v: 0, ...extra }); PVP.searching = ref.id; }
     catch { toast('Nem sikerült keresést indítani (lehet, hogy nincs írási jogod)'); pvpStopSearch(); }
     finally { PVP.creating = false; }
-  } else if (mine) pvpDoc(mine.id).update({ seen: now }).catch(() => {});
+  } else if (mine) { PVP.friendSeen = true; pvpDoc(mine.id).update({ seen: now }).catch(() => {}); }
+  else if (PVP.friendTo && PVP.searching && PVP.friendSeen) { toast(`${PVP.friendTo.name} most nem ér rá`); pvpStopSearch(); }   // elutasította (törölte a kihívást)
 }
 function pvpStopSearch(cancel) {
   clearInterval(PVP.hb); clearInterval(PVP.searchClock); PVP.hb = null;
   if (cancel && PVP.searching) { const d = PVP.list.find(x => x.id === PVP.searching); if (!d || d.status === 'open') pvpDoc(PVP.searching).delete().catch(() => {}); }
-  PVP.searching = null; PVP.searchDeck = null;
+  PVP.searching = null; PVP.searchDeck = null; PVP.friendTo = null; PVP.friendSeen = false;
   $('#layer .pv-search')?.remove(); pvpPresence();
 }
 // körszámláló élő meccsben; ha a soros játékos nincs ott, a másik gép zárja le helyette a kört
@@ -1564,3 +1568,249 @@ $('#goDecks').onclick = () => { if (!Store.p) return showCreate(); renderDecks()
 $('#goQuests').onclick = () => { if (!Store.p) return showCreate(); renderQuests(); show('scr-quests'); };
 
 bootProfile();
+
+// ======================= Barátok: barátkód, jelölés, kihívás, lapcsere (csak a saját appban) =======================
+// Firestore: pub/<uid> (nyilvános kártya: név, kód, győzelmek, cserélhető lapok) · friends/<a_b> (parts, status) · trades/<id> (parts, from, to, give, want, status)
+const FR = { list: [], trades: [], pub: {}, unsubF: null, unsubT: null, seenCh: new Set(), busy: false, pubT: null };
+const FR_ABC = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+const frCode = uid => { let h = pvpHash('bou:' + uid), s = ''; for (let i = 0; i < 6; i++) { s += FR_ABC[h % 32]; h = Math.floor(h / 32) ^ pvpHash(s + uid); h >>>= 0; } return s; };
+const frOn = () => !!(window.APP_MODE && Store.db && Store.uid && Store.p);
+const frPair = (a, b) => [a, b].sort().join('_');
+const frOther = d => d.parts.find(u => u !== Store.uid);
+const frName = uid => FR.pub[uid]?.name || (FR.list.find(d => frOther(d) === uid) || {}).names?.[uid] || 'Barát';
+const tradable = id => { const c = CARD[id]; return c && !c.token && !c.variantOf && !c.foilOnly && !c.passOnly; };
+const RAR_ORDER = { l: 0, e: 1, r: 2, k: 3 };
+function frPubSync(now) {
+  if (!frOn()) return;
+  clearTimeout(FR.pubT);
+  FR.pubT = setTimeout(() => {
+    const p = Store.p, coll = {};
+    for (const [id, e] of Object.entries(p.coll || {})) if (tradable(id) && (e.n || e.f)) coll[id] = [e.n || 0, e.f || 0];
+    Store.db.doc('pub/' + Store.uid).set({ name: p.name, code: frCode(Store.uid), w: p.stats?.w || 0, coll, ver: window.APP_VERSION || '', updated: Date.now() }).catch(() => {});
+  }, now ? 50 : 2500);
+}
+function frStart() {
+  if (!frOn() || FR.unsubF) return;
+  frPubSync(true);
+  FR.unsubF = Store.db.collection('friends').where('parts', 'array-contains', Store.uid).onSnapshot(s => {
+    FR.list = s.docs.map(d => ({ id: d.id, ...d.data() }));
+    FR.list.filter(d => d.status === 'accepted').forEach(d => frFetchPub(frOther(d)));
+    frRefresh();
+  }, () => { FR.unsubF = null; });
+  FR.unsubT = Store.db.collection('trades').where('parts', 'array-contains', Store.uid).onSnapshot(s => {
+    FR.trades = s.docs.map(d => ({ id: d.id, ...d.data() }));
+    frProcessTrades(); frRefresh();
+  }, () => { FR.unsubT = null; });
+}
+async function frFetchPub(uid, force) {
+  if (!uid || (FR.pub[uid] && !force && Date.now() - FR.pub[uid]._at < 60000)) return FR.pub[uid];
+  try { const s = await Store.db.doc('pub/' + uid).get(); if (s.exists) { FR.pub[uid] = { ...s.data(), _at: Date.now() }; frRefresh(); } } catch {}
+  return FR.pub[uid];
+}
+const frIncomingCh = () => PVP.list.filter(d => d.status === 'open' && d.to === Store.uid && d.live && Date.now() - (d.seen || 0) < 20000);
+function frBadgeCount() {
+  if (!frOn()) return 0;
+  const req = FR.list.filter(d => d.status === 'pending' && d.from !== Store.uid).length;
+  const tr = FR.trades.filter(t => t.status === 'offer' && t.to === Store.uid).length;
+  return req + tr + frIncomingCh().length;
+}
+function frRefresh() {
+  const b = $('#friendBadge'); if (b) { const n = frBadgeCount(); b.hidden = !n; b.textContent = n; }
+  const t = $('#goFriends'); if (t) t.hidden = !window.APP_MODE;
+  if (!$('#scr-friends').hidden) renderFriends();
+}
+// PvP-listából: új kihívás érkezett tőle → felugró ablak
+function frOnPvpList() {
+  if (!frOn()) return;
+  for (const d of frIncomingCh()) {
+    if (FR.seenCh.has(d.id)) continue; FR.seenCh.add(d.id);
+    if (S && !$('#scr-game').hidden) { toast(`⚔️ ${d.host?.name || 'Egy barátod'} kihívott! (Barátok menü)`); continue; }
+    frChallengePopup(d);
+  }
+  frRefresh();
+}
+function frChallengePopup(d) {
+  const o = document.createElement('div'); o.className = 'overlay fr-ch';
+  o.innerHTML = `<div class="modal acct-box fr-chbox"><div class="pv-spin">⚔️</div><h3></h3><p class="live">Élő meccsre hív – ${escH(HERO[d.host?.hero]?.name || '')} paklival.</p>
+    <button class="btn primary" data-a="ok">Elfogadom</button><button class="btn" data-a="no">Most nem</button></div>`;
+  o.querySelector('h3').textContent = `${d.host?.name || 'Egy barátod'} kihívott!`;
+  o.onclick = e => { const b = e.target.closest('[data-a]'); if (!b) return; o.remove();
+    if (b.dataset.a === 'no') return pvpDoc(d.id).delete().catch(() => {});
+    frAcceptChallenge(d); };
+  $('#layer').appendChild(o);
+}
+function frAcceptChallenge(d) {
+  const cur = PVP.list.find(x => x.id === d.id);
+  if (!cur || cur.status !== 'open') return toast('Ez a kihívás már nem él');
+  if (!pvpVerOk(cur)) return toast(window.APP_NEWER?.() ? 'Frissítsd a játékot (fent: Frissítés), utána játszhattok!' : 'Neki régebbi verziója van – szólj neki, hogy frissítsen!');
+  pvpPickDeck('Melyik paklival fogadod el?', dk => pvpJoin(d.id, dk));
+}
+function frChallenge(uid) {
+  if (PVP.searching) return toast('Már vársz egy meccsre');
+  const name = frName(uid);
+  pvpPickDeck(`Melyik paklival hívod ki: ${escH(name)}?`, dk => { PVP.friendTo = { uid, name }; PVP.friendSeen = false; pvpQuick(dk); });
+}
+// ---- barátjelölés ----
+async function frAdd(code) {
+  code = String(code || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+  if (code.length !== 6) return toast('A barátkód 6 karakter');
+  if (code === frCode(Store.uid)) return toast('Ez a saját kódod 🙂');
+  try {
+    const q = await Store.db.collection('pub').where('code', '==', code).limit(1).get();
+    if (q.empty) return toast('Nincs ilyen kódú játékos');
+    const doc = q.docs[0], uid = doc.id, other = doc.data();
+    const id = frPair(Store.uid, uid), ex = FR.list.find(d => d.id === id);
+    if (ex?.status === 'accepted') return toast(`${other.name} már a barátod`);
+    if (ex?.status === 'pending' && ex.from !== Store.uid) { await frAccept(id); return; }
+    await Store.db.doc('friends/' + id).set({ parts: [Store.uid, uid], from: Store.uid, names: { [Store.uid]: Store.p.name, [uid]: other.name || '' }, status: 'pending', created: Date.now() });
+    toast(`Jelölés elküldve: ${other.name}`);
+  } catch (e) { toast('Nem sikerült – próbáld újra'); }
+}
+async function frAccept(id) { try { await Store.db.doc('friends/' + id).update({ status: 'accepted', since: Date.now(), ['names.' + Store.uid]: Store.p.name }); toast('Új barát! 🤝'); } catch { toast('Nem sikerült'); } }
+async function frRemove(id) { try { await Store.db.doc('friends/' + id).delete(); } catch { toast('Nem sikerült'); } }
+// ---- lapcsere: azonos ritkaság, Full Art csak Full Artra, naponta egy ----
+const tradeDoneToday = () => Store.p?.tradeDay === today();
+const myPendingOffer = () => FR.trades.find(t => t.from === Store.uid && t.status === 'offer');
+function collTake(p, id, foil) { const e = p.coll[id]; if (!e) return false; if (foil) { if (!(e.f > 0)) return false; e.f--; } else { if (!(e.n > 0)) return false; e.n--; } return true; }
+function collGive(p, id, foil) { const e = p.coll[id] || (p.coll[id] = { n: 0, f: 0 }); if (foil) e.f++; else e.n++; }
+const tLog = (p, id) => { p.tradeLog = (p.tradeLog || []).concat(id).slice(-40); };
+const cardLabel = (c) => `${CARD[c.id].name}${c.foil ? ' (Full Art)' : ''}`;
+async function frProcessTrades() {
+  const p = Store.p; if (!p || FR.busy) return;
+  FR.busy = true;
+  try {
+    for (const t of FR.trades) {
+      if (t.from !== Store.uid) continue;
+      const done = (p.tradeLog || []).includes(t.id);
+      if (t.status === 'accepted' && !done) {          // a barát elfogadta: megkapom, amit kértem
+        collGive(p, t.want.id, t.want.foil); tLog(p, t.id); convertDupes(p); await save();
+        toast(`🔄 Csere kész: megkaptad – ${cardLabel(t.want)}!`);
+        await Store.db.doc('trades/' + t.id).delete().catch(() => {});
+      } else if (t.status === 'accepted' && done) await Store.db.doc('trades/' + t.id).delete().catch(() => {});
+      else if (t.status === 'declined') {              // elutasította: visszakapom a félretett lapot, és ma újra próbálhatok
+        if (!done) { collGive(p, t.give.id, t.give.foil); tLog(p, t.id); if (p.tradeDay === today() && t.day === today()) p.tradeDay = ''; await save();
+          toast(`${escH(t.names?.[t.to] || 'A barátod')} most nem kérte a cserét – visszakaptad a lapod`); }
+        await Store.db.doc('trades/' + t.id).delete().catch(() => {});
+      }
+    }
+  } finally { FR.busy = false; }
+}
+async function frOffer(uid, want, give) {
+  const p = Store.p;
+  if (tradeDoneToday()) return toast('Ma már cseréltél – holnap újra!');
+  if (myPendingOffer()) return toast('Már van egy függő cserejavaslatod');
+  if (!collTake(p, give.id, give.foil)) return toast('Ez a lap már nincs meg');
+  p.tradeDay = today(); await save();                  // a felajánlott lap félre van téve, amíg a barát dönt
+  try {
+    await Store.db.collection('trades').add({ parts: [Store.uid, uid], from: Store.uid, to: uid, names: { [Store.uid]: p.name, [uid]: frName(uid) },
+      give, want, status: 'offer', day: today(), created: Date.now() });
+    toast('Cserejavaslat elküldve 🔄');
+  } catch { collGive(p, give.id, give.foil); p.tradeDay = ''; await save(); toast('Nem sikerült elküldeni'); }
+}
+async function frCancelOffer(t) {
+  let ok = false;
+  try { ok = await Store.db.runTransaction(async tx => { const r = Store.db.doc('trades/' + t.id), s = await tx.get(r); if (!s.exists || s.data().status !== 'offer') return false; tx.update(r, { status: 'cancelled' }); return true; }); } catch {}
+  if (!ok) return toast('Már nem vonható vissza – nézd meg, mi lett vele');
+  const p = Store.p; collGive(p, t.give.id, t.give.foil); tLog(p, t.id); if (p.tradeDay === today() && t.day === today()) p.tradeDay = ''; await save();
+  await Store.db.doc('trades/' + t.id).delete().catch(() => {}); toast('Cserejavaslat visszavonva');
+}
+async function frAnswer(t, yes) {
+  const p = Store.p, r = Store.db.doc('trades/' + t.id);
+  if (!yes) { await r.update({ status: 'declined' }).catch(() => {}); return; }
+  if (tradeDoneToday()) return toast('Ma már cseréltél – holnap fogadhatod el!');
+  const e = p.coll[t.want.id]; if (!e || !(t.want.foil ? e.f > 0 : e.n > 0)) return toast('Ez a lap már nincs meg neked');
+  let ok = false;
+  try { ok = await Store.db.runTransaction(async tx => { const s = await tx.get(r); if (!s.exists || s.data().status !== 'offer') return false; tx.update(r, { status: 'accepted', at: Date.now() }); return true; }); } catch {}
+  if (!ok) return toast('Ezt a cserét már visszavonták');
+  collTake(p, t.want.id, t.want.foil); collGive(p, t.give.id, t.give.foil); p.tradeDay = today(); tLog(p, t.id);
+  const conv = convertDupes(p); await save(); frPubSync();
+  toast(`🔄 Csere kész: megkaptad – ${cardLabel(t.give)}!${conv.coins ? ` (+${conv.coins} coin duplikátumért)` : ''}`);
+}
+// csere összeállítása: 1) mit kérsz tőle 2) mit adsz érte 3) megerősítés
+async function frTradeModal(uid) {
+  if (tradeDoneToday()) return toast('Ma már cseréltél – holnap újra!');
+  if (myPendingOffer()) return toast('Már van egy függő cserejavaslatod – várd meg, vagy vond vissza');
+  const pub = await frFetchPub(uid, true); if (!pub) return toast('Nem sikerült betölteni a lapjait');
+  const name = pub.name || 'Barát';
+  const theirs = [];
+  for (const [id, [n, f]] of Object.entries(pub.coll || {})) { if (!tradable(id)) continue; if (n > 0) theirs.push({ id, foil: false, k: n }); if (f > 0) theirs.push({ id, foil: true, k: f }); }
+  const sortC = a => a.sort((x, y) => (x.foil === y.foil ? 0 : x.foil ? -1 : 1) || RAR_ORDER[CARD[x.id].rarity] - RAR_ORDER[CARD[y.id].rarity] || CARD[x.id].cost - CARD[y.id].cost);
+  sortC(theirs);
+  const o = document.createElement('div'); o.className = 'overlay fr-trade';
+  const grid = (arr, pick) => arr.length ? `<div class="tr-grid">${arr.map((c, i) => `<button class="tr-c" data-${pick}="${i}">${cardHTML(c.id, { foil: c.foil })}<span class="tr-n">×${c.k}${pick === 'w' && owned(c.id) ? ` · neked ${owned(c.id)}` : ''}</span></button>`).join('')}</div>` : '';
+  const step1 = () => {
+    o.innerHTML = `<div class="modal tr-box"><h3>${escH(name)} lapjai – melyiket kéred?</h3><p class="live">Csak azonos ritkaságú lapot adhatsz érte, Full Artot Full Artért. Naponta egy csere.</p>
+      ${grid(theirs, 'w') || '<p class="q-note">Neki még nincs cserélhető lapja.</p>'}<button class="btn" data-x>Mégse</button></div>`;
+  };
+  let want = null;
+  const step2 = () => {
+    const mine = []; for (const [id, e] of Object.entries(Store.p.coll)) { if (!tradable(id) || id === want.id || CARD[id].rarity !== CARD[want.id].rarity) continue; const k = want.foil ? e.f : e.n; if (k > 0) mine.push({ id, foil: want.foil, k }); }
+    sortC(mine); o._mine = mine;
+    o.innerHTML = `<div class="modal tr-box"><h3>Mit adsz érte?</h3><div class="tr-want">${cardHTML(want.id, { foil: want.foil })}<span>${RAR[CARD[want.id].rarity]}${want.foil ? ' · Full Art' : ''}</span></div>
+      ${grid(mine, 'g') || `<p class="q-note">Nincs olyan ${want.foil ? 'Full Art ' : ''}${RAR[CARD[want.id].rarity].toLowerCase()} lapod, amit adhatnál érte.</p>`}<button class="btn" data-back1>Vissza</button></div>`;
+  };
+  const step3 = give => {
+    const inDeck = (Store.p.decks || []).some(d => d.list[give.id] && d.list[give.id] >= owned(give.id));
+    o.innerHTML = `<div class="modal tr-box"><h3>Csere – ${escH(name)}</h3>
+      <div class="tr-pair"><div>${cardHTML(give.id, { foil: give.foil })}<small>Adod</small></div><span class="tr-arrow">⇄</span><div>${cardHTML(want.id, { foil: want.foil })}<small>Kapod</small></div></div>
+      ${owned(give.id) === 1 ? '<p class="tr-warn">⚠️ Ez az utolsó példányod ebből a lapból.</p>' : ''}${inDeck ? '<p class="tr-warn">⚠️ Az egyik paklidban szerepel – csere után hiányozni fog belőle.</p>' : ''}
+      <p class="live">A lapod félreteszem, amíg ${escH(name)} dönt. Ha nemet mond, visszakapod.</p>
+      <button class="btn primary" data-send>🔄 Csere ajánlása</button><button class="btn" data-back2>Vissza</button></div>`;
+    o._give = give;
+  };
+  o.onclick = async e => {
+    const b = e.target.closest('button'); if (e.target === o || (b && b.hasAttribute('data-x'))) return o.remove(); if (!b) return;
+    if (b.dataset.w != null) { want = theirs[+b.dataset.w]; return step2(); }
+    if (b.dataset.g != null) return step3(o._mine[+b.dataset.g]);
+    if (b.hasAttribute('data-back1')) return step1();
+    if (b.hasAttribute('data-back2')) return step2();
+    if (b.hasAttribute('data-send')) { b.disabled = true; o.remove(); await frOffer(uid, { id: want.id, foil: want.foil }, o._give); }
+  };
+  step1(); $('#layer').appendChild(o);
+}
+// ---- Barátok képernyő ----
+function renderFriends() {
+  const body = $('#frBody'); if (!body) return;
+  if (!frOn()) { body.innerHTML = '<p class="q-note">A barátlista a Best of Us appban érhető el (bestofus.pages.dev).</p>'; return; }
+  const me = Store.uid, online = new Set(); for (const pr of (PVP.room?.peers() || [])) if (pr.presence?.uid) online.add(pr.presence.uid);
+  const reqIn = FR.list.filter(d => d.status === 'pending' && d.from !== me), reqOut = FR.list.filter(d => d.status === 'pending' && d.from === me);
+  const fr = FR.list.filter(d => d.status === 'accepted').sort((a, b) => online.has(frOther(b)) - online.has(frOther(a)) || frName(frOther(a)).localeCompare(frName(frOther(b)), 'hu'));
+  const chIn = frIncomingCh(), trIn = FR.trades.filter(t => t.status === 'offer' && t.to === me), trOut = FR.trades.filter(t => t.status === 'offer' && t.from === me);
+  const av = n => `<span class="fr-av">${escH((n || '?').trim().charAt(0).toUpperCase())}</span>`;
+  const mini = c => `<span class="fr-mini">${cardHTML(c.id, { foil: c.foil })}</span>`;
+  body.innerHTML = `
+    <div class="fr-code"><div><small>A te barátkódod</small><b>${frCode(me)}</b></div><button class="btn" data-copy>Másolás</button></div>
+    <form class="fr-add" autocomplete="off"><input id="frIn" maxlength="7" placeholder="Barát kódja" autocapitalize="characters" spellcheck="false"><button class="btn primary">Jelölés</button></form>
+    ${chIn.length ? `<div class="lbl">⚔️ Kihívtak</div>${chIn.map(d => `<div class="pv-row hot">${av(d.host?.name)}<div class="pv-txt"><b>${escH(d.host?.name || '')}</b><small>Élő meccsre vár · ${escH(HERO[d.host?.hero]?.name || '')}</small></div><button class="btn primary" data-chacc="${d.id}">Elfogadom</button></div>`).join('')}` : ''}
+    ${trIn.length ? `<div class="lbl">🔄 Cserejavaslatok</div>${trIn.map(t => `<div class="tr-row"><div class="tr-who"><b>${escH(t.names?.[t.from] || 'Barát')}</b> cserélne veled</div>
+      <div class="tr-pair sm"><div>${mini(t.give)}<small>Kapod</small></div><span class="tr-arrow">⇄</span><div>${mini(t.want)}<small>Adod${owned(t.want.id) ? ` (van ${owned(t.want.id)})` : ' – nincs meg!'}</small></div></div>
+      <div class="tr-btns"><button class="btn primary" data-tyes="${t.id}">Elfogadom</button><button class="btn" data-tno="${t.id}">Nem</button></div></div>`).join('')}` : ''}
+    ${reqIn.length ? `<div class="lbl">Jelöltek</div>${reqIn.map(d => `<div class="pv-row hot">${av(d.names?.[d.from])}<div class="pv-txt"><b>${escH(d.names?.[d.from] || 'Valaki')}</b><small>barátnak jelölt</small></div><div class="fr-btns"><button class="btn primary" data-acc="${d.id}">Elfogad</button><button class="btn ghost" data-rm="${d.id}">✕</button></div></div>`).join('')}` : ''}
+    <div class="lbl">Barátaid (${fr.length})</div>
+    ${fr.length ? fr.map(d => { const u = frOther(d), on = online.has(u), pub = FR.pub[u];
+      return `<div class="pv-row fr-row">${av(frName(u))}<div class="pv-txt"><b>${escH(frName(u))}</b><small><i class="odot ${on ? 'on' : ''}"></i>${on ? 'Online' : 'Offline'}${pub ? ` · ${pub.w || 0} győzelem` : ''}</small></div>
+        <div class="fr-btns"><button class="btn primary" data-ch="${u}" title="Kihívás">⚔️</button><button class="btn" data-tr="${u}" title="Csere">🔄</button><button class="btn ghost" data-rmf="${d.id}" title="Törlés">⋯</button></div></div>`; }).join('')
+      : '<p class="q-note">Még nincs barátod. Küldd el a kódodat a haveroknak, vagy írd be az övékét!</p>'}
+    ${reqOut.length ? `<div class="lbl">Elküldött jelölések</div>${reqOut.map(d => `<div class="pv-row mine">${av(d.names?.[frOther(d)])}<div class="pv-txt"><b>${escH(d.names?.[frOther(d)] || 'Barát')}</b><small>még nem fogadta el</small></div><button class="btn ghost" data-rm="${d.id}">Visszavon</button></div>`).join('')}` : ''}
+    ${trOut.length ? `<div class="lbl">Elküldött csere</div>${trOut.map(t => `<div class="tr-row mine"><div class="tr-who">Várjuk <b>${escH(t.names?.[t.to] || 'a barátod')}</b> válaszát</div>
+      <div class="tr-pair sm"><div>${mini(t.give)}<small>Adod</small></div><span class="tr-arrow">⇄</span><div>${mini(t.want)}<small>Kapod</small></div></div><div class="tr-btns"><button class="btn ghost" data-tcan="${t.id}">Visszavonom</button></div></div>`).join('')}` : ''}
+    <p class="q-note">🔄 <b>Csere:</b> azonos ritkaságú lapok, Full Art csak Full Artért, naponta egy. ${tradeDoneToday() ? '<b>Ma már cseréltél</b> – holnap újra.' : 'Mai cseréd még elérhető.'}</p>`;
+  const nm = body.querySelectorAll('.pv-txt b'); // (a nevek már escapelve)
+  body.querySelector('.fr-add').onsubmit = e => { e.preventDefault(); frAdd($('#frIn').value); $('#frIn').value = ''; };
+  body.onclick = async e => {
+    const b = e.target.closest('button'); if (!b || b.closest('form')) return;
+    const ds = b.dataset;
+    if (b.hasAttribute('data-copy')) { try { await navigator.clipboard.writeText(frCode(me)); toast('Kód kimásolva ✔'); } catch { toast(frCode(me)); } return; }
+    if (ds.acc) return frAccept(ds.acc);
+    if (ds.rm) return frRemove(ds.rm);
+    if (ds.rmf) { if (confirm('Törlöd a barátlistádról?')) frRemove(ds.rmf); return; }
+    if (ds.ch) return frChallenge(ds.ch);
+    if (ds.tr) return frTradeModal(ds.tr);
+    if (ds.chacc) { const d = PVP.list.find(x => x.id === ds.chacc); if (d) frAcceptChallenge(d); return; }
+    if (ds.tyes || ds.tno) { const t = FR.trades.find(x => x.id === (ds.tyes || ds.tno)); if (!t) return; b.disabled = true;
+      if (ds.tyes) { const c = confirm(`Elfogadod? Kapod: ${cardLabel(t.give)} · adod: ${cardLabel(t.want)}`); if (!c) { b.disabled = false; return; } }
+      return frAnswer(t, !!ds.tyes); }
+    if (ds.tcan) { const t = FR.trades.find(x => x.id === ds.tcan); if (t) frCancelOffer(t); }
+  };
+}
+$('#goFriends').onclick = () => { if (!Store.p) return showCreate(); frStart(); renderFriends(); show('scr-friends'); FR.list.filter(d => d.status === 'accepted').forEach(d => frFetchPub(frOther(d), true)); };
