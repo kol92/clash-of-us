@@ -1028,7 +1028,7 @@ h1,h2,h3{font-family:var(--display);font-weight:400;letter-spacing:.01em;text-wr
 .tv-tips{display:grid;gap:8px;text-align:left;} .tv-tips span{padding:8px 12px;border-radius:10px;background:rgba(255,255,255,.06);font-size:14px;font-weight:700;color:#e8f4f1;}
 .coach-ring{position:fixed;z-index:70;border:3px solid var(--gold);border-radius:14px;pointer-events:none;box-shadow:0 0 0 9999px rgba(0,0,0,.35),0 0 18px rgba(255,201,74,.8);animation:coachPulse 1.2s ease-in-out infinite;}
 @keyframes coachPulse{50%{box-shadow:0 0 0 9999px rgba(0,0,0,.35),0 0 30px rgba(255,201,74,1);}}
-.coach{position:fixed;z-index:71;padding:12px 14px;border-radius:14px;background:linear-gradient(160deg,#1d3550,#0f1d2e);border:2px solid var(--gold);box-shadow:0 10px 30px rgba(0,0,0,.6);}
+.coach{position:fixed;z-index:71;box-sizing:border-box;padding:12px 14px;border-radius:14px;background:linear-gradient(160deg,#1d3550,#0f1d2e);border:2px solid var(--gold);box-shadow:0 10px 30px rgba(0,0,0,.6);}
 .coach p{margin:0 0 10px;font-size:14px;line-height:1.45;color:#e8f4f1;} .coach p b{color:#ffe39a;}
 .coach div{display:flex;gap:8px;} .coach .btn{min-height:38px;font-size:14px;padding:0 14px;} .coach .btn.primary{flex:1;}
 .coach-ring[hidden],.coach[hidden]{display:none;}
