@@ -1,0 +1,266 @@
+# Clash of Us – szabályok és kártyakészlet (prototípus v18)
+
+## Fiók, gyűjtés, gazdaság (Claude-on belüli átmeneti változat)
+- Első indításkor játékosnév megadása → profil. Mentés: a Claude-fiókhoz kötve (a játék saját adattárában, játékosonként privát). Ha a felhőmentés nem elérhető, a profil az adott eszközön mentődik.
+- Megosztás barátoknak: e-mailes meghívással, szerkesztői (Editor) joggal, Claude-fiókkal. Nyilvános link nem működik ebben a változatban.
+- Kezdőgyűjtemény: mind a 9 hős, minden gyakori lap 2×, minden ritka lap 1×. Epikus és legendás lap, extra példányok és különleges (csillogó) változatok csak boosterből.
+- Később bekerülő gyakori lapokat a meglévő profilok is automatikusan megkapják 2×-es példányban (a profil „kiosztási verziója” alapján).
+- Coin meccsenként: győzelem 25, döntetlen 15, vereség 10; naponta legfeljebb 100 (helyi idő szerinti nap).
+- Booster: **Base set** (első és egyelőre egyetlen készlet), 50 coin, 3 lap. Napi 1 ingyen pack.
+- **Shiny Base set pack:** 250 coin, 3 lap; a legjobb lap biztosan különleges: 25% változat-lap (jelenleg a zöld Rehab), 15% Full Art hős, 60% Full Art lap. Szivárványos, csillogó pack-kinézet „Shiny” szalaggal.
+- **Full Art hősök:** packból szerezhetők – sima packban 2% eséllyel (a leggyengébb lap helyén), Shiny packban 15%. Nagy „Full Art hős!” bemutatóval jönnek. A gyűjtemény Full Art fülén csak a megszerzett Full Art hősök színesek; a meccsen a saját hősödre koppintva a Full Art változat látszik, ha megvan. 2 feletti példány 2 coint ér.
+- **✦ Arany hősök (2026-09-30) – a legritkább lapok:** külön ritkaság (Arany) a Legendás felett. Jelenleg: Krisz és Tomi, saját arany illusztrációval és arany kerettel. Esély: sima packban 0,5%, Shiny packban 5% (a pack első lapja helyén; Shiny packban a garantált különleges lap mellett). Bontáskor saját, hosszabb jelenet: a feltépett pack aranyba borul és megremeg, az arany lap hátulja izzik, felfordításkor sötétség, felszálló aranypor, erősödő remegés, arany villanás és lökéshullám, szétrepülő aranyérmék, majd forogva középre száll a lap „ARANY HŐS – A legritkább lap a játékban” felirattal és aranyesővel (az első 2,4 mp nem ugorható át). A meccsen az arany hős portréja és kerete arany, és a PvP-ellenfél is így látja; a pakliválasztóban és a menüben is az arany változat jelenik meg. Gyűjteményben külön „Arany hősök” sor. Arany hősből 1 marad, a második 100 coinra váltódik.
+- **Ajándék packok:** a kódban lévő ajándéklistával mindenki (a meglévő és az új profilok is) egyszer kap extra packot; a boltban „🎁 Ajándék pack bontása” gombbal bontható, nem jár le, és nem számít bele a napi ingyen packba. Eddig: 2026-09-28 – 1 Base set booster mindenkinek; 2026-09-28 – még 5 Base set booster mindenkinek. 2026-09-28 – egyszeri „Full Art ajándék pack” mindenkinek (a pack legjobb lapja garantáltan Full Art; külön ✨ gombbal bontható). 2026-09-28 – még 3 Base set booster mindenkinek. 2026-09-28 – még 10 Base set booster mindenkinek. 2026-09-28 – még egyszer 10 Base set booster mindenkinek. 2026-09-28 – 1 Shiny pack mindenkinek. 2026-09-28 – még 3 Shiny pack mindenkinek. 2026-09-28 – 500 coin mindenkinek (az ajándéklista coint is tud adni). 2026-09-30 – 10 Base set booster minden meglévő játékosnak.
+- **Full Art pack megszűnt (2026-09-28):** összevonva a Shiny packkal, mert az is garantál különleges lapot (Full Art, változat vagy Full Art hős), vagyis jobb. A még bontatlan Full Art packok automatikusan Shiny packká alakulnak.
+- **Üdvözlőcsomag:** aki újonnan regisztrál, a korábbi ajándékokat nem kapja meg visszamenőleg; helyette 10 Base set boostert és 1 Shiny packot kap (0 coin). A regisztrációja után kiosztott ajándékok már neki is járnak.
+- **Küldetések** (menü → Küldetések):
+  - Napi: 3 feladat, helyi éjfélkor cserélődnek; mindegyik 1 Base set packot ad. Lehetséges feladatok: nyerj 1 meccset, játssz le 3 meccset, 5 akció, 4 eszköz, 8 karakter, 30 sebzés az ellenfél hősének, 6 ellenséges karakter elpusztítása, 2 helyszín, 3 db 5+ energiás lap, nyerj egy adott hőssel.
+  - Heti: 1 nehezebb feladat, hétfő 0:01-kor cserélődik; 1 Shiny packot ad. Lehetséges: nyerj 7 meccset, nyerj 3 különböző hőssel, 150 sebzés az ellenfél hősének, 30 ellenséges karakter, játssz le 12 meccset.
+  - A haladás meccs végén számít, a jutalom teljesítéskor azonnal jóváíródik (a meccs végi ablakban is kiírja). A feladatok játékosonként (fiók szerint) sorsolódnak.
+- **Oktató (vezetett gyakorló meccs, 2026-09-30):**
+  - Az első „Játék indítása” gombnyomásra (0 lejátszott meccs) pakliválasztás nélkül indul; bármikor újra elindítható a menü alján az „🎓 Oktató” gombbal. Az első lépésnél „Kihagyom” gomb.
+  - Mindig ugyanaz: te Tomi vagy, az ellenfél Dávid 12 élettel, te kezdesz, nincs kezdőkéz-csere. A kezed: Pifti, Napszemüveg, Dinnyés Absolute Vodka, Vajda Peti; húzásra fixen jön Gyuri, Toma, Végh Tomi.
+  - Az ellenfél az első 4 körében mindig ugyanazt rakja: Pifti a Piftid elé → Kovács Bence → Gál Zoli (Lendülettel azonnal a hősödbe üt) → Pifti.
+  - 21 lépés, egyszerre egy sárga buborék a kiemelt elemen. Csak a kért lapot lehet kijátszani, csak a kért helyre; a Kör vége gomb is csak akkor működik, amikor kéri. Tanítja: cél és élet, energia, karakter lerakása, pihenés, eszköz (és Tomi képessége), akció célzása, üres sáv = hős sebzése, lap megnézése koppintással, halálkor ható lap (Kovács Bence), Lendület, hősképesség, Provokáció.
+  - Az 5. körtől szabad játék a normál bottal, amíg valaki nyer. A végén „Oktató újra” / „Igazi meccs” / „Menü”. Nem ad coint, küldetés-haladást és Season Pass XP-t.
+  - Kezdő kéz cseréjénél minden lap alatt „🔍 Megnézem” gomb: nagyban mutatja a lapot a leírással. Csere után az új lapok zöld „Új” jelöléssel ott maradnak, amíg a „Kezdjük!” gombra nem koppintasz (közben meg is nézheted őket).
+- **PvP (2026-09-30):** menü → PvP. Két mód:
+  - **⚡ Élő meccs (mint a Hearthstone):** „Élő meccs keresése” → pakliválasztás → keresés. Ha más is épp keres, azonnal összepárosít (a később indult keresés csatlakozik a korábbihoz), különben vár, amíg valaki más is keresni kezd. A lobbi mutatja, ki van most a PvP-ben (🟢).
+    - Kör ideje 75 mp, a Kör vége gomb alatti sávon fogy (utolsó 15 mp piros). Ha lejár, a köröd magától véget ér.
+    - Ha a soros játékos nincs ott (bezárta, elment a net), a másik gép 15 mp türelmi idő után lezárja helyette a kört; aki kétszer így elmarad, elveszíti a meccset.
+    - Kezdő kéz: 45 mp; aki addig nem dönt, megtartja a lapjait.
+    - Az ellenfél neve mellett zöld pont: online; piros: nincs itt.
+    - 💬 gyors üzenetek: „Szia!”, „Jó lépés!”, „Hoppá…”, „Ezt nézd!”, „Köszi!”, „Na ne!” (buborék a hős mellett; 2,5 mp-enként egy).
+    - A lépések azonnal átmennek (a közös adatbázis + egy élő jelzés a meccs „szobájában”); az ellenfél kijátszott lapja középre úszik, a támadások lejátszódnak.
+  - **📨 Ráérős kihívás:** nyitott kihívás, amit bárki elfogadhat, amikor ráér; nincs időkorlát, a menü jelzi, ha te jössz.
+  - Közös: véletlen, ki kezd; kezdőkéz-csere; ⚑ gomb: kilépés (a meccs megmarad, a PvP menüből folytatható) vagy feladás. Jutalom: ugyanannyi coin, küldetés-haladás és Season Pass XP, mint a bot ellen, meccsenként egyszer.
+  - **Ritka kinézet látszik az ellenfélnek is:** a Full Art hősöd (ragyogó keret a sávban és nagy nézetben), a Full Art / variáns lapjaid (asztalon, temetőben, eszközként, helyszínként) és kijátszáskor egy „✨ Full Art ✨” felirat. Meccs indulásakor rögzül, mi a tiéd; csak az ezután indult meccsekre vonatkozik.
+  - Technika: egy meccs = pvp/<id> dokumentum; aki lép, ő számol és a teljes állást beírja, a másik gép ugyanabból a véletlenmagból lejátssza (teszten 0 eltérés), vitánál a beírt állás a mérvadó. Lezárt meccsek 7 nap, ráérős kihívások 3 nap, abbahagyott keresések 1 perc után törlődnek.
+  - Feltétel: a barátoknak legalább „Contributor” (közreműködő) hozzáférés kell a játékhoz (Megosztás menü). A lapok elméletileg kiolvashatók a közös adatból (baráti körben nem gond).
+- **Season Pass** (menü → Season Pass; ingyenes, mindenkinek):
+  - 1. szezon · Nyitókör: 2026. szeptember 28. – november 2. (hétfő 0:01).
+  - XP: győzelem 60, döntetlen 40, vereség 30; teljesített napi küldetés +100, heti küldetés +300. 30 szint, szintenként 250 XP.
+  - Jutalmak szintenként: 1. 50 coin · 2. 1 pack · 3. 75 coin · 4. 1 pack · 5. Shiny pack · 6. 100 coin · 7. 2 pack · 8. 75 coin · 9. 1 pack · 10. Shiny pack · 11. 100 coin · 12. Pifti különleges változat · 13. 100 coin · 14. 1 pack · 15. Shiny pack · 16. 150 coin · 17. 2 pack · 18. TZS különleges változat · 19. 2 pack · 20. Shiny pack · 21. 150 coin · 22. 2 pack · 23. 150 coin · 24. 3 pack · 25. Tomi nyaklánca Full Art (csak innen garantált) · 26. 200 coin · 27. 3 pack · 28. Shiny pack · 29. 250 coin · 30. választott Full Art hős.
+  - Pifti (üvegekkel, garázsban) és TZS (páncélban) különleges változata csak Full Artban létezik, és csak a Season Passból szerezhető (packból soha). Ugyanaz a lap, mint az alap (a pakliban az alappal együtt legfeljebb 2 lehet belőle); a gyűjteményben az Alap nézetben is Full Artként látszik.
+  - A 30. szint után minden további 250 XP 1 ráadás packot ad.
+  - A jutalmat kézzel kell átvenni (egyenként vagy „Mind átveszem”). Ami a szezon végéig átvétlen marad, a következő szezon indulásakor automatikusan jóváíródik.
+  - A menü csempéje mutatja a szintet; ha van átvehető jutalom, a jelvény zölden pulzál. A meccs végi ablak kiírja a kapott XP-t és a szintlépést.
+- **Duplikátum-beváltás:** egy lapból (sima + Full Art együtt) legfeljebb 2 példány marad; a többi automatikusan 2 coint ér laponként (Full Art példány vagy változat-lap – pl. a zöld Rehab – beváltásakor 10 coint). Full Art hősből csak 1 marad, már a második is 10 coinra váltódik (előbb a sima példányok váltódnak be, a Full Art megmarad). Pack bontásnál a beváltott lapon „+2 coin” vagy „+10 coin” címke, a végén összesítő üzenet; a régi, 2 feletti készletek a következő megnyitáskor egyszerre váltódnak be. A beváltásból jövő coin nem számít bele a napi 100-as coin-korlátba.
+- Esély laponként: gyakori 70%, ritka 22%, epikus 6,5%, legendás 1,5%; különleges változat 4%. Minden packban legalább 1 ritka vagy jobb. Szánalomrendszer: 10 pack epikus/legendás nélkül → a következőben biztosan van.
+- **Full Art:** minden lapnak van nagyon ritka Full Art változata (esély laponként 4%). Irizáló ezüst-arany keret, a kép kitölti az egész lapot, holografikus csillogás. Ha megvan, a kezedben, a táblán, a temetőben és az előnézetben is így jelenik meg.
+- Pack bontás: a saját Base set pack-grafika jelenik meg (a boltban is). A játékos a pack tetején vízszintesen végighúzva tépi fel (a tépésvonal világít, a teteje elrepül, fény tör ki belőle); sima koppintásra magától feltépődik. Utána 3 lap hátlappal felfelé, egyenként fordíthatók. Legendás vagy Full Art lapnál külön bemutató: a hátlap megremeg és egyre erősebben izzik, forgó fénysugarak, felfordulásnál villanás és szikraeső, majd a lap nagyban középre ugrik „Legendás!” / „Full Art!” / „Legendás · Full Art!” felirattal (Full Art-nál szivárványos színekben); epikus/legendás/Full Art lap színes fénnyel, az újak „Új!” jelölést kapnak.
+- Paklik: 20 lap + egy hős (a hős a 20 lapon kívül van, a paklihoz tartozik); egy lapból legfeljebb 2, legendásból 1; csak birtokolt lapból. A két kezdőpakli nem szerkeszthető, de lemásolható (Rohamcsapat hőse: Barna, Éjszakai műszak hőse: Gabi). Hős nélküli régi saját pakli addig nem játszható, amíg nem választasz hozzá hőst.
+- Pakliépítő (Hearthstone-szerű): bal oldalt a gyűjtemény lapjai (szűrés típus szerint; koppintás = hozzáadás, hosszú nyomás = részletek), jobb oldalt a pakli listája: felül a hős (koppintásra csere), alatta a lapok költség szerint sorban, képcsíkkal, darabszámmal (koppintás = eltávolítás), alul energiagörbe, állapot és Mentés. Új paklinál először hőst kell választani.
+- Meccs indítása: nincs külön hősválasztás, a pakli választásával jön a hős is.
+- Ha a különleges változat megvan, a kézben is csillogva jelenik meg.
+- Hátlap: „Best of Us” (pack, ellenfél lapjának felfordítása, rejtett lapok).
+- Tervezett: átállás saját szerverre (valódi regisztráció, szerveroldali pack bontás), duplikátumok átváltása, további booster készletek.
+
+## Kártyaötletek táblázat
+- Google Táblázat: „Kártyaötletek” (Drive). Ami zölddel van kiszínezve, az kerül be a játékba.
+- 2026-09-28: bekerült Delfin póz, Fehér varázshó, Csattogós lepke, Akuma (mind Krisz ötlete).
+
+## Alapszabályok
+- Hős: 20 élet (Bence: 24), egy passzív képességgel. Ha elfogy az élete, vesztettél.
+- Felváltott körök. Energia: 1. körben 1, körönként +1, legfeljebb 6.
+- Kör eleje: 1 lap húzás (a kezdő játékos az első körében nem húz). Kézlimit 8. Üres paklinál egyre nagyobb sebzés.
+- **Kezdő kéz cseréje (mulligan):** a meccs elején mindkét játékos egyszer kiválaszthatja, mely kezdőlapjait keveri vissza a pakliba; helyettük ugyanannyi újat húz (a visszakevert lapok csak a húzás után kerülnek vissza). Mindkét játékos 4 lappal indul (a második játékos extra lapját kivettük: vele a kezdő csak 38%-ban nyert, nélküle 50%). A bot az 5+ költségű lapokat és a második helyszínt cseréli.
+- Tábla: játékosonként 4 hely + egy közös helyszín.
+- Lapot kijátszani csak húzással lehet; koppintásra a lap nagyban megjelenik.
+- Kör vége: a te karaktereid balról jobbra támadnak, mindegyik a szemben állót (kölcsönös sebzés), üres hely esetén a hőst. Az új karakter csak a következő körödben támad.
+- Hirtelen halál: a 20. kör végén a több élettel rendelkező nyer (a gyakorlatban a meccsek addigra kiütéssel véget érnek; a pakli elfogyása után egyre nagyobb sebzés jár).
+- Kulcsszavak:
+  - **Pajzs** – az első sebzést elnyeli.
+  - **Ital** – nem külön lapfajta, hanem címke az akciók és eszközök között (a lapon „Akció · Ital” / „Eszköz · Ital”). Jelenleg: Tubi, Akuma, Energiaital, Kancsó Long Island, Koktélarmageddon, Tálca shot, Rehab, Abszint, Dinnyés Absolute Vodka, Mangós Ciroc Vodka, Adios Motherfucker!, Vodka Kancsó. Kristóf ezek közül ad egyet (azonos eséllyel; a Rehab-változat nem külön lap).
+  - **Izom** – ha a támadása megöli a szemben állót, a maradék sebzés az ellenfél hősét éri (Pajzsnál nincs; az Akácfa +1-e nem adódik hozzá újra). Kezdetben: Ati, A Nagy Fehér Cigány, Laszy; a TomiNegan ütője is Izmot ad a karakternek.
+  - **Provokáció** – amíg él, az ellenfél karakterei mindig őt támadják. Kezdetben: Boros, Végh Tomi; a Fehér szarvas bunda is Provokációt ad. A táblán „provokál” címke jelzi.
+  - **Lendület** – már a kijátszás körében támad (eszköztől kapva: már abban a körben támad, amikor az eszközt ráteszed).
+  - **Bénult** – nem támad, és nem üt vissza.
+  - **Sunyulás** – lefordítva kerül a táblára, az ellenfél nem látja, mi az (a táblán hátlap, „?” értékekkel; ellenfél kijátszásakor csak „lerakott egy rejtett lapot” látszik). Felfordul, amikor támad, amikor megtámadják, vagy amikor ellenséges hatás éri (sebzés, Buffalo!, Csattogós lepke). A saját rejtett lapodon „rejtve” címke van. A bot sem lát bele: átlagos 2/2-es lapnak veszi.
+- Ritkaság: gyakori, ritka, epikus, legendás.
+- **Temető:** játékosonként; ide kerülnek a kijátszott akciók, az elpusztult karakterek és eszközeik (az eszköz a kijátszója temetőjébe), a lecserélt helyszínek és a tele kéz miatt elégett lapok. A hős sávjában a 🪦 gombbal nézhető meg, legfrissebb elöl, körszámmal és okkal.
+- **Magyarázatok:** bármelyik lapra koppintva a nagy lap alatt ott a lapfajta és minden kulcsszó (Pajzs, Lendület, Sunyulás, Bénult, Pihen, Eltűnik, Legendás) jelentése.
+
+## Megjelenítés
+- Az ellenfél kijátszott lapja középre úszik, hátlapról felfordul (a hős nevével), kb. 1,5 mp-ig látszik (koppintással átugorható), a célpont pirosan kijelölődik, és a lap a célpontra repül.
+- Támadás: a támadó lap felhúz, nekilendül a szemben álló karakternek (vagy az ellenfél hősének), fénylő becsapódás, majd visszarugózik. Hősre menő ütésnél a képernyő megrezzen. Zana két rohamot tesz.
+- Hatásanimációk: sebzés, kiesés, gyógyítás, erősítés, gyengítés („−2 ⚔”), pajzs, bénítás, visszaküldés a kézbe, hős sebzése/gyógyítása, új karakter „landolása”, rejtett lap felfordulása („Lelepleződött!”), Akuma halála („Akuma elvitte”).
+- Kezdőképernyő (ChatGPT-terv alapján): „Best of Us – Trading Card Game” logó felül, alatta 3 véletlen hős Full Art lapja, díszes profil-panel (név, győzelmek, coin, mai coin-mérő), arany „Játék indítása – Bot elleni csata” gomb keresztbe tett kardokkal, Boosterek csempe a pack-képpel (ingyen/ajándék pack jelzéssel), Paklik és Gyűjtemény csempe, alul Szabályok és mentési állapot.
+
+## Hősök (9; a passzív képességek még helykitöltők; mind a 9 illusztráció kész)
+| Hős | Képesség |
+|---|---|
+| Barna | A körödben elsőként kijátszott karaktered +1 támadást kap. |
+| Gabi | A köröd végén a legsérültebb karaktered 1 életet gyógyul; ha nincs ilyen, a hősöd. |
+| Krisz | A körödben az első akciókártyád 1-gyel olcsóbb. |
+| Tomi | Az eszközeid +1 életet is adnak. |
+| Dávid | Ha helyszínt játszol ki, húzol egy lapot. |
+| Bence | 24 élettel kezd. |
+| Milo | Ha egy karaktered meghal, 1 sebzést okoz az ellenfél hősének. |
+| Laci | Minden harmadik körödben húzol egy extra lapot. |
+| Sasi | Ha a köröd végén legalább két karaktered áll a táblán, 1 sebzést okozol az ellenfél hősének. |
+
+Hősképesség-ötletek a táblázatban (még nem zöldek, nincsenek beépítve): Krisz – Vad Képmások lapok +1/+1; Tomi – ha hatással megnézel egy lapot, húzol; Bence – Fehér varázshó szinergia; Milo – visszavesz egy Fehér varázshót; Laci – ha hatás miatt dobsz lapot, húzol; Barna – női karakterek 1-gyel olcsóbbak; Gabi – Zanafar szinergia.
+
+## Base set – lapok (58 + Rehab-változat + Query; plusz a Season Pass Pifti- és TZS-változata)
+**Karakterek (költség · támadás/élet)**
+- Query 0 · 1/1 – csak PP idézi meg; nem gyűjthető, nincs packban, pakliba nem tehető
+- Pifti 1 · 1/1, gyakori
+- PP 3 · 1/3, gyakori (nerf: 2→3 energia) – kijátszáskor maga mellé idéz egy 1/1-es Queryt, ha van üres hely (előbb jobbra, aztán balra, ha mellette nincs hely, bárhova)
+- TZS 1 · 3/1, ritka – amikor támad, 1 sebzést okoz a saját hősödnek is
+- Tálos 1 · 1/1, ritka – a mellette álló karaktereid +2 támadást kapnak, amíg él
+- Gyuri 2 · 2/2, gyakori – Sunyulás
+- Rebi 2 · 2/2, ritka – a vele szemben álló ellenséges karakternek 1-gyel kisebb a támadása
+- Kovács Bence 2 · 1/1, gyakori (nerf: 2/1→1/1) – amikor meghal, 2 sebzést okoz a vele szemben állónak; ha ott nincs senki, az ellenfél hősének
+- Vera 3 · 1/2, ritka (nerf: 2→3 energia) – kijátszáskor egy ellenséges karakter visszakerül az ellenfél kezébe
+- Gál Zoli 3 · 3/1, gyakori – Lendület; egy támadás után magától elpusztul
+- Vajda Peti 3 · 3/4, gyakori – nincs képesség (megbízható középső lap)
+- Milo, az örökivó 2 · 1/2, ritka (nerf: 1/3→1/2) – valahányszor Italt játszol ki, végleg +1 támadást kap
+- Laczkó Tomi 4 · 3/3, ritka – ha Italt játszol ki, húzol egy lapot (körönként egyszer, akárhány Laczkó van lent)
+- Gabi, a legyőzhetetlen 5 · 4/4, legendás – amikor először meghal, újraéled a helyén 1 élettel (az eszközei lekerülnek, a támadása visszaáll 4-re; másodszorra már végleg meghal)
+- Zsibrita 3 · 2/3, ritka – kijátszáskor egy ellenséges karaktert áttolhatsz az ellenfél egy üres sávjába (előbb a helye, aztán a célpont, végül az üres hely; ha nincs ellenséges karakter vagy üres hely, hatás nélkül kerül le)
+- Kristóf 3 · 2/2, ritka – kijátszáskor egy véletlen Ital lap kerül a kezedbe (nem kell birtokolnod, csak arra a meccsre szól; tele kéznél elég)
+- Sasi, a mesélő 3 · 2/2, ritka – kijátszáskor húzol egy lapot (2026-09-30)
+- Zana 4 · 3/3, epikus (nerf: 3→4 energia) – körönként kétszer támad
+- Végh Tomi 4 · 3/5, gyakori (nerf: 4/5→3/5) – Provokáció
+- Ati 4 · 8/4, epikus – Izom; csak akkor támad, ha nincs más karaktered a táblán
+- Toma 4 · 4/4, ritka (korábban „Sasi” karakterlap; a belső azonosító maradt, a hős Sasi változatlan)
+- Fogel 5 · 2/4, ritka* – kijátszáskor a többi karaktered +2 életet kap (tartósan)
+- Boros 5 · 3/5, ritka – **Provokáció**: amíg él, az ellenfél karakterei mindig őt támadják, bárhol áll (Nyiti is; a Laszy félrecsúszása nem). Ha több ilyen van, a bal oldali. Varázslatokra/akciókra nem vonatkozik. (Korábban: kör végén 1 élet gyógyulás – kivéve.)
+- Nyiti 5 · 5/4, legendás – mindig közvetlenül az ellenfél hősét támadja
+- A Nagy Fehér Cigány 6 · 8/1, gyakori – Izom
+- Laszy 6 · 6/3, epikus – Lendület, Izom; támadáskor 50% eséllyel saját karaktert vagy saját hőst talál el
+
+**Akciók**
+- Legénybúcsú! 4, legendás – minden saját karaktered végleg +1 támadást és +1 életet kap
+- Nem én voltam hanem a haverom! 1, gyakori – két saját karaktered helyet cserél, vagy egy karaktered átlép egy üres sávodba (előbb a karakter, aztán a másik karakter vagy üres hely)
+- Mosh Pit 3, epikus – az ellenfél összes karaktere egy sávval jobbra csúszik, a jobb szélső a bal szélre kerül
+- Ki vagy tiltva! 2, gyakori – eltünteted a pályán lévő helyszínt (a gazdája temetőjébe kerül), és húzol egy lapot; helyszín nélkül is kijátszható (akkor csak húzol)
+- Musztafa Gyros Tál 5, ritka – eldobod az összes kézben lévő lapodat (a temetőbe kerülnek), majd húzol 4 lapot
+- Cheddar sajtkrém leves 2, gyakori – húzol 2 lapot (minden kezdőpakliban benne van, 1–2 db)
+- Delfin póz 1, gyakori – a hősöd 2 sebzést kap, és húzol 2 lapot (ötlet: Krisz)
+- Dinnyés Absolute Vodka 1, gyakori – 3 sebzés egy ellenséges karakternek vagy az ellenfél hősének
+- Rehab 3, gyakori – egy saját karaktered 3 életet gyógyul és megszűnik a bénulása (a Buffalo! lekerül róla); a hősödre is kijátszható, akkor a hős gyógyul 3-at
+- Rehab (ritka változat, zöld Monster-kép, ✦ jelzés) – ugyanaz a hatás. Packban: ha Rehab jön, 1 az 5-höz eséllyel ez lesz. Saját kártyaként számít a gyűjteményben (a 2 feletti beváltás külön vonatkozik rá), de a pakliban a sima Rehabbal együtt legfeljebb 2 lehet. Kezdőgyűjteménybe nem jár.
+- Abszint 4, ritka (nerf: 3→4 energia) – 7 sebzés egy ellenséges karakternek (hősre nem)
+- Mangós Ciroc Vodka 4, ritka – a hősöd 4 életet gyógyul
+- Koktélarmageddon 5, epikus* – egy véletlen karakter +5 támadás (tartós), egy másik véletlen karakter 5 sebzés; bármelyik oldalon
+- Kancsó Long Island 6, epikus – 3-3 sebzés két különböző, általad választott célpontnak (bármely karakter, akár a sajátod is, vagy az ellenfél hőse); két lépésben célzol: előbb az első, aztán a második. Ha csak egy célpont van, egyet sebez.
+- Tálca shot 6, epikus – mindenki 2 sebzést kap: az összes karakter mindkét oldalon és mindkét hős
+- STOP 4, epikus – leszedi az ellenfél karaktereiről azokat az eszközöket, amiket ő maga tett rájuk (a te Buffalo!/Csattogós lepkéd rajtuk marad); a hatásuk is megszűnik (támadás, élet – a karakter nem hal bele, legfeljebb 1 élete marad –, Pajzs, Lendület, Akuma halála). Az eszközök a gazdájuk temetőjébe kerülnek.
+- Adios Motherfucker! 5, legendás – megbénítja az ellenfél hősét: a következő körében nem játszhat ki lapot (a karakterei támadnak, energiát kap, húz). A hős sávján „bénult” címke jelzi.
+- Sasi ütése 6, epikus – a karaktereid összesített támadása egy ellenséges karakterre vagy az ellenfél hősére
+- Tubi 3, epikus – 6 sebzés egy ellenséges karakternek vagy az ellenfél hősének, 3 sebzés a saját hősödnek
+
+**Eszközök**
+- Fehér varázshó 0, gyakori – saját karakterre: Lendület; a hősöd 1 sebzést kap (ötlet: Krisz)
+- Csattogós lepke 1, gyakori – negatív eszköz ellenséges karakterre: −2 támadás, tartósan (ötlet: Krisz)
+- Buffalo! 2, gyakori – negatív eszköz ellenséges karakterre: 2 körig bénult (nem támad, nem üt vissza)
+- Fehér szarvas bunda 2, ritka – saját karakterre: +3 élet és Provokáció (STOP leszedi mindkettőt)
+- Vodka Kancsó 3, ritka, Ital – saját karakterre: +4 támadás és Izom; a köröd végén még rendesen támad, utána a következő körödben bénult (nem támad, nem üt vissza; a Rehab feloldja)
+- TomiNegan ütője 3, legendás – saját karakterre: +3 támadás és Izom (amíg a karakter él; STOP leszedi mindkettőt)
+- Akuma 2, legendás – saját karakterre: +5 támadás, Lendület; a köröd végén (a támadások után) a karakter meghal (ötlet: Krisz)
+- Helykitöltők: Napszemüveg 1, gyakori (+1/+1) · Energiaital 1, ritka (+2 tám., Lendület) · Bőrkabát 2, ritka (+2 élet, Pajzs) · Szerencsekabala 2, gyakori (+1/+1, haláskor húz) · Tomi nyaklánca 3, legendás (+2/+3)
+
+**Helyszínek (az alap 5: 1 energia, gyakori, mindkét félre hat)**
+- Akácfa söröző – minden sebzés +1 · Morrison’s 2 – minden karakter 1 sebzést kap a gazdája körének végén · Budapest Park – minden lap 1-gyel drágább · Barhole – minden lap 1-gyel olcsóbb · Siófoki Kórház – minden karakter 1 életet gyógyul a gazdája körének végén
+- Laciverse – 3 energia, epikus – az első „saját” helyszín: csak a kijátszója karakterei kapnak +1 támadást (ha az ellenfél lecseréli vagy a Ki vagy tiltva! eltünteti, a bónusz megszűnik)
+
+*Fogel és a Koktélarmageddon ritkasága ideiglenes.
+
+## Értelmezési döntések (ha máshogy gondoltad, módosítható)
+- Vera a karakter helyének kiválasztása után céloz; ha nincs ellenséges karakter, hatás nélkül kerül le; a visszaküldött karakter eszközei elvesznek.
+- Az Abszint csak ellenséges karaktert célozhat; a Dinnyés, a Sasi ütése és a Tubi ellenséges karaktert vagy hőst. Rejtett lapot is lehet célozni (ettől felfordul). A sávot váltó karakterek (helycsere, Zsibrita, Mosh Pit) odacsúsznak az új helyükre. Ha egy rejtett lapot sebzés ér, előbb felfordul és látszik, csak utána hal meg (akkor is, ha az ütéstől azonnal meghal).
+- Laszy félrecsúszott támadására nem jön visszaütés. 
+- Rebi −1-e minden támadásra hat (visszaütés, Sasi ütése összege is); a támadás 0 alá nem mehet.
+- TZS önsebzése minden támadásakor bekövetkezik; az Akácfa söröző ezt is növeli.
+- Fogel csak a már táblán lévő többi karakterednek ad életet.
+- Ati korlátozása csak a saját támadására vonatkozik; visszaütni teljes erővel üt.
+- Koktélarmageddon: a −5 sebzésként működik (Pajzs elnyeli, Akácfa +1); a két hatás két különböző karakterre esik.
+- Sunyulás: a saját lapjaid hatásai (pl. Fogel +2 élete, Tálos aurája) nem fordítják fel a rejtett lapot; a Koktélarmageddon +5-je sem, csak az 5 sebzése.
+- Fehér varázshó és Akuma csak saját karakterre tehető („választott karakter”); a Csattogós lepke ellenségesre.
+- Csattogós lepke: a lap alap-támadását csökkenti tartósan, 0 alá nem; a Tálos-aura ezután is hozzáadódik.
+- Akuma: a „kör vége” a te köröd vége – előbb támad a karakter, utána hal meg. Ellenfél körében nem számít. Milo képessége és a Szerencsekabala ilyenkor is érvényesül.
+- Rehab: a „3 sebzést gyógyít” = 3 élet gyógyítás, legfeljebb a maximumig. Karakterre vagy saját hősre is kijátszható. Új gyakori lapként a meglévő profilok is 2 példányt kapnak.
+- Delfin póz: az Akácfa söröző a 2 önsebzést 3-ra növeli; ha tele a kezed, a húzott lap elég. Tomi hős +1 élete a Fehér varázshóra és az Akumára is jár.
+
+## Kezdőpaklik (hősönként egy, 20 lap; a 2026-09-29-i nerfek után újrahangolva; 8000 bot-meccsen hősönként kb. 44–56%)
+- **Rohamcsapat** (Barna): Pifti 2, Gyuri 2, Kovács Bence, Gál Zoli 2, TZS, Tálos, Rebi, Toma, Dinnyés Absolute Vodka 2, Napszemüveg, Cheddar sajtkrém leves 2, Nem én voltam hanem a haverom!, Csattogós lepke, Buffalo!, Fehér varázshó
+- **Éjszakai műszak** (Gabi): Végh Tomi, Vajda Peti, Gyuri 2, Pifti 2, Boros, Fogel, Vera, Rebi, Bőrkabát, Rehab, Mangós Ciroc Vodka, Abszint, Siófoki Kórház, Cheddar sajtkrém leves 2, Dinnyés Absolute Vodka, Fehér szarvas bunda, Delfin póz
+- **Vodkás est** (Krisz): Milo, az örökivó, Laczkó Tomi, Kristóf, PP 2, Gyuri 2, Vajda Peti 2, Dinnyés Absolute Vodka 2, Cheddar sajtkrém leves 2, Rehab 2, Abszint, Mangós Ciroc Vodka, Vodka Kancsó, Energiaital, Rebi
+- **Felszerelés** (Tomi): Pifti 2, Gyuri 2, Tálos, Rebi, Toma, Napszemüveg 2, Szerencsekabala 2, Bőrkabát, Vodka Kancsó, Buffalo!, Csattogós lepke, Cheddar sajtkrém leves, Fehér varázshó, Fehér szarvas bunda, Delfin póz, Vajda Peti
+- **Kocsmatúra** (Dávid): Pifti, Gyuri 2, Vajda Peti 2, Végh Tomi 2, Akácfa söröző, Barhole, Siófoki Kórház, Ki vagy tiltva! 2, Dinnyés Absolute Vodka 2, Abszint, Boros, Rebi, Toma, Zsibrita, Kristóf
+- **Mindent bele** (Bence): TZS, Gál Zoli 2, Gyuri 2, Kovács Bence 2, Vajda Peti 2, Toma, Delfin póz, Dinnyés Absolute Vodka 2, Musztafa Gyros Tál, Abszint, Buffalo!, Végh Tomi, Cheddar sajtkrém leves, Napszemüveg, Pifti
+- **Kamikaze** (Milo): Kovács Bence 2, Pifti 2, Gál Zoli 2, TZS, PP 2, Gyuri 2, Tálos, Rebi, Szerencsekabala 2, Morrison’s 2, Dinnyés Absolute Vodka 2, Fehér varázshó, Cheddar sajtkrém leves
+- **Hosszú éjszaka** (Laci): Végh Tomi, Vajda Peti 2, Gyuri 2, Fogel, Vera, Rebi, Abszint, Mangós Ciroc Vodka, Rehab, Dinnyés Absolute Vodka, Buffalo!, Csattogós lepke, Ki vagy tiltva!, Cheddar sajtkrém leves, Pifti 2, Budapest Park, Delfin póz
+- **A banda** (Sasi): PP 2, Pifti 2, Gyuri 2, Kovács Bence 2, Vajda Peti 2, Tálos, Rebi, Zsibrita, Fogel, Napszemüveg 2, Siófoki Kórház, Dinnyés Absolute Vodka 2, Végh Tomi
+- Csak gyakori (max 2) és ritka (max 1) lapból állnak, így mindenki ki tudja játszani őket az ingyenes kezdőgyűjteménnyel. Minden meglévő játékos megkapja az összes ritka lapból 1 példányt, ha még nincs neki (az újak eleve megkapják).
+- A bot a véletlenül választott hőse saját kezdőpaklijával játszik.
+
+## Nerfek (2026-09-29)
+- Módszer: 5000 szimulált bot-meccs véletlen 20 lapos paklikkal (bármely lap bármely hőssel); laponként mérve, hány %-ban nyert az a pakli, amiben benne volt. Átlag 50%, ±1,5% a mérési zaj. A bot a helyzeti lapokat (helyszínek, Mosh Pit, Ki vagy tiltva!) valószínűleg alulhasználja, ezért azok számai lefelé torzítanak.
+- Legerősebbek voltak: PP 56,2%, Zana 56,0%, Vera 55,5%, Kovács Bence 54,9%, Milo az örökivó 54,7%, Vajda Peti 54,4%, Végh Tomi 53,4% (kezdőpaklikban ennél jóval erősebb), Abszint 52,8%.
+- Változtatások: Abszint 3→4 energia · Zana 3→4 energia · PP 2→3 energia · Vera 2→3 energia · Kovács Bence 2/1→1/1 · Milo, az örökivó 1/3→1/2 · Végh Tomi 4/5→3/5. Vajda Peti (3 energia 3/4) maradt, de figyelni kell.
+- Leggyengébbek (esetleges későbbi buff): Barhole 44,8%, Laszy 45,2%, Koktélarmageddon 45,2%, Akácfa söröző 45,5%, Ki vagy tiltva! 45,5%, Mosh Pit 45,7%, Musztafa Gyros Tál 45,7%, Delfin póz 45,8%.
+- A kezdőpaklik a nerfek után újra hangolva (lásd lent). A kezdő játékos továbbra is kb. 57%-ban nyer – ez nem lapkérdés.
+
+## Lapötletek a hiányokra (2026-09-29 – név és grafika még nincs, Tomi találja ki)
+1. ✅ Vajda Peti – Karakter 3 · 3/4, gyakori – nincs képesség
+2. ✅ Végh Tomi – Karakter 4 · 4/5, gyakori (eredetileg ritkának terveztük) – Provokáció
+3. ✅ Nem én voltam hanem a haverom! – Akció 1, gyakori – két saját karaktered helyet cserél, vagy egy saját karaktered átlép egy üres sávba
+4. ✅ Zsibrita – Karakter 3 · 2/3, ritka – kijátszáskor egy ellenséges karaktert áttolhatsz egy üres sávba
+5. ✅ Mosh Pit – Akció 3, epikus – az ellenfél összes karaktere egy sávval jobbra csúszik (a jobb szélső a bal szélre kerül)
+6. ✅ Milo, az örökivó – Karakter 2 · 1/3, ritka – valahányszor Italt játszol ki, végleg +1 támadást kap
+7. ✅ Laczkó Tomi – Karakter 4 · 3/3, ritka (eredetileg epikus) – ha Italt játszol ki, húzol egy lapot (körönként egyszer)
+8. ✅ Kovács Bence – Karakter 2 · 2/1, gyakori – amikor meghal, 2 sebzést okoz a vele szemben állónak (ha ott senki, az ellenfél hősének)
+9. ✅ Gabi, a legyőzhetetlen – Karakter 5 · 4/4, legendás – amikor először meghal, újraéled a mezőn 1 élettel (eredetileg: visszakerül a kézbe)
+10. ✅ Laciverse – Helyszín 3, epikus – csak a gazdájának: a karaktereid +1 támadást kapnak
+11. ✅ Ki vagy tiltva! – Akció 2, gyakori – eltünteti a pályán lévő helyszínt, és húzol egy lapot
+12. ✅ Fehér szarvas bunda – Eszköz 2, ritka – +3 élet és Provokáció
+
+## Kivett lapok
+- Bag (5, epikus – a karaktereid +2 támadás, −1 élet): kivéve 2026-09-28.
+- Korsó (0 · 0/1, gyakori – a következő köröd végén magától elpusztul): egyelőre kivéve.
+
+## UI-grafika (ChatGPT UI-csomag, 2026-09-28)
+- Pályaháttér (sötétkék kő, díszes keret) a játéktéren.
+- Lapkeretek: kék – karakter, borostyán – eszköz. Ebből átszínezve (ideiglenesen): rózsaszín – akció, zöld – helyszín, arany – hős. A saját keretük még hiányzik.
+- Normál lapokon a kép a keret ablakában van, a név alul a panelen. Nagy nézetben a név a kép alján, a hatásszöveg a panelen.
+- A különleges (csillogó) változat szándékosan keret nélküli, teljes képes marad.
+- Költség: kék hatszög-kristály (olcsóbbnál zöld); élet: piros pajzs; támadás: arany kristály keresztbe tett kardokkal.
+- Pályaháttér középen sötétítve (a külső keret hangsúlyos marad). Állapotcímkék (pihen, rejtve, bénult, eltűnik) keskeny sávban a lap tetején; a pihenő lap képe enyhén sötétebb.
+- Hősök a meccsen: az ellenfél sávja a képernyő tetején, portréja a jobb felső sarokban; a te sávod a képernyő alján (a kéz alatt), portréd a bal alsó sarokban. A portré a sáv sarkában van, semmi nem takarja, a belső széle a sáv hátterébe halványul. Az aktív játékos portréja türkiz fényt kap, sebzéskor felvillan és megrázkódik. A portréra koppintva jön fel a hős képessége.
+- Aktív játékos: türkiz fény a hős sávján; piros jelölés csak sebzésnél/célzásnál.
+- Energia: kis kék kristályok (elköltött: szürke, még nem elérhető: halvány).
+- Üres helyszín: vékony „Nincs helyszín” sáv; helyszín kijátszásakor nagy panel.
+- Pakli-kupac: mindkét hős sávjának szélén egy kis hátlap-kupac mutatja, hány lap van még a pakliban (3 alatt piros, üresen szaggatott piros keret); koppintásra kiírja.
+- Húzás-animáció: az új lap hátlappal kirepül a pakli-kupacból, a helyére ér a kézben, és ott felfordul; a kezdő kéz is így érkezik egymás után. Az ellenfél húzásánál egy hátlap ugrik ki a kupacából.
+- Pajzs: a karakteren arany, áttetsző, csillogó buborék (mint a Hearthstone Divine Shieldje); amikor elnyel egy sebzést, felvillan és szétpattan.
+- Lapfajta-címke a kis lapokon: „Akció”, „Eszköz”, „Helyszín” színes szalag (a karakternek nincs).
+- Kéz: legyező elrendezés (mint a Hearthstone-ban). Nyomva tartásra a lap kinagyítva kiemelkedik; koppintásra nagy előnézet, ahonnan a lapot közvetlenül fel lehet húzni a táblára.
+- Hősportré: ezüst-kék kör keret; az éppen soron lévő játékosé a világító változat.
+- A Siófoki Kórház panorámát nem használjuk.
+
+## Technikai megjegyzések
+- Minden illusztrációból két méret van: 360 px széles a kis lapokhoz (kéz, tábla, gyűjtemény, temető) és 800 px a nagy nézethez. A keretekből is van kicsi (300 px). Új képnél mindkettőt el kell készíteni.
+- Induláskor a kis képek és keretek előre letöltődnek és dekódolódnak, a nagyok utána, a háttérben.
+- A játéktér részei (hős sávok, sorok, kéz, helyszín) csak akkor rajzolódnak újra, ha tényleg változott a tartalmuk.
+
+## Illusztrációk – stílus
+- **Hősök:** neonhátteres portré, álló 2:3, az arc a felső harmadban. Mind a 9 kész.
+- **Karakterek és egyéb lapok:** képregényes jelenetkép, álló 3:4; a kivágás lapként állítható; a különleges változaton a teljes jelenet látszik.
+  - Kész karakterek: Pifti, Tálos, Gyuri, Rebi, Gál Zoli, TZS, Fogel, Ati, Vera, Nyiti, Laszy, Boros, Toma, Zana, Kristóf, Vajda Peti, Végh Tomi, Kovács Bence, Zsibrita, Milo az örökivó, Laczkó Tomi, Gabi a legyőzhetetlen, Sasi a mesélő.
+  - Kész akciók: Abszint, Koktélarmageddon, Dinnyés Absolute Vodka, Mangós Ciroc Vodka, Delfin póz, Rehab, Sasi ütése, Tubi, Cheddar sajtkrém leves, Musztafa Gyros Tál, Ki vagy tiltva!, Legénybúcsú!, Nem én voltam hanem a haverom!, Mosh Pit.
+  - Kész eszközök: Buffalo!, Bőrkabát, Akuma, Szerencsekabala, Csattogós lepke, Fehér varázshó, Napszemüveg, Energiaital, Tomi nyaklánca, Vodka Kancsó, Fehér szarvas bunda.
+  - Kész helyszínek: Siófoki Kórház, Morrison’s 2, Budapest Park, Akácfa söröző, Barhole, Laciverse – mind a 6 kész (a táblán a helyszín-sávban kis képként is látszik).
+  - Hátlap kész („Best of Us”).
+  - Hátra van, fontossági sorrendben:
+    1. UI: saját rózsaszín akció-, zöld helyszín- és arany hőskeret (most a kékből átszínezett helykitöltők).
+  - Képformátum: álló 3:4. A normál lapon a keret ablaka nagyjából négyzet alakú részt mutat a kép közepéből (a teteje-alja levágódik), a Full Art a teljes képet.
+
+## Saját appá alakítás (terv, 2026-09-30)
+- Cél: telepíthető webapp (PWA) iPhone-ra és Androidra, 0 Ft-os szerverrel; App Store / Play Store nincs.
+- Kód: privát GitHub-tároló (clash-of-us) → Cloudflare Pages automatikusan kiteszi minden feltöltés után (~1 perc). Külön teszt link az éles előtt.
+- Szerver: Firebase ingyenes csomag – Firestore (profilok, PvP-meccsek), Authentication (Google + e-mail/jelszó), Realtime Database (online jelenlét, élő PvP jelzések). A képek a Cloudflare-en, nem Firebase Storage-ban (az fizetős).
+- Sorrend: 1) GitHub-tároló (Tomi) 2) Firebase-projekt + webes config (Tomi) 3) átírás Firebase-re + PWA (Claude) 4) Cloudflare Pages bekötése (Tomi) 5) engedélyezett domain a Firebase-ben (Tomi) 6) közös teszt 7) profil-átköltöztetés kóddal a régi (Claude-os) verzióból 8) link a haveroknak.
+- Frissítések: Claude feltölti a GitHubra → Cloudflare kiteszi → a játék „Új verzió” jelzést ad; „Újdonságok” ablak; PvP csak azonos verziók között.
