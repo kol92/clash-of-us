@@ -1497,7 +1497,7 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%;}
 <script src="vendor/firebase-auth-compat.js"></script>
 <script src="vendor/firebase-firestore-compat.js"></script>
 <script src="vendor/firebase-database-compat.js"></script>
-<script>window.APP_VERSION = "2026.10.01-0007";</script>
+<script>window.APP_VERSION = "2026.10.01-0021";</script>
 <script>// ===== Best of Us – saját szerver (Firebase) =====
 // A játék eredetileg a Claude-os tárolót használta (window.claude.use('db' | 'user' | 'room')).
 // Ez a fájl ugyanazt a felületet adja Firebase-ből, így a játék kódja szinte változatlan maradhat:
@@ -5139,7 +5139,7 @@ function renderFriends() {
     ${reqOut.length ? `<div class="lbl">Elküldött jelölések</div>${reqOut.map(d => `<div class="pv-row mine">${av(d.names?.[frOther(d)])}<div class="pv-txt"><b>${escH(d.names?.[frOther(d)] || 'Barát')}</b><small>még nem fogadta el</small></div><button class="btn ghost" data-rm="${d.id}">Visszavon</button></div>`).join('')}` : ''}
     ${trOut.length ? `<div class="lbl">Elküldött csere</div>${trOut.map(t => `<div class="tr-row mine"><div class="tr-who">Várjuk <b>${escH(t.names?.[t.to] || 'a barátod')}</b> válaszát</div>
       <div class="tr-pair sm"><div>${mini(t.give)}<small>Adod</small></div><span class="tr-arrow">⇄</span><div>${mini(t.want)}<small>Kapod</small></div></div><div class="tr-btns"><button class="btn ghost" data-tcan="${t.id}">Visszavonom</button></div></div>`).join('')}` : ''}
-    ${(Store.p.tradeHist || []).length ? `<div class="lbl">Csere-előzmények</div><div class="tr-hist">${Store.p.tradeHist.slice(0, FR.histAll ? 40 : 5).map(h => `<div class="th-row"><span class="fr-mini">${cardHTML(h.gave.id, { foil: h.gave.foil })}</span><span class="th-mid"><b>${escH(h.with)}</b><small>${new Date(h.at).toLocaleDateString('hu-HU', { month: 'short', day: 'numeric' })}</small><span class="tr-arrow">⇄</span><small>adtad · kaptad</small></span><span class="fr-mini">${cardHTML(h.got.id, { foil: h.got.foil })}</span></div>`).join('')}</div>${Store.p.tradeHist.length > 5 && !FR.histAll ? '<button class="btn ghost" data-histall>Összes előzmény</button>' : ''}` : ''}
+    <div class="lbl">Csere-előzmények</div>${(Store.p.tradeHist || []).length ? `<div class="tr-hist">${Store.p.tradeHist.slice(0, FR.histAll ? 40 : 5).map(h => `<div class="th-row"><span class="fr-mini">${cardHTML(h.gave.id, { foil: h.gave.foil })}</span><span class="th-mid"><b>${escH(h.with)}</b><small>${new Date(h.at).toLocaleDateString('hu-HU', { month: 'short', day: 'numeric' })}</small><span class="tr-arrow">⇄</span><small>adtad · kaptad</small></span><span class="fr-mini">${cardHTML(h.got.id, { foil: h.got.foil })}</span></div>`).join('')}</div>${Store.p.tradeHist.length > 5 && !FR.histAll ? '<button class="btn ghost" data-histall>Összes előzmény</button>' : ''}` : '<p class="q-note">Még nincs rögzített cseréd – a következő cserédtől itt látod, kivel mit mire cseréltél.</p>'}
     <p class="q-note">🔄 <b>Csere:</b> azonos ritkaságú lapok, Full Art csak Full Artért, naponta egy. ${tradeDoneToday() ? '<b>Ma már cseréltél</b> – holnap újra.' : 'Mai cseréd még elérhető.'}</p>`;
   const nm = body.querySelectorAll('.pv-txt b'); // (a nevek már escapelve)
   body.querySelector('.fr-add').onsubmit = e => { e.preventDefault(); frAdd($('#frIn').value); $('#frIn').value = ''; };
