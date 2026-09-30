@@ -108,6 +108,8 @@ const ART = {
   // Arany hősök (a legritkább lapok)
   g_krisz: { src:'art/g_krisz.webp', av:'60% 22%', pos:'60% 24%', port:'62% 20%' },
   g_tomi:  { src:'art/g_tomi.webp',  av:'56% 14%', pos:'56% 16%', port:'57% 12%' },
+  g_barna: { src:'art/g_barna.webp', av:'64% 20%', pos:'62% 20%', port:'64% 16%' },
+  g_laci:  { src:'art/g_laci.webp',  av:'46% 20%', pos:'46% 20%', port:'46% 16%' },
   c_sasi:{ src:'art/toma.webp', pos:'50% 14%' },   // a karakterlap neve mostantól Toma (a hős Sasi marad)
   c_pifti:{ src:'art/pifti.webp', pos:'66% 16%' },
   c_gyuri:{ src:'art/gyuri.webp', pos:'60% 17%' },
