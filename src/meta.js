@@ -155,11 +155,11 @@ function migrate(p) {
   if ((p.gv || 1) < GRANT_V) p._dirty = true;
   const g = applyGifts(p); if (g) { p._dirty = true; Store.giftMsg = g.msg; }
   if (p.faPacks > 0) { p.shinyPacks = (p.shinyPacks || 0) + p.faPacks; Store.faMsg = `A ${p.faPacks} Full Art packod Shiny packká alakult`; p.faPacks = 0; p._dirty = true; }
-  const dc = convertDupes(p);
+  const dc = { coins: 0 };   // lapokat már nem váltunk be automatikusan (csere miatt) – csak kézzel, a Gyűjteményben
   // Full Art hősből elég 1: a többi darabonként 10 coint ér
   for (const h of Object.keys(p.heroGold || {})) if (p.heroGold[h] > 1) { const x = p.heroGold[h] - 1; p.heroGold[h] = 1; p.coins += x * ECON.goldDupe; dc.coins += x * ECON.goldDupe; }
   for (const h of Object.keys(p.heroFa || {})) if (p.heroFa[h] > 1) { const x = p.heroFa[h] - 1; p.heroFa[h] = 1; p.coins += x * DUPE_COIN_RARE; dc.coins += x * DUPE_COIN_RARE; }
-  if (dc.coins) { p._dirty = true; Store.dupeMsg = `A fölösleges lapjaid automatikusan beváltódtak: +${dc.coins} coin`; }
+  if (dc.coins) { p._dirty = true; Store.dupeMsg = `A fölösleges hős-példányaid beváltódtak: +${dc.coins} coin`; }
   p.gv = GRANT_V;
   // kivett lapok eltávolítása a paklikból
   for (const d of p.decks) for (const id of Object.keys(d.list)) if (!CARD[id] || CARD[id].token) delete d.list[id];
@@ -345,17 +345,13 @@ async function buyPack(setId, free) {
   p.packs++;
   const shinyMode = free === 'shiny' || free === 'shinyGift';
   const cards = openPackRoll(setId, free === 'fa', shinyMode);
-  const conv = convertDupes(p);
-  // a packban melyik lap lett beváltva (egy példány egyszer): sima példány előbb, mint a Full Art
-  for (const c of [...cards].sort((a, b) => a.foil - b.foil)) {
-    const o = conv.cards[c.id]; if (!o) continue;
-    if (c.foil && o.f > 0) { o.f--; c.dupe = DUPE_COIN_RARE; } else if (!c.foil && o.n > 0) { o.n--; c.dupe = dupeVal(c.id, false); }
-  }
+  const conv = { coins: 0 };   // a lapok duplikátumai megmaradnak (cserélhetők, vagy a Gyűjteményben kézzel beválthatók)
+  for (const c of cards) if (!c.hero && !c.isNew) c.have = owned(c.id);
   for (const c of cards) if (c.gold && p.heroGold[c.hero] > 1) { p.heroGold[c.hero]--; p.coins += ECON.goldDupe; conv.coins += ECON.goldDupe; c.dupe = ECON.goldDupe; }
   for (const c of cards) if (c.hero && !c.gold && p.heroFa[c.hero] > 1) { p.heroFa[c.hero]--; p.coins += DUPE_COIN_RARE; conv.coins += DUPE_COIN_RARE; c.dupe = DUPE_COIN_RARE; }
   await save(); renderProfileBar(); renderShop();
   await packOpening(setId, cards, { shiny: shinyMode });
-  if (conv.coins) toast(`Duplikátumok beváltva: +${conv.coins} coin`);
+  if (conv.coins) toast(`Fölösleges hős-példány beváltva: +${conv.coins} coin`);
 }
 
 // ---- bolt képernyő ----
@@ -456,7 +452,7 @@ async function packOpening(setId, cards, po = {}) {
   packEl.remove();
   const row = document.createElement('div'); row.className = 'op-cards';
   row.innerHTML = cards.map((c, i) => `<button class="flip${c.gold ? ' goldback' : ''}" data-i="${i}" style="--rc:${RAR_COLOR[pcRar(c)]}" aria-label="Lap felfordítása">
-      <span class="flip-in"><span class="face back"></span><span class="face front">${pcHTML(c, { big: true, foil: c.foil })}${c.dupe ? `<em class="newtag dupetag">+${c.dupe} coin</em>` : c.isNew ? '<em class="newtag">Új!</em>' : ''}</span></span></button>`).join('');
+      <span class="flip-in"><span class="face back"></span><span class="face front">${pcHTML(c, { big: true, foil: c.foil })}${c.dupe ? `<em class="newtag dupetag">+${c.dupe} coin</em>` : c.have > 2 ? `<em class="newtag dupetag">×${c.have}</em>` : c.isNew ? '<em class="newtag">Új!</em>' : ''}</span></span></button>`).join('');
   o.querySelector('.op-stage').appendChild(row);
   const hint = document.createElement('div'); hint.className = 'op-hint'; hint.textContent = 'Fordítsd fel a lapokat'; o.querySelector('.op-stage').appendChild(hint);
   row.querySelectorAll('.flip').forEach((f, i) => f.animate([{ transform: 'translateY(60px) scale(.6)', opacity: 0 }, { transform: 'none', opacity: 1 }],
@@ -1673,6 +1669,7 @@ const tradeDoneToday = () => Store.p?.tradeDay === today();
 const myPendingOffer = () => FR.trades.find(t => t.from === Store.uid && t.status === 'offer');
 function collTake(p, id, foil) { const e = p.coll[id]; if (!e) return false; if (foil) { if (!(e.f > 0)) return false; e.f--; } else { if (!(e.n > 0)) return false; e.n--; } return true; }
 function collGive(p, id, foil) { const e = p.coll[id] || (p.coll[id] = { n: 0, f: 0 }); if (foil) e.f++; else e.n++; }
+const tHist = (p, withName, gave, got) => { p.tradeHist = [{ at: Date.now(), with: withName || 'Barát', gave, got }].concat(p.tradeHist || []).slice(0, 40); };
 const tLog = (p, id) => { p.tradeLog = (p.tradeLog || []).concat(id).slice(-40); };
 const cardLabel = (c) => `${CARD[c.id].name}${c.foil ? ' (Full Art)' : ''}`;
 async function frProcessTrades() {
@@ -1683,7 +1680,7 @@ async function frProcessTrades() {
       if (t.from !== Store.uid) continue;
       const done = (p.tradeLog || []).includes(t.id);
       if (t.status === 'accepted' && !done) {          // a barát elfogadta: megkapom, amit kértem
-        collGive(p, t.want.id, t.want.foil); tLog(p, t.id); convertDupes(p); await save();
+        collGive(p, t.want.id, t.want.foil); tLog(p, t.id); tHist(p, t.names?.[t.to], t.give, t.want); await save();
         toast(`🔄 Csere kész: megkaptad – ${cardLabel(t.want)}!`);
         await Store.db.doc('trades/' + t.id).delete().catch(() => {});
       } else if (t.status === 'accepted' && done) await Store.db.doc('trades/' + t.id).delete().catch(() => {});
@@ -1722,9 +1719,9 @@ async function frAnswer(t, yes) {
   let ok = false;
   try { ok = await Store.db.runTransaction(async tx => { const s = await tx.get(r); if (!s.exists || s.data().status !== 'offer') return false; tx.update(r, { status: 'accepted', at: Date.now() }); return true; }); } catch {}
   if (!ok) return toast('Ezt a cserét már visszavonták');
-  collTake(p, t.want.id, t.want.foil); collGive(p, t.give.id, t.give.foil); p.tradeDay = today(); tLog(p, t.id);
-  const conv = convertDupes(p); await save(); frPubSync();
-  toast(`🔄 Csere kész: megkaptad – ${cardLabel(t.give)}!${conv.coins ? ` (+${conv.coins} coin duplikátumért)` : ''}`);
+  collTake(p, t.want.id, t.want.foil); collGive(p, t.give.id, t.give.foil); p.tradeDay = today(); tLog(p, t.id); tHist(p, t.names?.[t.from], t.want, t.give);
+  await save(); frPubSync();
+  toast(`🔄 Csere kész: megkaptad – ${cardLabel(t.give)}!`);
 }
 // csere összeállítása: 1) mit kérsz tőle 2) mit adsz érte 3) megerősítés
 async function frTradeModal(uid) {
@@ -1794,6 +1791,7 @@ function renderFriends() {
     ${reqOut.length ? `<div class="lbl">Elküldött jelölések</div>${reqOut.map(d => `<div class="pv-row mine">${av(d.names?.[frOther(d)])}<div class="pv-txt"><b>${escH(d.names?.[frOther(d)] || 'Barát')}</b><small>még nem fogadta el</small></div><button class="btn ghost" data-rm="${d.id}">Visszavon</button></div>`).join('')}` : ''}
     ${trOut.length ? `<div class="lbl">Elküldött csere</div>${trOut.map(t => `<div class="tr-row mine"><div class="tr-who">Várjuk <b>${escH(t.names?.[t.to] || 'a barátod')}</b> válaszát</div>
       <div class="tr-pair sm"><div>${mini(t.give)}<small>Adod</small></div><span class="tr-arrow">⇄</span><div>${mini(t.want)}<small>Kapod</small></div></div><div class="tr-btns"><button class="btn ghost" data-tcan="${t.id}">Visszavonom</button></div></div>`).join('')}` : ''}
+    ${(Store.p.tradeHist || []).length ? `<div class="lbl">Csere-előzmények</div><div class="tr-hist">${Store.p.tradeHist.slice(0, FR.histAll ? 40 : 5).map(h => `<div class="th-row"><span class="fr-mini">${cardHTML(h.gave.id, { foil: h.gave.foil })}</span><span class="th-mid"><b>${escH(h.with)}</b><small>${new Date(h.at).toLocaleDateString('hu-HU', { month: 'short', day: 'numeric' })}</small><span class="tr-arrow">⇄</span><small>adtad · kaptad</small></span><span class="fr-mini">${cardHTML(h.got.id, { foil: h.got.foil })}</span></div>`).join('')}</div>${Store.p.tradeHist.length > 5 && !FR.histAll ? '<button class="btn ghost" data-histall>Összes előzmény</button>' : ''}` : ''}
     <p class="q-note">🔄 <b>Csere:</b> azonos ritkaságú lapok, Full Art csak Full Artért, naponta egy. ${tradeDoneToday() ? '<b>Ma már cseréltél</b> – holnap újra.' : 'Mai cseréd még elérhető.'}</p>`;
   const nm = body.querySelectorAll('.pv-txt b'); // (a nevek már escapelve)
   body.querySelector('.fr-add').onsubmit = e => { e.preventDefault(); frAdd($('#frIn').value); $('#frIn').value = ''; };
@@ -1811,6 +1809,30 @@ function renderFriends() {
       if (ds.tyes) { const c = confirm(`Elfogadod? Kapod: ${cardLabel(t.give)} · adod: ${cardLabel(t.want)}`); if (!c) { b.disabled = false; return; } }
       return frAnswer(t, !!ds.tyes); }
     if (ds.tcan) { const t = FR.trades.find(x => x.id === ds.tcan); if (t) frCancelOffer(t); }
+    if (b.hasAttribute('data-histall')) { FR.histAll = true; renderFriends(); }
   };
 }
 $('#goFriends').onclick = () => { if (!Store.p) return showCreate(); frStart(); renderFriends(); show('scr-friends'); FR.list.filter(d => d.status === 'accepted').forEach(d => frFetchPub(frOther(d), true)); };
+
+// ---- duplikátumok kézi beváltása (Gyűjtemény) ----
+function dupeList(p) {   // ami 2 példány fölött van (előbb a sima példányok mennek, a Full Art marad)
+  const out = []; let coins = 0;
+  for (const [id, e] of Object.entries(p.coll || {})) {
+    if (!CARD[id]) continue;
+    let extra = e.n + e.f - DUPE_KEEP; if (extra <= 0) continue;
+    const n = Math.min(extra, e.n), f = Math.min(extra - n, e.f);
+    const c = n * dupeVal(id, false) + f * dupeVal(id, true); coins += c; out.push({ id, n, f, coins: c });
+  }
+  out.sort((a, b) => b.coins - a.coins || RAR_ORDER[CARD[a.id].rarity] - RAR_ORDER[CARD[b.id].rarity]);
+  return { out, coins };
+}
+function dupeModal() {
+  const d = dupeList(Store.p); if (!d.out.length) return toast('Nincs 2 példány fölötti lapod');
+  const o = document.createElement('div'); o.className = 'overlay';
+  o.innerHTML = `<div class="modal tr-box"><h3>♻️ Duplikátumok beváltása</h3><p class="live">Minden lapból 2 példány megmarad (a Full Art-ot megtartom), a többi coinra vált. Előtte érdemes megnézni, nem cserélnéd-e el valamelyiket egy barátoddal!</p>
+    <div class="tr-grid">${d.out.map(x => `<div class="tr-c">${cardHTML(x.id)}<span class="tr-n">−${x.n + x.f}${x.f ? ` (${x.f} FA)` : ''} · +${x.coins}</span></div>`).join('')}</div>
+    <button class="btn primary" data-go>Beváltom: +${d.coins} coin</button><button class="btn" data-x>Mégse</button></div>`;
+  o.onclick = async e => { const b = e.target.closest('button'); if (e.target === o || (b && b.hasAttribute('data-x'))) return o.remove(); if (!b) return;
+    if (b.hasAttribute('data-go')) { b.disabled = true; const r = convertDupes(Store.p); await save(); frPubSync(); o.remove(); renderProfileBar(); renderColl(); toast(`♻️ Beváltva: +${r.coins} coin`); } };
+  $('#layer').appendChild(o);
+}
