@@ -20,14 +20,13 @@ os.makedirs(os.path.join(DIST, 'vendor'))
 for n in ['app', 'auth', 'firestore', 'database']:
     shutil.copy(f'{FB}/firebase-{n}-compat.js', os.path.join(DIST, 'vendor', f'firebase-{n}-compat.js'))
 os.makedirs(os.path.join(DIST, 'icons'))
-back = Image.open(os.path.join(SRC, 'art', 'back.webp')).convert('RGB')
-emb = back.crop((40, 130, 560, 650))
-for sz in (192, 512, 180):
-    emb.resize((sz, sz), Image.LANCZOS).save(os.path.join(DIST, 'icons', f'icon-{sz}.png'))
-for sz in (192, 512):   # „maskable”: Android kerekre/cseppre vághatja, ezért körben hely marad
-    bg = Image.new('RGB', (sz, sz), (8, 18, 28)); inner = int(sz * .78)
-    bg.paste(emb.resize((inner, inner), Image.LANCZOS), ((sz - inner) // 2, (sz - inner) // 2))
-    bg.save(os.path.join(DIST, 'icons', f'maskable-{sz}.png'))
+# az app ikonja (BU embléma): teljes kitöltésű, így Androidon a kör/csepp alakú vágás is csak a díszek szélét veszi le
+emb = Image.open(os.path.join(SRC, 'app', 'icon.png')).convert('RGB')
+for sz in (180, 192, 512):
+    emb.resize((sz, sz), Image.LANCZOS).save(os.path.join(DIST, 'icons', f'icon-{sz}.png'), optimize=True)
+for sz in (192, 512):
+    emb.resize((sz, sz), Image.LANCZOS).save(os.path.join(DIST, 'icons', f'maskable-{sz}.png'), optimize=True)
+emb.resize((32, 32), Image.LANCZOS).save(os.path.join(DIST, 'icons', 'favicon-32.png'))
 
 # 2) index.html: a játék héja + scriptek
 shell = open(os.path.join(SRC, 'shell.html'), encoding='utf-8').read()
@@ -46,7 +45,7 @@ html = f'''<!doctype html>
 <meta name="theme-color" content="#0b1c21">
 <meta name="description" content="Best of Us – a banda saját kártyajátéka">
 <link rel="manifest" href="manifest.webmanifest">
-<link rel="icon" href="icons/icon-192.png">
+<link rel="icon" href="icons/favicon-32.png" sizes="32x32">\n<link rel="icon" href="icons/icon-192.png" sizes="192x192">
 <link rel="apple-touch-icon" href="icons/icon-180.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
