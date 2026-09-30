@@ -276,7 +276,7 @@ function playCard(s, pi, hi, t) {
   const h = p.hand[hi], c = CARD[h.id];
   p.energy -= cardCost(s, pi, h.id);
   p.hand.splice(hi, 1);
-  ev(s, { t:'play', side:pi, id:c.id });
+  ev(s, { t:'play', side:pi, id:c.id, at: c.type === 'char' && t && t.k === 'slot' ? t.i : null });
   if (c.drink) {   // Italos szinergiák: Milo, az örökivó erősödik, Laczkó Tomi húzat (körönként egyszer)
     p.board.forEach((x, j) => { if (x && x.id === 'c_miloivo') { x.atk += 1; ev(s, { t:'buff', side:pi, i:j, n:1 }); } });
     if (!p.drinkDraw && p.board.some(x => x && x.id === 'c_laczko')) { p.drinkDraw = true; const j = p.board.findIndex(x => x && x.id === 'c_laczko'); ev(s, { t:'drinkdraw', side:pi, i:j }); draw(s, pi); }

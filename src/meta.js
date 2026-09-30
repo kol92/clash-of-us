@@ -444,7 +444,7 @@ async function packOpening(setId, cards, po = {}) {
   const hasGold = cards.some(c => c.gold);
   if (hasGold) {   // arany van a packban: a feltépett pack aranyba borul, remeg a képernyő
     o.classList.add('gold-pack');
-    await o.animate([{ transform: 'none' }, { transform: 'translate(-4px,2px)' }, { transform: 'translate(4px,-2px)' }, { transform: 'translate(-3px,-3px)' }, { transform: 'translate(3px,3px)' }, { transform: 'none' }], { duration: 520, iterations: 2 }).finished;
+    await pk.animate([{ transform: 'none', filter: 'brightness(1)' }, { transform: 'scale(1.06) rotate(-1.5deg)', filter: 'brightness(1.5) sepia(.6)' }, { transform: 'scale(1.1) rotate(1.5deg)', filter: 'brightness(1.8) sepia(.8)' }, { transform: 'none', filter: 'brightness(1)' }], { duration: 900, easing: 'ease-in-out' }).finished;
   }
   const flash = document.createElement('div'); flash.className = 'op-flash' + (hasGold ? ' gold' : ''); o.appendChild(flash);
   flash.animate([{ opacity: 0 }, { opacity: 1 }, { opacity: 0 }], { duration: 600 });
@@ -480,7 +480,7 @@ async function packOpening(setId, cards, po = {}) {
 
 // ---- ARANY bontás: a legritkább lap – hosszabb, nagyobb, aranyesős jelenet ----
 async function goldReveal(o, f, c) {
-  const r = f.getBoundingClientRect(), cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+  const r = f.getBoundingClientRect(); let cx = r.left + r.width / 2, cy = r.top + r.height / 2;
   o.classList.add('rare-dim', 'gold-dim');
   const layer = document.createElement('div'); layer.className = 'gold-fx'; o.appendChild(layer);
   // 1) sötétség, a lap aranyban izzik, alulról aranypor száll fel, egyre erősebben remeg minden
@@ -489,13 +489,15 @@ async function goldReveal(o, f, c) {
   let rising = true;
   (async () => { while (rising) { for (let k = 0; k < 3; k++) goldMote(layer, Math.random() * innerWidth, innerHeight + 10, cx, cy); await sleep(60); } })();
   f.classList.add('charging', 'gold');
-  const shake = n => Array.from({ length: 12 }, (_, k) => ({ transform: `translate(${(Math.random() - .5) * n * (k / 12)}px,${(Math.random() - .5) * n * (k / 12)}px) scale(${1 + k * .018})` }));
-  const stage = o.querySelector('.op-stage');
-  await Promise.all([f.animate(shake(14), { duration: 2200, easing: 'ease-in' }).finished,
-                     stage.animate(shake(8), { duration: 2200, easing: 'ease-in' }).finished]);
+  // csak a lap mozog: középre úszik, egyre nagyobb és egyre jobban remeg (a képernyő többi része áll)
+  const dx = innerWidth / 2 - cx, dy = innerHeight * .42 - cy;
+  const kf = Array.from({ length: 16 }, (_, k) => { const p = k / 15, j = 10 * p * p;
+    return { transform: `translate(${dx * Math.min(1, p * 1.6) + (Math.random() - .5) * j}px,${dy * Math.min(1, p * 1.6) + (Math.random() - .5) * j}px) scale(${1 + p * .55}) rotate(${(Math.random() - .5) * j * .4}deg)` }; });
+  const move = f.animate(kf, { duration: 2200, easing: 'ease-in', fill: 'forwards' }); await move.finished;
   rising = false;
   // 2) robbanás: fehér-arany villanás, lökéshullám, aranyérmék és szikrák
   f.classList.remove('charging'); f.classList.add('open', 'glow');
+  const fr = f.getBoundingClientRect(); cx = fr.left + fr.width / 2; cy = fr.top + fr.height / 2;
   const flash = document.createElement('div'); flash.className = 'rare-flash gold'; layer.appendChild(flash);
   flash.animate([{ opacity: 0 }, { opacity: 1, offset: .12 }, { opacity: 0 }], { duration: 1300, fill: 'forwards' });
   for (let k = 0; k < 3; k++) { const ring = document.createElement('i'); ring.className = 'gold-ring'; ring.style.left = cx + 'px'; ring.style.top = cy + 'px'; layer.appendChild(ring);
@@ -532,6 +534,7 @@ async function goldReveal(o, f, c) {
   await Promise.race([sleep(12000), new Promise(res => show.addEventListener('click', ev => { ev.stopPropagation(); res(); }, { once: true }))]);
   await layer.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 350, fill: 'forwards' }).finished;
   layer.remove(); o.classList.remove('rare-dim', 'gold-dim');
+  move.cancel(); f.style.transform = '';   // a lap visszakerül a helyére a sorban
 }
 function goldMote(parent, x, y, tx, ty) {
   const s = document.createElement('i'), sz = 2 + Math.random() * 5; s.className = 'rare-spark';

@@ -323,9 +323,30 @@ function slashAt(el) {
 }
 const unitAt = (side, i) => cellEl(side, i)?.querySelector('.unit');
 let revealed = new Set();
+// kijátszás: előbb maga a lap jelenik meg (karakter leszáll a helyére, akció/eszköz/helyszín felvillan), csak utána jönnek a hatásai
+const preLanded = new Set();
+async function playIntro(e, hasFx) {
+  const c = CARD[e.id]; if (!c) return;
+  if (c.type === 'char' && e.at != null) {
+    const u = S.players[e.side].board[e.at], cell = cellEl(e.side, e.at);
+    if (!u || !cell || cell.querySelector('.unit')) return;
+    const t = document.createElement('div'); t.innerHTML = unitHTML(u, e.side, e.at).trim();
+    const el = t.firstElementChild; cell.appendChild(el); preLanded.add(u.uid); fx(el, 'fx-land');
+    if (hasFx) await sleep(460);
+    return;
+  }
+  if (e.side !== ME || !hasFx) return;   // az ellenfél lapját a nagy felfordítás már megmutatta
+  const o = document.createElement('div'); o.className = 'cast'; o.innerHTML = cardHTML(e.id, { foil: foilOf(ME, e.id) });
+  $('#layer').appendChild(o);
+  await o.animate([{ transform: 'translate(-50%,-30%) scale(.55)', opacity: 0 }, { transform: 'translate(-50%,-50%) scale(1)', opacity: 1 }], { duration: 220, easing: 'cubic-bezier(.2,1.3,.4,1)' }).finished;
+  await sleep(260);
+  await o.animate([{ opacity: 1, transform: 'translate(-50%,-50%) scale(1)' }, { opacity: 0, transform: 'translate(-50%,-58%) scale(1.12)' }], { duration: 200, easing: 'ease-in', fill: 'forwards' }).finished;
+  o.remove();
+}
 async function animateEvents(evs) {
   let hold = 0;
   for (const e of evs) {
+    if (e.t === 'play') { await playIntro(e, evs.length > 1); continue; }
     if (e.t === 'burn' && e.side === ME) { toast('Tele a kezed, egy lap elégett'); continue; }
     if (e.t === 'fatigue' && e.side === ME) { toast('Elfogyott a paklid!'); continue; }
     if (e.i == null || e.side == null) continue;
@@ -404,13 +425,13 @@ async function runFx(fn) {
   render();
   document.querySelectorAll('.unit[data-uid]').forEach(x => {
     if (revealed.has(x.dataset.uid)) x.animate([{ transform: 'rotateY(-90deg) scale(1.08)' }, { transform: 'none' }], { duration: 260, easing: 'ease-out' });
-    else if (!before.has(x.dataset.uid)) fx(x, 'fx-land');
+    else if (!before.has(x.dataset.uid) && !preLanded.has(x.dataset.uid)) fx(x, 'fx-land');
     else {   // sávot váltott (helycsere, Zsibrita, Mosh Pit): odacsúszik a régi helyéről
       const o = pos.get(x.dataset.uid), n = x.getBoundingClientRect(), dx = o.left - n.left, dy = o.top - n.top;
       if (Math.abs(dx) > 20 || Math.abs(dy) > 20) x.animate([{ transform: `translate(${dx}px,${dy}px) rotate(${dx > 0 ? -6 : 6}deg)` }, { transform: 'none' }], { duration: 420, easing: 'cubic-bezier(.3,1.3,.5,1)' });
     }
   });
-  revealed = new Set();
+  revealed = new Set(); preLanded.clear();
 }
 
 // ---------- játék renderelés ----------
