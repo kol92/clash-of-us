@@ -4,7 +4,17 @@ const $ = q => document.querySelector(q);
 const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 // a valódi képernyőmagasság (iPhone-on a telepített app máshogy számolja a 100%-ot, ettől csúszott el a tábla)
-const setAppH = () => document.documentElement.style.setProperty('--apph', innerHeight + 'px');
+const setAppH = () => {
+  let h = innerHeight;
+  // iPhone, telepített app, átlátszó óra-sáv: a böngésző az óra-sáv nélkül adja meg a magasságot, de a képernyő tetejétől rajzol → a teljes képernyőmagasság kell
+  const ios = /iphone|ipad|ipod/i.test(navigator.userAgent), standalone = navigator.standalone === true || matchMedia('(display-mode: standalone)').matches;
+  if (ios && standalone) {
+    let p = document.querySelector('.safe-probe'); if (!p) { p = document.createElement('i'); p.className = 'safe-probe'; document.body.appendChild(p); }
+    const top = parseFloat(getComputedStyle(p).paddingTop) || 0, full = Math.max(screen.width, screen.height) === Math.max(innerWidth, innerHeight) ? 0 : (innerWidth < innerHeight ? screen.height : screen.width);
+    if (top > 0 && full && full - h > 10 && full - h <= top + 2) h = full;
+  }
+  document.documentElement.style.setProperty('--apph', h + 'px');
+};
 setAppH(); addEventListener('resize', setAppH); addEventListener('orientationchange', () => setTimeout(setAppH, 350));
 addEventListener('pageshow', setAppH); document.addEventListener('visibilitychange', () => { if (!document.hidden) setAppH(); });
 let S = null, busy = false;

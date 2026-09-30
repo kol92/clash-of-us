@@ -20,8 +20,7 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font
   -webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none;}
 button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer;}
 button:focus-visible,.card:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
-#app{height:var(--apph,100%);max-width:480px;margin:0 auto;position:relative;box-sizing:border-box;
-  padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);}   /* telepített appban: az óra-sáv és az alsó csík ne takarjon */
+#app{height:var(--apph,100%);max-width:480px;margin:0 auto;position:relative;box-sizing:border-box;}
 .screen{height:100%;overflow-y:auto;box-sizing:border-box;padding-inline:16px;}
 h1,h2,h3{font-family:var(--display);font-weight:400;letter-spacing:.01em;text-wrap:balance;margin:0;}
 
@@ -1260,6 +1259,14 @@ h1,h2,h3{font-family:var(--display);font-weight:400;letter-spacing:.01em;text-wr
 .onb-pack .pk{--pw:54px;}
 .onb-box .btn{width:100%;}
 @media (max-height:700px){.in-vis{height:38vh}.in-slide h2{font-size:25px}.in-slide p{font-size:15px}.in-fan{transform:scale(.8)}}
+
+/* ===== teljes képernyő (telepített app): a tábla és a háttér a képernyő széléig ér, csak a gombok és a szöveg kerülik az óra-sávot és az alsó csíkot ===== */
+#eBar{padding-top:calc(8px + env(safe-area-inset-top,0px));}
+#pBar{padding-bottom:calc(10px + env(safe-area-inset-bottom,0px));}
+#app>.screen:not(#scr-game){padding-top:env(safe-area-inset-top,0px);}
+#app>.screen:not(#scr-game):not(#scr-edit){padding-bottom:calc(14px + env(safe-area-inset-bottom,0px));}
+#scr-edit{padding-bottom:env(safe-area-inset-bottom,0px);}
+.safe-probe{position:fixed;left:0;top:0;width:0;height:0;visibility:hidden;padding-top:env(safe-area-inset-top,0px);pointer-events:none;}
 </style>
 
 <div id="app">
