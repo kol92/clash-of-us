@@ -3,6 +3,10 @@ let ME = 0, BOT = 1;   // PvP-ben a vendégnél felcserélődik: mindig te vagy 
 const $ = q => document.querySelector(q);
 const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const sleep = ms => new Promise(r => setTimeout(r, ms));
+// a valódi képernyőmagasság (iPhone-on a telepített app máshogy számolja a 100%-ot, ettől csúszott el a tábla)
+const setAppH = () => document.documentElement.style.setProperty('--apph', innerHeight + 'px');
+setAppH(); addEventListener('resize', setAppH); addEventListener('orientationchange', () => setTimeout(setAppH, 350));
+addEventListener('pageshow', setAppH); document.addEventListener('visibilitychange', () => { if (!document.hidden) setAppH(); });
 let S = null, busy = false;
 const ui = { sel: null, pend: null, drag: null, dragEnd: 0, hero: 'barna', deck: 'roham', foil: false, handSeen: null, botHandN: null, flying: new Set() };
 

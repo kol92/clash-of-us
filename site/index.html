@@ -28,14 +28,15 @@
   --display:'Paytone One','Arial Rounded MT Bold','Trebuchet MS',sans-serif;
   --body:'Nunito',system-ui,-apple-system,'Segoe UI',sans-serif;
 }
-html,body{height:100%;}
+html,body{height:var(--apph,100%);}
 [hidden]{display:none!important;}
 body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;
   background-image:radial-gradient(120% 70% at 50% 45%,#123a44 0%,var(--bg) 70%);overflow:hidden;
   -webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none;}
 button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer;}
 button:focus-visible,.card:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
-#app{height:100%;max-width:480px;margin:0 auto;position:relative;}
+#app{height:var(--apph,100%);max-width:480px;margin:0 auto;position:relative;box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);}   /* telepített appban: az óra-sáv és az alsó csík ne takarjon */
 .screen{height:100%;overflow-y:auto;box-sizing:border-box;padding-inline:16px;}
 h1,h2,h3{font-family:var(--display);font-weight:400;letter-spacing:.01em;text-wrap:balance;margin:0;}
 
@@ -237,6 +238,7 @@ h1,h2,h3{font-family:var(--display);font-weight:400;letter-spacing:.01em;text-wr
   text-shadow:0 2px 0 rgba(0,0,0,.6),0 0 10px rgba(0,0,0,.5);animation:rise .95s ease-out forwards;}
 .float.dmg{color:var(--red);} .float.heal{color:var(--green);} .float.info{color:#dff4ff;font-size:18px;} .float.buff{color:var(--gold);font-size:20px;}
 .overlay{position:fixed;inset:0;z-index:50;display:grid;place-items:center;padding:16px;background:rgba(3,10,13,.72);backdrop-filter:blur(3px);}
+.overlay:not(.intro){padding-top:calc(16px + env(safe-area-inset-top,0px));padding-bottom:calc(16px + env(safe-area-inset-bottom,0px));}
 .modal{display:grid;gap:14px;justify-items:center;text-align:center;max-width:320px;width:100%;}
 .modal .card{--cw:min(250px,68vw);}
 .close-hint{font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--mute);opacity:.8;}
@@ -1425,7 +1427,7 @@ h1,h2,h3{font-family:var(--display);font-weight:400;letter-spacing:.01em;text-wr
 <script src="vendor/firebase-auth-compat.js"></script>
 <script src="vendor/firebase-firestore-compat.js"></script>
 <script src="vendor/firebase-database-compat.js"></script>
-<script>window.APP_VERSION = "2026.09.30-2109";</script>
+<script>window.APP_VERSION = "2026.09.30-2116";</script>
 <script>// ===== Best of Us – saját szerver (Firebase) =====
 // A játék eredetileg a Claude-os tárolót használta (window.claude.use('db' | 'user' | 'room')).
 // Ez a fájl ugyanazt a felületet adja Firebase-ből, így a játék kódja szinte változatlan maradhat:
@@ -2268,6 +2270,10 @@ let ME = 0, BOT = 1;   // PvP-ben a vendégnél felcserélődik: mindig te vagy 
 const $ = q => document.querySelector(q);
 const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const sleep = ms => new Promise(r => setTimeout(r, ms));
+// a valódi képernyőmagasság (iPhone-on a telepített app máshogy számolja a 100%-ot, ettől csúszott el a tábla)
+const setAppH = () => document.documentElement.style.setProperty('--apph', innerHeight + 'px');
+setAppH(); addEventListener('resize', setAppH); addEventListener('orientationchange', () => setTimeout(setAppH, 350));
+addEventListener('pageshow', setAppH); document.addEventListener('visibilitychange', () => { if (!document.hidden) setAppH(); });
 let S = null, busy = false;
 const ui = { sel: null, pend: null, drag: null, dragEnd: 0, hero: 'barna', deck: 'roham', foil: false, handSeen: null, botHandN: null, flying: new Set() };
 
@@ -4235,8 +4241,8 @@ const TUT_STEPS = [
   { turn: 1, kind: 'info', at: () => $('#pBar .en'), txt: 'Ezek a kék gyémántok az <b>energiád</b>. Most 1 van, és <b>minden körben eggyel több</b> lesz (legfeljebb 6). Ebből fizeted a lapokat.' },
   { turn: 1, kind: 'play', card: 'c_pifti', t: { k:'slot', side: 'me', i: 1 }, at: () => ui.sel != null ? cellEl(ME, 1) : tutHand('c_pifti'),
     txt: '<b>Húzd fel Piftit a kiemelt helyre!</b> A lap bal felső sarkában lévő szám az ára: 1 energia. (Ha csak rákoppintasz, nagyban megnézheted.)' },
-  { turn: 1, kind: 'info', at: () => unitAt(ME, 1), txt: 'Pifti a táblán van. Az újonnan lerakott karakter <b>egy kört pihen</b>, a következő körödtől támad.' },
-  { turn: 1, kind: 'end', at: () => $('#endBtn'), txt: 'Most nincs több energiád. Nyomd meg a <b>Kör vége</b> gombot – ilyenkor a karaktereid támadnak, aztán az ellenfél jön.' },
+  { turn: 1, kind: 'info', at: () => unitAt(ME, 1), txt: 'Pifti a táblán van. Az újonnan lerakott karakter <b>egy kört pihen</b>, a következő körödtől támad. <b>Fontos:</b> a karaktereidet nem kell irányítanod – <b>minden köröd végén maguktól támadnak</b>!' },
+  { turn: 1, kind: 'end', at: () => $('#endBtn'), txt: 'Most nincs több energiád. Nyomd meg a <b>Kör vége</b> gombot – ilyenkor a karaktereid <b>maguktól</b> támadnak, aztán az ellenfél jön.' },
   { turn: 2, kind: 'info', at: () => unitAt(BOT, 1), txt: 'Az ellenfél is lerakott egy Piftit, <b>pont a tiéd elé</b>. A karakterek mindig a velük szemben állót ütik.' },
   { turn: 2, kind: 'info', at: () => $('#pBar .en'), txt: 'Új kör: <b>2 energiád</b> van, és húztál egy új lapot. Most megtanulsz eszközt és akciót kijátszani.' },
   { turn: 2, kind: 'play', card: 'i_napszemuveg', t: { k:'unit', side: 'me', i: 1 }, at: () => ui.sel != null ? cellEl(ME, 1) : tutHand('i_napszemuveg'),
@@ -4348,7 +4354,7 @@ const INTRO = [
     v: () => `<div class="in-gems">${Array.from({ length: 6 }, (_, k) => `<i style="--k:${k}"></i>`).join('')}</div><div class="in-row">${['c_pifti', 'c_gyuri', 'c_vajda'].map(id => cardHTML(id)).join('')}</div>` },
   { t: 'Négyféle lap', p: '<b>Karakter</b> – harcol a táblán · <b>Eszköz</b> – felszereled vele · <b>Akció</b> – egyszeri hatás · <b>Helyszín</b> – mindkét félre hat.',
     v: () => `<div class="in-row four">${[['c_pifti', 'Karakter'], ['i_napszemuveg', 'Eszköz'], ['a_dinnyes', 'Akció'], ['l_barhole', 'Helyszín']].map(([id, n]) => `<div class="in-type">${cardHTML(id)}<small>${n}</small></div>`).join('')}</div>` },
-  { t: 'Így megy a harc', p: 'A köröd végén a karaktereid <b>a velük szemben állót ütik</b>. Ha előttük <b>üres a sáv</b>, egyenesen az ellenfél hősét!',
+  { t: 'Így megy a harc', p: 'Nem kell irányítanod őket: a köröd végén a karaktereid <b>maguktól támadnak</b> – a velük szemben állót ütik, ha előttük <b>üres a sáv</b>, egyenesen az ellenfél hősét!',
     v: () => `<div class="in-board"><div class="in-lane"><div class="in-slot">${cardHTML('c_kovacs')}</div><div class="in-slot empty"><span>üres</span></div></div>
       <div class="in-lane me"><div class="in-slot hit">${cardHTML('c_vajda')}</div><div class="in-slot hit2">${cardHTML('c_pifti')}</div></div><div class="in-face">💥</div></div>` },
   { t: 'Gyűjts, bonts, nyerj!', p: 'Nyerj meccseket, bonts boostereket, vadászd a <b>Full Art</b> és a legritkább <b>Arany</b> lapokat – és mérkőzz a haverokkal élő <b>PvP</b>-ben!',
