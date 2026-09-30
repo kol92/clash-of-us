@@ -608,6 +608,7 @@ async function doPlay(hi, t) {
 }
 $('#flagBtn').onclick = () => {
   if (!S || S.winner != null) return;
+  if (S.tut?.onboard) return toast('Előbb játszd végig a gyakorló meccset – utána jön a főmenü 🙂');
   if (busy) return toast('Várd meg, amíg lezajlik a lépés');
   const o = document.createElement('div'); o.className = 'overlay';
   o.innerHTML = `<div class="modal"><h3>Meccs</h3><p class="live">${S.pvp ? 'Ha kilépsz, a meccs megmarad: a PvP menüben bármikor folytathatod.' : S.tut ? 'Kilépsz az oktatóból?' : 'Ha kilépsz, a bot elleni meccs elvész.'}</p>

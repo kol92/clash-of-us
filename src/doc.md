@@ -258,9 +258,15 @@ Hősképesség-ötletek a táblázatban (még nem zöldek, nincsenek beépítve)
     1. UI: saját rózsaszín akció-, zöld helyszín- és arany hőskeret (most a kékből átszínezett helykitöltők).
   - Képformátum: álló 3:4. A normál lapon a keret ablaka nagyjából négyzet alakú részt mutat a kép közepéből (a teteje-alja levágódik), a Full Art a teljes képet.
 
+## Új játékosok bevezetője (2026-09-30)
+- Profil létrehozása után (csak új játékosnál, átköltöztetett profilnál nem): 6 lapozható bemutató dia (Üdv · A cél · Energia és lapok · Négyféle lap · Így megy a harc · Gyűjts, bonts, nyerj!), a játék saját lapjaival és kis animációkkal; húzással is lapozható.
+- Utána azonnal a vezetett gyakorló meccs, „Kihagyom” gomb nélkül; a ⚑ gomb sem visz ki. Csak ezután jön a főmenü, egy záróképernyővel és az üdvözlő ajándékkal (10 booster + 1 Shiny pack).
+- Ha közben bezárja az appot, legközelebb a bemutatótól folytatja.
+
 ## Saját appá alakítás (terv, 2026-09-30)
 - Cél: telepíthető webapp (PWA) iPhone-ra és Androidra, 0 Ft-os szerverrel; App Store / Play Store nincs.
 - Kód: privát GitHub-tároló (clash-of-us) → Cloudflare Pages automatikusan kiteszi minden feltöltés után (~1 perc). Külön teszt link az éles előtt.
 - Szerver: Firebase ingyenes csomag – Firestore (profilok, PvP-meccsek), Authentication (Google + e-mail/jelszó), Realtime Database (online jelenlét, élő PvP jelzések). A képek a Cloudflare-en, nem Firebase Storage-ban (az fizetős).
+- Állapot: élesben a bestofus.pages.dev címen (Cloudflare Pages ← GitHub kol92/clash-of-us, main ág, `site` mappa). A forrás a tároló `src` mappájában. Profil-átvitel: régi verzió menü alja „☁️ Felhőben mentve” → kód → új appban „Hozd át a profilod kóddal”.
 - Sorrend: 1) GitHub-tároló (Tomi) 2) Firebase-projekt + webes config (Tomi) 3) átírás Firebase-re + PWA (Claude) 4) Cloudflare Pages bekötése (Tomi) 5) engedélyezett domain a Firebase-ben (Tomi) 6) közös teszt 7) profil-átköltöztetés kóddal a régi (Claude-os) verzióból 8) link a haveroknak.
 - Frissítések: Claude feltölti a GitHubra → Cloudflare kiteszi → a játék „Új verzió” jelzést ad; „Újdonságok” ablak; PvP csak azonos verziók között.

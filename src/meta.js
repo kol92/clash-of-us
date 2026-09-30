@@ -140,7 +140,7 @@ async function bootProfile() {
   if (Store.faMsg) { const m = Store.faMsg; Store.faMsg = null; setTimeout(() => toast(m), 4200); }
   if (Store.dupeMsg) { const m = Store.dupeMsg; Store.dupeMsg = null; setTimeout(() => toast(m), Store.giftMsg === null ? 2400 : 600); }
   renderProfileBar(); if (Store.p && GOLD_HEROES.some(ownsHeroGold)) renderMenuFan();
-  if (!Store.p) showCreate();
+  if (!Store.p) showCreate(); else if (Store.p.onboard) startOnboarding();
   pvpStart(); renderPvpBadge(); pvpRoomInit();
 }
 function migrate(p) {
@@ -189,9 +189,8 @@ function showCreate() {
     const name = inp.value.trim().replace(/\s+/g, ' ');
     const err = o.querySelector('#perr');
     if (name.length < 2) { err.hidden = false; err.textContent = 'A név legalább 2 karakter legyen.'; return; }
-    Store.p = newProfile(name); await save(); o.remove();
-    setTimeout(() => toast(`🎁 Üdvözlő ajándék: ${WELCOME.packs} ingyen Base set booster és ${WELCOME.shinyPacks} Shiny pack! A Boosterek menüben bonthatod ki.`), 500);
-    renderProfileBar(); toast(`Üdv, ${name}!`);
+    Store.p = newProfile(name); Store.p.onboard = true; await save(); o.remove();
+    renderProfileBar(); startOnboarding();
   };
 }
 
@@ -1008,7 +1007,7 @@ const TUT_STEPS = [
 ];
 const tutStep = () => S && S.tut && !S.tut.free ? TUT_STEPS[S.tut.step] : null;
 const tutSide = x => x === 'me' ? ME : BOT;
-function startTutorial() {
+function startTutorial(opt = {}) {
   const mine = { c_gyuri:2, c_sasi:2, a_cheddar:2, c_kovacs:2, a_dinnyes:2, c_zoli:2, i_napszemuveg:2, c_rebi:1, c_boros:1, i_energiaital:1, c_vajda:1, c_pifti:1, c_veghtomi:1 };
   const bot = { c_pifti:2, c_gyuri:2, c_kovacs:2, c_rebi:2, a_dinnyes:2, c_zoli:2, i_napszemuveg:2, a_cheddar:2, c_vajda:2, a_delfin:2 };
   S = newGame('tomi', mine, 'david', bot, ME); S.events = [];
@@ -1018,7 +1017,7 @@ function startTutorial() {
   B.hand = ['c_pifti', 'c_kovacs', 'c_zoli', 'c_pifti'].map(card);
   B.deck = shuffle(['c_gyuri', 'c_gyuri', 'c_rebi', 'a_dinnyes', 'c_kovacs', 'a_cheddar', 'c_vajda', 'a_delfin', 'i_napszemuveg', 'c_rebi', 'c_zoli', 'a_cheddar']);
   B.hp = B.maxHp = 12;
-  S.tut = { step: 0, free: false };
+  S.tut = { step: 0, free: false, onboard: !!opt.onboard };
   ui.sel = null; ui.pend = null; busy = false; ui.handSeen = null; ui.botHandN = null; ui.flying = new Set();
   show('scr-game'); $('#layer').innerHTML = ''; render();
 }
@@ -1047,7 +1046,7 @@ function tutCheck() {
     COACH.ring = document.createElement('div'); COACH.ring.className = 'coach-ring';
     COACH.el = document.createElement('div'); COACH.el.className = 'coach';
     COACH.el.innerHTML = `<small class="coach-n">Oktató · ${S.tut.step + 1}/${TUT_STEPS.length}</small><p>${st.txt}</p>`
-      + (st.kind === 'info' ? `<div><button class="btn primary" data-c="ok">${st.last ? 'Játsszunk!' : 'Tovább'}</button>${S.tut.step === 0 ? '<button class="btn ghost" data-c="skip">Kihagyom</button>' : ''}</div>` : `<div class="coach-do">${st.kind === 'end' ? '👉 Kör vége' : st.kind === 'tap' ? '👉 Koppints a kiemelt elemre' : '👉 Húzd a lapot a kiemelt helyre'}</div>`);
+      + (st.kind === 'info' ? `<div><button class="btn primary" data-c="ok">${st.last ? 'Játsszunk!' : 'Tovább'}</button>${S.tut.step === 0 && !S.tut.onboard ? '<button class="btn ghost" data-c="skip">Kihagyom</button>' : ''}</div>` : `<div class="coach-do">${st.kind === 'end' ? '👉 Kör vége' : st.kind === 'tap' ? '👉 Koppints a kiemelt elemre' : '👉 Húzd a lapot a kiemelt helyre'}</div>`);
     COACH.el.onclick = e => { const b = e.target.closest('[data-c]'); if (!b) return;
       if (b.dataset.c === 'skip') { tutHide(); S.tut = null; if (Store.p) { Store.p.tutSkip = true; save(); } renderPick(); show('scr-pick'); return; }
       tutAdvance(); };
@@ -1076,6 +1075,7 @@ window.addEventListener('resize', () => { const st = tutStep(); if (st && COACH.
 setInterval(() => { if (tutStep() || COACH.el) tutCheck(); }, 350);   // pl. egy felugró ablak bezárása után is előjöjjön a következő lépés
 function tutFinish() {
   const win = S.winner === ME;
+  if (S.tut?.onboard) return onboardDone(win);
   if (Store.p && !Store.p.tutDone) { Store.p.tutDone = true; save(); }
   const o = document.createElement('div'); o.className = 'overlay';
   o.innerHTML = `<div class="modal result${win ? '' : ' lose'}"><h2>${win ? 'Megvan!' : 'Most nem jött össze'}</h2>
@@ -1086,6 +1086,68 @@ function tutFinish() {
     if (b.dataset.r === 'again') startTutorial(); else if (b.dataset.r === 'play') { renderPick(); show('scr-pick'); } else { renderMenuFan(); renderProfileBar(); show('scr-menu'); } };
   setTimeout(() => $('#layer').appendChild(o), 700);
 }
+// ================= új játékosok bevezetője: rövid bemutató → gyakorló meccs → főmenü =================
+const INTRO = [
+  { t: 'Üdv a Best of Us-ban!', p: 'A banda saját kártyajátéka: a haverokból lettek a lapok. Gyűjtsd őket, építs paklit, és verd meg a többieket!',
+    v: () => `<div class="in-fan">${['barna', 'krisz', 'gabi'].map(h => heroCardHTML(HERO[h], { foil: true })).join('')}</div>` },
+  { t: 'A cél', p: 'Mindkét félnek van egy hőse. Az nyer, aki előbb <b>nullára viszi az ellenfél hősének életét</b>.',
+    v: () => `<div class="in-duel"><div class="in-hero">${heroPortrait('tomi', 'in-port')}<b>Te</b><span class="in-hp"><i></i></span></div><div class="in-vs">VS</div><div class="in-hero foe">${heroPortrait('david', 'in-port')}<b>Ellenfél</b><span class="in-hp drain"><i></i><em></em></span></div></div>` },
+  { t: 'Energia és lapok', p: 'Minden körben <b>eggyel több energiád</b> van (legfeljebb 6). A lap bal felső sarkában az ára – ebből rakod le a lapokat.',
+    v: () => `<div class="in-gems">${Array.from({ length: 6 }, (_, k) => `<i style="--k:${k}"></i>`).join('')}</div><div class="in-row">${['c_pifti', 'c_gyuri', 'c_vajda'].map(id => cardHTML(id)).join('')}</div>` },
+  { t: 'Négyféle lap', p: '<b>Karakter</b> – harcol a táblán · <b>Eszköz</b> – felszereled vele · <b>Akció</b> – egyszeri hatás · <b>Helyszín</b> – mindkét félre hat.',
+    v: () => `<div class="in-row four">${[['c_pifti', 'Karakter'], ['i_napszemuveg', 'Eszköz'], ['a_dinnyes', 'Akció'], ['l_barhole', 'Helyszín']].map(([id, n]) => `<div class="in-type">${cardHTML(id)}<small>${n}</small></div>`).join('')}</div>` },
+  { t: 'Így megy a harc', p: 'A köröd végén a karaktereid <b>a velük szemben állót ütik</b>. Ha előttük <b>üres a sáv</b>, egyenesen az ellenfél hősét!',
+    v: () => `<div class="in-board"><div class="in-lane"><div class="in-slot">${cardHTML('c_kovacs')}</div><div class="in-slot empty"><span>üres</span></div></div>
+      <div class="in-lane me"><div class="in-slot hit">${cardHTML('c_vajda')}</div><div class="in-slot hit2">${cardHTML('c_pifti')}</div></div><div class="in-face">💥</div></div>` },
+  { t: 'Gyűjts, bonts, nyerj!', p: 'Nyerj meccseket, bonts boostereket, vadászd a <b>Full Art</b> és a legritkább <b>Arany</b> lapokat – és mérkőzz a haverokkal élő <b>PvP</b>-ben!',
+    v: () => `<div class="in-collect"><div class="in-pack">${packHTML('base')}</div>${heroCardHTML(HERO.krisz, { gold: true })}${cardHTML('c_zana', { foil: true })}</div>` },
+];
+function showIntro() {
+  return new Promise(done => {
+    const o = document.createElement('div'); o.className = 'overlay intro';
+    o.innerHTML = `<div class="in-track">${INTRO.map((sl, i) => `<section class="in-slide" data-i="${i}"><div class="in-vis">${sl.v()}</div><h2>${sl.t}</h2><p>${sl.p}</p></section>`).join('')}</div>
+      <div class="in-foot"><div class="in-dots">${INTRO.map((_, i) => `<i data-d="${i}"></i>`).join('')}</div><button class="btn primary in-next">Tovább</button></div>`;
+    document.body.appendChild(o);
+    const track = o.querySelector('.in-track'), next = o.querySelector('.in-next');
+    let cur = 0;
+    const go = i => {
+      cur = Math.max(0, Math.min(INTRO.length - 1, i));
+      track.style.transform = `translateX(${-cur * 100}%)`;
+      o.querySelectorAll('.in-slide').forEach((el, k) => el.classList.toggle('on', k === cur));
+      o.querySelectorAll('.in-dots i').forEach((d, k) => d.classList.toggle('on', k === cur));
+      next.textContent = cur === INTRO.length - 1 ? 'Jöhet a gyakorló meccs! ⚔️' : 'Tovább';
+    };
+    next.onclick = () => { if (cur < INTRO.length - 1) return go(cur + 1); o.classList.add('out'); setTimeout(() => { o.remove(); done(); }, 350); };
+    o.querySelector('.in-dots').onclick = e => { const d = e.target.closest('[data-d]'); if (d) go(+d.dataset.d); };
+    let sx = null, sy = null;   // lapozás húzással
+    o.addEventListener('touchstart', e => { sx = e.touches[0].clientX; sy = e.touches[0].clientY; }, { passive: true });
+    o.addEventListener('touchend', e => { if (sx == null) return; const dx = e.changedTouches[0].clientX - sx, dy = e.changedTouches[0].clientY - sy; sx = null;
+      if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy)) go(cur + (dx < 0 ? 1 : -1)); });
+    requestAnimationFrame(() => go(0));
+  });
+}
+async function startOnboarding() {
+  if (ONB.running) return; ONB.running = true;
+  $('#layer').innerHTML = '';
+  await showIntro();
+  startTutorial({ onboard: true });
+  toast('Kövesd a sárga buborékokat!');
+}
+const ONB = { running: false };
+function onboardDone(win) {
+  ONB.running = false;
+  const p = Store.p; if (p) { p.tutDone = true; delete p.onboard; save(); }
+  const o = document.createElement('div'); o.className = 'overlay onb-done';
+  o.innerHTML = `<div class="modal onb-box"><div class="onb-burst" aria-hidden="true"></div><h2>${win ? 'Megvan! 🎉' : 'Szép volt! 👏'}</h2>
+    <p>${win ? 'Megnyerted a gyakorló meccset – már mindent tudsz, ami kell.' : 'Most nem jött össze, de az alapokat már tudod – élesben jobban fog menni!'}</p>
+    <div class="onb-gift"><div class="onb-pack">${packHTML('base')}</div><div><b>Üdvözlő ajándék</b><span>${WELCOME.packs} Base set booster + ${WELCOME.shinyPacks} Shiny pack vár rád a <b>Boosterek</b> menüben.</span></div></div>
+    <button class="btn primary" data-r="menu">Irány a főmenü!</button><button class="btn ghost" data-r="again">Még egy gyakorló meccs</button></div>`;
+  o.onclick = e => { const b = e.target.closest('[data-r]'); if (!b) return; o.remove(); tutHide();
+    if (b.dataset.r === 'again') return startTutorial();
+    S = null; renderMenuFan(); renderProfileBar(); show('scr-menu'); setTimeout(() => toast(`Üdv, ${Store.p?.name || ''}! Kezdd a boosterek bontásával 🎁`), 400); };
+  setTimeout(() => $('#layer').appendChild(o), 700);
+}
+
 $('#goTut').onclick = () => { if (!Store.p) return showCreate(); startTutorial(); };
 
 // ======================= PvP (barátok egymás ellen) =======================
