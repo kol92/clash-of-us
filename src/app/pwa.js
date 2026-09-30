@@ -45,8 +45,8 @@
     const o = document.createElement('div'); o.className = 'overlay';
     o.innerHTML = `<div class="modal inst-box"><h3>Telepítés iPhone-ra</h3>
       <ol><li>Ezt az oldalt <b>Safariban</b> nyisd meg.</li>
-      <li>Koppints lent a <b>Megosztás</b> gombra <span class="ios-share" aria-hidden="true"></span></li>
-      <li>Görgess le, és válaszd: <b>Főképernyőhöz adás</b>.</li>
+      <li>Koppints a <b>Megosztás</b> gombra <span class="ios-share" aria-hidden="true"></span><br><small>Új iPhone-on (iOS 26): a címsor melletti <b>•••</b> gomb → <b>Megosztás</b></small></li>
+      <li>Görgess le, és válaszd: <b>Főképernyőhöz adás</b> (ha nem látod: <b>Továbbiak</b>).</li>
       <li>Jobb fent: <b>Hozzáadás</b>. Kész – a Best of Us ikon ott lesz a főképernyőn.</li></ol>
       <p class="live">Telepítés után lépj be újra az appban (a Safari és az app külön emlékszik rád).</p>
       <button class="btn primary" data-x>Értem</button></div>`;
