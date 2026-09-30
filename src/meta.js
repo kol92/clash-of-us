@@ -174,7 +174,7 @@ function showCreate() {
       <h2>Új játékos</h2>
       <p>Válassz játékosnevet. Ezzel a névvel látnak majd a barátaid.</p>
       <label class="fld"><span>Játékosnév</span><input id="pname" maxlength="18" autocomplete="nickname" required></label>
-      <div class="gift"><b>Kezdőcsomag</b><span>Mind a 9 hős · minden gyakori lap 2× · minden ritka lap 1× · 2 kész pakli</span></div>
+      <div class="gift"><b>Kezdőcsomag</b><span>Mind a ${HEROES.length} hős · minden gyakori lap 2× · minden ritka lap 1× · ${Object.keys(DECKS).length} kész pakli (minden hősnek egy)</span></div>
       <p class="err" id="perr" hidden></p>
       <button class="btn primary" type="submit">Játékos létrehozása</button>
       <small class="where">${window.APP_MODE ? 'A profilod a fiókodhoz kötve, a felhőben mentődik.' : Store.mode === 'cloud' ? 'A profilod a Claude-fiókodhoz kötve mentődik.' : 'A profilod ezen az eszközön mentődik.'}</small>
