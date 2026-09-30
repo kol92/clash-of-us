@@ -1021,7 +1021,7 @@ function startTutorial(opt = {}) {
   ui.sel = null; ui.pend = null; busy = false; ui.handSeen = null; ui.botHandN = null; ui.flying = new Set();
   show('scr-game'); $('#layer').innerHTML = ''; render();
 }
-function tutAdvance() { S.tut.step++; if (!TUT_STEPS[S.tut.step]) S.tut.free = true; tutHide(); setTimeout(tutCheck, 200); }
+function tutAdvance() { S.tut.step++; if (!TUT_STEPS[S.tut.step]) S.tut.free = true; tutHide(); if (!busy) render(); setTimeout(tutCheck, 200); }   // újrarajzolás: a lapok szürkesége a lépéshez igazodjon
 function tutHide() { COACH.el?.remove(); COACH.ring?.remove(); COACH.el = COACH.ring = null; }
 const COACH = { el: null, ring: null, cur: null };
 function tutPlace(step) {
