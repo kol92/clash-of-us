@@ -16,11 +16,16 @@
     } catch {}
   }
   window.APP_NEWER = () => shown;   // a PvP ezt nézi: régi verzióval nem párosít
+  // meccs közben nem jelenik meg (ne takarja el az ellenfél életét) – kivárja, amíg nem játszol; ✕-szel el is rejthető
+  const inMatch = () => { const g = document.getElementById('scr-game'); return !!g && !g.hidden; };
   function showUpdate(j) {
+    if (inMatch() || document.querySelector('.overlay.intro, .overlay.opening')) { setTimeout(() => showUpdate(j), 3000); return; }
     const b = document.createElement('div'); b.className = 'upd-bar';
-    b.innerHTML = `<span><b>Új verzió érhető el!</b>${j.note ? `<small>${String(j.note).replace(/[<>&]/g, '')}</small>` : ''}</span><button class="btn primary">Frissítés</button>`;
-    b.querySelector('button').onclick = async () => {
-      b.querySelector('button').disabled = true;
+    b.innerHTML = `<span><b>Új verzió érhető el!</b>${j.note ? `<small>${String(j.note).replace(/[<>&]/g, '')}</small>` : ''}</span><button class="btn primary upd-go">Frissítés</button><button class="upd-x" aria-label="Később">✕</button>`;
+    b.querySelector('.upd-x').onclick = () => { b.remove(); setTimeout(() => showUpdate(j), 10 * 60 * 1000); };   // 10 perc múlva újra szól
+    const hideT = setInterval(() => { if (!b.isConnected) return clearInterval(hideT); b.hidden = inMatch(); }, 1000);   // ha közben meccs indul, eltűnik
+    b.querySelector('.upd-go').onclick = async () => {
+      b.querySelector('.upd-go').disabled = true;
       try { const regs = await navigator.serviceWorker?.getRegistrations?.() || []; await Promise.all(regs.map(r => r.update().catch(() => {}))); } catch {}
       location.reload();
     };
