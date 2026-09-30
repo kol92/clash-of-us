@@ -1267,6 +1267,18 @@ h1,h2,h3{font-family:var(--display);font-weight:400;letter-spacing:.01em;text-wr
 #app>.screen:not(#scr-game):not(#scr-edit){padding-bottom:calc(14px + env(safe-area-inset-bottom,0px));}
 #scr-edit{padding-bottom:env(safe-area-inset-bottom,0px);}
 .safe-probe{position:fixed;left:0;top:0;width:0;height:0;visibility:hidden;padding-top:env(safe-area-inset-top,0px);pointer-events:none;}
+
+/* nagyobb betűméret (iPhone „A A” / szövegméret) mellett se lógjon ki semmi a képernyőből */
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%;}
+.menu-btns{grid-template-columns:minmax(0,1fr);}
+.menu-btns>*,.m-play>*,.m-tile>*,.btn-row>*{min-width:0;}
+.m-play b{font-size:min(27px,6.8vw);overflow-wrap:anywhere;}
+.m-play small{font-size:min(15px,3.9vw);}
+.m-tile b{font-size:min(20px,5.3vw);overflow-wrap:anywhere;}
+.m-tile small{font-size:min(13px,3.4vw);}
+#scr-menu .btn-row .m-tile b{font-size:min(17px,4.4vw);}
+#scr-menu,#app{overflow-x:hidden;}
+@media (max-height:760px){.m-play b{font-size:min(23px,6.2vw);}}
 </style>
 
 <div id="app">
