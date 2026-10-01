@@ -424,6 +424,15 @@ h1,h2,h3{font-family:var(--display);font-weight:400;letter-spacing:.01em;text-wr
 @keyframes heroHit{20%{background:rgba(255,93,108,.45);border-color:var(--red)}}
 .hbar.fx-heroheal{animation:heroHeal .7s;}
 @keyframes heroHeal{30%{background:rgba(79,224,166,.35);border-color:var(--green)}}
+.zap-orb{position:fixed;z-index:62;pointer-events:none;width:46px;height:46px;border-radius:50%;display:grid;place-items:center;font-size:24px;line-height:1;background:radial-gradient(circle,#fff 0 18%,#ffd36b 34%,#ff6a2a 58%,rgba(255,60,20,0) 72%);box-shadow:0 0 22px 8px rgba(255,120,40,.65);}
+.zap-orb.kill{background:radial-gradient(circle,#fff 0 16%,#d9b3ff 32%,#7b2cff 56%,rgba(60,0,120,0) 72%);box-shadow:0 0 26px 10px rgba(140,60,255,.7);}
+.zap-orb.steal{background:radial-gradient(circle,#fff 0 16%,#bfffd0 32%,#22c55e 56%,rgba(0,90,40,0) 72%);box-shadow:0 0 22px 8px rgba(40,200,110,.6);}
+.zap-boom{position:fixed;z-index:61;pointer-events:none;width:30px;height:30px;border-radius:50%;transform:translate(-50%,-50%);border:4px solid #ffb347;box-shadow:0 0 30px 10px rgba(255,140,40,.6);animation:zapBoom .6s ease-out forwards;}
+.zap-boom.kill{border-color:#b98cff;box-shadow:0 0 34px 12px rgba(140,60,255,.7);}
+.zap-boom.steal{border-color:#4ade80;box-shadow:0 0 30px 10px rgba(40,200,110,.6);}
+@keyframes zapBoom{from{width:30px;height:30px;opacity:1}to{width:170px;height:170px;opacity:0;border-width:1px}}
+.zap-mark{outline:3px solid #ff5a5a;outline-offset:2px;border-radius:10px;animation:zapMark .3s ease-in-out infinite alternate;}
+@keyframes zapMark{from{filter:brightness(1)}to{filter:brightness(1.5) drop-shadow(0 0 10px #ff5a5a)}}
 .slash{position:fixed;z-index:61;pointer-events:none;width:110px;height:5px;border-radius:3px;background:linear-gradient(90deg,transparent,#fff 45%,#ffe3e6 55%,transparent);box-shadow:0 0 14px #fff,0 0 26px var(--red);transform:translate(-50%,-50%) rotate(-35deg) scaleX(0);animation:slash .35s ease-out forwards;}
 @keyframes slash{0%{transform:translate(-50%,-50%) rotate(-35deg) scaleX(0);opacity:1}55%{transform:translate(-50%,-50%) rotate(-35deg) scaleX(1.1);opacity:1}100%{transform:translate(-50%,-50%) rotate(-35deg) scaleX(1.25);opacity:0}}
 @media (prefers-reduced-motion:reduce){.card.foil,.card.foil .cframe::after,.cell.tgt,.cell.aim,#endBtn.nudge{animation:none!important;}}
@@ -1541,7 +1550,7 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%;}
 <script src="vendor/firebase-auth-compat.js"></script>
 <script src="vendor/firebase-firestore-compat.js"></script>
 <script src="vendor/firebase-database-compat.js"></script>
-<script>window.APP_VERSION = "2026.10.01-1500";</script>
+<script>window.APP_VERSION = "2026.10.01-1508";</script>
 <script>// ===== Best of Us – saját szerver (Firebase) =====
 // A játék eredetileg a Claude-os tárolót használta (window.claude.use('db' | 'user' | 'room')).
 // Ez a fájl ugyanazt a felületet adja Firebase-ből, így a játék kódja szinte változatlan maradhat:
@@ -1812,6 +1821,7 @@ const CARDS = [
   { id:'c_alekosz', type:'char', name:'Alekosz Tibi', cost:4, atk:2, hp:2, rarity:'e', text:'Kijátszáskor ellop egy véletlen ellenséges karaktert, és maga mellé teszi (ha van mellette üres hely).' },
   { id:'c_norbi', type:'char', name:'Lukács Norbi', cost:3, atk:2, hp:3, rarity:'r', text:'Ha mellette áll egy másik karaktered, +2 támadást kap.' },
   { id:'c_udvarhelyi', type:'char', name:'Udvarhelyi Zoli', cost:6, atk:5, hp:5, rarity:'k', text:'' },
+  { id:'c_molnar', type:'char', name:'Molnár Zsolti', cost:5, atk:2, hp:4, rarity:'r', deathKill:true, text:'Amikor meghal, elpusztít egy véletlen ellenséges karaktert.' },
   { id:'c_zana', type:'char', name:'Zana', cost:4, atk:3, hp:3, rarity:'e', text:'Körönként kétszer támad.' },
   { id:'c_ati', type:'char', name:'Ati', cost:4, atk:8, hp:4, rarity:'e', muscle:true, text:'Csak akkor támad, ha nincs más karaktered a táblán.' },
   { id:'c_veghtomi', type:'char', name:'Végh Tomi', cost:4, atk:3, hp:5, rarity:'k', taunt:true, text:'Amíg él, az ellenfél karakterei mindig őt támadják, bárhol áll.' },
@@ -2098,6 +2108,7 @@ function playCard(s, pi, hi, t) {
       if (j >= 0 && cand.length) {
         const k = cand[Math.floor(rnd() * cand.length)];
         reveal(s, ei, k);
+        ev(s, { t:'zap', side:pi, i:t.i, ts:ei, ti:k, kind:'steal' });
         const u = e.board[k]; e.board[k] = null;
         // az eszközök gazdája marad, aki rátette: ami eddig „idegen” volt, az most az enyém, a többi az ellenfélé
         const oldFoe = [...(u.foe || [])], foe = [];
@@ -2254,8 +2265,18 @@ function cleanup(s) {
           if (has(p, 'deathPing') && u.id !== 'c_korso') damageHero(s, other(side), 1);
           if (CARD[u.id].deathBlast) {   // Kovács Bence: 2 sebzés a szemben állónak, ha nincs ott senki, az ellenfél hősének
             const os = other(side), x = s.players[os].board[i];
-            ev(s, { t:'deathblast', side, i });
+            ev(s, { t:'zap', side, i, ts:os, ti:x && x.hp > 0 ? i : -1, kind:'blast' });
             if (x && x.hp > 0) damageUnit(s, os, i, CARD[u.id].deathBlast); else damageHero(s, os, CARD[u.id].deathBlast);
+          }
+          if (CARD[u.id].deathKill) {   // Molnár Zsolti: halálakor egy véletlen ellenséges karaktert elpusztít (pajzs sem véd)
+            const os = other(side), ob = s.players[os].board;
+            const cand = ob.map((x, k) => x && x.hp > 0 && x.id !== 'c_korso' ? k : -1).filter(k => k >= 0);
+            if (cand.length) {
+              const k = cand[Math.floor(rnd() * cand.length)];
+              reveal(s, os, k);
+              ev(s, { t:'zap', side, i, ts:os, ti:k, kind:'kill' });
+              ob[k].shield = false; ob[k].hp = 0;
+            }
           }
         }
       });
@@ -2562,6 +2583,7 @@ const ART = {
   c_veghtomi: { src:'art/veghtomi.webp', pos:'45% 15%' },
   c_zana:   { src:'art/zana.webp', pos:'38% 20%' },
   c_norbi:  { src:'art/norbi.webp', pos:'42% 18%' },
+  c_molnar: { src:'art/molnar.webp', pos:'50% 22%' },
   c_udvarhelyi: { src:'art/udvarhelyi.webp', pos:'47% 5%' },
   c_alekosz: { src:'art/alekosz.webp', pos:'52% 16%' },
   i_aranylanc: { src:'art/nyaklanc.webp', pos:'50% 55%' },
@@ -2741,6 +2763,8 @@ function floatAt(el, text, cls) {
   const f = document.createElement('div'); f.className = 'float ' + cls; f.textContent = text;
   f.style.left = (r.left + r.width / 2) + 'px'; f.style.top = (r.top + r.height / 2) + 'px';
   $('#layer').appendChild(f); setTimeout(() => f.remove(), 1000);
+  const w = f.offsetWidth, x = r.left + r.width / 2;   // a képernyő szélén se lógjon ki a felirat
+  if (w) f.style.left = Math.min(Math.max(x, w / 2 + 6), innerWidth - w / 2 - 6) + 'px';
 }
 const cellEl = (side, i) => document.querySelector(`.cell[data-side="${side}"][data-i="${i}"]`);
 const barEl = side => side === ME ? $('#pBar') : $('#eBar');
@@ -2762,6 +2786,33 @@ function slashAt(el) {
   $('#layer').appendChild(s); setTimeout(() => s.remove(), 450);
 }
 const unitAt = (side, i) => cellEl(side, i)?.querySelector('.unit');
+// Célzott hatás: fénygolyó repül a forrásból a célpontig, hogy látszódjon, mi kit talált el (Molnár Zsolti, Kovács Bence, Alekosz Tibi…)
+async function zapFx(e) {
+  const from = cellEl(e.side, e.i), to = e.ti === -1 ? barEl(e.ts)?.querySelector('.hpbar') : cellEl(e.ts, e.ti);
+  if (!from || !to) return;
+  const a = from.getBoundingClientRect(), b = to.getBoundingClientRect();
+  const x0 = a.left + a.width / 2, y0 = a.top + a.height / 2, x1 = b.left + b.width / 2, y1 = b.top + b.height / 2;
+  const tgt = e.ti === -1 ? barEl(e.ts) : unitAt(e.ts, e.ti);
+  if (tgt) tgt.classList.add('zap-mark');   // a célpont már repülés közben jelölve van
+  const o = document.createElement('div'); o.className = 'zap-orb ' + e.kind;
+  o.textContent = e.kind === 'kill' ? '💀' : e.kind === 'steal' ? '🫳' : '💥';
+  o.style.left = x0 + 'px'; o.style.top = y0 + 'px';
+  $('#layer').appendChild(o);
+  const dx = x1 - x0, dy = y1 - y0, lift = Math.min(90, Math.hypot(dx, dy) * 0.35);
+  await o.animate([
+    { transform: 'translate(-50%,-50%) scale(.4)', opacity: 0 },
+    { transform: 'translate(-50%,-50%) scale(1.25)', opacity: 1, offset: .15 },
+    { transform: `translate(calc(-50% + ${dx / 2}px), calc(-50% + ${dy / 2 - lift}px)) scale(1.1)`, opacity: 1, offset: .55 },
+    { transform: `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px)) scale(1)`, opacity: 1 },
+  ], { duration: 620, easing: 'cubic-bezier(.45,0,.4,1)', fill: 'forwards' }).finished;
+  o.remove();
+  const boom = document.createElement('div'); boom.className = 'zap-boom ' + e.kind;
+  boom.style.left = x1 + 'px'; boom.style.top = y1 + 'px'; $('#layer').appendChild(boom); setTimeout(() => boom.remove(), 650);
+  if (tgt) { tgt.classList.remove('zap-mark'); fx(tgt, e.kind === 'steal' ? 'fx-buff' : 'fx-hit'); }
+  if (e.kind === 'kill') floatAt(to, '💀 Elpusztítva!', 'dmg');
+  if (e.kind === 'blast') floatAt(to, '💥 Utolsó ütés!', 'dmg');
+  await sleep(e.kind === 'kill' ? 380 : 200);
+}
 let revealed = new Set();
 // kijátszás: előbb maga a lap jelenik meg (karakter leszáll a helyére, akció/eszköz/helyszín felvillan), csak utána jönnek a hatásai
 const preLanded = new Set();
@@ -2829,6 +2880,7 @@ async function animateEvents(evs) {
       case 'summon': floatAt(anchor, 'Query!', 'info'); hold = Math.max(hold, 300); break;
       case 'drinkgift': floatAt(anchor, e.side === ME ? `🍸 ${CARD[e.id].name} a kezedbe!` : '🍸 Ital a kezébe!', 'info'); hold = Math.max(hold, 700); break;
       case 'deathblast': floatAt(anchor, '💥 Utolsó ütés!', 'dmg'); hold = Math.max(hold, 450); break;
+      case 'zap': await zapFx(e); break;
       case 'locgone': floatAt(anchor, `🚫 ${CARD[e.id].name} bezárt`, 'info'); hold = Math.max(hold, 600); break;
       case 'swap': floatAt(anchor, 'Helycsere!', 'info'); hold = Math.max(hold, 300); break;
       case 'push': floatAt(anchor, 'Arrébb tolva!', 'info'); hold = Math.max(hold, 300); break;
@@ -3489,7 +3541,7 @@ function starterCollection() {
   return coll;
 }
 // Később bekerült gyakori lapok: a meglévő profilok is megkapják (gv = kiosztási verzió)
-const STARTER_ADDS = { 2: ['a_delfin', 'i_varazsho', 'i_lepke'], 3: ['a_rehab'], 4: ['c_pp'], 5: ['c_nfc'], 6: ['a_cheddar'], 7: ['c_vajda', 'c_veghtomi'], 8: ['c_kovacs'], 9: ['a_kitiltva'], 10: ['a_haver'], 11: PLAYABLE.filter(c => c.rarity === 'r' && !c.variantOf).map(c => c.id), 12: ['c_sasimeselo'], 13: ['c_norbi'], 14: ['c_udvarhelyi'] };   // 12: Laci új kezdőpaklijához   // 11: minden ritka lapból 1 (a kezdőpaklikhoz)
+const STARTER_ADDS = { 2: ['a_delfin', 'i_varazsho', 'i_lepke'], 3: ['a_rehab'], 4: ['c_pp'], 5: ['c_nfc'], 6: ['a_cheddar'], 7: ['c_vajda', 'c_veghtomi'], 8: ['c_kovacs'], 9: ['a_kitiltva'], 10: ['a_haver'], 11: PLAYABLE.filter(c => c.rarity === 'r' && !c.variantOf).map(c => c.id), 12: ['c_sasimeselo'], 13: ['c_norbi'], 14: ['c_udvarhelyi'], 15: ['c_molnar'] };   // 12: Laci új kezdőpaklijához   // 11: minden ritka lapból 1 (a kezdőpaklikhoz)
 const GRANT_V = Math.max(1, ...Object.keys(STARTER_ADDS).map(Number));
 // Ajándékok: minden profil egyszer kapja meg (a meglévők a következő megnyitáskor, az újak létrehozáskor)
 const GIFTS = [{ id: 'g-2026-09-28', packs: 1 }, { id: 'g-2026-09-28b', packs: 5 },

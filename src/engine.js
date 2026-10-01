@@ -25,6 +25,7 @@ const CARDS = [
   { id:'c_alekosz', type:'char', name:'Alekosz Tibi', cost:4, atk:2, hp:2, rarity:'e', text:'Kijátszáskor ellop egy véletlen ellenséges karaktert, és maga mellé teszi (ha van mellette üres hely).' },
   { id:'c_norbi', type:'char', name:'Lukács Norbi', cost:3, atk:2, hp:3, rarity:'r', text:'Ha mellette áll egy másik karaktered, +2 támadást kap.' },
   { id:'c_udvarhelyi', type:'char', name:'Udvarhelyi Zoli', cost:6, atk:5, hp:5, rarity:'k', text:'' },
+  { id:'c_molnar', type:'char', name:'Molnár Zsolti', cost:5, atk:2, hp:4, rarity:'r', deathKill:true, text:'Amikor meghal, elpusztít egy véletlen ellenséges karaktert.' },
   { id:'c_zana', type:'char', name:'Zana', cost:4, atk:3, hp:3, rarity:'e', text:'Körönként kétszer támad.' },
   { id:'c_ati', type:'char', name:'Ati', cost:4, atk:8, hp:4, rarity:'e', muscle:true, text:'Csak akkor támad, ha nincs más karaktered a táblán.' },
   { id:'c_veghtomi', type:'char', name:'Végh Tomi', cost:4, atk:3, hp:5, rarity:'k', taunt:true, text:'Amíg él, az ellenfél karakterei mindig őt támadják, bárhol áll.' },
@@ -311,6 +312,7 @@ function playCard(s, pi, hi, t) {
       if (j >= 0 && cand.length) {
         const k = cand[Math.floor(rnd() * cand.length)];
         reveal(s, ei, k);
+        ev(s, { t:'zap', side:pi, i:t.i, ts:ei, ti:k, kind:'steal' });
         const u = e.board[k]; e.board[k] = null;
         // az eszközök gazdája marad, aki rátette: ami eddig „idegen” volt, az most az enyém, a többi az ellenfélé
         const oldFoe = [...(u.foe || [])], foe = [];
@@ -467,8 +469,18 @@ function cleanup(s) {
           if (has(p, 'deathPing') && u.id !== 'c_korso') damageHero(s, other(side), 1);
           if (CARD[u.id].deathBlast) {   // Kovács Bence: 2 sebzés a szemben állónak, ha nincs ott senki, az ellenfél hősének
             const os = other(side), x = s.players[os].board[i];
-            ev(s, { t:'deathblast', side, i });
+            ev(s, { t:'zap', side, i, ts:os, ti:x && x.hp > 0 ? i : -1, kind:'blast' });
             if (x && x.hp > 0) damageUnit(s, os, i, CARD[u.id].deathBlast); else damageHero(s, os, CARD[u.id].deathBlast);
+          }
+          if (CARD[u.id].deathKill) {   // Molnár Zsolti: halálakor egy véletlen ellenséges karaktert elpusztít (pajzs sem véd)
+            const os = other(side), ob = s.players[os].board;
+            const cand = ob.map((x, k) => x && x.hp > 0 && x.id !== 'c_korso' ? k : -1).filter(k => k >= 0);
+            if (cand.length) {
+              const k = cand[Math.floor(rnd() * cand.length)];
+              reveal(s, os, k);
+              ev(s, { t:'zap', side, i, ts:os, ti:k, kind:'kill' });
+              ob[k].shield = false; ob[k].hp = 0;
+            }
           }
         }
       });

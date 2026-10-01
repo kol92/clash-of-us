@@ -153,6 +153,7 @@ const ART = {
   c_veghtomi: { src:'art/veghtomi.webp', pos:'45% 15%' },
   c_zana:   { src:'art/zana.webp', pos:'38% 20%' },
   c_norbi:  { src:'art/norbi.webp', pos:'42% 18%' },
+  c_molnar: { src:'art/molnar.webp', pos:'50% 22%' },
   c_udvarhelyi: { src:'art/udvarhelyi.webp', pos:'47% 5%' },
   c_alekosz: { src:'art/alekosz.webp', pos:'52% 16%' },
   i_aranylanc: { src:'art/nyaklanc.webp', pos:'50% 55%' },
@@ -332,6 +333,8 @@ function floatAt(el, text, cls) {
   const f = document.createElement('div'); f.className = 'float ' + cls; f.textContent = text;
   f.style.left = (r.left + r.width / 2) + 'px'; f.style.top = (r.top + r.height / 2) + 'px';
   $('#layer').appendChild(f); setTimeout(() => f.remove(), 1000);
+  const w = f.offsetWidth, x = r.left + r.width / 2;   // a képernyő szélén se lógjon ki a felirat
+  if (w) f.style.left = Math.min(Math.max(x, w / 2 + 6), innerWidth - w / 2 - 6) + 'px';
 }
 const cellEl = (side, i) => document.querySelector(`.cell[data-side="${side}"][data-i="${i}"]`);
 const barEl = side => side === ME ? $('#pBar') : $('#eBar');
@@ -353,6 +356,33 @@ function slashAt(el) {
   $('#layer').appendChild(s); setTimeout(() => s.remove(), 450);
 }
 const unitAt = (side, i) => cellEl(side, i)?.querySelector('.unit');
+// Célzott hatás: fénygolyó repül a forrásból a célpontig, hogy látszódjon, mi kit talált el (Molnár Zsolti, Kovács Bence, Alekosz Tibi…)
+async function zapFx(e) {
+  const from = cellEl(e.side, e.i), to = e.ti === -1 ? barEl(e.ts)?.querySelector('.hpbar') : cellEl(e.ts, e.ti);
+  if (!from || !to) return;
+  const a = from.getBoundingClientRect(), b = to.getBoundingClientRect();
+  const x0 = a.left + a.width / 2, y0 = a.top + a.height / 2, x1 = b.left + b.width / 2, y1 = b.top + b.height / 2;
+  const tgt = e.ti === -1 ? barEl(e.ts) : unitAt(e.ts, e.ti);
+  if (tgt) tgt.classList.add('zap-mark');   // a célpont már repülés közben jelölve van
+  const o = document.createElement('div'); o.className = 'zap-orb ' + e.kind;
+  o.textContent = e.kind === 'kill' ? '💀' : e.kind === 'steal' ? '🫳' : '💥';
+  o.style.left = x0 + 'px'; o.style.top = y0 + 'px';
+  $('#layer').appendChild(o);
+  const dx = x1 - x0, dy = y1 - y0, lift = Math.min(90, Math.hypot(dx, dy) * 0.35);
+  await o.animate([
+    { transform: 'translate(-50%,-50%) scale(.4)', opacity: 0 },
+    { transform: 'translate(-50%,-50%) scale(1.25)', opacity: 1, offset: .15 },
+    { transform: `translate(calc(-50% + ${dx / 2}px), calc(-50% + ${dy / 2 - lift}px)) scale(1.1)`, opacity: 1, offset: .55 },
+    { transform: `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px)) scale(1)`, opacity: 1 },
+  ], { duration: 620, easing: 'cubic-bezier(.45,0,.4,1)', fill: 'forwards' }).finished;
+  o.remove();
+  const boom = document.createElement('div'); boom.className = 'zap-boom ' + e.kind;
+  boom.style.left = x1 + 'px'; boom.style.top = y1 + 'px'; $('#layer').appendChild(boom); setTimeout(() => boom.remove(), 650);
+  if (tgt) { tgt.classList.remove('zap-mark'); fx(tgt, e.kind === 'steal' ? 'fx-buff' : 'fx-hit'); }
+  if (e.kind === 'kill') floatAt(to, '💀 Elpusztítva!', 'dmg');
+  if (e.kind === 'blast') floatAt(to, '💥 Utolsó ütés!', 'dmg');
+  await sleep(e.kind === 'kill' ? 380 : 200);
+}
 let revealed = new Set();
 // kijátszás: előbb maga a lap jelenik meg (karakter leszáll a helyére, akció/eszköz/helyszín felvillan), csak utána jönnek a hatásai
 const preLanded = new Set();
@@ -420,6 +450,7 @@ async function animateEvents(evs) {
       case 'summon': floatAt(anchor, 'Query!', 'info'); hold = Math.max(hold, 300); break;
       case 'drinkgift': floatAt(anchor, e.side === ME ? `🍸 ${CARD[e.id].name} a kezedbe!` : '🍸 Ital a kezébe!', 'info'); hold = Math.max(hold, 700); break;
       case 'deathblast': floatAt(anchor, '💥 Utolsó ütés!', 'dmg'); hold = Math.max(hold, 450); break;
+      case 'zap': await zapFx(e); break;
       case 'locgone': floatAt(anchor, `🚫 ${CARD[e.id].name} bezárt`, 'info'); hold = Math.max(hold, 600); break;
       case 'swap': floatAt(anchor, 'Helycsere!', 'info'); hold = Math.max(hold, 300); break;
       case 'push': floatAt(anchor, 'Arrébb tolva!', 'info'); hold = Math.max(hold, 300); break;
