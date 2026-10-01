@@ -365,7 +365,7 @@ async function zapFx(e) {
   const tgt = e.ti === -1 ? barEl(e.ts) : unitAt(e.ts, e.ti);
   if (tgt) tgt.classList.add('zap-mark');   // a célpont már repülés közben jelölve van
   const o = document.createElement('div'); o.className = 'zap-orb ' + e.kind;
-  o.textContent = e.kind === 'kill' ? '💀' : e.kind === 'steal' ? '🫳' : '💥';
+  o.textContent = e.kind === 'kill' ? '💀' : e.kind === 'steal' ? '🫳' : e.kind === 'sound' ? '🔊' : '💥';
   o.style.left = x0 + 'px'; o.style.top = y0 + 'px';
   $('#layer').appendChild(o);
   const dx = x1 - x0, dy = y1 - y0, lift = Math.min(90, Math.hypot(dx, dy) * 0.35);
@@ -380,14 +380,16 @@ async function zapFx(e) {
   boom.style.left = x1 + 'px'; boom.style.top = y1 + 'px'; $('#layer').appendChild(boom); setTimeout(() => boom.remove(), 650);
   if (tgt) { tgt.classList.remove('zap-mark'); fx(tgt, e.kind === 'steal' ? 'fx-buff' : 'fx-hit'); }
   if (e.kind === 'kill') floatAt(to, '💀 Elpusztítva!', 'dmg');
+  if (e.kind === 'sound') { fx($('#app'), 'fx-quake'); floatAt(to, '🔊 Kifújta a basszus!', 'dmg'); }
   if (e.kind === 'blast') floatAt(to, '💥 Utolsó ütés!', 'dmg');
-  await sleep(e.kind === 'kill' ? 380 : 200);
+  await sleep(e.kind === 'kill' || e.kind === 'sound' ? 380 : 200);
 }
 let revealed = new Set();
 // kijátszás: előbb maga a lap jelenik meg (karakter leszáll a helyére, akció/eszköz/helyszín felvillan), csak utána jönnek a hatásai
 const preLanded = new Set();
 async function playIntro(e, hasFx) {
   const c = CARD[e.id]; if (!c) return;
+  if (c.finisher) { await finisherIntro(e); return; }
   if (c.type === 'char' && e.at != null) {
     const u = S.players[e.side].board[e.at], cell = cellEl(e.side, e.at);
     if (!u || !cell || cell.querySelector('.unit')) return;
@@ -447,7 +449,18 @@ async function animateEvents(evs) {
       case 'death':
         if (el) { const d = el; setTimeout(() => { d.classList.remove('fx-hit'); fx(d, 'fx-die'); }, 220); }
         hold = Math.max(hold, 900); break;
-      case 'summon': floatAt(anchor, 'Query!', 'info'); hold = Math.max(hold, 300); break;
+      case 'summon':
+        if (e.id === 'l_munkahely') floatAt($('#loc'), '🏢 Munkahely!', 'info');
+        else floatAt(anchor, `${CARD[e.id]?.name || 'Query'}!`, 'info');
+        hold = Math.max(hold, e.id === 'c_query' ? 300 : 520); break;
+      case 'rise': floatAt(anchor, `✝️ ${CARD[e.id].name} visszatért! +2/+2`, 'buff'); hold = Math.max(hold, 750); break;
+      case 'morph': fx(el, 'fx-heroheal'); fx($('#app'), 'fx-quake'); floatAt(anchor, '🦋 Metamorfózis! Itt van Baszó', 'buff'); hold = Math.max(hold, 1000); break;
+      case 'machineon': floatAt(anchor, '⚙️ Gépüzemmód bekapcsolva', 'info'); hold = Math.max(hold, 700); break;
+      case 'machine': fx(el, 'fx-heroheal'); fx($('#app'), 'fx-quake'); floatAt(anchor, '⚙️ GÉPÜZEMMÓD! Vissza 10 élettel', 'buff'); hold = Math.max(hold, 1200); break;
+      case 'heroatk': break;   // a lendülést a baszoAnim már lejátszotta
+      case 'chomp': await chompFx(e); break;
+      case 'swim': floatAt(anchor, '🦈 ←', 'info'); hold = Math.max(hold, 350); break;
+      case 'sharkgone': floatAt(anchor, '🦈 Elúszott…', 'info'); hold = Math.max(hold, 600); break;
       case 'drinkgift': floatAt(anchor, e.side === ME ? `🍸 ${CARD[e.id].name} a kezedbe!` : '🍸 Ital a kezébe!', 'info'); hold = Math.max(hold, 700); break;
       case 'deathblast': floatAt(anchor, '💥 Utolsó ütés!', 'dmg'); hold = Math.max(hold, 450); break;
       case 'zap': await zapFx(e); break;
@@ -498,15 +511,98 @@ async function runFx(fn) {
   revealed = new Set(); preLanded.clear();
 }
 
+// ---------- kivégző lapok ----------
+// Bevonulás: elsötétül a pálya, fénysugarak, a lap becsapódik középre, „KIVÉGZŐ” felirat
+async function finisherIntro(e) {
+  const c = CARD[e.id], h = HERO[c.hero];
+  const o = document.createElement('div'); o.className = 'fin-intro';
+  const sub = c.opts && e.o != null ? c.opts[e.o] : h ? `${h.name} kivégzője` : '';
+  o.innerHTML = `<div class="fin-dark"></div><div class="fin-rays"></div><div class="fin-card">${cardHTML(e.id, { big: true, foil: foilOf(e.side, e.id) })}</div>
+    <div class="fin-title"><small>${e.side === ME ? 'Kivégző' : 'Ellenséges kivégző'}</small><b>${c.name}</b><em>${sub}</em></div><div class="fin-flash"></div>`;
+  $('#layer').appendChild(o);
+  const dark = o.querySelector('.fin-dark'), rays = o.querySelector('.fin-rays'), card = o.querySelector('.fin-card'), title = o.querySelector('.fin-title'), flash = o.querySelector('.fin-flash');
+  await dark.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 560, easing: 'ease-in', fill: 'forwards' }).finished;
+  await sleep(120);
+  rays.animate([{ opacity: 0, transform: 'translate(-50%,-50%) scale(.5) rotate(0deg)' }, { opacity: 1, transform: 'translate(-50%,-50%) scale(1) rotate(40deg)' }], { duration: 700, easing: 'ease-out', fill: 'forwards' })
+    .finished.then(() => rays.animate([{ transform: 'translate(-50%,-50%) rotate(40deg)' }, { transform: 'translate(-50%,-50%) rotate(400deg)' }], { duration: 9000, iterations: Infinity }));
+  await card.animate([{ transform: 'translate(-50%,-50%) scale(2.8) rotate(-10deg)', opacity: 0, filter: 'blur(10px) brightness(3)' },
+                      { transform: 'translate(-50%,-50%) scale(.92) rotate(1.5deg)', opacity: 1, filter: 'blur(0) brightness(1.7)', offset: .72 },
+                      { transform: 'translate(-50%,-50%) scale(1) rotate(0deg)', opacity: 1, filter: 'brightness(1)' }], { duration: 650, easing: 'cubic-bezier(.3,.9,.3,1)', fill: 'forwards' }).finished;
+  fx($('#app'), 'fx-quake');
+  flash.animate([{ opacity: .85 }, { opacity: 0 }], { duration: 420, easing: 'ease-out', fill: 'forwards' });
+  title.animate([{ opacity: 0, transform: 'translate(-50%,0) scale(1.7)', letterSpacing: '.5em' }, { opacity: 1, transform: 'translate(-50%,0) scale(1)', letterSpacing: '.02em' }],
+                { duration: 520, easing: 'cubic-bezier(.2,1.3,.4,1)', fill: 'forwards' });
+  card.animate([{ filter: 'brightness(1) drop-shadow(0 0 0 rgba(255,80,40,0))' }, { filter: 'brightness(1.25) drop-shadow(0 0 28px rgba(255,80,40,.9))' }, { filter: 'brightness(1) drop-shadow(0 0 0 rgba(255,80,40,0))' }],
+               { duration: 1100, iterations: 2, easing: 'ease-in-out' });
+  const t0 = performance.now();
+  await Promise.race([sleep(2000), new Promise(r => o.addEventListener('pointerdown', () => { if (performance.now() - t0 > 500) r(); }))]);
+  card.animate([{ opacity: 1, transform: 'translate(-50%,-50%) scale(1)', filter: 'brightness(1)' }, { opacity: 0, transform: 'translate(-50%,-50%) scale(1.25)', filter: 'brightness(3)' }], { duration: 380, easing: 'ease-in', fill: 'forwards' });
+  await o.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 460, delay: 140, fill: 'forwards' }).finished;
+  o.remove();
+}
+// Gluténbomba: két lehetőség közül választasz
+function chooseOpt(c) {
+  return new Promise(res => {
+    const o = document.createElement('div'); o.className = 'overlay';
+    o.innerHTML = `<div class="modal opt-box"><h3>${c.name}</h3><p class="live">Válassz:</p>${c.opts.map((t, k) => `<button class="btn primary opt-btn" data-o="${k}">${t}</button>`).join('')}<button class="btn opt-x" data-o="x">Mégse</button></div>`;
+    o.onclick = ev => { const b = ev.target.closest('[data-o]'); if (!b && ev.target !== o) return; o.remove(); res(!b || b.dataset.o === 'x' ? null : +b.dataset.o); };
+    $('#layer').appendChild(o);
+  });
+}
+// Baszó támadása: a hős portréja nekilendül a célpontnak (a legbalra álló ellenséges karakter vagy az ellenfél hőse)
+async function baszoAnim(pi) {
+  const port = barEl(pi)?.querySelector('.hport'), foe = other(pi);
+  const j = S.players[foe].board.findIndex(Boolean);
+  const target = j >= 0 ? (unitAt(foe, j) || cellEl(foe, j)) : barEl(foe);
+  if (!port || !target) { await runFx(() => baszoStrike(S)); return; }
+  const a = port.getBoundingClientRect(), b = target.getBoundingClientRect();
+  const fly = port.cloneNode(true); fly.classList.add('hport-fly');
+  Object.assign(fly.style, { left: a.left + 'px', top: a.top + 'px', width: a.width + 'px', height: a.height + 'px' });
+  fly.querySelectorAll('button').forEach(x => x.remove());
+  $('#layer').appendChild(fly); port.style.visibility = 'hidden';
+  floatAt(port, 'Baszó támad!', 'info');
+  const dx = (b.left + b.width / 2) - (a.left + a.width / 2), dy = (b.top + b.height / 2) - (a.top + a.height / 2);
+  await fly.animate([{ transform: 'none' }, { transform: `translate(${-dx * .06}px,${-dy * .06}px) scale(1.18) rotate(-6deg)` }], { duration: 260, easing: 'cubic-bezier(.3,0,.6,1)', fill: 'forwards' }).finished;
+  await fly.animate([{ transform: `translate(${-dx * .06}px,${-dy * .06}px) scale(1.18) rotate(-6deg)` }, { transform: `translate(${dx * .82}px,${dy * .82}px) scale(1.25) rotate(6deg)` }], { duration: 190, easing: 'cubic-bezier(.6,0,1,.7)', fill: 'forwards' }).finished;
+  burstAt(b.left + b.width / 2, b.top + b.height / 2, j < 0); fx($('#app'), 'fx-quake');
+  const back = fly.animate([{ transform: `translate(${dx * .82}px,${dy * .82}px) scale(1.25) rotate(6deg)` }, { transform: 'none' }], { duration: 420, easing: 'cubic-bezier(.2,.8,.3,1)', fill: 'forwards' });
+  await Promise.all([runFx(() => baszoStrike(S)), back.finished]);
+  fly.remove(); const p2 = barEl(pi)?.querySelector('.hport'); if (p2) p2.style.visibility = '';
+}
+// Cápa: odaúszik a célponthoz, és összecsapódó állkapoccsal megeszi
+async function chompFx(e) {
+  const to = cellEl(e.side, e.i); if (!to) return;
+  const b = to.getBoundingClientRect(), x1 = b.left + b.width / 2, y1 = b.top + b.height / 2;
+  const from = e.from >= 0 ? cellEl(e.side, e.from) : null, a = from && from.getBoundingClientRect();
+  const x0 = a ? a.left + a.width / 2 : innerWidth + 60, y0 = a ? a.top + a.height / 2 : y1;
+  const tgt = unitAt(e.side, e.i); if (tgt) tgt.classList.add('zap-mark');
+  const sh = document.createElement('div'); sh.className = 'shark-fly'; sh.textContent = '🦈';
+  sh.style.left = x0 + 'px'; sh.style.top = y0 + 'px'; $('#layer').appendChild(sh);
+  await sh.animate([{ transform: 'translate(-50%,-50%) scale(.8) rotate(0deg)' }, { transform: `translate(calc(-50% + ${(x1 - x0) * .5}px), calc(-50% + ${(y1 - y0) * .5 - 26}px)) scale(1.1) rotate(-8deg)`, offset: .5 },
+                    { transform: `translate(calc(-50% + ${x1 - x0}px), calc(-50% + ${y1 - y0}px)) scale(1.35) rotate(6deg)` }], { duration: 620, easing: 'cubic-bezier(.45,0,.4,1)', fill: 'forwards' }).finished;
+  const jaws = document.createElement('div'); jaws.className = 'jaws'; jaws.innerHTML = '<i class="jaw up"></i><i class="jaw down"></i>';
+  Object.assign(jaws.style, { left: b.left + 'px', top: b.top + 'px', width: b.width + 'px', height: b.height + 'px' });
+  $('#layer').appendChild(jaws);
+  await Promise.all([...jaws.children].map((j, k) => j.animate([{ transform: `translateY(${k ? 70 : -70}%)` }, { transform: 'translateY(0)' }], { duration: 170, easing: 'cubic-bezier(.7,0,1,.6)', fill: 'forwards' }).finished));
+  fx($('#app'), 'fx-quake'); if (tgt) { tgt.classList.remove('zap-mark'); fx(tgt, 'fx-hit'); }
+  floatAt(to, '🦈 Megette!', 'dmg');
+  await sleep(260);
+  jaws.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 300, fill: 'forwards' }); sh.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 300, fill: 'forwards' });
+  await sleep(300); jaws.remove(); sh.remove();
+}
+
 // ---------- játék renderelés ----------
+// Krisz kivégzője után Baszó a hős (saját név, portré és képesség)
+const BASZO = { id:'baszo', name:'Baszó', hue:330, text:'A köröd végén a karaktereid után 3-at üt: mindig a legbalra álló ellenséges karaktert, ha nincs ilyen, az ellenfél hősét. Neki nem lehet visszaütni.' };
+const heroOf = pi => S.players[pi].baszo ? BASZO : HERO[S.players[pi].heroId];
 function heroBar(pi) {
-  const p = S.players[pi], h = HERO[p.heroId];
+  const p = S.players[pi], h = heroOf(pi), bz = !!p.baszo;
   const pips = Array.from({ length: 6 }, (_, k) => `<i class="${k < p.energy ? 'on' : k < p.maxEnergy ? 'used' : 'locked'}"></i>`).join('');
-  const gold = heroGoldOf(pi) && !!ART['g_' + h.id], aid = gold ? 'g_' + h.id : h.id;
+  const gold = !bz && heroGoldOf(pi) && !!ART['g_' + h.id], aid = gold ? 'g_' + h.id : h.id;
   const img = ART[aid] ? `background-image:url('${artSrc(aid, true)}');--hp:${ART[aid].port || '50% 7%'}` : '';
-  const fa = gold || heroFaOf(pi);
-  return `<div class="hport${ART[h.id] ? '' : ' noart'}${fa ? ' fa' : ''}${gold ? ' gold' : ''}" style="--h:${h.hue};${img}" aria-hidden="true">${ART[h.id] ? '' : `<span>${initials(h.name)}</span>`}${fa ? '<i class="hfa-holo"></i><i class="hfa-shine"></i><i class="hfa-rim"></i>' : ''}</div>
-    <button class="hport-hit" data-hero="${pi}" aria-label="${h.name} képessége"></button>${p.locked ? '<span class="hlock" title="Adios Motherfucker!: ebben a körében nem játszhat ki lapot">Bénult</span>' : ''}
+  const fa = !bz && (gold || heroFaOf(pi));
+  return `<div class="hport${ART[h.id] ? '' : ' noart'}${fa ? ' fa' : ''}${gold ? ' gold' : ''}${bz ? ' baszo' : ''}" style="--h:${h.hue};${img}" aria-hidden="true">${ART[h.id] ? '' : `<span>${initials(h.name)}</span>`}${fa ? '<i class="hfa-holo"></i><i class="hfa-shine"></i><i class="hfa-rim"></i>' : ''}</div>
+    <button class="hport-hit" data-hero="${pi}" aria-label="${h.name} képessége"></button>${p.machine === 1 ? '<span class="hmachine" title="Gépüzemmód: egyszer visszatér 10 élettel">⚙️</span>' : ''}${p.locked ? '<span class="hlock" title="Adios Motherfucker!: ebben a körében nem játszhat ki lapot">Bénult</span>' : ''}
     <div class="hinfo"><div class="hname">${h.name}<small>${pi === BOT ? (S.pvp ? escH(S.names?.[pi] || 'barát') : 'bot') : 'te'}</small></div>
       <div class="hpbar"><i style="width:${Math.max(0, p.hp) / p.maxHp * 100}%"></i><b>${Math.max(0, p.hp)} / ${p.maxHp}</b></div></div>
     <div class="res"><div class="en">${pips}<span>${p.energy}/${p.maxEnergy}</span></div>
@@ -517,8 +613,8 @@ function unitHTML(u, side, i) {
   if (u.hidden && side !== ME) return `<button data-uid="${u.uid}" class="unit facedown" aria-label="Rejtett lap">
     <span class="uin"><span class="art back-art"></span><span class="uname">Rejtett lap</span></span>
     <span class="st atk">?</span><span class="st hp">?</span>${u.stun ? `<span class="tags"><span class="zz stun">bénult ${u.stun}</span></span>` : ''}</button>`;
-  const c = CARD[u.id], atk = S.players[side].board[i]?.uid === u.uid ? effAtk(S, side, i) : u.atk, sleeping = u.fresh && !u.haste && u.id !== 'c_korso' && !u.stun;
-  const tags = (sleeping ? '<span class="zz">pihen</span>' : u.id === 'c_ati' && !u.stun && !atiFree(S, side, i) ? '<span class="zz">nem támad</span>' : '')
+  const c = CARD[u.id], atk = S.players[side].board[i]?.uid === u.uid ? effAtk(S, side, i) : u.atk, sleeping = u.fresh && !u.haste && u.id !== 'c_korso' && !c.noAttack && !u.stun;
+  const tags = (sleeping ? '<span class="zz">pihen</span>' : c.noAttack ? `<span class="zz">${u.id === 'c_capa' ? '🦈 úszik' : 'nem támad'}</span>` : u.id === 'c_ati' && !u.stun && !atiFree(S, side, i) ? '<span class="zz">nem támad</span>' : '')
     + (u.expire != null || u.doom ? '<span class="zz">eltűnik</span>' : '') + (u.stun ? `<span class="zz stun">bénult ${u.stun}</span>` : '')
     + (u.hidden ? '<span class="sneak-tag" title="Az ellenfél nem látja">rejtve</span>' : '')
     + (c.taunt || u.taunt ? '<span class="zz taunt" title="Provokáció: mindenki őt támadja">provokál</span>' : '');
@@ -532,7 +628,7 @@ function unitHTML(u, side, i) {
 function laneHTML(pi, tg) {
   return S.players[pi].board.map((u, i) => {
     const isT = tg.some(t => t.side === pi && t.i === i);
-    return `<div class="cell${isT ? ' tgt' : ''}" data-side="${pi}" data-i="${i}">${u ? unitHTML(u, pi, i) : ''}</div>`;
+    return `<div class="cell${isT ? ' tgt' : ''}${closedLane(S, pi, i) ? ' closed' : ''}" data-side="${pi}" data-i="${i}">${u ? unitHTML(u, pi, i) : ''}</div>`;
   }).join('');
 }
 // hosszú nevek automatikus kicsinyítése, hogy ne lógjanak ki a lap névsávjából
@@ -696,12 +792,17 @@ $('#scr-game').addEventListener('click', e => {
       openModal(cardHTML(g.dataset.gear, { big: true, foil: foilOf(+g.dataset.own, g.dataset.gear) }), `${CARD[u.id].name} karakteren · ${+g.dataset.own === ME ? 'te tetted rá' : 'az ellenfél tette rá'}`, cardHelpHTML(g.dataset.gear)); });
   }
   const hb = e.target.closest('[data-hero]');
-  if (hb) { const gp = heroGoldOf(+hb.dataset.hero); openModal(heroCardHTML(HERO[S.players[+hb.dataset.hero].heroId], { big: true, foil: heroFaOf(+hb.dataset.hero), gold: gp }), (+hb.dataset.hero === ME ? 'A te hősöd' : 'Az ellenfél hőse') + (gp ? ' · ✦ Arany' : '')); }
+  if (hb) { const gp = heroGoldOf(+hb.dataset.hero); openModal(heroCardHTML(heroOf(+hb.dataset.hero), { big: true, foil: !S.players[+hb.dataset.hero].baszo && heroFaOf(+hb.dataset.hero), gold: gp && !S.players[+hb.dataset.hero].baszo }), (+hb.dataset.hero === ME ? 'A te hősöd' : 'Az ellenfél hőse') + (gp ? ' · ✦ Arany' : '')); }
   if (e.target.closest('#loc') && S.location) openModal(cardHTML(S.location.id, { big: true, foil: foilOf(S.location.owner, S.location.id) }), `Kijátszotta: ${S.location.owner === ME ? 'te' : 'az ellenfél'}`, cardHelpHTML(S.location.id));
 });
 $('#hand').addEventListener('keydown', e => { if ((e.key === 'Enter' || e.key === ' ') && e.target.dataset.hi) { e.preventDefault(); e.target.click(); } });
 
 async function doPlay(hi, t) {
+  const c0 = CARD[S.players[ME].hand[hi]?.id];
+  if (c0 && c0.opts && (t == null || t.o == null)) {   // választós lap (Gluténbomba): előbb dönts
+    const o = await chooseOpt(c0); if (o == null) { ui.sel = null; ui.pend = null; render(); return; }
+    t = { k:'none', o };
+  }
   busy = true; ui.sel = null; ui.pend = null;
   const id = S.players[ME].hand[hi].id;
   if (S.pvp) pvpSeed();
@@ -803,6 +904,7 @@ async function resolveEnd() {
     await attackAnim(pi, i, u);
     await sleep(140);
   }
+  if (S.winner == null && S.players[pi].baszo && !S.players[pi].struck) { await baszoAnim(pi); await sleep(140); }
   await runFx(() => finishTurn(S));
 }
 
@@ -816,6 +918,7 @@ function flyTarget(id, tg) {
   return null;
 }
 async function showPlayed(id, tg) {
+  if (CARD[id].finisher) return;   // a kivégzőnek saját, nagy bevonulása van (playIntro)
   const secret = !!CARD[id].sneak;
   const back = document.createElement('div'); back.className = 'played';
   back.innerHTML = `<div class="wrap"><span class="tag">${S.pvp ? escH(S.names?.[BOT] || 'Az ellenfél') : HERO[S.players[BOT].heroId].name} ${secret ? 'lerakott egy rejtett lapot' : 'kijátszotta'}</span><span class="flip rev"><span class="flip-in"><span class="face back"></span><span class="face front">${cardHTML(id, { big: true, foil: foilOf(BOT, id) })}</span></span></span>${foilOf(BOT, id) && !CARD[id].sneak ? '<span class="fa-flash">✨ Full Art ✨</span>' : ''}<span class="skip">Koppints a folytatáshoz</span></div>`;

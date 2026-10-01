@@ -76,6 +76,23 @@ const CARDS = [
   { id:'l_park', type:'loc', name:'Budapest Park', cost:1, rarity:'k', text:'Minden lap kijátszása 1-gyel többe kerül.' },
   { id:'l_barhole', type:'loc', name:'Barhole', cost:1, rarity:'k', text:'Minden lap kijátszása 1-gyel kevesebbe kerül.' },
   { id:'l_laciverse', type:'loc', name:'Laciverse', cost:3, rarity:'e', text:'Csak annak segít, aki kijátszotta: minden karaktere +1 támadást kap.' },
+  // --- Kivégző lapok: hősönként egy, csak annak a hősnek a paklijába. off = még nincs grafika, sehol nem látszik ---
+  { id:'f_bender', type:'action', name:'Bender', cost:6, rarity:'l', finisher:true, hero:'bence', off:true, tgt:'summon', text:'Minden szabad helyedre egy Árnyékember (1/1) kerül. Minden hiányzó hely után mindegyik +1/+1-et kap (pl. 2 szabad hely: két 3/3-as).' },
+  { id:'f_egyutt', type:'action', name:'Együtt sírtok, együtt nevettek', cost:6, rarity:'l', finisher:true, hero:'gabi', off:true, tgt:'summon', text:'Megidéz egy Gyerek Zanát és egy Gyerek Gabit (mindkettő 5/5).' },
+  { id:'f_jbl', type:'action', name:'JBL', cost:6, rarity:'l', finisher:true, hero:'laci', off:true, tgt:'ownSlot', text:'Lerakod a JBL hangfalat (0/6). Amíg él, az ellenfél két szélső helye zárva van, és legfeljebb 2 karaktere lehet. Ha kijátszáskor 2-nél több karaktere van, a szélső helyeken állók elpusztulnak.' },
+  { id:'f_metamorf', type:'action', name:'Metamorfózis', cost:6, rarity:'l', finisher:true, hero:'krisz', off:true, text:'Krisz Baszóvá változik, és 12 élete lesz. Baszó minden köröd végén a karaktereid után 3-at üt: mindig a legbalra álló ellenséges karaktert, ha nincs ilyen, az ellenfél hősét. Neki nem lehet visszaütni.' },
+  { id:'f_atok', type:'action', name:'Az összetartás átka', cost:6, rarity:'l', finisher:true, hero:'tomi', off:true, tgt:'grave', text:'Két véletlen karakter visszatér a temetődből a pályára, az eredeti értékeinél +2/+2-vel.' },
+  { id:'f_munkahely', type:'action', name:'A munkahely', cost:6, rarity:'l', finisher:true, hero:'david', off:true, text:'Kijátssza a Munkahely helyszínt: a te lapjaid 1-gyel olcsóbbak, az ellenfélé 1-gyel drágábbak. Ha a Munkahely eltűnik, Dávid 5 életet gyógyul.' },
+  { id:'f_gepuzem', type:'action', name:'Gépüzemmód', cost:6, rarity:'l', finisher:true, hero:'milo', off:true, text:'Ha Milo meghalna, egyszer visszatér 10 élettel.' },
+  { id:'f_capa', type:'action', name:'Hátad mögött, cápa megesz!', cost:6, rarity:'l', finisher:true, hero:'barna', off:true, text:'Megidéz egy 9/9-es Cápát az ellenfél jobb szélső helyére (aki ott áll, azt megeszi). A köröd elején egy hellyel balra úszik, és megeszi, aki ott áll. Nem támad, de visszaüt. A bal szélre érve elpusztul.' },
+  { id:'f_gluten', type:'action', name:'Gluténbomba', cost:6, rarity:'l', finisher:true, hero:'sasi', off:true, opts:['5 sebzés + 5 gyógyulás', '8 sebzés, de te is kapsz 8-at'], text:'Válassz: 5 sebzés az ellenfél hősének és 5 életet gyógyulsz, vagy 8 sebzés az ellenfél hősének, de te is kapsz 8-at.' },
+  // a kivégzők által hozott, nem gyűjthető lapok
+  { id:'c_arnyek', type:'char', name:'Árnyékember', cost:0, atk:1, hp:1, rarity:'k', token:true, text:'Csak a Bender idézheti meg.' },
+  { id:'c_gyzana', type:'char', name:'Gyerek Zana', cost:0, atk:5, hp:5, rarity:'l', token:true, text:'Csak az Együtt sírtok, együtt nevettek idézheti meg.' },
+  { id:'c_gygabi', type:'char', name:'Gyerek Gabi', cost:0, atk:5, hp:5, rarity:'l', token:true, text:'Csak az Együtt sírtok, együtt nevettek idézheti meg.' },
+  { id:'c_jbl', type:'char', name:'JBL hangfal', cost:0, atk:0, hp:6, rarity:'l', token:true, noAttack:true, text:'Nem támad. Amíg él, az ellenfél két szélső helye zárva van, és legfeljebb 2 karaktere lehet.' },
+  { id:'c_capa', type:'char', name:'Cápa', cost:0, atk:9, hp:9, rarity:'l', token:true, noAttack:true, fixed:true, text:'Nem támad, de visszaüt. Gazdája körének elején egy hellyel balra úszik, és megeszi, aki ott áll. A bal szélre érve elpusztul.' },
+  { id:'l_munkahely', type:'loc', name:'Munkahely', cost:0, rarity:'l', token:true, text:'A gazdája lapjai 1-gyel olcsóbbak, az ellenfeléi 1-gyel drágábbak. Ha eltűnik, a gazdája 5 életet gyógyul.' },
   { id:'l_korhaz', type:'loc', name:'Siófoki Kórház', cost:1, rarity:'k', text:'Minden karakter 1 életet gyógyul a gazdája körének végén.' },
 ];
 const CARD = Object.fromEntries(CARDS.map(c => [c.id, c]));
@@ -95,7 +112,23 @@ const HERO = Object.fromEntries(HEROES.map(h => [h.id, h]));
 // passzív képességek → hős
 const PASSIVE = { firstCharAtk:'barna', endHeal:'gabi', firstTwo:'krisz', itemHp:'tomi', regular:'david', bigHp:'bence', deathPing:'milo', extraDraw:'laci', teamPing:'sasi' };
 const has = (p, key) => p.heroId === PASSIVE[key];
-const isReg = (s, side) => has(s.players[side], 'regular');   // Dávid, a törzsvendég: a helyszínek neki kedveznek
+const isReg = (s, side) => has(s.players[side], 'regular');
+// JBL hangfal: amíg az egyik oldalon él, a másik oldal két szélső helye zárva, és ott legfeljebb 2 karakter lehet
+const jblOn = (s, side) => s.players[side].board.some(u => u && u.id === 'c_jbl');
+const closedLane = (s, side, j) => (j === 0 || j === LANES - 1) && jblOn(s, 1 - side);
+function openSlots(s, side) {   // ahová most új karaktert lehet tenni (balról jobbra)
+  const b = s.players[side].board, jb = jblOn(s, 1 - side), out = [];
+  let n = b.filter(Boolean).length;
+  for (let j = 0; j < LANES; j++) {
+    if (b[j] || (jb && (j === 0 || j === LANES - 1))) continue;
+    if (jb && n >= 2) break;
+    out.push(j); if (jb) n++;
+  }
+  return out;
+}
+const canPlace = (s, side, j) => openSlots(s, side).includes(j);
+const isFixed = u => !!(u && CARD[u.id].fixed);
+const graveChars = p => p.grave.filter(g => CARD[g.id] && CARD[g.id].type === 'char' && !CARD[g.id].token);   // Dávid, a törzsvendég: a helyszínek neki kedveznek
 
 const DECKS = {
   roham: { name:'Rohamcsapat', hero:'barna', desc:'Olcsó, gyors karakterek és vodka az arcba. Kovács Bence halála is fáj, Barna minden körben felpörgeti az első emberét.',
@@ -191,10 +224,11 @@ function startTurn(s) {
   const pi = s.active, p = s.players[pi];
   s.half++; p.turns++;
   p.maxEnergy = Math.min(6, p.turns); p.energy = p.maxEnergy;
-  p.charThisTurn = false; p.itemThisTurn = false; p.drinkDraw = false;
+  p.charThisTurn = false; p.itemThisTurn = false; p.struck = false; p.drinkDraw = false;
   p.board.forEach(u => { if (u) u.fresh = false; });
   ev(s, { t:'turn', side:pi });
   if (s.half > 1) draw(s, pi);
+  sharkSwim(s, pi);
   if (has(p, 'extraDraw') && p.turns % 3 === 0) draw(s, pi);
   checkWin(s);
 }
@@ -203,6 +237,7 @@ function cardCost(s, pi, id) {
   const c = CARD[id], p = s.players[pi]; let v = c.cost;
   if (locIs(s, 'l_park') && !isReg(s, pi)) v++;
   if (locIs(s, 'l_barhole')) v -= isReg(s, pi) ? 2 : 1;
+  if (locIs(s, 'l_munkahely')) v += s.location.owner === pi ? -1 : 1;   // Dávid kivégzője
   if (c.type === 'item' && has(p, 'itemHp') && !p.itemThisTurn) v--;   // Tomi: körönként az első eszköz olcsóbb
   if (has(p, 'firstTwo') && (p.played || 0) < 2) v--;   // Krisz: a meccs első két lapja olcsóbb
   return Math.max(0, v);
@@ -228,12 +263,13 @@ function targetsFor(s, pi, id) {
   switch (c.type) {
     case 'char': {
       const foes = e.board.map((u, i) => u ? i : -1).filter(i => i >= 0);
+      const foesM = foes.filter(j => !isFixed(e.board[j]));
       p.board.forEach((u, i) => {
-        if (u) return;
-        const empt = e.board.map((u, j) => u ? -1 : j).filter(j => j >= 0);
-        if (c.playTgt === 'enemy' && foes.length) foes.forEach(j => T.push({ k:'slot', side:pi, i, t2:{ side:ei, i:j } }));
-        else if (c.playTgt === 'push' && foes.length && empt.length)   // Zsibrita: melyik ellenséget, és hova
-          foes.forEach(j => empt.forEach(k => T.push({ k:'slot', side:pi, i, t2:{ side:ei, i:j, t3:{ k:'eslot', side:ei, i:k } } })));
+        if (u || !canPlace(s, pi, i)) return;
+        const empt = e.board.map((u, j) => u || closedLane(s, ei, j) ? -1 : j).filter(j => j >= 0);
+        if (c.playTgt === 'enemy' && foesM.length) foesM.forEach(j => T.push({ k:'slot', side:pi, i, t2:{ side:ei, i:j } }));
+        else if (c.playTgt === 'push' && foesM.length && empt.length)   // Zsibrita: melyik ellenséget, és hova
+          foesM.forEach(j => empt.forEach(k => T.push({ k:'slot', side:pi, i, t2:{ side:ei, i:j, t3:{ k:'eslot', side:ei, i:k } } })));
         else T.push({ k:'slot', side:pi, i });
       });
       break;
@@ -247,7 +283,7 @@ function targetsFor(s, pi, id) {
       else if (c.tgt === 'own') own();
       else if (c.tgt === 'ownOrHero') { own(); T.push({ k:'hero', side:pi, i:-1 }); }
       else if (c.tgt === 'swap') {   // saját karakter + másik saját karakter (csere) vagy saját üres hely (átlépés)
-        p.board.forEach((u, a) => { if (u) p.board.forEach((x, b) => { if (b !== a) T.push({ k:'unit', side:pi, i:a, t2:{ k: x ? 'unit' : 'slot', side:pi, i:b } }); }); });
+        p.board.forEach((u, a) => { if (u && !isFixed(u)) p.board.forEach((x, b) => { if (b !== a && !isFixed(x) && (x || !closedLane(s, pi, b))) T.push({ k:'unit', side:pi, i:a, t2:{ k: x ? 'unit' : 'slot', side:pi, i:b } }); }); });
       }
       else if (c.tgt === 'two') {   // két különböző célpont: bármely karakter vagy az ellenfél hőse
         const one = [];
@@ -256,6 +292,10 @@ function targetsFor(s, pi, id) {
         if (one.length === 1) T.push(one[0]);
         else for (const a of one) for (const b of one) if (a !== b) T.push({ ...a, t2:{ ...b } });
       }
+      else if (c.tgt === 'summon') { if (openSlots(s, pi).length) T.push({ k:'none' }); }
+      else if (c.tgt === 'ownSlot') openSlots(s, pi).forEach(i => T.push({ k:'slot', side:pi, i }));
+      else if (c.tgt === 'grave') { if (openSlots(s, pi).length && graveChars(p).length) T.push({ k:'none' }); }
+      else if (c.opts) c.opts.forEach((_, o) => T.push({ k:'none', o }));
       else T.push({ k:'none' });
   }
   return T;
@@ -265,10 +305,14 @@ function whyNot(s, pi, hi) {
   const h = s.players[pi].hand[hi]; if (!h) return 'Nincs ilyen lap';
   if (s.active !== pi) return 'Most az ellenfél köre van';
   if (s.players[pi].locked) return 'Adios Motherfucker!: ebben a körben nem játszhatsz ki lapot';
+  const hc = CARD[h.id];
+  if (hc.hero && s.players[pi].heroId !== hc.hero) return `Ezt csak ${HERO[hc.hero].name} játszhatja ki`;
+  if (hc.id === 'f_metamorf' && s.players[pi].baszo) return 'Már Baszó vagy';
   if (cardCost(s, pi, h.id) > s.players[pi].energy) return 'Nincs elég energiád';
   if (!targetsFor(s, pi, h.id).length) {
     const c = CARD[h.id];
-    if (c.type === 'char') return 'Nincs szabad helyed';
+    if (c.type === 'char' || c.tgt === 'summon' || c.tgt === 'ownSlot') return 'Nincs szabad helyed';
+    if (c.tgt === 'grave') return graveChars(s.players[pi]).length ? 'Nincs szabad helyed' : 'Nincs karakter a temetődben';
     if (c.type === 'item') return c.tgt === 'enemy' ? 'Az ellenfélnek nincs karaktere' : 'Nincs karaktered, akire rátehetnéd';
     if (c.type === 'loc') return 'Ez a helyszín már játékban van';
     if (c.tgt === 'enemyEmpty') return 'Az ellenfélnek nincs üres helye';
@@ -283,7 +327,7 @@ function playCard(s, pi, hi, t) {
   const h = p.hand[hi], c = CARD[h.id];
   p.energy -= cardCost(s, pi, h.id); p.played = (p.played || 0) + 1;
   p.hand.splice(hi, 1);
-  ev(s, { t:'play', side:pi, id:c.id, at: c.type === 'char' && t && t.k === 'slot' ? t.i : null });
+  ev(s, { t:'play', side:pi, id:c.id, at: c.type === 'char' && t && t.k === 'slot' ? t.i : null, o: t && t.o != null ? t.o : undefined });
   if (c.drink) {   // Italos szinergiák: Milo, az örökivó erősödik, Laczkó Tomi húzat (körönként egyszer)
     p.board.forEach((x, j) => { if (x && x.id === 'c_miloivo') { x.atk += 1; ev(s, { t:'buff', side:pi, i:j, n:1 }); } });
     if (!p.drinkDraw && p.board.some(x => x && x.id === 'c_laczko')) { p.drinkDraw = true; const j = p.board.findIndex(x => x && x.id === 'c_laczko'); ev(s, { t:'drinkdraw', side:pi, i:j }); draw(s, pi); }
@@ -294,8 +338,8 @@ function playCard(s, pi, hi, t) {
     if (has(p, 'firstCharAtk') && !p.charThisTurn && c.id !== 'c_korso' && c.cost <= 2) { u.atk += 1; ev(s, { t:'buff', side:pi, i:t.i }); }
     p.charThisTurn = true;
     if (c.id === 'c_pp') {   // Query idézése: előbb jobbra, aztán balra, ha ott nincs hely, bárhova
-      const spots = [t.i + 1, t.i - 1].filter(j => j >= 0 && j < LANES && !p.board[j]);
-      const j = spots.length ? spots[0] : p.board.findIndex(x => !x);
+      const os = openSlots(s, pi), spots = [t.i + 1, t.i - 1].filter(j => os.includes(j));
+      const j = spots.length ? spots[0] : os.length ? os[0] : -1;
       if (j >= 0) { p.board[j] = makeUnit(s, 'c_query', pi); ev(s, { t:'summon', side:pi, i:j, id:'c_query' }); }
     }
     if (c.id === 'c_kristof') {   // véletlen Ital lap a kézbe (nem kell birtokolni, csak erre a meccsre)
@@ -306,9 +350,9 @@ function playCard(s, pi, hi, t) {
     }
     if (c.id === 'c_sasimeselo') draw(s, pi);
     if (c.id === 'c_alekosz') {   // véletlen ellenséges karaktert ellop, és maga mellé teszi (előbb jobbra, aztán balra, aztán bárhova)
-      const spots = [t.i + 1, t.i - 1].filter(j => j >= 0 && j < LANES && !p.board[j]);
-      const j = spots.length ? spots[0] : p.board.findIndex(x => !x);
-      const cand = e.board.map((x, k) => x && x.id !== 'c_korso' ? k : -1).filter(k => k >= 0);
+      const os = openSlots(s, pi), spots = [t.i + 1, t.i - 1].filter(j => os.includes(j));
+      const j = spots.length ? spots[0] : os.length ? os[0] : -1;
+      const cand = e.board.map((x, k) => x && x.id !== 'c_korso' && !isFixed(x) ? k : -1).filter(k => k >= 0);
       if (j >= 0 && cand.length) {
         const k = cand[Math.floor(rnd() * cand.length)];
         reveal(s, ei, k);
@@ -330,7 +374,7 @@ function playCard(s, pi, hi, t) {
     }
     if (c.id === 'c_vera' && t.t2) {
       const x = e.board[t.t2.i];
-      if (x) { e.board[t.t2.i] = null; ev(s, { t:'bounce', side:ei, i:t.t2.i }); buryItems(s, ei, x); addToHand(s, ei, x.id); }
+      if (x) { e.board[t.t2.i] = null; ev(s, { t:'bounce', side:ei, i:t.t2.i }); buryItems(s, ei, x); if (!CARD[x.id].token) addToHand(s, ei, x.id); }
     }
   } else if (c.type === 'item' && c.tgt === 'enemy') {
     p.itemThisTurn = true;
@@ -348,7 +392,7 @@ function playCard(s, pi, hi, t) {
     ev(s, { t:'buff', side:pi, i:t.i });
     if (c.selfDmg) damageHero(s, pi, c.selfDmg);
   } else if (c.type === 'loc') {
-    if (s.location) bury(s, s.location.owner, s.location.id, 'loc');
+    dropLocation(s, 'loc');
     s.location = { id:c.id, owner:pi };
   } else {
     switch (c.id) {
@@ -360,11 +404,14 @@ function playCard(s, pi, hi, t) {
         for (let k = 0; k < 4 && s.winner == null; k++) draw(s, pi);
         break; }
       case 'a_kitiltva':
-        if (s.location) { bury(s, s.location.owner, s.location.id, 'banned'); ev(s, { t:'locgone', side:pi, i:-1, id:s.location.id }); s.location = null; }
+        if (s.location) { ev(s, { t:'locgone', side:pi, i:-1, id:s.location.id }); dropLocation(s, 'banned'); }
         draw(s, pi); break;
       case 'a_legeny': p.board.forEach((x, j) => { if (x) { x.atk += 1; x.hp += 1; x.maxHp += 1; ev(s, { t:'buff', side:pi, i:j }); } }); break;
       case 'a_haver': if (t.t2) { const a = t.i, b = t.t2.i; [p.board[a], p.board[b]] = [p.board[b], p.board[a]]; ev(s, { t:'swap', side:pi, i:b }); } break;
-      case 'a_moshpit': if (e.board.some(Boolean)) { e.board.unshift(e.board.pop()); ev(s, { t:'mosh', side:ei, i:-1 }); } break;
+      case 'a_moshpit': if (e.board.some(Boolean)) {   // a zárt helyek (JBL) és a Cápa kimaradnak a forgatásból
+        const L = []; for (let j = 0; j < LANES; j++) if (!closedLane(s, ei, j) && !isFixed(e.board[j])) L.push(j);
+        const v = L.map(j => e.board[j]); v.unshift(v.pop()); L.forEach((j, k) => { e.board[j] = v[k]; });
+        ev(s, { t:'mosh', side:ei, i:-1 }); } break;
       case 'a_cheddar': draw(s, pi); draw(s, pi); break;
       case 'a_delfin': damageHero(s, pi, 2); if (s.winner == null) { draw(s, pi); draw(s, pi); } break;
       case 'a_mangos': healHero(s, pi, 4); break;
@@ -418,12 +465,57 @@ function playCard(s, pi, hi, t) {
         damageHero(s, ei, 2); damageHero(s, pi, 2);
         break;
       case 'a_tubi': if (t.k === 'hero') damageHero(s, ei, 6); else damageUnit(s, ei, t.i, 6); damageHero(s, pi, 3); break;
+      // ===== Kivégzők =====
+      case 'f_bender': {   // minden szabad helyre Árnyékember; minél kevesebb a hely, annál erősebbek
+        const sl = openSlots(s, pi), b = LANES - sl.length;
+        sl.forEach(j => { const u = makeUnit(s, 'c_arnyek', pi); u.atk += b; u.hp += b; u.maxHp += b; p.board[j] = u; ev(s, { t:'summon', side:pi, i:j, id:'c_arnyek' }); });
+        break; }
+      case 'f_egyutt': {
+        const sl = openSlots(s, pi); let ids = ['c_gyzana', 'c_gygabi'];
+        if (sl.length < 2) ids = [ids[Math.floor(rnd() * 2)]];
+        ids.forEach((id, k) => { p.board[sl[k]] = makeUnit(s, id, pi); ev(s, { t:'summon', side:pi, i:sl[k], id }); });
+        break; }
+      case 'f_jbl': {
+        p.board[t.i] = makeUnit(s, 'c_jbl', pi); ev(s, { t:'summon', side:pi, i:t.i, id:'c_jbl' });
+        if (e.board.filter(Boolean).length > 2) for (const j of [0, LANES - 1]) {
+          const x = e.board[j]; if (!x || isFixed(x)) continue;
+          reveal(s, ei, j); ev(s, { t:'zap', side:pi, i:t.i, ts:ei, ti:j, kind:'sound' });
+          x.shield = false; x.hp = 0;
+        }
+        break; }
+      case 'f_metamorf': p.baszo = true; p.hp = 12; p.maxHp = 12; ev(s, { t:'morph', side:pi, i:-1 }); break;
+      case 'f_atok': {   // két véletlen saját karakter vissza a temetőből, +2/+2
+        const sl = openSlots(s, pi);
+        const pool = p.grave.map((g, k) => k).filter(k => { const x = CARD[p.grave[k].id]; return x && x.type === 'char' && !x.token; });
+        const pick = [];
+        while (pick.length < Math.min(2, sl.length) && pool.length) pick.push(pool.splice(Math.floor(rnd() * pool.length), 1)[0]);
+        const ids = pick.map(k => p.grave[k].id);
+        pick.sort((a, b) => b - a).forEach(k => p.grave.splice(k, 1));
+        ids.forEach((id, k) => { const u = makeUnit(s, id, pi); u.atk += 2; u.hp += 2; u.maxHp += 2; p.board[sl[k]] = u; ev(s, { t:'rise', side:pi, i:sl[k], id }); });
+        break; }
+      case 'f_munkahely': dropLocation(s, 'loc'); s.location = { id:'l_munkahely', owner:pi }; ev(s, { t:'summon', side:pi, i:-1, id:'l_munkahely' }); break;
+      case 'f_gepuzem': p.machine = 1; ev(s, { t:'machineon', side:pi, i:-1 }); break;
+      case 'f_capa': {   // a cápa az ellenfél jobb szélére érkezik, és megeszi, aki ott áll
+        const j = LANES - 1, x = e.board[j];
+        if (x && !isFixed(x)) { reveal(s, ei, j); ev(s, { t:'chomp', side:ei, i:j, from:-1 }); x.shield = false; x.hp = 0; cleanup(s); }
+        if (!e.board[j]) { const u = makeUnit(s, 'c_capa', ei); u.owner = pi; u.fresh = false; e.board[j] = u; ev(s, { t:'summon', side:ei, i:j, id:'c_capa' }); }
+        break; }
+      case 'f_gluten':
+        if (t.o === 1) { damageHero(s, ei, 8); damageHero(s, pi, 8); }
+        else { damageHero(s, ei, 5); if (s.winner == null) healHero(s, pi, 5); }
+        break;
     }
     bury(s, pi, c.id, 'action');
   }
   cleanup(s); checkWin(s);
 }
 
+function dropLocation(s, how) {   // a pályán lévő helyszín eltűnik (lecserélik vagy kitiltják)
+  const L = s.location; if (!L) return;
+  if (!CARD[L.id].token) bury(s, L.owner, L.id, how);
+  s.location = null;
+  if (L.id === 'l_munkahely') healHero(s, L.owner, 5);   // Dávid kivégzője: ha elpusztul a munkahely, 5 életet gyógyul
+}
 const boost = (s, n, side) => n > 0 && locIs(s, 'l_akacfa') && !(side != null && isReg(s, side)) ? n + 1 : n;
 // Sunyulás: a lap lefordítva marad, amíg nem támad, meg nem támadják, vagy nem éri ellenséges hatás
 function reveal(s, side, i) {
@@ -466,7 +558,7 @@ function cleanup(s) {
           p.board[i] = null; ev(s, { t:'death', side, i, id:u.id });
           bury(s, side, u.id, 'death'); buryItems(s, side, u);
           if (u.items.includes('i_kabala')) draw(s, side);
-          if (has(p, 'deathPing') && u.id !== 'c_korso') damageHero(s, other(side), 1);
+          if (has(p, 'deathPing') && u.id !== 'c_korso' && !CARD[u.id].fixed) damageHero(s, other(side), 1);
           if (CARD[u.id].deathBlast) {   // Kovács Bence: 2 sebzés a szemben állónak, ha nincs ott senki, az ellenfél hősének
             const os = other(side), x = s.players[os].board[i];
             ev(s, { t:'zap', side, i, ts:os, ti:x && x.hp > 0 ? i : -1, kind:'blast' });
@@ -490,12 +582,16 @@ function cleanup(s) {
 }
 function checkWin(s) {
   if (s.winner != null) return;
+  for (const pi of [0, 1]) {   // Gépüzemmód: Milo egyszer visszatér 10 élettel
+    const p = s.players[pi];
+    if (p.hp <= 0 && p.machine === 1) { p.machine = 2; p.hp = 10; ev(s, { t:'machine', side:pi, i:-1 }); }
+  }
   const a = s.players[0].hp <= 0, b = s.players[1].hp <= 0;
   if (a && b) s.winner = 'draw'; else if (a) s.winner = 1; else if (b) s.winner = 0; else return;
   s.reason = 'ko';
 }
 
-function canAttack(u) { return !!u && (!u.fresh || u.haste) && u.id !== 'c_korso' && !u.stun; }
+function canAttack(u) { return !!u && (!u.fresh || u.haste) && u.id !== 'c_korso' && !CARD[u.id].noAttack && !u.stun; }
 
 // Laszy félreütése: 50% eséllyel egy saját karakter (i) vagy a saját hős (i = -1); a felület előre dob, hogy jó irányba animáljon
 function laszyRoll(s, pi, i) {
@@ -548,15 +644,40 @@ function attackLane(s, i) {
   return true;
 }
 
+// Baszó (Krisz kivégzője): a karakterek után ő is üt 3-at, mindig a legbalra álló ellenséges karaktert, különben a hőst; nem lehet visszaütni
+function baszoStrike(s) {
+  const pi = s.active, p = s.players[pi];
+  if (!p.baszo || p.struck || s.winner != null) return;
+  p.struck = true;
+  const ei = other(pi), j = s.players[ei].board.findIndex(Boolean);
+  ev(s, { t:'heroatk', side:pi, i:-1, tj:j });
+  if (j >= 0) { reveal(s, ei, j); damageUnit(s, ei, j, 3); cleanup(s); } else damageHero(s, ei, 3);
+  checkWin(s);
+}
+// Cápa (Barna kivégzője): a gazdája körének elején egy hellyel balra úszik, és megeszi, aki ott áll; a bal szélen elpusztul
+function sharkSwim(s, pi) {
+  const ei = other(pi), b = s.players[ei].board, i = b.findIndex(u => u && u.id === 'c_capa' && u.owner === pi);
+  if (i < 0) return;
+  const sh = b[i], j = i - 1;
+  if (j < 0) { sh.hp = 0; ev(s, { t:'sharkgone', side:ei, i }); cleanup(s); return; }
+  const x = b[j];
+  if (x) { reveal(s, ei, j); ev(s, { t:'chomp', side:ei, i:j, from:i }); x.shield = false; x.hp = 0; cleanup(s); }
+  if (!b[j] && b[i] === sh) {
+    b[j] = sh; b[i] = null; ev(s, { t:'swim', side:ei, i:j });
+    if (j === 0) { sh.hp = 0; ev(s, { t:'sharkgone', side:ei, i:j }); cleanup(s); }
+  }
+}
+
 function finishTurn(s) {
   const pi = s.active, p = s.players[pi];
+  baszoStrike(s);
   p.locked = false;   // az Adios Motherfucker! bénítása a megbénított játékos körének végén jár le
   if (s.winner == null && has(p, 'endHeal')) {
     let best = -1, gap = 0;
     p.board.forEach((u, i) => { if (u && u.maxHp - u.hp > gap) { gap = u.maxHp - u.hp; best = i; } });
     if (best >= 0) healUnit(s, pi, best, 1); else healHero(s, pi, 1);
   }
-  if (s.winner == null && has(p, 'teamPing') && p.board.filter(Boolean).length >= 2) damageHero(s, other(pi), 1);
+  if (s.winner == null && has(p, 'teamPing') && p.board.filter(u => u && !isFixed(u)).length >= 2) damageHero(s, other(pi), 1);
   if (locIs(s, 'l_morisson') && !isReg(s, pi)) p.board.forEach((u, i) => { if (u) damageUnit(s, pi, i, 1); });
   if (locIs(s, 'l_korhaz')) p.board.forEach((u, i) => { if (u) healUnit(s, pi, i, isReg(s, pi) ? 2 : 1); });
   p.board.forEach((u, i) => { if (u && u.stun) { u.stun--; if (!u.stun) { if (u.items.includes('i_buffalo')) { u.items = u.items.filter(x => x !== 'i_buffalo'); u.foe = (u.foe || []).filter(x => x !== 'i_buffalo'); bury(s, other(pi), 'i_buffalo', 'item'); } ev(s, { t:'unstun', side:pi, i }); } } });
@@ -631,4 +752,4 @@ function botChoose(real) {
   return best;
 }
 
-if (typeof module !== 'undefined') module.exports = { DECK_OF, LANES, MAX_HALF, mulligan, botMulligan, beginGame, CARDS, CARD, HEROES, HERO, DECKS, newGame, playCard, canPlay, targetsFor, cardCost, attackLane, finishTurn, runEndTurn, botChoose, canAttack, effAtk };
+if (typeof module !== 'undefined') module.exports = { baszoStrike, sharkSwim, openSlots, closedLane, CARDS_ALL: CARDS, DECK_OF, LANES, MAX_HALF, mulligan, botMulligan, beginGame, CARDS, CARD, HEROES, HERO, DECKS, newGame, playCard, canPlay, targetsFor, cardCost, attackLane, finishTurn, runEndTurn, botChoose, canAttack, effAtk };

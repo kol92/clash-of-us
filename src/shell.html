@@ -409,6 +409,33 @@ h1,h2,h3{font-family:var(--display);font-weight:400;letter-spacing:.01em;text-wr
 @keyframes heroHit{20%{background:rgba(255,93,108,.45);border-color:var(--red)}}
 .hbar.fx-heroheal{animation:heroHeal .7s;}
 @keyframes heroHeal{30%{background:rgba(79,224,166,.35);border-color:var(--green)}}
+.zap-orb.sound{background:radial-gradient(circle,#fff 0 16%,#a5f3fc 32%,#0891b2 56%,rgba(0,60,90,0) 72%);box-shadow:0 0 24px 9px rgba(34,211,238,.6);}
+.zap-boom.sound{border-color:#67e8f9;box-shadow:0 0 30px 10px rgba(34,211,238,.6);}
+/* kivégző lapok */
+.fin-intro{position:fixed;inset:0;z-index:80;overflow:hidden;}
+.fin-dark{position:absolute;inset:0;opacity:0;background:radial-gradient(circle at 50% 44%,rgba(70,6,0,.62),rgba(0,0,0,.95) 62%);}
+.fin-rays{position:absolute;left:50%;top:44%;width:160vmax;height:160vmax;opacity:0;transform:translate(-50%,-50%);background:repeating-conic-gradient(from 0deg,rgba(255,196,80,.26) 0 7deg,rgba(255,70,40,0) 7deg 20deg);-webkit-mask:radial-gradient(circle,#000 0 10%,transparent 42%);mask:radial-gradient(circle,#000 0 10%,transparent 42%);}
+.fin-card{position:absolute;left:50%;top:44%;transform:translate(-50%,-50%);opacity:0;}
+.fin-card .card{--cw:min(280px,64vw);}
+.fin-title{position:absolute;left:50%;bottom:calc(9% + env(safe-area-inset-bottom));transform:translate(-50%,0);width:94vw;text-align:center;opacity:0;pointer-events:none;}
+.fin-title small{display:block;font-family:var(--display);font-size:clamp(30px,10vw,50px);line-height:1;letter-spacing:.02em;text-transform:uppercase;color:#ff4d3d;text-shadow:0 0 22px rgba(255,60,40,.95),0 3px 0 #2a0000;}
+.fin-title b{display:block;margin-top:6px;font-family:var(--display);font-weight:400;font-size:clamp(20px,6.4vw,30px);color:#ffe9a8;text-shadow:0 0 16px rgba(255,200,80,.8);}
+.fin-title em{display:block;margin-top:4px;font-style:normal;font-size:14px;color:#cbd5e1;}
+.fin-flash{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none;}
+.cell.closed{background:repeating-linear-gradient(135deg,rgba(148,163,184,.22) 0 8px,rgba(30,41,59,.35) 8px 16px);filter:grayscale(1);border-color:rgba(148,163,184,.35)!important;}
+.cell.closed::after{content:'🔊';position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:22px;opacity:.55;pointer-events:none;}
+.hport.baszo{box-shadow:0 0 0 2px #ff4fa3,0 0 18px rgba(255,79,163,.7);}
+.hmachine{position:absolute;right:2px;top:2px;z-index:3;font-size:16px;filter:drop-shadow(0 0 4px #000);animation:spinGear 4s linear infinite;}
+@keyframes spinGear{to{transform:rotate(360deg)}}
+.hport-fly{position:fixed!important;z-index:70;margin:0!important;pointer-events:none;}
+.shark-fly{position:fixed;z-index:72;font-size:64px;line-height:1;pointer-events:none;filter:drop-shadow(0 6px 10px rgba(0,0,0,.6));}
+.jaws{position:fixed;z-index:71;pointer-events:none;overflow:hidden;border-radius:10px;}
+.jaws .jaw{position:absolute;left:-6%;width:112%;height:52%;background:#7a0f1d;}
+.jaws .jaw.up{top:0;border-bottom:0;background:linear-gradient(#5b0a15,#9b1426);-webkit-mask:linear-gradient(#000,#000) top/100% 70% no-repeat,conic-gradient(from 135deg at 50% 0,#000 90deg,transparent 0) bottom/16% 30% repeat-x;mask:linear-gradient(#000,#000) top/100% 70% no-repeat,conic-gradient(from 135deg at 50% 0,#000 90deg,transparent 0) bottom/16% 30% repeat-x;}
+.jaws .jaw.down{bottom:0;background:linear-gradient(#9b1426,#5b0a15);-webkit-mask:linear-gradient(#000,#000) bottom/100% 70% no-repeat,conic-gradient(from -45deg at 50% 100%,#000 90deg,transparent 0) top/16% 30% repeat-x;mask:linear-gradient(#000,#000) bottom/100% 70% no-repeat,conic-gradient(from -45deg at 50% 100%,#000 90deg,transparent 0) top/16% 30% repeat-x;}
+.opt-box{display:grid;gap:10px;min-width:min(86vw,340px);}
+.opt-box h3{margin:0;text-align:center;}
+.opt-btn{font-size:17px;padding:14px 12px;}
 .zap-orb{position:fixed;z-index:62;pointer-events:none;width:46px;height:46px;border-radius:50%;display:grid;place-items:center;font-size:24px;line-height:1;background:radial-gradient(circle,#fff 0 18%,#ffd36b 34%,#ff6a2a 58%,rgba(255,60,20,0) 72%);box-shadow:0 0 22px 8px rgba(255,120,40,.65);}
 .zap-orb.kill{background:radial-gradient(circle,#fff 0 16%,#d9b3ff 32%,#7b2cff 56%,rgba(60,0,120,0) 72%);box-shadow:0 0 26px 10px rgba(140,60,255,.7);}
 .zap-orb.steal{background:radial-gradient(circle,#fff 0 16%,#bfffd0 32%,#22c55e 56%,rgba(0,90,40,0) 72%);box-shadow:0 0 22px 8px rgba(40,200,110,.6);}
