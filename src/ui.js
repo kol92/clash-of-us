@@ -114,6 +114,7 @@ const ART = {
   g_gabi:  { src:'art/g_gabi.webp',  av:'55% 28%', pos:'55% 26%', port:'56% 24%' },
   g_bence: { src:'art/g_bence.webp', av:'55% 18%', pos:'55% 18%', port:'55% 9%' },
   g_milo:  { src:'art/g_milo.webp',  av:'46% 24%', pos:'46% 23%', port:'46% 20%' },
+  g_david: { src:'art/g_david.webp', av:'62% 22%', pos:'62% 22%', port:'62% 18%' },
   c_sasi:{ src:'art/toma.webp', pos:'50% 14%' },   // a karakterlap neve mostantól Toma (a hős Sasi marad)
   c_pifti:{ src:'art/pifti.webp', pos:'66% 16%' },
   c_gyuri:{ src:'art/gyuri.webp', pos:'60% 17%' },
