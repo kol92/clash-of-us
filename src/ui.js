@@ -255,6 +255,25 @@ function renderColl() {
 }
 $('#vBase').onclick = () => { ui.foil = false; $('#vBase').setAttribute('aria-pressed', 'true'); $('#vFoil').setAttribute('aria-pressed', 'false'); renderColl(); };
 $('#vFoil').onclick = () => { ui.foil = true; $('#vFoil').setAttribute('aria-pressed', 'true'); $('#vBase').setAttribute('aria-pressed', 'false'); renderColl(); };
+// egy lap nagy nézete a Gyűjteményben – ha 2 példány fölött van belőle, egyenként beváltható
+function collCardModal(id, cap) {
+  const e = Store.p?.coll[id] || { n: 0, f: 0 }, extra = e.n + e.f - DUPE_KEEP;
+  cap = cap || `${RAR[CARD[id].rarity]} · ${e.n} db${e.f ? ` + ${e.f} Full Art` : ''}${CARD[id].passOnly ? ' · csak a Season Passból szerezhető' : !e.n && !e.f ? ' · boosterből szerezhető' : ''}`;
+  const btns = extra > 0 ? `<div class="cv-row">${e.n > 0 ? `<button class="btn cv-btn" data-cv="n">♻️ 1 lap beváltása · +${dupeVal(id, false)} coin</button>` : ''}${e.f > 0 ? `<button class="btn cv-btn fa" data-cv="f">♻️ 1 Full Art beváltása · +${dupeVal(id, true)} coin</button>` : ''}</div><small class="cv-note">${extra} fölösleges példány – 2 mindig megmarad</small>` : '';
+  openModal(cardHTML(id, { big: true, foil: ui.foil || (e.f > 0 && !e.n) }), cap, btns + cardHelpHTML(id));
+  const o = $('#layer').lastElementChild;
+  o.addEventListener('click', async ev => {
+    const b = ev.target.closest('[data-cv]'); if (!b) return;
+    ev.stopPropagation(); b.disabled = true;
+    const p = Store.p, x = p.coll[id], foil = b.dataset.cv === 'f';
+    if (!x || x.n + x.f <= DUPE_KEEP || !(foil ? x.f > 0 : x.n > 0)) { o.remove(); return; }
+    if (foil) x.f--; else x.n--;
+    const c = dupeVal(id, foil); p.coins += c; p.dupeCoins = (p.dupeCoins || 0) + c;
+    await save(); if (typeof frPubSync === 'function') frPubSync();
+    o.remove(); renderProfileBar(); renderColl(); toast(`♻️ +${c} coin`);
+    if (x.n + x.f > DUPE_KEEP) collCardModal(id);   // ha még van fölösleg, nyitva marad
+  }, true);
+}
 $('#collBody').onclick = e => {
   if (e.target.closest('#dupeBtn')) return dupeModal();
   const c = e.target.closest('[data-card]'), h = e.target.closest('[data-hcard]'), hg = e.target.closest('[data-hgold]');
@@ -262,8 +281,8 @@ $('#collBody').onclick = e => {
   if (hg && ownsHeroGold(hg.dataset.hgold) && heroSkins(hg.dataset.hgold).length > 1) return skinModal(hg.dataset.hgold);
   if (hg) { const hid = hg.dataset.hgold; openModal(heroCardHTML(HERO[hid], { big: true, gold: true }), ownsHeroGold(hid) ? '✦ Arany hős · a tiéd!' : `✦ Arany hős · boosterből ${ECON.goldPlain * 100}%, Shiny boosterből ${ECON.goldShiny * 100}% eséllyel`); return; }
   if (c) { const id = c.dataset.card, e = Store.p?.coll[id] || { n: 0, f: 0 };
-    if (CARD[id].variantOf) return openModal(cardHTML(id, { big: true, foil: ui.foil }), `✦ Ritka változat: a(z) ${CARD[CARD[id].variantOf].name} különleges kinézete – ugyanúgy játszható, ugyanaz a hatása · ${e.n + e.f} db${CARD[id].passOnly ? ' · csak a Season Passból' : !e.n && !e.f ? ' · Shiny boosterből szerezhető' : ''}`, cardHelpHTML(id));
-    openModal(cardHTML(id, { big: true, foil: ui.foil }), `${RAR[CARD[id].rarity]} · ${e.n} db${e.f ? ` + ${e.f} Full Art` : ''}${CARD[id].passOnly ? ' · csak a Season Passból szerezhető' : !e.n && !e.f ? ' · boosterből szerezhető' : ''}`, cardHelpHTML(id)); }
+    if (CARD[id].variantOf) return collCardModal(id, `✦ Ritka változat: a(z) ${CARD[CARD[id].variantOf].name} különleges kinézete – ugyanúgy játszható, ugyanaz a hatása · ${e.n + e.f} db${CARD[id].passOnly ? ' · csak a Season Passból' : !e.n && !e.f ? ' · Shiny boosterből szerezhető' : ''}`, null);
+    collCardModal(id); }
   if (h) openModal(heroCardHTML(HERO[h.dataset.hcard], { big: true, foil: ui.foil }), ui.foil ? (ownsHeroFa(h.dataset.hcard) ? 'Full Art hős' : 'Full Art hős · boosterből szerezhető') : 'Hős');
 };
 
