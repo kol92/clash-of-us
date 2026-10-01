@@ -153,6 +153,7 @@ const ART = {
   c_veghtomi: { src:'art/veghtomi.webp', pos:'45% 15%' },
   c_zana:   { src:'art/zana.webp', pos:'38% 20%' },
   c_norbi:  { src:'art/norbi.webp', pos:'42% 18%' },
+  c_udvarhelyi: { src:'art/udvarhelyi.webp', pos:'47% 5%' },
   c_alekosz: { src:'art/alekosz.webp', pos:'52% 16%' },
   i_aranylanc: { src:'art/nyaklanc.webp', pos:'50% 55%' },
   i_vodkakancso: { src:'art/vodkakancso.webp', pos:'55% 30%' },

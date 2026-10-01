@@ -24,6 +24,7 @@ const CARDS = [
   { id:'c_vajda', type:'char', name:'Vajda Peti', cost:3, atk:3, hp:4, rarity:'k', text:'' },
   { id:'c_alekosz', type:'char', name:'Alekosz Tibi', cost:4, atk:2, hp:2, rarity:'e', text:'Kijátszáskor ellop egy véletlen ellenséges karaktert, és maga mellé teszi (ha van mellette üres hely).' },
   { id:'c_norbi', type:'char', name:'Lukács Norbi', cost:3, atk:2, hp:3, rarity:'r', text:'Ha mellette áll egy másik karaktered, +2 támadást kap.' },
+  { id:'c_udvarhelyi', type:'char', name:'Udvarhelyi Zoli', cost:6, atk:5, hp:5, rarity:'k', text:'' },
   { id:'c_zana', type:'char', name:'Zana', cost:4, atk:3, hp:3, rarity:'e', text:'Körönként kétszer támad.' },
   { id:'c_ati', type:'char', name:'Ati', cost:4, atk:8, hp:4, rarity:'e', muscle:true, text:'Csak akkor támad, ha nincs más karaktered a táblán.' },
   { id:'c_veghtomi', type:'char', name:'Végh Tomi', cost:4, atk:3, hp:5, rarity:'k', taunt:true, text:'Amíg él, az ellenfél karakterei mindig őt támadják, bárhol áll.' },

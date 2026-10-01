@@ -1541,7 +1541,7 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%;}
 <script src="vendor/firebase-auth-compat.js"></script>
 <script src="vendor/firebase-firestore-compat.js"></script>
 <script src="vendor/firebase-database-compat.js"></script>
-<script>window.APP_VERSION = "2026.10.01-1448";</script>
+<script>window.APP_VERSION = "2026.10.01-1500";</script>
 <script>// ===== Best of Us – saját szerver (Firebase) =====
 // A játék eredetileg a Claude-os tárolót használta (window.claude.use('db' | 'user' | 'room')).
 // Ez a fájl ugyanazt a felületet adja Firebase-ből, így a játék kódja szinte változatlan maradhat:
@@ -1811,6 +1811,7 @@ const CARDS = [
   { id:'c_vajda', type:'char', name:'Vajda Peti', cost:3, atk:3, hp:4, rarity:'k', text:'' },
   { id:'c_alekosz', type:'char', name:'Alekosz Tibi', cost:4, atk:2, hp:2, rarity:'e', text:'Kijátszáskor ellop egy véletlen ellenséges karaktert, és maga mellé teszi (ha van mellette üres hely).' },
   { id:'c_norbi', type:'char', name:'Lukács Norbi', cost:3, atk:2, hp:3, rarity:'r', text:'Ha mellette áll egy másik karaktered, +2 támadást kap.' },
+  { id:'c_udvarhelyi', type:'char', name:'Udvarhelyi Zoli', cost:6, atk:5, hp:5, rarity:'k', text:'' },
   { id:'c_zana', type:'char', name:'Zana', cost:4, atk:3, hp:3, rarity:'e', text:'Körönként kétszer támad.' },
   { id:'c_ati', type:'char', name:'Ati', cost:4, atk:8, hp:4, rarity:'e', muscle:true, text:'Csak akkor támad, ha nincs más karaktered a táblán.' },
   { id:'c_veghtomi', type:'char', name:'Végh Tomi', cost:4, atk:3, hp:5, rarity:'k', taunt:true, text:'Amíg él, az ellenfél karakterei mindig őt támadják, bárhol áll.' },
@@ -2561,6 +2562,7 @@ const ART = {
   c_veghtomi: { src:'art/veghtomi.webp', pos:'45% 15%' },
   c_zana:   { src:'art/zana.webp', pos:'38% 20%' },
   c_norbi:  { src:'art/norbi.webp', pos:'42% 18%' },
+  c_udvarhelyi: { src:'art/udvarhelyi.webp', pos:'47% 5%' },
   c_alekosz: { src:'art/alekosz.webp', pos:'52% 16%' },
   i_aranylanc: { src:'art/nyaklanc.webp', pos:'50% 55%' },
   i_vodkakancso: { src:'art/vodkakancso.webp', pos:'55% 30%' },
@@ -3487,7 +3489,7 @@ function starterCollection() {
   return coll;
 }
 // Később bekerült gyakori lapok: a meglévő profilok is megkapják (gv = kiosztási verzió)
-const STARTER_ADDS = { 2: ['a_delfin', 'i_varazsho', 'i_lepke'], 3: ['a_rehab'], 4: ['c_pp'], 5: ['c_nfc'], 6: ['a_cheddar'], 7: ['c_vajda', 'c_veghtomi'], 8: ['c_kovacs'], 9: ['a_kitiltva'], 10: ['a_haver'], 11: PLAYABLE.filter(c => c.rarity === 'r' && !c.variantOf).map(c => c.id), 12: ['c_sasimeselo'], 13: ['c_norbi'] };   // 12: Laci új kezdőpaklijához   // 11: minden ritka lapból 1 (a kezdőpaklikhoz)
+const STARTER_ADDS = { 2: ['a_delfin', 'i_varazsho', 'i_lepke'], 3: ['a_rehab'], 4: ['c_pp'], 5: ['c_nfc'], 6: ['a_cheddar'], 7: ['c_vajda', 'c_veghtomi'], 8: ['c_kovacs'], 9: ['a_kitiltva'], 10: ['a_haver'], 11: PLAYABLE.filter(c => c.rarity === 'r' && !c.variantOf).map(c => c.id), 12: ['c_sasimeselo'], 13: ['c_norbi'], 14: ['c_udvarhelyi'] };   // 12: Laci új kezdőpaklijához   // 11: minden ritka lapból 1 (a kezdőpaklikhoz)
 const GRANT_V = Math.max(1, ...Object.keys(STARTER_ADDS).map(Number));
 // Ajándékok: minden profil egyszer kapja meg (a meglévők a következő megnyitáskor, az újak létrehozáskor)
 const GIFTS = [{ id: 'g-2026-09-28', packs: 1 }, { id: 'g-2026-09-28b', packs: 5 },
