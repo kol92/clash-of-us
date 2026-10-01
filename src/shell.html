@@ -1381,6 +1381,31 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%;}
 
 /* ===== ritka változat-lapok: ránézésre is látszódjon ===== */
 .vartag{display:none;}
+/* Kánon esemény lapok: saját izzó vörös-arany keret, lüktető fény, vörös energiakő */
+.t-action.kanon{--frame:url('art/ui/sm/frame-kanon.webp');}
+.big.t-action.kanon{--frame:url('art/ui/frame-kanon.webp');}
+.card.kanon{box-shadow:0 0 .45em rgba(255,90,30,.7),0 .3em .8em rgba(0,0,0,.5);animation:kanonGlow 2.6s ease-in-out infinite;}
+@keyframes kanonGlow{50%{box-shadow:0 0 1em rgba(255,110,40,.95),0 0 .25em rgba(255,214,130,.9),0 .3em .8em rgba(0,0,0,.5);}}
+.card.kanon .cost{filter:hue-rotate(150deg) saturate(1.5) brightness(1.08);}
+.card.kanon .name{color:#ffe2a8;text-shadow:0 0 .45em rgba(255,100,30,.95),0 1px 0 #000;}
+.card.kanon .txt{color:#ffeccc;}
+.card.kanon .art.has-art::after{content:"";position:absolute;inset:0;pointer-events:none;border-radius:inherit;box-shadow:inset 0 0 1.2em rgba(255,80,20,.55);}
+.kanon-ribbon{position:absolute;z-index:7;left:50%;top:-.55em;transform:translateX(-50%);white-space:nowrap;font-style:normal;font-family:var(--body);font-weight:900;
+  font-size:.42em;letter-spacing:.08em;text-transform:uppercase;color:#2a0600;padding:.25em .85em;border-radius:1em;
+  background:linear-gradient(90deg,#ff5a1f,#ffd27a 50%,#ff5a1f);box-shadow:0 0 .7em rgba(255,90,30,.9),0 .15em .3em rgba(0,0,0,.6);}
+.card.big .kanon-ribbon{font-size:.32em;}
+.kanon-ribbon b{font-weight:900;} .kanon-ribbon span{display:none;}
+.card:not(.big) .kanon-ribbon{left:58%;font-size:.5em;top:-.45em;} .card:not(.big) .kanon-ribbon b{display:none;} .card:not(.big) .kanon-ribbon span{display:inline;}
+.card.foil .kanon-ribbon,.card.foil:not(.big) .kanon-ribbon{top:.5em;z-index:8;}
+@media (prefers-reduced-motion:reduce){.card.kanon{animation:none!important;}}
+.kanon-hero{position:absolute;z-index:6;right:5.5%;top:6.5%;width:24%;aspect-ratio:1;border-radius:50%;background:hsl(var(--h) 45% 32%) center/cover no-repeat;
+  display:grid;place-items:center;font-style:normal;font-weight:900;color:#fff;font-size:.5em;
+  box-shadow:0 0 0 .09em #ffd27a,0 0 0 .17em #7a1405,0 0 .55em .1em rgba(255,90,30,.85),0 .15em .35em rgba(0,0,0,.7);}
+.card:not(.big) .kanon-hero{width:30%;}
+.card.big .kanon-hero{width:22%;right:6%;top:7%;}
+.card.foil .kanon-hero{top:5%;right:5%;}
+.card.kanon .ctype-below{color:#ff8a4c;}
+.card:not(.big) .kanon-ribbon{left:50%;}
 .var-ribbon{position:absolute;z-index:7;left:50%;top:-.55em;transform:translateX(-50%);white-space:nowrap;font-style:normal;font-family:var(--body);font-weight:900;
   font-size:.42em;letter-spacing:.08em;text-transform:uppercase;color:#062a1c;padding:.25em .8em;border-radius:1em;
   background:linear-gradient(90deg,#7dffc4,#e6ffb0 50%,#7dffc4);background-size:200% 100%;animation:varShine 3s linear infinite;box-shadow:0 0 .6em rgba(80,255,170,.8),0 .15em .3em rgba(0,0,0,.6);}

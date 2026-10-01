@@ -620,6 +620,7 @@ function deckProblem(list, hero) {
   if (hero !== undefined && !HERO[hero]) return 'Válassz hőst';
   const n = deckCount(list);
   if (n !== DECK_SIZE) return `${n}/${DECK_SIZE} lap`;
+  for (const [id, k] of Object.entries(list)) if (k > 0 && CARD[id].off) return `${CARD[id].name}: még nem elérhető`;
   for (const [id, k] of Object.entries(list)) if (k > owned(id)) return `Hiányzik: ${CARD[id].name}`;
   for (const id of Object.keys(list)) if (CARD[id].hero && list[id] > 0 && CARD[id].hero !== hero) return `${CARD[id].name}: csak ${HERO[CARD[id].hero].name} paklijába`;
   return null;

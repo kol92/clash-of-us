@@ -54,6 +54,7 @@ function cardHelpHTML(id, u) {
   if (u && u.fresh && !u.haste && !u.stun) add('fresh');
   if (u && (u.doom || u.expire != null)) add('doom');
   if (c.rarity === 'l') add('legend');
+  if (c.finisher) rows.unshift(['Kánon esemény', `Ultra erős lap, csak ${HERO[c.hero].name} paklijába tehető (a jobb felső sarokban az ő portréja). Kijátszáskor elsötétül a pálya, és különleges bevonulással érkezik.`]);
   return `<dl class="help">${rows.map(([a, b]) => `<div><dt>${a}</dt><dd>${b}</dd></div>`).join('')}</dl>`;
 }
 
@@ -80,13 +81,14 @@ function cardHTML(id, o = {}) {
   const c = CARD[id], cost = o.cost ?? c.cost;
   if (c.foilOnly && !o.foil) o = { ...o, foil: true };   // csak Full Artban létező lap
   const tl = textHTML(c).replace(/<[^>]+>/g, '').length, tlc = tl > 95 ? ' tl-l' : tl > 62 ? ' tl-m' : '';
-  return `<div class="card ${TYPE[c.type][1]}${c.variantOf ? ' variant' : ''}${o.big ? ' big' : ''}${o.foil ? ' foil' : ' framed' + tlc}${o.cls ? ' ' + o.cls : ''}" style="--h:${hueOf(id)}" ${o.attrs || ''}>
+  return `<div class="card ${TYPE[c.type][1]}${c.finisher ? ' kanon' : ''}${c.variantOf ? ' variant' : ''}${o.big ? ' big' : ''}${o.foil ? ' foil' : ' framed' + tlc}${o.cls ? ' ' + o.cls : ''}" style="--h:${hueOf(id)}" ${o.attrs || ''}>
     <div class="cframe">
       ${ART[id] ? `<div class="art has-art" style="${artStyle(id, o.big)}"></div>`
         : `<div class="art"><span class="mono">${initials(c.name)}</span>${o.big && !o.foil ? '<span class="artnote">Illusztráció helye</span>' : ''}</div>`}
       <div class="ctype">${c.finisher ? 'Kánon esemény' : TYPE[c.type][0]}${c.drink ? ' · Ital' : ''}<i class="rar r-${c.rarity}" title="${RAR[c.rarity]}"></i></div>
-      ${c.type !== 'char' && !o.big ? `<div class="tribbon">${TYPE[c.type][0]}${c.drink ? '<i class="drk">Ital</i>' : ''}</div>` : ''}
-      <div class="name${c.name.length > 16 ? ' long' : ''}${longWord(c.name) > 11 ? ' xl' : ''}">${c.name}</div>${c.variantOf ? '<i class="var-ribbon"><b>✦ Ritka változat</b><span>✦ Változat</span></i>' : ''}
+      ${c.finisher ? `<i class="kanon-hero" title="${HERO[c.hero].name}" style="--h:${HERO[c.hero].hue};${ART[c.hero] ? `background-image:url('${artSrc(c.hero, false)}');background-position:${ART[c.hero].av || '50% 15%'}` : ''}">${ART[c.hero] ? '' : initials(HERO[c.hero].name)}</i>` : ''}
+      ${c.type !== 'char' && !o.big && !c.finisher ? `<div class="tribbon">${TYPE[c.type][0]}${c.drink ? '<i class="drk">Ital</i>' : ''}</div>` : ''}
+      <div class="name${c.name.length > 16 ? ' long' : ''}${longWord(c.name) > 11 ? ' xl' : ''}">${c.name}</div>${c.variantOf ? '<i class="var-ribbon"><b>✦ Ritka változat</b><span>✦ Változat</span></i>' : ''}${c.finisher ? '<i class="kanon-ribbon"><b>🔥 Kánon esemény</b><span>Kánon</span></i>' : ''}
       <div class="txt"><span>${textHTML(c)}</span></div>
     </div>
     ${o.big ? `<div class="ctype-below">${c.finisher ? 'Kánon esemény' : TYPE[c.type][0]}${c.drink ? ' · Ital' : ''}</div>` : ''}
