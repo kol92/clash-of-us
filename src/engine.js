@@ -77,11 +77,11 @@ const CARDS = [
 const CARD = Object.fromEntries(CARDS.map(c => [c.id, c]));
 
 const HEROES = [
-  { id:'barna', name:'Barna', hue:28, text:'A körödben elsőként kijátszott karaktered +1 támadást kap.' },
+  { id:'barna', name:'Barna', hue:28, text:'A körödben elsőként kijátszott karaktered +1 támadást kap, ha legfeljebb 2 energiába kerül.' },
   { id:'gabi', name:'Gabi', hue:165, text:'A köröd végén a legsérültebb karaktered 1 életet gyógyul. Ha nincs sérült karaktered, a hősöd gyógyul.' },
-  { id:'krisz', name:'Krisz', hue:210, text:'A körödben az első akciókártyád 1-gyel olcsóbb.' },
-  { id:'tomi', name:'Tomi', hue:45, text:'Az eszközeid +1 életet is adnak.' },
-  { id:'david', name:'Dávid', hue:305, text:'Ha helyszínt játszol ki, húzol egy lapot.' },
+  { id:'krisz', name:'Krisz', hue:210, text:'A körödben az első két akciókártyád 1-gyel olcsóbb.' },
+  { id:'tomi', name:'Tomi', hue:45, text:'Az eszközeid +1 életet is adnak, és a körödben az első eszközöd 1-gyel olcsóbb.' },
+  { id:'david', name:'Dávid', hue:305, text:'Ha helyszínt játszol ki, húzol egy lapot, és a hősöd 1 életet gyógyul.' },
   { id:'bence', name:'Bence', hue:0, text:'24 élettel kezd 20 helyett.' },
   { id:'milo', name:'Milo', hue:95, text:'Ha egy karaktered meghal, 1 sebzést okoz az ellenfél hősének.' },
   { id:'laci', name:'Laci', hue:255, text:'Minden harmadik körödben húzol egy extra lapot.' },
@@ -94,21 +94,21 @@ const has = (p, key) => p.heroId === PASSIVE[key];
 
 const DECKS = {
   roham: { name:'Rohamcsapat', hero:'barna', desc:'Olcsó, gyors karakterek és vodka az arcba. Kovács Bence halála is fáj, Barna minden körben felpörgeti az első emberét.',
-    list:{ c_pifti:2, c_gyuri:2, c_kovacs:1, c_zoli:2, c_tzs:1, c_talos:1, c_rebi:1, c_sasi:1, a_dinnyes:2, i_napszemuveg:1, a_cheddar:2, a_haver:1, i_lepke:1, i_buffalo:1, i_varazsho:1 } },
+    list:{ c_pifti:2, c_gyuri:2, c_kovacs:2, c_zoli:2, c_tzs:1, c_talos:1, c_rebi:1, c_sasi:1, a_dinnyes:2, i_napszemuveg:1, a_cheddar:2, i_lepke:1, i_buffalo:1, i_varazsho:1 } },
   ejszaka: { name:'Éjszakai műszak', hero:'gabi', desc:'Falak és gyógyítás: Végh Tomi és a Bunda provokál, Gabi közben mindenkit foltoz. Húzd el a meccset, a végén nyersz.',
     list:{ c_veghtomi:1, c_vajda:1, c_gyuri:2, c_pifti:2, c_boros:1, c_fogel:1, c_vera:1, c_rebi:1, i_borkabat:1, a_rehab:1, a_mangos:1, a_abszint:1, l_korhaz:1, a_cheddar:2, a_dinnyes:1, i_bunda:1, a_delfin:1 } },
-  vodka: { name:'Vodkás est', hero:'krisz', desc:'Italos pakli: minden pohár erősíti Milót, Laczkó Tomi közben tölti a kezed, Kristóf hozza a következő kört. Krisz olcsóbban tolja az akciókat.',
+  vodka: { name:'Vodkás est', hero:'krisz', desc:'Italos pakli: minden pohár erősíti Milót, Laczkó Tomi közben tölti a kezed, Kristóf hozza a következő kört. Krisz minden körben az első két akciót olcsóbban tolja.',
     list:{ c_miloivo:1, c_laczko:1, c_kristof:1, c_pp:2, c_gyuri:2, c_vajda:2, a_dinnyes:2, a_cheddar:2, a_rehab:2, a_abszint:1, a_mangos:1, i_vodkakancso:1, i_energiaital:1, c_rebi:1 } },
-  felszereles: { name:'Felszerelés', hero:'tomi', desc:'Minden karakterre jut valami: napszemüveg, bunda, vodkás kancsó – Tomi eszközei plusz életet is adnak.',
+  felszereles: { name:'Felszerelés', hero:'tomi', desc:'Minden karakterre jut valami: napszemüveg, bunda, vodkás kancsó – Tomi eszközei plusz életet adnak, és körönként az első olcsóbb.',
     list:{ c_pifti:2, c_gyuri:2, c_talos:1, c_rebi:1, c_sasi:1, i_napszemuveg:2, i_kabala:2, i_borkabat:1, i_vodkakancso:1, i_buffalo:1, i_lepke:1, a_cheddar:1, i_varazsho:1, i_bunda:1, a_delfin:1, c_vajda:1 } },
-  kocsmatura: { name:'Kocsmatúra', hero:'david', desc:'Helyszínről helyszínre: Dávid minden helyszínnel húz, és ha kell, a Ki vagy tiltva! bezárja az ellenfél kocsmáját.',
+  kocsmatura: { name:'Kocsmatúra', hero:'david', desc:'Helyszínről helyszínre: Dávid minden helyszínnel húz és gyógyul, és ha kell, a Ki vagy tiltva! bezárja az ellenfél kocsmáját.',
     list:{ c_pifti:1, c_gyuri:2, c_vajda:2, c_veghtomi:2, l_akacfa:1, l_barhole:1, l_korhaz:1, a_kitiltva:2, a_dinnyes:2, a_abszint:1, c_boros:1, c_rebi:1, c_sasi:1, c_zsibrita:1, c_kristof:1 } },
   mindentbele: { name:'Mindent bele', hero:'bence', desc:'Bence 24 élete elbírja: Delfin póz, Varázshó és TZS önsebzése ide bátran jöhet, a Gyros Tál új kezet hoz.',
     list:{ c_tzs:1, c_zoli:2, c_gyuri:2, c_kovacs:2, c_vajda:2, c_sasi:1, a_delfin:1, a_dinnyes:2, a_gyros:1, a_abszint:1, i_buffalo:1, c_veghtomi:1, a_cheddar:1, i_napszemuveg:1, c_pifti:1 } },
   kamikaze: { name:'Kamikaze', hero:'milo', desc:'Olcsó karakterek, akik szívesen kiesnek: Milo minden halálért megsebzi az ellenfelet, Kovács Bence még utoljára odacsap.',
     list:{ c_kovacs:2, c_pifti:2, c_zoli:2, c_tzs:1, c_pp:2, c_gyuri:2, c_talos:1, c_rebi:1, i_kabala:2, l_morisson:1, a_dinnyes:2, i_varazsho:1, a_cheddar:1 } },
   hosszu: { name:'Hosszú éjszaka', hero:'laci', desc:'Védekezz, bénítsd le az ellenfelet, gyógyíts – Laci extra lapjai és a falak a végére elhúznak.',
-    list:{ c_veghtomi:1, c_vajda:2, c_gyuri:2, c_fogel:1, c_vera:1, c_rebi:1, a_abszint:1, a_mangos:1, a_rehab:1, a_dinnyes:1, i_buffalo:1, i_lepke:1, a_kitiltva:1, a_cheddar:1, c_pifti:2, l_park:1, a_delfin:1 } },
+    list:{ c_veghtomi:1, c_vajda:2, c_gyuri:2, c_fogel:1, c_vera:1, c_rebi:1, c_boros:1, a_abszint:1, a_mangos:1, a_rehab:1, a_dinnyes:1, i_buffalo:1, i_bunda:1, a_kitiltva:1, a_cheddar:1, c_sasimeselo:1, l_korhaz:1, a_delfin:1 } },
   banda: { name:'A banda', hero:'sasi', desc:'Minél többen vagytok lent, annál jobb: Sasi minden körben odacsap, Zsibrita és a haverok utat nyitnak.',
     list:{ c_pp:2, c_pifti:2, c_gyuri:2, c_kovacs:2, c_vajda:2, c_talos:1, c_rebi:1, c_zsibrita:1, c_fogel:1, i_napszemuveg:2, l_korhaz:1, a_dinnyes:2, c_veghtomi:1 } },
 };
@@ -129,7 +129,7 @@ function buildDeck(d) { const out = []; const list = typeof d === 'string' ? DEC
 function makePlayer(heroId, deckId) {
   const maxHp = heroId === PASSIVE.bigHp ? 24 : 20;
   return { heroId, deckId, hp:maxHp, maxHp, deck:buildDeck(deckId), hand:[], board:Array(LANES).fill(null), grave:[],
-           energy:0, maxEnergy:0, turns:0, fatigue:0, charThisTurn:false, actionThisTurn:false };
+           energy:0, maxEnergy:0, turns:0, fatigue:0, charThisTurn:false, actN:0 };
 }
 function makeUnit(s, id, owner) {
   const c = CARD[id];
@@ -186,7 +186,7 @@ function startTurn(s) {
   const pi = s.active, p = s.players[pi];
   s.half++; p.turns++;
   p.maxEnergy = Math.min(6, p.turns); p.energy = p.maxEnergy;
-  p.charThisTurn = false; p.actionThisTurn = false; p.drinkDraw = false;
+  p.charThisTurn = false; p.actN = 0; p.itemThisTurn = false; p.drinkDraw = false;
   p.board.forEach(u => { if (u) u.fresh = false; });
   ev(s, { t:'turn', side:pi });
   if (s.half > 1) draw(s, pi);
@@ -198,7 +198,8 @@ function cardCost(s, pi, id) {
   const c = CARD[id], p = s.players[pi]; let v = c.cost;
   if (locIs(s, 'l_park')) v++;
   if (locIs(s, 'l_barhole')) v--;
-  if (c.type === 'action' && has(p, 'actionDiscount') && !p.actionThisTurn) v--;
+  if (c.type === 'item' && has(p, 'itemHp') && !p.itemThisTurn) v--;   // Tomi: körönként az első eszköz olcsóbb
+  if (c.type === 'action' && has(p, 'actionDiscount') && (p.actN || 0) < 2) v--;   // Krisz: az első két akció olcsóbb
   return Math.max(0, v);
 }
 
@@ -284,7 +285,7 @@ function playCard(s, pi, hi, t) {
   if (c.type === 'char') {
     const u = makeUnit(s, c.id, pi);
     p.board[t.i] = u;
-    if (has(p, 'firstCharAtk') && !p.charThisTurn && c.id !== 'c_korso') { u.atk += 1; ev(s, { t:'buff', side:pi, i:t.i }); }
+    if (has(p, 'firstCharAtk') && !p.charThisTurn && c.id !== 'c_korso' && c.cost <= 2) { u.atk += 1; ev(s, { t:'buff', side:pi, i:t.i }); }
     p.charThisTurn = true;
     if (c.id === 'c_pp') {   // Query idézése: előbb jobbra, aztán balra, ha ott nincs hely, bárhova
       const spots = [t.i + 1, t.i - 1].filter(j => j >= 0 && j < LANES && !p.board[j]);
@@ -308,11 +309,13 @@ function playCard(s, pi, hi, t) {
       if (x) { e.board[t.t2.i] = null; ev(s, { t:'bounce', side:ei, i:t.t2.i }); buryItems(s, ei, x); addToHand(s, ei, x.id); }
     }
   } else if (c.type === 'item' && c.tgt === 'enemy') {
+    p.itemThisTurn = true;
     const u = e.board[t.i];
     reveal(s, ei, t.i); u.items.push(c.id); (u.foe = u.foe || []).push(c.id);
     if (c.stun) { u.stun = c.stun; ev(s, { t:'stun', side:ei, i:t.i }); }
     if (c.debuff) { u.atk = Math.max(0, u.atk - c.debuff); ev(s, { t:'debuff', side:ei, i:t.i, n:c.debuff }); }
   } else if (c.type === 'item') {
+    p.itemThisTurn = true;
     const u = p.board[t.i];
     const hp = (c.hp || 0) + (has(p, 'itemHp') ? 1 : 0);
     u.atk += c.atk || 0; u.hp += hp; u.maxHp += hp;
@@ -323,9 +326,9 @@ function playCard(s, pi, hi, t) {
   } else if (c.type === 'loc') {
     if (s.location) bury(s, s.location.owner, s.location.id, 'loc');
     s.location = { id:c.id, owner:pi };
-    if (has(p, 'locDraw')) draw(s, pi);
+    if (has(p, 'locDraw')) { draw(s, pi); healHero(s, pi, 1); }
   } else {
-    p.actionThisTurn = true;
+    p.actN = (p.actN || 0) + 1;
     switch (c.id) {
       case 'a_dinnyes': if (t.k === 'hero') damageHero(s, ei, 3); else damageUnit(s, ei, t.i, 3); break;
       case 'a_gyros': {

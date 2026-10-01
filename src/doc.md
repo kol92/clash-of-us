@@ -90,15 +90,21 @@
 ## Hősök (9; a passzív képességek még helykitöltők; mind a 9 illusztráció kész)
 | Hős | Képesség |
 |---|---|
-| Barna | A körödben elsőként kijátszott karaktered +1 támadást kap. |
+| Barna | A körödben elsőként kijátszott karaktered +1 támadást kap, ha legfeljebb 2 energiába kerül. |
 | Gabi | A köröd végén a legsérültebb karaktered 1 életet gyógyul; ha nincs ilyen, a hősöd. |
-| Krisz | A körödben az első akciókártyád 1-gyel olcsóbb. |
-| Tomi | Az eszközeid +1 életet is adnak. |
-| Dávid | Ha helyszínt játszol ki, húzol egy lapot. |
+| Krisz | A körödben az első két akciókártyád 1-gyel olcsóbb. |
+| Tomi | Az eszközeid +1 életet is adnak, és a körödben az első eszközöd 1-gyel olcsóbb. |
+| Dávid | Ha helyszínt játszol ki, húzol egy lapot, és a hősöd 1 életet gyógyul. |
 | Bence | 24 élettel kezd. |
 | Milo | Ha egy karaktered meghal, 1 sebzést okoz az ellenfél hősének. |
 | Laci | Minden harmadik körödben húzol egy extra lapot. |
 | Sasi | Ha a köröd végén legalább két karaktered áll a táblán, 1 sebzést okozol az ellenfél hősének. |
+
+**Hős-kiegyensúlyozás (2026-10-01):** botszimulációval mérve (kb. 16 000 meccs; „csak képesség” = mindkét oldal ugyanazzal a paklival, „saját pakli” = a kezdőpaklikkal).
+- Előtte: csak képesség 38–69% (Barna 69% kilógott; Dávid, Krisz, Tomi 38–40%), saját pakli 44–55% (Laci és Tomi 44%).
+- Változások: Barna bónusza csak legfeljebb 2 energiás karakterre; Krisz az első két akciót kapja olcsóbban; Tomi körönként az első eszközét 1-gyel olcsóbban rakja le; Dávid helyszínnél 1 életet is gyógyul; Laci paklijából kikerült a Budapest Park (mindenkinek drágított), a 2 Pifti és a Csattogós lepke, helyette Siófoki Kórház, Sasi, a mesélő, Boros és Fehér szarvas bunda; Barna paklijában a Nem én voltam hanem a haverom! helyett 2. Kovács Bence.
+- Kipróbált, de elvetett: Tomi eszközei +1 támadást is adnak – a saját paklijával 63–67%-ra ugrott, túl erős.
+- Utána: csak képesség 40–59% (Milo, Gabi, Laci a teteje; Krisz, Dávid az alja), saját pakli 44–56%.
 
 Hősképesség-ötletek a táblázatban (még nem zöldek, nincsenek beépítve): Krisz – Vad Képmások lapok +1/+1; Tomi – ha hatással megnézel egy lapot, húzol; Bence – Fehér varázshó szinergia; Milo – visszavesz egy Fehér varázshót; Laci – ha hatás miatt dobsz lapot, húzol; Barna – női karakterek 1-gyel olcsóbbak; Gabi – Zanafar szinergia.
 
@@ -185,14 +191,14 @@ Hősképesség-ötletek a táblázatban (még nem zöldek, nincsenek beépítve)
 - Delfin póz: az Akácfa söröző a 2 önsebzést 3-ra növeli; ha tele a kezed, a húzott lap elég. Tomi hős +1 élete a Fehér varázshóra és az Akumára is jár.
 
 ## Kezdőpaklik (hősönként egy, 20 lap; a 2026-09-29-i nerfek után újrahangolva; 8000 bot-meccsen hősönként kb. 44–56%)
-- **Rohamcsapat** (Barna): Pifti 2, Gyuri 2, Kovács Bence, Gál Zoli 2, TZS, Tálos, Rebi, Toma, Dinnyés Absolute Vodka 2, Napszemüveg, Cheddar sajtkrém leves 2, Nem én voltam hanem a haverom!, Csattogós lepke, Buffalo!, Fehér varázshó
+- **Rohamcsapat** (Barna): Pifti 2, Gyuri 2, Kovács Bence 2, Gál Zoli 2, TZS, Tálos, Rebi, Toma, Dinnyés Absolute Vodka 2, Napszemüveg, Cheddar sajtkrém leves 2, Csattogós lepke, Buffalo!, Fehér varázshó
 - **Éjszakai műszak** (Gabi): Végh Tomi, Vajda Peti, Gyuri 2, Pifti 2, Boros, Fogel, Vera, Rebi, Bőrkabát, Rehab, Mangós Ciroc Vodka, Abszint, Siófoki Kórház, Cheddar sajtkrém leves 2, Dinnyés Absolute Vodka, Fehér szarvas bunda, Delfin póz
 - **Vodkás est** (Krisz): Milo, az örökivó, Laczkó Tomi, Kristóf, PP 2, Gyuri 2, Vajda Peti 2, Dinnyés Absolute Vodka 2, Cheddar sajtkrém leves 2, Rehab 2, Abszint, Mangós Ciroc Vodka, Vodka Kancsó, Energiaital, Rebi
 - **Felszerelés** (Tomi): Pifti 2, Gyuri 2, Tálos, Rebi, Toma, Napszemüveg 2, Szerencsekabala 2, Bőrkabát, Vodka Kancsó, Buffalo!, Csattogós lepke, Cheddar sajtkrém leves, Fehér varázshó, Fehér szarvas bunda, Delfin póz, Vajda Peti
 - **Kocsmatúra** (Dávid): Pifti, Gyuri 2, Vajda Peti 2, Végh Tomi 2, Akácfa söröző, Barhole, Siófoki Kórház, Ki vagy tiltva! 2, Dinnyés Absolute Vodka 2, Abszint, Boros, Rebi, Toma, Zsibrita, Kristóf
 - **Mindent bele** (Bence): TZS, Gál Zoli 2, Gyuri 2, Kovács Bence 2, Vajda Peti 2, Toma, Delfin póz, Dinnyés Absolute Vodka 2, Musztafa Gyros Tál, Abszint, Buffalo!, Végh Tomi, Cheddar sajtkrém leves, Napszemüveg, Pifti
 - **Kamikaze** (Milo): Kovács Bence 2, Pifti 2, Gál Zoli 2, TZS, PP 2, Gyuri 2, Tálos, Rebi, Szerencsekabala 2, Morrison’s 2, Dinnyés Absolute Vodka 2, Fehér varázshó, Cheddar sajtkrém leves
-- **Hosszú éjszaka** (Laci): Végh Tomi, Vajda Peti 2, Gyuri 2, Fogel, Vera, Rebi, Abszint, Mangós Ciroc Vodka, Rehab, Dinnyés Absolute Vodka, Buffalo!, Csattogós lepke, Ki vagy tiltva!, Cheddar sajtkrém leves, Pifti 2, Budapest Park, Delfin póz
+- **Hosszú éjszaka** (Laci): Végh Tomi, Vajda Peti 2, Gyuri 2, Fogel, Vera, Rebi, Boros, Abszint, Mangós Ciroc Vodka, Rehab, Dinnyés Absolute Vodka, Buffalo!, Fehér szarvas bunda, Ki vagy tiltva!, Cheddar sajtkrém leves, Sasi, a mesélő, Siófoki Kórház, Delfin póz (2026-10-01 óta)
 - **A banda** (Sasi): PP 2, Pifti 2, Gyuri 2, Kovács Bence 2, Vajda Peti 2, Tálos, Rebi, Zsibrita, Fogel, Napszemüveg 2, Siófoki Kórház, Dinnyés Absolute Vodka 2, Végh Tomi
 - Csak gyakori (max 2) és ritka (max 1) lapból állnak, így mindenki ki tudja játszani őket az ingyenes kezdőgyűjteménnyel. Minden meglévő játékos megkapja az összes ritka lapból 1 példányt, ha még nincs neki (az újak eleve megkapják).
 - A bot a véletlenül választott hőse saját kezdőpaklijával játszik.
