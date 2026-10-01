@@ -1349,6 +1349,35 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%;}
 .cast{position:fixed;left:50%;top:44%;z-index:58;pointer-events:none;transform:translate(-50%,-50%);}
 .cast .card{--cw:150px;box-shadow:0 0 30px 6px rgba(255,210,120,.45),0 12px 30px rgba(0,0,0,.6);}
 .cast .ctype-below{display:none;}
+
+.skin-row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;}
+.skin-opt{display:grid;justify-items:center;gap:8px;padding:8px;border-radius:14px;border:2px solid transparent;}
+.skin-opt .card{--cw:96px;} .skin-opt .ctype-below{display:none;}
+.skin-opt span{font-weight:900;font-size:13px;color:var(--mute);}
+.skin-opt.on{border-color:var(--gold);background:rgba(255,201,74,.08);} .skin-opt.on span{color:var(--gold);}
+.skin-n{color:var(--gold)!important;}
+
+/* ===== ritka változat-lapok: ránézésre is látszódjon ===== */
+.vartag{display:none;}
+.var-ribbon{position:absolute;z-index:7;left:50%;top:-.55em;transform:translateX(-50%);white-space:nowrap;font-style:normal;font-family:var(--body);font-weight:900;
+  font-size:.42em;letter-spacing:.08em;text-transform:uppercase;color:#062a1c;padding:.25em .8em;border-radius:1em;
+  background:linear-gradient(90deg,#7dffc4,#e6ffb0 50%,#7dffc4);background-size:200% 100%;animation:varShine 3s linear infinite;box-shadow:0 0 .6em rgba(80,255,170,.8),0 .15em .3em rgba(0,0,0,.6);}
+.card.big .var-ribbon{font-size:.32em;}
+@keyframes varShine{to{background-position:-200% 0;}}
+.card.variant{box-shadow:0 0 0 .12em #6fffbe,0 0 .9em .15em rgba(80,255,170,.55),0 .3em .9em rgba(0,0,0,.55);animation:varGlow 2.6s ease-in-out infinite;}
+@keyframes varGlow{50%{box-shadow:0 0 0 .12em #d8ffb0,0 0 1.3em .3em rgba(120,255,190,.75),0 .3em .9em rgba(0,0,0,.55);}}
+.rare-rays.var{background:repeating-conic-gradient(from 0deg,rgba(125,255,196,.9) 0deg 6deg,transparent 6deg 15deg,rgba(230,255,176,.8) 15deg 20deg,transparent 20deg 30deg);}
+.flip.charging.var .face.back{box-shadow:0 0 0 2px #e6ffb0,0 0 28px 8px rgba(80,255,170,.9),0 0 60px 18px rgba(80,255,170,.5);}
+.rare-flash.var{background:radial-gradient(circle,#fff 0%,rgba(170,255,210,.85) 28%,rgba(80,255,170,.4) 50%,transparent 72%);}
+.rare-show.var .rare-card .card{box-shadow:0 0 40px 10px rgba(80,255,170,.6),0 20px 40px rgba(0,0,0,.7);}
+.rare-show.var .rare-banner{color:#b9ffd9;text-shadow:0 0 12px rgba(80,255,170,.9),0 3px 0 #0b5a37,0 6px 14px rgba(0,0,0,.8);}
+.var-sub{position:relative;z-index:2;max-width:300px;text-align:center;font-size:13px;font-weight:800;color:#b9ffd9;margin-top:-6px;}
+@media (prefers-reduced-motion:reduce){.var-ribbon,.card.variant{animation:none!important;}}
+
+.var-ribbon b{font-weight:900;} .var-ribbon span{display:none;}
+.card:not(.big) .var-ribbon{left:58%;font-size:.5em;top:-.45em;} .card:not(.big) .var-ribbon b{display:none;} .card:not(.big) .var-ribbon span{display:inline;}
+
+.card.foil .var-ribbon,.card.foil:not(.big) .var-ribbon{top:.5em;z-index:8;}
 </style>
 </head>
 <body>
@@ -1507,7 +1536,7 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%;}
 <script src="vendor/firebase-auth-compat.js"></script>
 <script src="vendor/firebase-firestore-compat.js"></script>
 <script src="vendor/firebase-database-compat.js"></script>
-<script>window.APP_VERSION = "2026.10.01-0559";</script>
+<script>window.APP_VERSION = "2026.10.01-0901";</script>
 <script>// ===== Best of Us – saját szerver (Firebase) =====
 // A játék eredetileg a Claude-os tárolót használta (window.claude.use('db' | 'user' | 'room')).
 // Ez a fájl ugyanazt a felületet adja Firebase-ből, így a játék kódja szinte változatlan maradhat:
@@ -2432,13 +2461,13 @@ function cardHTML(id, o = {}) {
   const c = CARD[id], cost = o.cost ?? c.cost;
   if (c.foilOnly && !o.foil) o = { ...o, foil: true };   // csak Full Artban létező lap
   const tl = textHTML(c).replace(/<[^>]+>/g, '').length, tlc = tl > 95 ? ' tl-l' : tl > 62 ? ' tl-m' : '';
-  return `<div class="card ${TYPE[c.type][1]}${o.big ? ' big' : ''}${o.foil ? ' foil' : ' framed' + tlc}${o.cls ? ' ' + o.cls : ''}" style="--h:${hueOf(id)}" ${o.attrs || ''}>
+  return `<div class="card ${TYPE[c.type][1]}${c.variantOf ? ' variant' : ''}${o.big ? ' big' : ''}${o.foil ? ' foil' : ' framed' + tlc}${o.cls ? ' ' + o.cls : ''}" style="--h:${hueOf(id)}" ${o.attrs || ''}>
     <div class="cframe">
       ${ART[id] ? `<div class="art has-art" style="${artStyle(id, o.big)}"></div>`
         : `<div class="art"><span class="mono">${initials(c.name)}</span>${o.big && !o.foil ? '<span class="artnote">Illusztráció helye</span>' : ''}</div>`}
       <div class="ctype">${TYPE[c.type][0]}${c.drink ? ' · Ital' : ''}<i class="rar r-${c.rarity}" title="${RAR[c.rarity]}"></i></div>
       ${c.type !== 'char' && !o.big ? `<div class="tribbon">${TYPE[c.type][0]}${c.drink ? '<i class="drk">Ital</i>' : ''}</div>` : ''}
-      <div class="name${c.name.length > 16 ? ' long' : ''}${longWord(c.name) > 11 ? ' xl' : ''}">${c.name}</div>${c.variantOf ? '<i class="vartag" title="Ritka változat">✦</i>' : ''}
+      <div class="name${c.name.length > 16 ? ' long' : ''}${longWord(c.name) > 11 ? ' xl' : ''}">${c.name}</div>${c.variantOf ? '<i class="var-ribbon"><b>✦ Ritka változat</b><span>✦ Változat</span></i>' : ''}
       <div class="txt"><span>${textHTML(c)}</span></div>
     </div>
     ${o.big ? `<div class="ctype-below">${TYPE[c.type][0]}${c.drink ? ' · Ital' : ''}</div>` : ''}
@@ -2462,6 +2491,8 @@ const ART = {
   g_tomi:  { src:'art/g_tomi.webp',  av:'56% 14%', pos:'56% 16%', port:'57% 12%' },
   g_barna: { src:'art/g_barna.webp', av:'64% 20%', pos:'62% 20%', port:'64% 16%' },
   g_laci:  { src:'art/g_laci.webp',  av:'46% 20%', pos:'46% 20%', port:'46% 16%' },
+  g_sasi:  { src:'art/g_sasi.webp',  av:'46% 17%', pos:'46% 16%', port:'46% 12%' },
+  g_gabi:  { src:'art/g_gabi.webp',  av:'55% 28%', pos:'55% 26%', port:'56% 24%' },
   c_sasi:{ src:'art/toma.webp', pos:'50% 14%' },   // a karakterlap neve mostantól Toma (a hős Sasi marad)
   c_pifti:{ src:'art/pifti.webp', pos:'66% 16%' },
   c_gyuri:{ src:'art/gyuri.webp', pos:'60% 17%' },
@@ -2566,7 +2597,7 @@ document.querySelectorAll('[data-back]').forEach(b => b.onclick = () => { render
 function renderMenuFan() {
   const pool = HEROES.filter(h => ART[h.id]).slice();
   for (let i = pool.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [pool[i], pool[j]] = [pool[j], pool[i]]; }
-  let gold = []; try { if (Store.p) gold = GOLD_HEROES.filter(ownsHeroGold); } catch {}   // induláskor még nincs betöltve a profil   // ha van arany hősöd, az is a menüben díszeleg
+  let gold = []; try { if (Store.p) gold = GOLD_HEROES.filter(h => heroSkin(h) === 'gold'); } catch {}   // induláskor még nincs betöltve a profil   // ha van arany hősöd, az is a menüben díszeleg
   const pick = pool.slice(0, 3); if (gold.length) pick[1] = HERO[gold[Math.floor(Math.random() * gold.length)]];
   $('#menuFan').innerHTML = pick.map(h => heroCardHTML(h, { foil: true, gold: gold.includes(h.id) })).join('');
 }
@@ -2599,7 +2630,8 @@ function renderColl() {
       return `<div class="coll-slot${n ? '' : ' missing'}">${cardHTML(c.id, { foil: ui.foil, attrs: `data-card="${c.id}" tabindex="0"` })}<span class="own-n">${n ? '×' + n : 'Nincs meg'}</span></div>`;
     }).join('')
          : HEROES.map(h => { const miss = ui.foil && !ownsHeroFa(h.id);
-             return `<div class="coll-slot${miss ? ' missing' : ''}">${heroCardHTML(h, { foil: ui.foil, attrs: `data-hcard="${h.id}" tabindex="0"` })}${ui.foil ? `<span class="own-n">${miss ? 'Nincs meg' : '×' + Store.p.heroFa[h.id]}</span>` : ''}</div>`; }).join('')}</div>${type ? '' : `<div class="lbl gold-lbl">✦ Arany hősök – a legritkább lapok</div><div class="coll-grid">${GOLD_HEROES.map(hid => { const has = ownsHeroGold(hid);
+             const multi = !ui.foil && Store.p && heroSkins(h.id).length > 1, sk = multi ? heroSkin(h.id) : 'base';
+             return `<div class="coll-slot${miss ? ' missing' : ''}">${heroCardHTML(h, { foil: ui.foil || sk === 'fa', gold: !ui.foil && sk === 'gold', attrs: `data-hcard="${h.id}" tabindex="0"` })}${ui.foil ? `<span class="own-n">${miss ? 'Nincs meg' : '×' + Store.p.heroFa[h.id]}</span>` : multi ? `<span class="own-n skin-n">🎨 ${SKIN_NAME[sk]}</span>` : ''}</div>`; }).join('')}</div>${type ? '' : `<div class="lbl gold-lbl">✦ Arany hősök – a legritkább lapok</div><div class="coll-grid">${GOLD_HEROES.map(hid => { const has = ownsHeroGold(hid);
              return `<div class="coll-slot${has ? '' : ' missing gold-miss'}">${heroCardHTML(HERO[hid], { gold: true, attrs: `data-hgold="${hid}" tabindex="0"` })}<span class="own-n">${has ? '✦ Megvan' : 'Nincs meg'}</span></div>`; }).join('')}</div>`}`).join('');
 }
 $('#vBase').onclick = () => { ui.foil = false; $('#vBase').setAttribute('aria-pressed', 'true'); $('#vFoil').setAttribute('aria-pressed', 'false'); renderColl(); };
@@ -2607,8 +2639,11 @@ $('#vFoil').onclick = () => { ui.foil = true; $('#vFoil').setAttribute('aria-pre
 $('#collBody').onclick = e => {
   if (e.target.closest('#dupeBtn')) return dupeModal();
   const c = e.target.closest('[data-card]'), h = e.target.closest('[data-hcard]'), hg = e.target.closest('[data-hgold]');
+  if (h && !ui.foil && Store.p && heroSkins(h.dataset.hcard).length > 1) return skinModal(h.dataset.hcard);
+  if (hg && ownsHeroGold(hg.dataset.hgold) && heroSkins(hg.dataset.hgold).length > 1) return skinModal(hg.dataset.hgold);
   if (hg) { const hid = hg.dataset.hgold; openModal(heroCardHTML(HERO[hid], { big: true, gold: true }), ownsHeroGold(hid) ? '✦ Arany hős · a tiéd!' : `✦ Arany hős · boosterből ${ECON.goldPlain * 100}%, Shiny boosterből ${ECON.goldShiny * 100}% eséllyel`); return; }
   if (c) { const id = c.dataset.card, e = Store.p?.coll[id] || { n: 0, f: 0 };
+    if (CARD[id].variantOf) return openModal(cardHTML(id, { big: true, foil: ui.foil }), `✦ Ritka változat: a(z) ${CARD[CARD[id].variantOf].name} különleges kinézete – ugyanúgy játszható, ugyanaz a hatása · ${e.n + e.f} db${CARD[id].passOnly ? ' · csak a Season Passból' : !e.n && !e.f ? ' · Shiny boosterből szerezhető' : ''}`, cardHelpHTML(id));
     openModal(cardHTML(id, { big: true, foil: ui.foil }), `${RAR[CARD[id].rarity]} · ${e.n} db${e.f ? ` + ${e.f} Full Art` : ''}${CARD[id].passOnly ? ' · csak a Season Passból szerezhető' : !e.n && !e.f ? ' · boosterből szerezhető' : ''}`, cardHelpHTML(id)); }
   if (h) openModal(heroCardHTML(HERO[h.dataset.hcard], { big: true, foil: ui.foil }), ui.foil ? (ownsHeroFa(h.dataset.hcard) ? 'Full Art hős' : 'Full Art hős · boosterből szerezhető') : 'Hős');
 };
@@ -2644,8 +2679,8 @@ function openModal(inner, live, help = '') {
 // Full Art: a saját lapjaidnál a gyűjteményed dönt; PvP-ben az ellenfélnél az, amit a meccs elején magáról megosztott
 const longWord = n => Math.max(...n.split(/[\s\u00AD]+/).map(w => w.length));   // a leghosszabb szó (ezt nem lehet tördelni)
 const foilOf = (side, id) => side === ME ? ownsFoil(id) : !!(S && S.cos && S.cos[side] && S.cos[side].foils && S.cos[side].foils.includes(id));
-const heroGoldOf = side => !!S && (side === ME ? ownsHeroGold(S.players[side].heroId) : !!(S.cos && S.cos[side] && S.cos[side].heroGold));
-const heroFaOf = side => side === ME ? ownsHeroFa(S.players[side].heroId) : !!(S && S.cos && S.cos[side] && S.cos[side].heroFa);
+const heroGoldOf = side => !!S && (side === ME ? heroSkin(S.players[side].heroId) === 'gold' : !!(S.cos && S.cos[side] && S.cos[side].heroGold));
+const heroFaOf = side => side === ME ? heroSkin(S.players[side].heroId) === 'fa' : !!(S && S.cos && S.cos[side] && S.cos[side].heroFa);
 const escH = s => String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
 function toast(t) { const d = document.createElement('div'); d.className = 'toast'; d.textContent = t; $('#layer').appendChild(d); setTimeout(() => d.remove(), 1600); }
 function floatAt(el, text, cls) {
@@ -3460,6 +3495,23 @@ const ownsHeroFa = hid => (Store.p?.heroFa?.[hid] || 0) > 0;
 // Arany hősök: a legritkább lapok (p.heroGold[hősId] = darab); sima packban 0,5%, Shiny packban 5% eséllyel
 const GOLD_HEROES = HEROES.filter(h => ART['g_' + h.id]).map(h => h.id);
 const ownsHeroGold = hid => (Store.p?.heroGold?.[hid] || 0) > 0;
+// melyik hős-portrét használja (sima / Full Art / arany): a választott, ha megvan; különben a legritkább, ami megvan
+const heroSkins = hid => ['base'].concat(ownsHeroFa(hid) ? ['fa'] : [], ownsHeroGold(hid) && ART['g_' + hid] ? ['gold'] : []);
+function heroSkin(hid) {
+  const have = heroSkins(hid), pref = Store.p?.heroSkin?.[hid];
+  return have.includes(pref) ? pref : have[have.length - 1];
+}
+const SKIN_NAME = { base: 'Sima', fa: 'Full Art', gold: '✦ Arany' };
+function skinModal(hid) {
+  const h = HERO[hid], have = heroSkins(hid), cur = heroSkin(hid);
+  const o = document.createElement('div'); o.className = 'overlay';
+  o.innerHTML = `<div class="modal tr-box skin-box"><h3>${escH(h.name)} – melyik portrét használod?</h3><p class="live">Ez látszik a meccseken (a PvP-ellenfeled is ezt látja), a pakliválasztóban és a menüben.</p>
+    <div class="skin-row">${have.map(v => `<button class="skin-opt${v === cur ? ' on' : ''}" data-skin="${v}">${heroCardHTML(h, { foil: v === 'fa', gold: v === 'gold' })}<span>${SKIN_NAME[v]}${v === cur ? ' ✓' : ''}</span></button>`).join('')}</div>
+    <button class="btn" data-x>Bezárás</button></div>`;
+  o.onclick = async e => { const b = e.target.closest('button'); if (e.target === o || (b && b.hasAttribute('data-x'))) return o.remove(); if (!b || !b.dataset.skin) return;
+    const p = Store.p; p.heroSkin = { ...(p.heroSkin || {}), [hid]: b.dataset.skin }; await save(); o.remove(); renderColl(); renderMenuFan(); toast(`${h.name}: ${SKIN_NAME[b.dataset.skin]} portré beállítva`); };
+  $('#layer').appendChild(o);
+}
 function rollHeroGold(p) {
   const h = GOLD_HEROES[Math.floor(Math.random() * GOLD_HEROES.length)];
   p.heroGold = p.heroGold || {}; const isNew = !p.heroGold[h]; p.heroGold[h] = (p.heroGold[h] || 0) + 1;
@@ -3844,7 +3896,7 @@ async function packOpening(setId, cards, po = {}) {
       e.stopPropagation();
       const c = cards[+f.dataset.i], rar = pcRar(c);
       if (c.gold) { busyFlip = true; await goldReveal(o, f, c); busyFlip = false; }
-      else if (rar === 'l' || c.foil) { busyFlip = true; await rareReveal(o, f, c); busyFlip = false; }
+      else if (rar === 'l' || c.foil || (!c.hero && CARD[c.id].variantOf)) { busyFlip = true; await rareReveal(o, f, c); busyFlip = false; }
       else { f.classList.add('open'); if (rar === 'e' || (!c.hero && CARD[c.id].variantOf)) f.classList.add('glow'); }
       if (--left === 0) done();
     });
@@ -3926,7 +3978,8 @@ function goldMote(parent, x, y, tx, ty) {
 // ---- különleges bontás: legendás vagy Full Art lap ----
 async function rareReveal(o, f, c) {
   const leg = !c.hero && CARD[c.id].rarity === 'l', fa = !!c.foil;
-  const kind = fa && leg ? 'both' : fa ? 'fa' : 'leg';
+  const vari = !c.hero && !!CARD[c.id].variantOf;
+  const kind = vari && !fa ? 'var' : fa && leg ? 'both' : fa ? 'fa' : 'leg';
   const r = f.getBoundingClientRect(), cx = r.left + r.width / 2, cy = r.top + r.height / 2;
   o.classList.add('rare-dim');
   // 1) a lap megremeg, egyre erősebben izzik, mögötte fénysugarak kezdenek forogni
@@ -3942,7 +3995,7 @@ async function rareReveal(o, f, c) {
   f.classList.remove('charging'); f.classList.add('open', 'glow');
   const flash = document.createElement('div'); flash.className = `rare-flash ${kind}`; o.appendChild(flash);
   flash.animate([{ opacity: 0 }, { opacity: .65, offset: .15 }, { opacity: 0 }], { duration: 900, fill: 'forwards' }).finished.then(() => flash.remove());
-  const cols = kind === 'leg' ? ['#fff4c2', '#ffd24a', '#ffb300', '#ffffff'] : ['#ff8fd0', '#8fd4ff', '#b6ffcf', '#ffe28a', '#ffffff'];
+  const cols = kind === 'var' ? ['#7dffc4', '#e6ffb0', '#b9ffd9', '#ffffff'] : kind === 'leg' ? ['#fff4c2', '#ffd24a', '#ffb300', '#ffffff'] : ['#ff8fd0', '#8fd4ff', '#b6ffcf', '#ffe28a', '#ffffff'];
   for (let k = 0; k < 44; k++) {
     const s = document.createElement('i'); s.className = 'rare-spark';
     const a = Math.random() * Math.PI * 2, d = 90 + Math.random() * 170, sz = 4 + Math.random() * 7;
@@ -3954,9 +4007,9 @@ async function rareReveal(o, f, c) {
   await sleep(380);
   // 3) bemutató: a lap nagyban középre ugrik, felirattal
   const show = document.createElement('div'); show.className = `rare-show ${kind}`;
-  const label = c.hero ? 'Full Art hős!' : kind === 'both' ? 'Legendás · Full Art!' : kind === 'fa' ? 'Full Art!' : 'Legendás!';
+  const label = c.hero ? 'Full Art hős!' : vari ? '✦ Ritka változat!' : kind === 'both' ? 'Legendás · Full Art!' : kind === 'fa' ? 'Full Art!' : 'Legendás!';
   show.innerHTML = `<div class="rare-rays big ${kind}"></div><div class="rare-card">${pcHTML(c, { big: true, foil: c.foil })}</div>
-    <div class="rare-banner">${label}</div><div class="rare-name">${c.hero ? `${HERO[c.hero].name} – Full Art hős` : CARD[c.id].name}${c.isNew ? ' · Új!' : ''}</div><div class="op-hint">Koppints a folytatáshoz</div>`;
+    <div class="rare-banner">${label}</div><div class="rare-name">${c.hero ? `${HERO[c.hero].name} – Full Art hős` : CARD[c.id].name}${c.isNew ? ' · Új!' : ''}</div>${vari ? `<div class="var-sub">A(z) ${CARD[CARD[c.id].variantOf].name} különleges, ritka kinézete – ugyanúgy játszható</div>` : ''}<div class="op-hint">Koppints a folytatáshoz</div>`;
   o.appendChild(show);
   const card = show.querySelector('.rare-card');
   show.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 250, fill: 'forwards' });
@@ -3986,7 +4039,7 @@ const deckIssue = d => deckProblem(d.list, d.hero || null);
 function heroPortrait(hid, cls = '') {
   const h = HERO[hid];
   if (!h) return `<span class="hp-img empty ${cls}">?</span>`;
-  const aid = ownsHeroGold(hid) && ART['g_' + hid] ? 'g_' + hid : hid;
+  const aid = heroSkin(hid) === 'gold' && ART['g_' + hid] ? 'g_' + hid : hid;
   return `<span class="hp-img ${cls}${aid !== hid ? ' gold' : ''}" style="--h:${h.hue};${ART[aid] ? `background-image:url('${artSrc(aid, false)}')` : ''}">${ART[aid] ? '' : initials(h.name)}</span>`;
 }
 function renderDecks() {
@@ -4630,7 +4683,7 @@ function pvpPickDeck(title, done) {
   $('#layer').appendChild(o);
 }
 const pvpMe = dk => ({ ver: window.APP_VERSION || '', uid: Store.uid, name: Store.p.name || 'Játékos', hero: dk.hero, deckName: dk.name, list: { ...dk.list },
-  cos: { heroGold: ownsHeroGold(dk.hero), heroFa: ownsHeroFa(dk.hero), foils: Object.keys(dk.list).filter(id => ownsFoil(id)) } });   // amit az ellenfél is lát: Full Art hős és lapok
+  cos: { heroGold: heroSkin(dk.hero) === 'gold', heroFa: heroSkin(dk.hero) === 'fa', foils: Object.keys(dk.list).filter(id => ownsFoil(id)) } });   // amit az ellenfél is lát: Full Art hős és lapok
 async function pvpCreate(dk) {
   try { await Store.db.collection('pvp').add({ parts: [Store.uid], status: 'open', created: Date.now(), updated: Date.now(), host: pvpMe(dk), guest: null, v: 0 }); toast('Kihívás létrehozva – szólj a haveroknak!'); }
   catch (e) { toast(e?.code === 'quota_exceeded' ? 'Megtelt a tárhely, próbáld később' : 'Nem sikerült létrehozni (lehet, hogy nincs írási jogod)'); }

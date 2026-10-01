@@ -80,13 +80,13 @@ function cardHTML(id, o = {}) {
   const c = CARD[id], cost = o.cost ?? c.cost;
   if (c.foilOnly && !o.foil) o = { ...o, foil: true };   // csak Full Artban létező lap
   const tl = textHTML(c).replace(/<[^>]+>/g, '').length, tlc = tl > 95 ? ' tl-l' : tl > 62 ? ' tl-m' : '';
-  return `<div class="card ${TYPE[c.type][1]}${o.big ? ' big' : ''}${o.foil ? ' foil' : ' framed' + tlc}${o.cls ? ' ' + o.cls : ''}" style="--h:${hueOf(id)}" ${o.attrs || ''}>
+  return `<div class="card ${TYPE[c.type][1]}${c.variantOf ? ' variant' : ''}${o.big ? ' big' : ''}${o.foil ? ' foil' : ' framed' + tlc}${o.cls ? ' ' + o.cls : ''}" style="--h:${hueOf(id)}" ${o.attrs || ''}>
     <div class="cframe">
       ${ART[id] ? `<div class="art has-art" style="${artStyle(id, o.big)}"></div>`
         : `<div class="art"><span class="mono">${initials(c.name)}</span>${o.big && !o.foil ? '<span class="artnote">Illusztráció helye</span>' : ''}</div>`}
       <div class="ctype">${TYPE[c.type][0]}${c.drink ? ' · Ital' : ''}<i class="rar r-${c.rarity}" title="${RAR[c.rarity]}"></i></div>
       ${c.type !== 'char' && !o.big ? `<div class="tribbon">${TYPE[c.type][0]}${c.drink ? '<i class="drk">Ital</i>' : ''}</div>` : ''}
-      <div class="name${c.name.length > 16 ? ' long' : ''}${longWord(c.name) > 11 ? ' xl' : ''}">${c.name}</div>${c.variantOf ? '<i class="vartag" title="Ritka változat">✦</i>' : ''}
+      <div class="name${c.name.length > 16 ? ' long' : ''}${longWord(c.name) > 11 ? ' xl' : ''}">${c.name}</div>${c.variantOf ? '<i class="var-ribbon"><b>✦ Ritka változat</b><span>✦ Változat</span></i>' : ''}
       <div class="txt"><span>${textHTML(c)}</span></div>
     </div>
     ${o.big ? `<div class="ctype-below">${TYPE[c.type][0]}${c.drink ? ' · Ital' : ''}</div>` : ''}
@@ -110,6 +110,8 @@ const ART = {
   g_tomi:  { src:'art/g_tomi.webp',  av:'56% 14%', pos:'56% 16%', port:'57% 12%' },
   g_barna: { src:'art/g_barna.webp', av:'64% 20%', pos:'62% 20%', port:'64% 16%' },
   g_laci:  { src:'art/g_laci.webp',  av:'46% 20%', pos:'46% 20%', port:'46% 16%' },
+  g_sasi:  { src:'art/g_sasi.webp',  av:'46% 17%', pos:'46% 16%', port:'46% 12%' },
+  g_gabi:  { src:'art/g_gabi.webp',  av:'55% 28%', pos:'55% 26%', port:'56% 24%' },
   c_sasi:{ src:'art/toma.webp', pos:'50% 14%' },   // a karakterlap neve mostantól Toma (a hős Sasi marad)
   c_pifti:{ src:'art/pifti.webp', pos:'66% 16%' },
   c_gyuri:{ src:'art/gyuri.webp', pos:'60% 17%' },
@@ -214,7 +216,7 @@ document.querySelectorAll('[data-back]').forEach(b => b.onclick = () => { render
 function renderMenuFan() {
   const pool = HEROES.filter(h => ART[h.id]).slice();
   for (let i = pool.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [pool[i], pool[j]] = [pool[j], pool[i]]; }
-  let gold = []; try { if (Store.p) gold = GOLD_HEROES.filter(ownsHeroGold); } catch {}   // induláskor még nincs betöltve a profil   // ha van arany hősöd, az is a menüben díszeleg
+  let gold = []; try { if (Store.p) gold = GOLD_HEROES.filter(h => heroSkin(h) === 'gold'); } catch {}   // induláskor még nincs betöltve a profil   // ha van arany hősöd, az is a menüben díszeleg
   const pick = pool.slice(0, 3); if (gold.length) pick[1] = HERO[gold[Math.floor(Math.random() * gold.length)]];
   $('#menuFan').innerHTML = pick.map(h => heroCardHTML(h, { foil: true, gold: gold.includes(h.id) })).join('');
 }
@@ -247,7 +249,8 @@ function renderColl() {
       return `<div class="coll-slot${n ? '' : ' missing'}">${cardHTML(c.id, { foil: ui.foil, attrs: `data-card="${c.id}" tabindex="0"` })}<span class="own-n">${n ? '×' + n : 'Nincs meg'}</span></div>`;
     }).join('')
          : HEROES.map(h => { const miss = ui.foil && !ownsHeroFa(h.id);
-             return `<div class="coll-slot${miss ? ' missing' : ''}">${heroCardHTML(h, { foil: ui.foil, attrs: `data-hcard="${h.id}" tabindex="0"` })}${ui.foil ? `<span class="own-n">${miss ? 'Nincs meg' : '×' + Store.p.heroFa[h.id]}</span>` : ''}</div>`; }).join('')}</div>${type ? '' : `<div class="lbl gold-lbl">✦ Arany hősök – a legritkább lapok</div><div class="coll-grid">${GOLD_HEROES.map(hid => { const has = ownsHeroGold(hid);
+             const multi = !ui.foil && Store.p && heroSkins(h.id).length > 1, sk = multi ? heroSkin(h.id) : 'base';
+             return `<div class="coll-slot${miss ? ' missing' : ''}">${heroCardHTML(h, { foil: ui.foil || sk === 'fa', gold: !ui.foil && sk === 'gold', attrs: `data-hcard="${h.id}" tabindex="0"` })}${ui.foil ? `<span class="own-n">${miss ? 'Nincs meg' : '×' + Store.p.heroFa[h.id]}</span>` : multi ? `<span class="own-n skin-n">🎨 ${SKIN_NAME[sk]}</span>` : ''}</div>`; }).join('')}</div>${type ? '' : `<div class="lbl gold-lbl">✦ Arany hősök – a legritkább lapok</div><div class="coll-grid">${GOLD_HEROES.map(hid => { const has = ownsHeroGold(hid);
              return `<div class="coll-slot${has ? '' : ' missing gold-miss'}">${heroCardHTML(HERO[hid], { gold: true, attrs: `data-hgold="${hid}" tabindex="0"` })}<span class="own-n">${has ? '✦ Megvan' : 'Nincs meg'}</span></div>`; }).join('')}</div>`}`).join('');
 }
 $('#vBase').onclick = () => { ui.foil = false; $('#vBase').setAttribute('aria-pressed', 'true'); $('#vFoil').setAttribute('aria-pressed', 'false'); renderColl(); };
@@ -255,8 +258,11 @@ $('#vFoil').onclick = () => { ui.foil = true; $('#vFoil').setAttribute('aria-pre
 $('#collBody').onclick = e => {
   if (e.target.closest('#dupeBtn')) return dupeModal();
   const c = e.target.closest('[data-card]'), h = e.target.closest('[data-hcard]'), hg = e.target.closest('[data-hgold]');
+  if (h && !ui.foil && Store.p && heroSkins(h.dataset.hcard).length > 1) return skinModal(h.dataset.hcard);
+  if (hg && ownsHeroGold(hg.dataset.hgold) && heroSkins(hg.dataset.hgold).length > 1) return skinModal(hg.dataset.hgold);
   if (hg) { const hid = hg.dataset.hgold; openModal(heroCardHTML(HERO[hid], { big: true, gold: true }), ownsHeroGold(hid) ? '✦ Arany hős · a tiéd!' : `✦ Arany hős · boosterből ${ECON.goldPlain * 100}%, Shiny boosterből ${ECON.goldShiny * 100}% eséllyel`); return; }
   if (c) { const id = c.dataset.card, e = Store.p?.coll[id] || { n: 0, f: 0 };
+    if (CARD[id].variantOf) return openModal(cardHTML(id, { big: true, foil: ui.foil }), `✦ Ritka változat: a(z) ${CARD[CARD[id].variantOf].name} különleges kinézete – ugyanúgy játszható, ugyanaz a hatása · ${e.n + e.f} db${CARD[id].passOnly ? ' · csak a Season Passból' : !e.n && !e.f ? ' · Shiny boosterből szerezhető' : ''}`, cardHelpHTML(id));
     openModal(cardHTML(id, { big: true, foil: ui.foil }), `${RAR[CARD[id].rarity]} · ${e.n} db${e.f ? ` + ${e.f} Full Art` : ''}${CARD[id].passOnly ? ' · csak a Season Passból szerezhető' : !e.n && !e.f ? ' · boosterből szerezhető' : ''}`, cardHelpHTML(id)); }
   if (h) openModal(heroCardHTML(HERO[h.dataset.hcard], { big: true, foil: ui.foil }), ui.foil ? (ownsHeroFa(h.dataset.hcard) ? 'Full Art hős' : 'Full Art hős · boosterből szerezhető') : 'Hős');
 };
@@ -292,8 +298,8 @@ function openModal(inner, live, help = '') {
 // Full Art: a saját lapjaidnál a gyűjteményed dönt; PvP-ben az ellenfélnél az, amit a meccs elején magáról megosztott
 const longWord = n => Math.max(...n.split(/[\s\u00AD]+/).map(w => w.length));   // a leghosszabb szó (ezt nem lehet tördelni)
 const foilOf = (side, id) => side === ME ? ownsFoil(id) : !!(S && S.cos && S.cos[side] && S.cos[side].foils && S.cos[side].foils.includes(id));
-const heroGoldOf = side => !!S && (side === ME ? ownsHeroGold(S.players[side].heroId) : !!(S.cos && S.cos[side] && S.cos[side].heroGold));
-const heroFaOf = side => side === ME ? ownsHeroFa(S.players[side].heroId) : !!(S && S.cos && S.cos[side] && S.cos[side].heroFa);
+const heroGoldOf = side => !!S && (side === ME ? heroSkin(S.players[side].heroId) === 'gold' : !!(S.cos && S.cos[side] && S.cos[side].heroGold));
+const heroFaOf = side => side === ME ? heroSkin(S.players[side].heroId) === 'fa' : !!(S && S.cos && S.cos[side] && S.cos[side].heroFa);
 const escH = s => String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
 function toast(t) { const d = document.createElement('div'); d.className = 'toast'; d.textContent = t; $('#layer').appendChild(d); setTimeout(() => d.remove(), 1600); }
 function floatAt(el, text, cls) {

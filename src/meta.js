@@ -81,6 +81,23 @@ const ownsHeroFa = hid => (Store.p?.heroFa?.[hid] || 0) > 0;
 // Arany hősök: a legritkább lapok (p.heroGold[hősId] = darab); sima packban 0,5%, Shiny packban 5% eséllyel
 const GOLD_HEROES = HEROES.filter(h => ART['g_' + h.id]).map(h => h.id);
 const ownsHeroGold = hid => (Store.p?.heroGold?.[hid] || 0) > 0;
+// melyik hős-portrét használja (sima / Full Art / arany): a választott, ha megvan; különben a legritkább, ami megvan
+const heroSkins = hid => ['base'].concat(ownsHeroFa(hid) ? ['fa'] : [], ownsHeroGold(hid) && ART['g_' + hid] ? ['gold'] : []);
+function heroSkin(hid) {
+  const have = heroSkins(hid), pref = Store.p?.heroSkin?.[hid];
+  return have.includes(pref) ? pref : have[have.length - 1];
+}
+const SKIN_NAME = { base: 'Sima', fa: 'Full Art', gold: '✦ Arany' };
+function skinModal(hid) {
+  const h = HERO[hid], have = heroSkins(hid), cur = heroSkin(hid);
+  const o = document.createElement('div'); o.className = 'overlay';
+  o.innerHTML = `<div class="modal tr-box skin-box"><h3>${escH(h.name)} – melyik portrét használod?</h3><p class="live">Ez látszik a meccseken (a PvP-ellenfeled is ezt látja), a pakliválasztóban és a menüben.</p>
+    <div class="skin-row">${have.map(v => `<button class="skin-opt${v === cur ? ' on' : ''}" data-skin="${v}">${heroCardHTML(h, { foil: v === 'fa', gold: v === 'gold' })}<span>${SKIN_NAME[v]}${v === cur ? ' ✓' : ''}</span></button>`).join('')}</div>
+    <button class="btn" data-x>Bezárás</button></div>`;
+  o.onclick = async e => { const b = e.target.closest('button'); if (e.target === o || (b && b.hasAttribute('data-x'))) return o.remove(); if (!b || !b.dataset.skin) return;
+    const p = Store.p; p.heroSkin = { ...(p.heroSkin || {}), [hid]: b.dataset.skin }; await save(); o.remove(); renderColl(); renderMenuFan(); toast(`${h.name}: ${SKIN_NAME[b.dataset.skin]} portré beállítva`); };
+  $('#layer').appendChild(o);
+}
 function rollHeroGold(p) {
   const h = GOLD_HEROES[Math.floor(Math.random() * GOLD_HEROES.length)];
   p.heroGold = p.heroGold || {}; const isNew = !p.heroGold[h]; p.heroGold[h] = (p.heroGold[h] || 0) + 1;
@@ -465,7 +482,7 @@ async function packOpening(setId, cards, po = {}) {
       e.stopPropagation();
       const c = cards[+f.dataset.i], rar = pcRar(c);
       if (c.gold) { busyFlip = true; await goldReveal(o, f, c); busyFlip = false; }
-      else if (rar === 'l' || c.foil) { busyFlip = true; await rareReveal(o, f, c); busyFlip = false; }
+      else if (rar === 'l' || c.foil || (!c.hero && CARD[c.id].variantOf)) { busyFlip = true; await rareReveal(o, f, c); busyFlip = false; }
       else { f.classList.add('open'); if (rar === 'e' || (!c.hero && CARD[c.id].variantOf)) f.classList.add('glow'); }
       if (--left === 0) done();
     });
@@ -547,7 +564,8 @@ function goldMote(parent, x, y, tx, ty) {
 // ---- különleges bontás: legendás vagy Full Art lap ----
 async function rareReveal(o, f, c) {
   const leg = !c.hero && CARD[c.id].rarity === 'l', fa = !!c.foil;
-  const kind = fa && leg ? 'both' : fa ? 'fa' : 'leg';
+  const vari = !c.hero && !!CARD[c.id].variantOf;
+  const kind = vari && !fa ? 'var' : fa && leg ? 'both' : fa ? 'fa' : 'leg';
   const r = f.getBoundingClientRect(), cx = r.left + r.width / 2, cy = r.top + r.height / 2;
   o.classList.add('rare-dim');
   // 1) a lap megremeg, egyre erősebben izzik, mögötte fénysugarak kezdenek forogni
@@ -563,7 +581,7 @@ async function rareReveal(o, f, c) {
   f.classList.remove('charging'); f.classList.add('open', 'glow');
   const flash = document.createElement('div'); flash.className = `rare-flash ${kind}`; o.appendChild(flash);
   flash.animate([{ opacity: 0 }, { opacity: .65, offset: .15 }, { opacity: 0 }], { duration: 900, fill: 'forwards' }).finished.then(() => flash.remove());
-  const cols = kind === 'leg' ? ['#fff4c2', '#ffd24a', '#ffb300', '#ffffff'] : ['#ff8fd0', '#8fd4ff', '#b6ffcf', '#ffe28a', '#ffffff'];
+  const cols = kind === 'var' ? ['#7dffc4', '#e6ffb0', '#b9ffd9', '#ffffff'] : kind === 'leg' ? ['#fff4c2', '#ffd24a', '#ffb300', '#ffffff'] : ['#ff8fd0', '#8fd4ff', '#b6ffcf', '#ffe28a', '#ffffff'];
   for (let k = 0; k < 44; k++) {
     const s = document.createElement('i'); s.className = 'rare-spark';
     const a = Math.random() * Math.PI * 2, d = 90 + Math.random() * 170, sz = 4 + Math.random() * 7;
@@ -575,9 +593,9 @@ async function rareReveal(o, f, c) {
   await sleep(380);
   // 3) bemutató: a lap nagyban középre ugrik, felirattal
   const show = document.createElement('div'); show.className = `rare-show ${kind}`;
-  const label = c.hero ? 'Full Art hős!' : kind === 'both' ? 'Legendás · Full Art!' : kind === 'fa' ? 'Full Art!' : 'Legendás!';
+  const label = c.hero ? 'Full Art hős!' : vari ? '✦ Ritka változat!' : kind === 'both' ? 'Legendás · Full Art!' : kind === 'fa' ? 'Full Art!' : 'Legendás!';
   show.innerHTML = `<div class="rare-rays big ${kind}"></div><div class="rare-card">${pcHTML(c, { big: true, foil: c.foil })}</div>
-    <div class="rare-banner">${label}</div><div class="rare-name">${c.hero ? `${HERO[c.hero].name} – Full Art hős` : CARD[c.id].name}${c.isNew ? ' · Új!' : ''}</div><div class="op-hint">Koppints a folytatáshoz</div>`;
+    <div class="rare-banner">${label}</div><div class="rare-name">${c.hero ? `${HERO[c.hero].name} – Full Art hős` : CARD[c.id].name}${c.isNew ? ' · Új!' : ''}</div>${vari ? `<div class="var-sub">A(z) ${CARD[CARD[c.id].variantOf].name} különleges, ritka kinézete – ugyanúgy játszható</div>` : ''}<div class="op-hint">Koppints a folytatáshoz</div>`;
   o.appendChild(show);
   const card = show.querySelector('.rare-card');
   show.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 250, fill: 'forwards' });
@@ -607,7 +625,7 @@ const deckIssue = d => deckProblem(d.list, d.hero || null);
 function heroPortrait(hid, cls = '') {
   const h = HERO[hid];
   if (!h) return `<span class="hp-img empty ${cls}">?</span>`;
-  const aid = ownsHeroGold(hid) && ART['g_' + hid] ? 'g_' + hid : hid;
+  const aid = heroSkin(hid) === 'gold' && ART['g_' + hid] ? 'g_' + hid : hid;
   return `<span class="hp-img ${cls}${aid !== hid ? ' gold' : ''}" style="--h:${h.hue};${ART[aid] ? `background-image:url('${artSrc(aid, false)}')` : ''}">${ART[aid] ? '' : initials(h.name)}</span>`;
 }
 function renderDecks() {
@@ -1251,7 +1269,7 @@ function pvpPickDeck(title, done) {
   $('#layer').appendChild(o);
 }
 const pvpMe = dk => ({ ver: window.APP_VERSION || '', uid: Store.uid, name: Store.p.name || 'Játékos', hero: dk.hero, deckName: dk.name, list: { ...dk.list },
-  cos: { heroGold: ownsHeroGold(dk.hero), heroFa: ownsHeroFa(dk.hero), foils: Object.keys(dk.list).filter(id => ownsFoil(id)) } });   // amit az ellenfél is lát: Full Art hős és lapok
+  cos: { heroGold: heroSkin(dk.hero) === 'gold', heroFa: heroSkin(dk.hero) === 'fa', foils: Object.keys(dk.list).filter(id => ownsFoil(id)) } });   // amit az ellenfél is lát: Full Art hős és lapok
 async function pvpCreate(dk) {
   try { await Store.db.collection('pvp').add({ parts: [Store.uid], status: 'open', created: Date.now(), updated: Date.now(), host: pvpMe(dk), guest: null, v: 0 }); toast('Kihívás létrehozva – szólj a haveroknak!'); }
   catch (e) { toast(e?.code === 'quota_exceeded' ? 'Megtelt a tárhely, próbáld később' : 'Nem sikerült létrehozni (lehet, hogy nincs írási jogod)'); }

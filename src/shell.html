@@ -1334,6 +1334,35 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%;}
 .cast{position:fixed;left:50%;top:44%;z-index:58;pointer-events:none;transform:translate(-50%,-50%);}
 .cast .card{--cw:150px;box-shadow:0 0 30px 6px rgba(255,210,120,.45),0 12px 30px rgba(0,0,0,.6);}
 .cast .ctype-below{display:none;}
+
+.skin-row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;}
+.skin-opt{display:grid;justify-items:center;gap:8px;padding:8px;border-radius:14px;border:2px solid transparent;}
+.skin-opt .card{--cw:96px;} .skin-opt .ctype-below{display:none;}
+.skin-opt span{font-weight:900;font-size:13px;color:var(--mute);}
+.skin-opt.on{border-color:var(--gold);background:rgba(255,201,74,.08);} .skin-opt.on span{color:var(--gold);}
+.skin-n{color:var(--gold)!important;}
+
+/* ===== ritka változat-lapok: ránézésre is látszódjon ===== */
+.vartag{display:none;}
+.var-ribbon{position:absolute;z-index:7;left:50%;top:-.55em;transform:translateX(-50%);white-space:nowrap;font-style:normal;font-family:var(--body);font-weight:900;
+  font-size:.42em;letter-spacing:.08em;text-transform:uppercase;color:#062a1c;padding:.25em .8em;border-radius:1em;
+  background:linear-gradient(90deg,#7dffc4,#e6ffb0 50%,#7dffc4);background-size:200% 100%;animation:varShine 3s linear infinite;box-shadow:0 0 .6em rgba(80,255,170,.8),0 .15em .3em rgba(0,0,0,.6);}
+.card.big .var-ribbon{font-size:.32em;}
+@keyframes varShine{to{background-position:-200% 0;}}
+.card.variant{box-shadow:0 0 0 .12em #6fffbe,0 0 .9em .15em rgba(80,255,170,.55),0 .3em .9em rgba(0,0,0,.55);animation:varGlow 2.6s ease-in-out infinite;}
+@keyframes varGlow{50%{box-shadow:0 0 0 .12em #d8ffb0,0 0 1.3em .3em rgba(120,255,190,.75),0 .3em .9em rgba(0,0,0,.55);}}
+.rare-rays.var{background:repeating-conic-gradient(from 0deg,rgba(125,255,196,.9) 0deg 6deg,transparent 6deg 15deg,rgba(230,255,176,.8) 15deg 20deg,transparent 20deg 30deg);}
+.flip.charging.var .face.back{box-shadow:0 0 0 2px #e6ffb0,0 0 28px 8px rgba(80,255,170,.9),0 0 60px 18px rgba(80,255,170,.5);}
+.rare-flash.var{background:radial-gradient(circle,#fff 0%,rgba(170,255,210,.85) 28%,rgba(80,255,170,.4) 50%,transparent 72%);}
+.rare-show.var .rare-card .card{box-shadow:0 0 40px 10px rgba(80,255,170,.6),0 20px 40px rgba(0,0,0,.7);}
+.rare-show.var .rare-banner{color:#b9ffd9;text-shadow:0 0 12px rgba(80,255,170,.9),0 3px 0 #0b5a37,0 6px 14px rgba(0,0,0,.8);}
+.var-sub{position:relative;z-index:2;max-width:300px;text-align:center;font-size:13px;font-weight:800;color:#b9ffd9;margin-top:-6px;}
+@media (prefers-reduced-motion:reduce){.var-ribbon,.card.variant{animation:none!important;}}
+
+.var-ribbon b{font-weight:900;} .var-ribbon span{display:none;}
+.card:not(.big) .var-ribbon{left:58%;font-size:.5em;top:-.45em;} .card:not(.big) .var-ribbon b{display:none;} .card:not(.big) .var-ribbon span{display:inline;}
+
+.card.foil .var-ribbon,.card.foil:not(.big) .var-ribbon{top:.5em;z-index:8;}
 </style>
 
 <div id="app">
