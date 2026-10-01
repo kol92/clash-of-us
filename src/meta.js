@@ -37,7 +37,8 @@ const GIFTS = [{ id: 'g-2026-09-28', packs: 1 }, { id: 'g-2026-09-28b', packs: 5
                { id: 'g-2026-09-29-tomi-shiny5b', shiny: 5, uid: 'u_HnZGtTolpJLediQ3MQ8Dzw' },
                { id: 'g-2026-09-29-tomi-shiny5c', shiny: 5, uid: 'u_HnZGtTolpJLediQ3MQ8Dzw' },
                { id: 'g-2026-09-29-tomi-shiny5d', shiny: 5, uid: 'u_HnZGtTolpJLediQ3MQ8Dzw' }, { id: 'g-2026-09-29-tomi-packs5', packs: 5, uid: 'u_HnZGtTolpJLediQ3MQ8Dzw' },
-               { id: 'g-2026-09-30-all10', packs: 10 }];   // uid: csak ennek a játékosnak   // egyszeri: garantált Full Art pack
+               { id: 'g-2026-09-30-all10', packs: 10 },
+               { id: 'g-2026-10-01-tomi-shiny5', shiny: 5, code: '438YAF' }];   // uid: csak ennek a játékosnak   // egyszeri: garantált Full Art pack
 // Duplikátum-beváltás: egy lapból legfeljebb 2 példány marad meg (Full Art-ot előnyben tartva), a többi lapként 2 coin
 const DUPE_KEEP = 2, DUPE_COIN = 2, DUPE_COIN_RARE = 10;   // Full Art és változat-lap beváltása 10 coint ér
 const dupeVal = (id, foil) => foil || CARD[id]?.variantOf ? DUPE_COIN_RARE : DUPE_COIN;
@@ -57,6 +58,7 @@ function applyGifts(p) {
   let n = 0, fa = 0, co = 0, sh = 0; p.shinyPacks = p.shinyPacks || 0;
   for (const g of GIFTS) if (!p.gifts.includes(g.id)) {
     if (g.uid && g.uid !== Store.uid) continue;   // személyre szóló ajándék
+    if (g.code && (!Store.uid || typeof frCode !== 'function' || frCode(Store.uid) !== g.code)) continue;   // barátkódhoz kötött ajándék (saját app)
     p.gifts.push(g.id);
     if (g.shiny) { p.shinyPacks += g.shiny; sh += g.shiny; }
     else if (g.coins) { p.coins += g.coins; co += g.coins; }
