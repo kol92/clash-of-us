@@ -23,6 +23,7 @@ const CARDS = [
   { id:'c_sasimeselo', type:'char', name:'Sasi, a mesélő', cost:3, atk:2, hp:2, rarity:'r', text:'Kijátszáskor: húzol egy lapot.' },
   { id:'c_vajda', type:'char', name:'Vajda Peti', cost:3, atk:3, hp:4, rarity:'k', text:'' },
   { id:'c_alekosz', type:'char', name:'Alekosz Tibi', cost:4, atk:2, hp:2, rarity:'e', text:'Kijátszáskor ellop egy véletlen ellenséges karaktert, és maga mellé teszi (ha van mellette üres hely).' },
+  { id:'c_norbi', type:'char', name:'Lukács Norbi', cost:3, atk:2, hp:3, rarity:'r', text:'Ha mellette áll egy másik karaktered, +2 támadást kap.' },
   { id:'c_zana', type:'char', name:'Zana', cost:4, atk:3, hp:3, rarity:'e', text:'Körönként kétszer támad.' },
   { id:'c_ati', type:'char', name:'Ati', cost:4, atk:8, hp:4, rarity:'e', muscle:true, text:'Csak akkor támad, ha nincs más karaktered a táblán.' },
   { id:'c_veghtomi', type:'char', name:'Végh Tomi', cost:4, atk:3, hp:5, rarity:'k', taunt:true, text:'Amíg él, az ellenfél karakterei mindig őt támadják, bárhol áll.' },
@@ -211,6 +212,7 @@ function effAtk(s, side, i) {
   let a = u.atk + u.temp;
   if (b[i - 1] && b[i - 1].id === 'c_talos') a += 2;
   if (b[i + 1] && b[i + 1].id === 'c_talos') a += 2;
+  if (u.id === 'c_norbi' && (b[i - 1] || b[i + 1])) a += 2;   // Lukács Norbi: ha van mellette valaki
   const opp = s.players[1 - side].board[i];
   if (opp && opp.id === 'c_rebi') a -= 1;
   if (s.location && s.location.id === 'l_laciverse' && (s.location.owner === side || isReg(s, side))) a += 1;

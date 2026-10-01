@@ -20,7 +20,7 @@ function starterCollection() {
   return coll;
 }
 // Később bekerült gyakori lapok: a meglévő profilok is megkapják (gv = kiosztási verzió)
-const STARTER_ADDS = { 2: ['a_delfin', 'i_varazsho', 'i_lepke'], 3: ['a_rehab'], 4: ['c_pp'], 5: ['c_nfc'], 6: ['a_cheddar'], 7: ['c_vajda', 'c_veghtomi'], 8: ['c_kovacs'], 9: ['a_kitiltva'], 10: ['a_haver'], 11: PLAYABLE.filter(c => c.rarity === 'r' && !c.variantOf).map(c => c.id), 12: ['c_sasimeselo'] };   // 12: Laci új kezdőpaklijához   // 11: minden ritka lapból 1 (a kezdőpaklikhoz)
+const STARTER_ADDS = { 2: ['a_delfin', 'i_varazsho', 'i_lepke'], 3: ['a_rehab'], 4: ['c_pp'], 5: ['c_nfc'], 6: ['a_cheddar'], 7: ['c_vajda', 'c_veghtomi'], 8: ['c_kovacs'], 9: ['a_kitiltva'], 10: ['a_haver'], 11: PLAYABLE.filter(c => c.rarity === 'r' && !c.variantOf).map(c => c.id), 12: ['c_sasimeselo'], 13: ['c_norbi'] };   // 12: Laci új kezdőpaklijához   // 11: minden ritka lapból 1 (a kezdőpaklikhoz)
 const GRANT_V = Math.max(1, ...Object.keys(STARTER_ADDS).map(Number));
 // Ajándékok: minden profil egyszer kapja meg (a meglévők a következő megnyitáskor, az újak létrehozáskor)
 const GIFTS = [{ id: 'g-2026-09-28', packs: 1 }, { id: 'g-2026-09-28b', packs: 5 },
