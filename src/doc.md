@@ -130,6 +130,7 @@ Hősképesség-ötletek a táblázatban (még nem zöldek, nincsenek beépítve)
 - Kristóf 3 · 2/2, ritka – kijátszáskor egy véletlen Ital lap kerül a kezedbe (nem kell birtokolnod, csak arra a meccsre szól; tele kéznél elég)
 - Sasi, a mesélő 3 · 2/2, ritka – kijátszáskor húzol egy lapot (2026-09-30)
 - Zana 4 · 3/3, epikus (nerf: 3→4 energia) – körönként kétszer támad
+- Alekosz Tibi 4 · 2/2, epikus (2026-10-01) – kijátszáskor ellop egy véletlen ellenséges karaktert, és maga mellé teszi (előbb jobbra, aztán balra, különben bárhova; ha nincs üres hely, nem lop). Az ellopott lap megtartja sérüléseit és eszközeit (az eszközök a temetőben annál maradnak, aki rátette), és abban a körben még pihen. Rejtett lapot is ellophat, ilyenkor lelepleződik. Teszt: egy példány egy 20 lapos pakliban kb. +11% győzelmi arány (Zanával 45%, Alekosszal 59%); 5 energiával +7% lenne.
 - Végh Tomi 4 · 3/5, gyakori (nerf: 4/5→3/5) – Provokáció
 - Ati 4 · 8/4, epikus – Izom; csak akkor támad, ha nincs más karaktered a táblán
 - Toma 4 · 4/4, ritka (korábban „Sasi” karakterlap; a belső azonosító maradt, a hős Sasi változatlan)
@@ -257,7 +258,7 @@ Hősképesség-ötletek a táblázatban (még nem zöldek, nincsenek beépítve)
 ## Illusztrációk – stílus
 - **Hősök:** neonhátteres portré, álló 2:3, az arc a felső harmadban. Mind a 9 kész.
 - **Karakterek és egyéb lapok:** képregényes jelenetkép, álló 3:4; a kivágás lapként állítható; a különleges változaton a teljes jelenet látszik.
-  - Kész karakterek: Pifti, Tálos, Gyuri, Rebi, Gál Zoli, TZS, Fogel, Ati, Vera, Nyiti, Laszy, Boros, Toma, Zana, Kristóf, Vajda Peti, Végh Tomi, Kovács Bence, Zsibrita, Milo az örökivó, Laczkó Tomi, Gabi a legyőzhetetlen, Sasi a mesélő.
+  - Kész karakterek: Pifti, Tálos, Gyuri, Rebi, Gál Zoli, TZS, Fogel, Ati, Vera, Nyiti, Laszy, Boros, Toma, Zana, Kristóf, Vajda Peti, Végh Tomi, Kovács Bence, Zsibrita, Milo az örökivó, Laczkó Tomi, Gabi a legyőzhetetlen, Sasi a mesélő., Alekosz Tibi
   - Kész akciók: Abszint, Koktélarmageddon, Dinnyés Absolute Vodka, Mangós Ciroc Vodka, Delfin póz, Rehab, Sasi ütése, Tubi, Cheddar sajtkrém leves, Musztafa Gyros Tál, Ki vagy tiltva!, Legénybúcsú!, Nem én voltam hanem a haverom!, Mosh Pit.
   - Kész eszközök: Buffalo!, Bőrkabát, Akuma, Szerencsekabala, Csattogós lepke, Fehér varázshó, Napszemüveg, Energiaital, Tomi nyaklánca, Vodka Kancsó, Fehér szarvas bunda.
   - Kész helyszínek: Siófoki Kórház, Morrison’s 2, Budapest Park, Akácfa söröző, Barhole, Laciverse – mind a 6 kész (a táblán a helyszín-sávban kis képként is látszik).

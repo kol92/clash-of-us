@@ -152,6 +152,7 @@ const ART = {
   c_vajda: { src:'art/vajda.webp', pos:'50% 18%' },
   c_veghtomi: { src:'art/veghtomi.webp', pos:'45% 15%' },
   c_zana:   { src:'art/zana.webp', pos:'38% 20%' },
+  c_alekosz: { src:'art/alekosz.webp', pos:'52% 16%' },
   i_aranylanc: { src:'art/nyaklanc.webp', pos:'50% 55%' },
   i_vodkakancso: { src:'art/vodkakancso.webp', pos:'55% 30%' },
   i_bunda: { src:'art/bunda.webp', pos:'50% 30%' },
@@ -420,6 +421,8 @@ async function animateEvents(evs) {
       case 'locgone': floatAt(anchor, `🚫 ${CARD[e.id].name} bezárt`, 'info'); hold = Math.max(hold, 600); break;
       case 'swap': floatAt(anchor, 'Helycsere!', 'info'); hold = Math.max(hold, 300); break;
       case 'push': floatAt(anchor, 'Arrébb tolva!', 'info'); hold = Math.max(hold, 300); break;
+      case 'stolen': fx(el, e.side === ME ? 'fx-bounce-up' : 'fx-bounce-down'); floatAt(anchor, '🫳 Ellopták!', 'dmg'); hold = Math.max(hold, 650); break;
+      case 'steal': floatAt(anchor, `🫳 ${CARD[e.id].name} átállt!`, 'buff'); hold = Math.max(hold, 700); break;
       case 'mosh': fx($('#app'), 'fx-quake'); floatAt(anchor, '🤘 Mosh Pit! Mindenki arrébb', 'dmg'); hold = Math.max(hold, 600); break;
       case 'revive': fx(el, 'fx-buff'); floatAt(anchor, '✨ Újraéledt!', 'buff'); hold = Math.max(hold, 800); break;
       case 'drinkdraw': floatAt(anchor, '🍺 +1 lap', 'info'); hold = Math.max(hold, 450); break;

@@ -22,6 +22,7 @@ const CARDS = [
   { id:'c_kristof', type:'char', name:'Kristóf', cost:3, atk:2, hp:2, rarity:'r', text:'Kijátszáskor: a kezedbe kerül egy véletlen Ital lap.' },
   { id:'c_sasimeselo', type:'char', name:'Sasi, a mesélő', cost:3, atk:2, hp:2, rarity:'r', text:'Kijátszáskor: húzol egy lapot.' },
   { id:'c_vajda', type:'char', name:'Vajda Peti', cost:3, atk:3, hp:4, rarity:'k', text:'' },
+  { id:'c_alekosz', type:'char', name:'Alekosz Tibi', cost:4, atk:2, hp:2, rarity:'e', text:'Kijátszáskor ellop egy véletlen ellenséges karaktert, és maga mellé teszi (ha van mellette üres hely).' },
   { id:'c_zana', type:'char', name:'Zana', cost:4, atk:3, hp:3, rarity:'e', text:'Körönként kétszer támad.' },
   { id:'c_ati', type:'char', name:'Ati', cost:4, atk:8, hp:4, rarity:'e', muscle:true, text:'Csak akkor támad, ha nincs más karaktered a táblán.' },
   { id:'c_veghtomi', type:'char', name:'Végh Tomi', cost:4, atk:3, hp:5, rarity:'k', taunt:true, text:'Amíg él, az ellenfél karakterei mindig őt támadják, bárhol áll.' },
@@ -300,6 +301,23 @@ function playCard(s, pi, hi, t) {
       addToHand(s, pi, d);
     }
     if (c.id === 'c_sasimeselo') draw(s, pi);
+    if (c.id === 'c_alekosz') {   // véletlen ellenséges karaktert ellop, és maga mellé teszi (előbb jobbra, aztán balra, aztán bárhova)
+      const spots = [t.i + 1, t.i - 1].filter(j => j >= 0 && j < LANES && !p.board[j]);
+      const j = spots.length ? spots[0] : p.board.findIndex(x => !x);
+      const cand = e.board.map((x, k) => x && x.id !== 'c_korso' ? k : -1).filter(k => k >= 0);
+      if (j >= 0 && cand.length) {
+        const k = cand[Math.floor(rnd() * cand.length)];
+        reveal(s, ei, k);
+        const u = e.board[k]; e.board[k] = null;
+        // az eszközök gazdája marad, aki rátette: ami eddig „idegen” volt, az most az enyém, a többi az ellenfélé
+        const oldFoe = [...(u.foe || [])], foe = [];
+        for (const id of u.items) { const x = oldFoe.indexOf(id); if (x >= 0) oldFoe.splice(x, 1); else foe.push(id); }
+        u.foe = foe; u.fresh = true;
+        p.board[j] = u;
+        ev(s, { t:'stolen', side:ei, i:k });
+        ev(s, { t:'steal', side:pi, i:j, id:u.id });
+      }
+    }
     if (c.id === 'c_fogel') p.board.forEach((x, j) => { if (x && j !== t.i) { x.hp += 2; x.maxHp += 2; ev(s, { t:'buff', side:pi, i:j }); } });
     if (c.id === 'c_zsibrita' && t.t2 && t.t2.t3) {
       const a = t.t2.i, b = t.t2.t3.i;
