@@ -2,7 +2,7 @@
 const ECON = { goldPlain: 0.005, goldShiny: 0.05, goldDupe: 100, heroFaChance: 0.02, shinyHero: 0.15, shinyPrice: 250, shinyVariant: 0.25, packPrice: 50, dailyCap: 100, win: 25, draw: 15, loss: 10, foilChance: 0.04, pityAfter: 10,
                odds: [['l', 1.5], ['e', 6.5], ['r', 22], ['k', 70]] };
 // a „token” lapok (pl. Query) csak más lap hatására kerülnek játékba: nincsenek packban, gyűjteményben, pakliban
-const PLAYABLE = CARDS.filter(c => !c.token && !c.off);   // off: kivégző lap, amíg nincs hozzá grafika – sehol nem látszik
+const PLAYABLE = CARDS.filter(c => !c.token && !c.off);   // off: kánon esemény lap, amíg nincs hozzá grafika – sehol nem látszik
 const SETS = { base: { name: 'Base set', cards: PLAYABLE.filter(c => !c.variantOf).map(c => c.id) } };
 const VARIANT_CHANCE = 0.2;   // ha az alaplap jön, 1 az 5-höz eséllyel a ritkább változata lesz belőle
 const DECK_SIZE = 20;
@@ -687,7 +687,7 @@ function renderEditor() {
         <span class="er-cost">${cardCostBase(id)}</span><span class="er-name">${c.name}</span><span class="er-n">${c.rarity === 'l' ? '★' : k > 1 ? '×' + k : ''}</span></button>`;
     }).join('')
     : `<p class="ed-empty">${ED.readonly ? 'Üres pakli.' : 'Még üres. Koppints a bal oldali lapokra, és itt jelennek meg.'}</p>`;
-  const pool = PLAYABLE.filter(c => owned(c.id) > 0 && (!c.hero || c.hero === d.hero) && (ED.filter === 'all' || c.type === ED.filter))   // kivégzőt csak a saját hőse kap
+  const pool = PLAYABLE.filter(c => owned(c.id) > 0 && (!c.hero || c.hero === d.hero) && (ED.filter === 'all' || c.type === ED.filter))   // kánon eseményt csak a saját hőse kap
                     .sort((a, b) => a.cost - b.cost || a.name.localeCompare(b.name, 'hu'));
   $('#edPool').innerHTML = pool.map(c => {
     const inDeck = d.list[c.id] || 0, cap = Math.min(maxCopies(c.id) - (sameCount(d.list, c.id) - inDeck), owned(c.id));
@@ -715,7 +715,7 @@ $('#edPool').addEventListener('click', e => {
   if (ED.readonly) { openModal(cardHTML(b.dataset.add, { big: true, foil: ownsFoil(b.dataset.add) }), `${owned(b.dataset.add)} db a gyűjteményedben`, cardHelpHTML(b.dataset.add)); return; }
   const id = b.dataset.add, d = ED.deck.list;
   if (deckCount(d) >= DECK_SIZE) { toast('A pakli tele van (20 lap)'); return; }
-  if (CARD[id].hero && CARD[id].hero !== ED.deck.hero) { toast(`Ez ${HERO[CARD[id].hero].name} kivégzője, csak az ő paklijába teheted`); return; }
+  if (CARD[id].hero && CARD[id].hero !== ED.deck.hero) { toast(`Ez ${HERO[CARD[id].hero].name} kánon eseménye, csak az ő paklijába teheted`); return; }
   if (sameCount(d, id) > (d[id] || 0) && sameCount(d, id) >= maxCopies(id)) { toast('A változattal együtt is max. 2'); return; }
   if ((d[id] || 0) >= Math.min(maxCopies(id), owned(id))) { toast(owned(id) < maxCopies(id) ? 'Nincs több ebből a lapból' : CARD[id].rarity === 'l' ? 'Legendásból 1 lehet a pakliban' : 'Egy lapból legfeljebb 2 lehet'); return; }
   d[id] = (d[id] || 0) + 1; renderEditor();

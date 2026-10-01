@@ -426,7 +426,7 @@ h1,h2,h3{font-family:var(--display);font-weight:400;letter-spacing:.01em;text-wr
 @keyframes heroHeal{30%{background:rgba(79,224,166,.35);border-color:var(--green)}}
 .zap-orb.sound{background:radial-gradient(circle,#fff 0 16%,#a5f3fc 32%,#0891b2 56%,rgba(0,60,90,0) 72%);box-shadow:0 0 24px 9px rgba(34,211,238,.6);}
 .zap-boom.sound{border-color:#67e8f9;box-shadow:0 0 30px 10px rgba(34,211,238,.6);}
-/* kivégző lapok */
+/* kánon esemény lapok */
 .fin-intro{position:fixed;inset:0;z-index:80;overflow:hidden;}
 .fin-dark{position:absolute;inset:0;opacity:0;background:radial-gradient(circle at 50% 44%,rgba(70,6,0,.62),rgba(0,0,0,.95) 62%);}
 .fin-rays{position:absolute;left:50%;top:44%;width:160vmax;height:160vmax;opacity:0;transform:translate(-50%,-50%);background:repeating-conic-gradient(from 0deg,rgba(255,196,80,.26) 0 7deg,rgba(255,70,40,0) 7deg 20deg);-webkit-mask:radial-gradient(circle,#000 0 10%,transparent 42%);mask:radial-gradient(circle,#000 0 10%,transparent 42%);}
@@ -434,6 +434,7 @@ h1,h2,h3{font-family:var(--display);font-weight:400;letter-spacing:.01em;text-wr
 .fin-card .card{--cw:min(280px,64vw);}
 .fin-title{position:absolute;left:50%;bottom:calc(9% + env(safe-area-inset-bottom));transform:translate(-50%,0);width:94vw;text-align:center;opacity:0;pointer-events:none;}
 .fin-title small{display:block;font-family:var(--display);font-size:clamp(30px,10vw,50px);line-height:1;letter-spacing:.02em;text-transform:uppercase;color:#ff4d3d;text-shadow:0 0 22px rgba(255,60,40,.95),0 3px 0 #2a0000;}
+.fin-title i{display:block;font-style:normal;font-family:var(--display);font-size:clamp(16px,5vw,22px);color:#fca5a5;letter-spacing:.06em;text-transform:uppercase;}
 .fin-title b{display:block;margin-top:6px;font-family:var(--display);font-weight:400;font-size:clamp(20px,6.4vw,30px);color:#ffe9a8;text-shadow:0 0 16px rgba(255,200,80,.8);}
 .fin-title em{display:block;margin-top:4px;font-style:normal;font-size:14px;color:#cbd5e1;}
 .fin-flash{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none;}
@@ -1577,7 +1578,7 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%;}
 <script src="vendor/firebase-auth-compat.js"></script>
 <script src="vendor/firebase-firestore-compat.js"></script>
 <script src="vendor/firebase-database-compat.js"></script>
-<script>window.APP_VERSION = "2026.10.01-1855";</script>
+<script>window.APP_VERSION = "2026.10.01-1941";</script>
 <script>// ===== Best of Us – saját szerver (Firebase) =====
 // A játék eredetileg a Claude-os tárolót használta (window.claude.use('db' | 'user' | 'room')).
 // Ez a fájl ugyanazt a felületet adja Firebase-ből, így a játék kódja szinte változatlan maradhat:
@@ -1899,7 +1900,7 @@ const CARDS = [
   { id:'l_park', type:'loc', name:'Budapest Park', cost:1, rarity:'k', text:'Minden lap kijátszása 1-gyel többe kerül.' },
   { id:'l_barhole', type:'loc', name:'Barhole', cost:1, rarity:'k', text:'Minden lap kijátszása 1-gyel kevesebbe kerül.' },
   { id:'l_laciverse', type:'loc', name:'Laciverse', cost:3, rarity:'e', text:'Csak annak segít, aki kijátszotta: minden karaktere +1 támadást kap.' },
-  // --- Kivégző lapok: hősönként egy, csak annak a hősnek a paklijába. off = még nincs grafika, sehol nem látszik ---
+  // --- Kánon esemény lapok: hősönként egy, csak annak a hősnek a paklijába. off = még nincs grafika, sehol nem látszik ---
   { id:'f_bender', type:'action', name:'Bender', cost:6, rarity:'l', finisher:true, hero:'bence', off:true, tgt:'summon', text:'Minden szabad helyedre egy Árnyékember (1/1) kerül. Minden hiányzó hely után mindegyik +1/+1-et kap (pl. 2 szabad hely: két 3/3-as).' },
   { id:'f_egyutt', type:'action', name:'Együtt sírtok, együtt nevettek', cost:6, rarity:'l', finisher:true, hero:'gabi', off:true, tgt:'summon', text:'Megidéz egy Gyerek Zanát és egy Gyerek Gabit (mindkettő 5/5).' },
   { id:'f_jbl', type:'action', name:'JBL', cost:6, rarity:'l', finisher:true, hero:'laci', off:true, tgt:'ownSlot', text:'Lerakod a JBL hangfalat (0/6). Amíg él, az ellenfél két szélső helye zárva van, és legfeljebb 2 karaktere lehet. Ha kijátszáskor 2-nél több karaktere van, a szélső helyeken állók elpusztulnak.' },
@@ -1909,7 +1910,7 @@ const CARDS = [
   { id:'f_gepuzem', type:'action', name:'Gépüzemmód', cost:6, rarity:'l', finisher:true, hero:'milo', off:true, text:'Ha Milo meghalna, egyszer visszatér 10 élettel.' },
   { id:'f_capa', type:'action', name:'Hátad mögött, cápa megesz!', cost:6, rarity:'l', finisher:true, hero:'barna', off:true, text:'Megidéz egy 9/9-es Cápát az ellenfél jobb szélső helyére (aki ott áll, azt megeszi). A köröd elején egy hellyel balra úszik, és megeszi, aki ott áll. Nem támad, de visszaüt. A bal szélre érve elpusztul.' },
   { id:'f_gluten', type:'action', name:'Gluténbomba', cost:6, rarity:'l', finisher:true, hero:'sasi', off:true, opts:['5 sebzés + 5 gyógyulás', '8 sebzés, de te is kapsz 8-at'], text:'Válassz: 5 sebzés az ellenfél hősének és 5 életet gyógyulsz, vagy 8 sebzés az ellenfél hősének, de te is kapsz 8-at.' },
-  // a kivégzők által hozott, nem gyűjthető lapok
+  // a kánon események által hozott, nem gyűjthető lapok
   { id:'c_arnyek', type:'char', name:'Árnyékember', cost:0, atk:1, hp:1, rarity:'k', token:true, text:'Csak a Bender idézheti meg.' },
   { id:'c_gyzana', type:'char', name:'Gyerek Zana', cost:0, atk:5, hp:5, rarity:'l', token:true, text:'Csak az Együtt sírtok, együtt nevettek idézheti meg.' },
   { id:'c_gygabi', type:'char', name:'Gyerek Gabi', cost:0, atk:5, hp:5, rarity:'l', token:true, text:'Csak az Együtt sírtok, együtt nevettek idézheti meg.' },
@@ -2060,7 +2061,7 @@ function cardCost(s, pi, id) {
   const c = CARD[id], p = s.players[pi]; let v = c.cost;
   if (locIs(s, 'l_park') && !isReg(s, pi)) v++;
   if (locIs(s, 'l_barhole')) v -= isReg(s, pi) ? 2 : 1;
-  if (locIs(s, 'l_munkahely')) v += s.location.owner === pi ? -1 : 1;   // Dávid kivégzője
+  if (locIs(s, 'l_munkahely')) v += s.location.owner === pi ? -1 : 1;   // Dávid kánon eseménye
   if (c.type === 'item' && has(p, 'itemHp') && !p.itemThisTurn) v--;   // Tomi: körönként az első eszköz olcsóbb
   if (has(p, 'firstTwo') && (p.played || 0) < 2) v--;   // Krisz: a meccs első két lapja olcsóbb
   return Math.max(0, v);
@@ -2288,7 +2289,7 @@ function playCard(s, pi, hi, t) {
         damageHero(s, ei, 2); damageHero(s, pi, 2);
         break;
       case 'a_tubi': if (t.k === 'hero') damageHero(s, ei, 6); else damageUnit(s, ei, t.i, 6); damageHero(s, pi, 3); break;
-      // ===== Kivégzők =====
+      // ===== Kánon események =====
       case 'f_bender': {   // minden szabad helyre Árnyékember; minél kevesebb a hely, annál erősebbek
         const sl = openSlots(s, pi), b = LANES - sl.length;
         sl.forEach(j => { const u = makeUnit(s, 'c_arnyek', pi); u.atk += b; u.hp += b; u.maxHp += b; p.board[j] = u; ev(s, { t:'summon', side:pi, i:j, id:'c_arnyek' }); });
@@ -2337,7 +2338,7 @@ function dropLocation(s, how) {   // a pályán lévő helyszín eltűnik (lecse
   const L = s.location; if (!L) return;
   if (!CARD[L.id].token) bury(s, L.owner, L.id, how);
   s.location = null;
-  if (L.id === 'l_munkahely') healHero(s, L.owner, 5);   // Dávid kivégzője: ha elpusztul a munkahely, 5 életet gyógyul
+  if (L.id === 'l_munkahely') healHero(s, L.owner, 5);   // Dávid kánon eseménye: ha elpusztul a munkahely, 5 életet gyógyul
 }
 const boost = (s, n, side) => n > 0 && locIs(s, 'l_akacfa') && !(side != null && isReg(s, side)) ? n + 1 : n;
 // Sunyulás: a lap lefordítva marad, amíg nem támad, meg nem támadják, vagy nem éri ellenséges hatás
@@ -2467,7 +2468,7 @@ function attackLane(s, i) {
   return true;
 }
 
-// Baszó (Krisz kivégzője): a karakterek után ő is üt 3-at, mindig a legbalra álló ellenséges karaktert, különben a hőst; nem lehet visszaütni
+// Baszó (Krisz kánon eseménye): a karakterek után ő is üt 3-at, mindig a legbalra álló ellenséges karaktert, különben a hőst; nem lehet visszaütni
 function baszoStrike(s) {
   const pi = s.active, p = s.players[pi];
   if (!p.baszo || p.struck || s.winner != null) return;
@@ -2477,7 +2478,7 @@ function baszoStrike(s) {
   if (j >= 0) { reveal(s, ei, j); damageUnit(s, ei, j, 3); cleanup(s); } else damageHero(s, ei, 3);
   checkWin(s);
 }
-// Cápa (Barna kivégzője): a gazdája körének elején egy hellyel balra úszik, és megeszi, aki ott áll; a bal szélen elpusztul
+// Cápa (Barna kánon eseménye): a gazdája körének elején egy hellyel balra úszik, és megeszi, aki ott áll; a bal szélen elpusztul
 function sharkSwim(s, pi) {
   const ei = other(pi), b = s.players[ei].board, i = b.findIndex(u => u && u.id === 'c_capa' && u.owner === pi);
   if (i < 0) return;
@@ -2662,12 +2663,12 @@ function cardHTML(id, o = {}) {
     <div class="cframe">
       ${ART[id] ? `<div class="art has-art" style="${artStyle(id, o.big)}"></div>`
         : `<div class="art"><span class="mono">${initials(c.name)}</span>${o.big && !o.foil ? '<span class="artnote">Illusztráció helye</span>' : ''}</div>`}
-      <div class="ctype">${TYPE[c.type][0]}${c.drink ? ' · Ital' : ''}<i class="rar r-${c.rarity}" title="${RAR[c.rarity]}"></i></div>
+      <div class="ctype">${c.finisher ? 'Kánon esemény' : TYPE[c.type][0]}${c.drink ? ' · Ital' : ''}<i class="rar r-${c.rarity}" title="${RAR[c.rarity]}"></i></div>
       ${c.type !== 'char' && !o.big ? `<div class="tribbon">${TYPE[c.type][0]}${c.drink ? '<i class="drk">Ital</i>' : ''}</div>` : ''}
       <div class="name${c.name.length > 16 ? ' long' : ''}${longWord(c.name) > 11 ? ' xl' : ''}">${c.name}</div>${c.variantOf ? '<i class="var-ribbon"><b>✦ Ritka változat</b><span>✦ Változat</span></i>' : ''}
       <div class="txt"><span>${textHTML(c)}</span></div>
     </div>
-    ${o.big ? `<div class="ctype-below">${TYPE[c.type][0]}${c.drink ? ' · Ital' : ''}</div>` : ''}
+    ${o.big ? `<div class="ctype-below">${c.finisher ? 'Kánon esemény' : TYPE[c.type][0]}${c.drink ? ' · Ital' : ''}</div>` : ''}
     <div class="cost${cost < c.cost ? ' cheaper' : ''}">${cost}</div>
     ${c.type === 'char' ? `<div class="st atk">${c.atk}</div><div class="st hp">${c.hp}</div>` : ''}
   </div>`;
@@ -3089,14 +3090,14 @@ async function runFx(fn) {
   revealed = new Set(); preLanded.clear();
 }
 
-// ---------- kivégző lapok ----------
+// ---------- kánon esemény lapok ----------
 // Bevonulás: elsötétül a pálya, fénysugarak, a lap becsapódik középre, „KIVÉGZŐ” felirat
 async function finisherIntro(e) {
   const c = CARD[e.id], h = HERO[c.hero];
   const o = document.createElement('div'); o.className = 'fin-intro';
-  const sub = c.opts && e.o != null ? c.opts[e.o] : h ? `${h.name} kivégzője` : '';
+  const sub = c.opts && e.o != null ? c.opts[e.o] : h ? `${h.name} kánon eseménye` : '';
   o.innerHTML = `<div class="fin-dark"></div><div class="fin-rays"></div><div class="fin-card">${cardHTML(e.id, { big: true, foil: foilOf(e.side, e.id) })}</div>
-    <div class="fin-title"><small>${e.side === ME ? 'Kivégző' : 'Ellenséges kivégző'}</small><b>${c.name}</b><em>${sub}</em></div><div class="fin-flash"></div>`;
+    <div class="fin-title">${e.side === ME ? '' : '<i>Az ellenfél</i>'}<small>Kánon esemény</small><b>${c.name}</b><em>${sub}</em></div><div class="fin-flash"></div>`;
   $('#layer').appendChild(o);
   const dark = o.querySelector('.fin-dark'), rays = o.querySelector('.fin-rays'), card = o.querySelector('.fin-card'), title = o.querySelector('.fin-title'), flash = o.querySelector('.fin-flash');
   await dark.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 560, easing: 'ease-in', fill: 'forwards' }).finished;
@@ -3170,7 +3171,7 @@ async function chompFx(e) {
 }
 
 // ---------- játék renderelés ----------
-// Krisz kivégzője után Baszó a hős (saját név, portré és képesség)
+// Krisz kánon eseménye után Baszó a hős (saját név, portré és képesség)
 const BASZO = { id:'baszo', name:'Baszó', hue:330, text:'A köröd végén a karaktereid után 3-at üt: mindig a legbalra álló ellenséges karaktert, ha nincs ilyen, az ellenfél hősét. Neki nem lehet visszaütni.' };
 const heroOf = pi => S.players[pi].baszo ? BASZO : HERO[S.players[pi].heroId];
 function heroBar(pi) {
@@ -3496,7 +3497,7 @@ function flyTarget(id, tg) {
   return null;
 }
 async function showPlayed(id, tg) {
-  if (CARD[id].finisher) return;   // a kivégzőnek saját, nagy bevonulása van (playIntro)
+  if (CARD[id].finisher) return;   // a kánon eseménynek saját, nagy bevonulása van (playIntro)
   const secret = !!CARD[id].sneak;
   const back = document.createElement('div'); back.className = 'played';
   back.innerHTML = `<div class="wrap"><span class="tag">${S.pvp ? escH(S.names?.[BOT] || 'Az ellenfél') : HERO[S.players[BOT].heroId].name} ${secret ? 'lerakott egy rejtett lapot' : 'kijátszotta'}</span><span class="flip rev"><span class="flip-in"><span class="face back"></span><span class="face front">${cardHTML(id, { big: true, foil: foilOf(BOT, id) })}</span></span></span>${foilOf(BOT, id) && !CARD[id].sneak ? '<span class="fa-flash">✨ Full Art ✨</span>' : ''}<span class="skip">Koppints a folytatáshoz</span></div>`;
@@ -3774,7 +3775,7 @@ function beginDrag(e, hi, el, opt = {}) {
 const ECON = { goldPlain: 0.005, goldShiny: 0.05, goldDupe: 100, heroFaChance: 0.02, shinyHero: 0.15, shinyPrice: 250, shinyVariant: 0.25, packPrice: 50, dailyCap: 100, win: 25, draw: 15, loss: 10, foilChance: 0.04, pityAfter: 10,
                odds: [['l', 1.5], ['e', 6.5], ['r', 22], ['k', 70]] };
 // a „token” lapok (pl. Query) csak más lap hatására kerülnek játékba: nincsenek packban, gyűjteményben, pakliban
-const PLAYABLE = CARDS.filter(c => !c.token && !c.off);   // off: kivégző lap, amíg nincs hozzá grafika – sehol nem látszik
+const PLAYABLE = CARDS.filter(c => !c.token && !c.off);   // off: kánon esemény lap, amíg nincs hozzá grafika – sehol nem látszik
 const SETS = { base: { name: 'Base set', cards: PLAYABLE.filter(c => !c.variantOf).map(c => c.id) } };
 const VARIANT_CHANCE = 0.2;   // ha az alaplap jön, 1 az 5-höz eséllyel a ritkább változata lesz belőle
 const DECK_SIZE = 20;
@@ -4459,7 +4460,7 @@ function renderEditor() {
         <span class="er-cost">${cardCostBase(id)}</span><span class="er-name">${c.name}</span><span class="er-n">${c.rarity === 'l' ? '★' : k > 1 ? '×' + k : ''}</span></button>`;
     }).join('')
     : `<p class="ed-empty">${ED.readonly ? 'Üres pakli.' : 'Még üres. Koppints a bal oldali lapokra, és itt jelennek meg.'}</p>`;
-  const pool = PLAYABLE.filter(c => owned(c.id) > 0 && (!c.hero || c.hero === d.hero) && (ED.filter === 'all' || c.type === ED.filter))   // kivégzőt csak a saját hőse kap
+  const pool = PLAYABLE.filter(c => owned(c.id) > 0 && (!c.hero || c.hero === d.hero) && (ED.filter === 'all' || c.type === ED.filter))   // kánon eseményt csak a saját hőse kap
                     .sort((a, b) => a.cost - b.cost || a.name.localeCompare(b.name, 'hu'));
   $('#edPool').innerHTML = pool.map(c => {
     const inDeck = d.list[c.id] || 0, cap = Math.min(maxCopies(c.id) - (sameCount(d.list, c.id) - inDeck), owned(c.id));
@@ -4487,7 +4488,7 @@ $('#edPool').addEventListener('click', e => {
   if (ED.readonly) { openModal(cardHTML(b.dataset.add, { big: true, foil: ownsFoil(b.dataset.add) }), `${owned(b.dataset.add)} db a gyűjteményedben`, cardHelpHTML(b.dataset.add)); return; }
   const id = b.dataset.add, d = ED.deck.list;
   if (deckCount(d) >= DECK_SIZE) { toast('A pakli tele van (20 lap)'); return; }
-  if (CARD[id].hero && CARD[id].hero !== ED.deck.hero) { toast(`Ez ${HERO[CARD[id].hero].name} kivégzője, csak az ő paklijába teheted`); return; }
+  if (CARD[id].hero && CARD[id].hero !== ED.deck.hero) { toast(`Ez ${HERO[CARD[id].hero].name} kánon eseménye, csak az ő paklijába teheted`); return; }
   if (sameCount(d, id) > (d[id] || 0) && sameCount(d, id) >= maxCopies(id)) { toast('A változattal együtt is max. 2'); return; }
   if ((d[id] || 0) >= Math.min(maxCopies(id), owned(id))) { toast(owned(id) < maxCopies(id) ? 'Nincs több ebből a lapból' : CARD[id].rarity === 'l' ? 'Legendásból 1 lehet a pakliban' : 'Egy lapból legfeljebb 2 lehet'); return; }
   d[id] = (d[id] || 0) + 1; renderEditor();

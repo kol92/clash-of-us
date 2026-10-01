@@ -84,12 +84,12 @@ function cardHTML(id, o = {}) {
     <div class="cframe">
       ${ART[id] ? `<div class="art has-art" style="${artStyle(id, o.big)}"></div>`
         : `<div class="art"><span class="mono">${initials(c.name)}</span>${o.big && !o.foil ? '<span class="artnote">Illusztráció helye</span>' : ''}</div>`}
-      <div class="ctype">${TYPE[c.type][0]}${c.drink ? ' · Ital' : ''}<i class="rar r-${c.rarity}" title="${RAR[c.rarity]}"></i></div>
+      <div class="ctype">${c.finisher ? 'Kánon esemény' : TYPE[c.type][0]}${c.drink ? ' · Ital' : ''}<i class="rar r-${c.rarity}" title="${RAR[c.rarity]}"></i></div>
       ${c.type !== 'char' && !o.big ? `<div class="tribbon">${TYPE[c.type][0]}${c.drink ? '<i class="drk">Ital</i>' : ''}</div>` : ''}
       <div class="name${c.name.length > 16 ? ' long' : ''}${longWord(c.name) > 11 ? ' xl' : ''}">${c.name}</div>${c.variantOf ? '<i class="var-ribbon"><b>✦ Ritka változat</b><span>✦ Változat</span></i>' : ''}
       <div class="txt"><span>${textHTML(c)}</span></div>
     </div>
-    ${o.big ? `<div class="ctype-below">${TYPE[c.type][0]}${c.drink ? ' · Ital' : ''}</div>` : ''}
+    ${o.big ? `<div class="ctype-below">${c.finisher ? 'Kánon esemény' : TYPE[c.type][0]}${c.drink ? ' · Ital' : ''}</div>` : ''}
     <div class="cost${cost < c.cost ? ' cheaper' : ''}">${cost}</div>
     ${c.type === 'char' ? `<div class="st atk">${c.atk}</div><div class="st hp">${c.hp}</div>` : ''}
   </div>`;
@@ -511,14 +511,14 @@ async function runFx(fn) {
   revealed = new Set(); preLanded.clear();
 }
 
-// ---------- kivégző lapok ----------
+// ---------- kánon esemény lapok ----------
 // Bevonulás: elsötétül a pálya, fénysugarak, a lap becsapódik középre, „KIVÉGZŐ” felirat
 async function finisherIntro(e) {
   const c = CARD[e.id], h = HERO[c.hero];
   const o = document.createElement('div'); o.className = 'fin-intro';
-  const sub = c.opts && e.o != null ? c.opts[e.o] : h ? `${h.name} kivégzője` : '';
+  const sub = c.opts && e.o != null ? c.opts[e.o] : h ? `${h.name} kánon eseménye` : '';
   o.innerHTML = `<div class="fin-dark"></div><div class="fin-rays"></div><div class="fin-card">${cardHTML(e.id, { big: true, foil: foilOf(e.side, e.id) })}</div>
-    <div class="fin-title"><small>${e.side === ME ? 'Kivégző' : 'Ellenséges kivégző'}</small><b>${c.name}</b><em>${sub}</em></div><div class="fin-flash"></div>`;
+    <div class="fin-title">${e.side === ME ? '' : '<i>Az ellenfél</i>'}<small>Kánon esemény</small><b>${c.name}</b><em>${sub}</em></div><div class="fin-flash"></div>`;
   $('#layer').appendChild(o);
   const dark = o.querySelector('.fin-dark'), rays = o.querySelector('.fin-rays'), card = o.querySelector('.fin-card'), title = o.querySelector('.fin-title'), flash = o.querySelector('.fin-flash');
   await dark.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 560, easing: 'ease-in', fill: 'forwards' }).finished;
@@ -592,7 +592,7 @@ async function chompFx(e) {
 }
 
 // ---------- játék renderelés ----------
-// Krisz kivégzője után Baszó a hős (saját név, portré és képesség)
+// Krisz kánon eseménye után Baszó a hős (saját név, portré és képesség)
 const BASZO = { id:'baszo', name:'Baszó', hue:330, text:'A köröd végén a karaktereid után 3-at üt: mindig a legbalra álló ellenséges karaktert, ha nincs ilyen, az ellenfél hősét. Neki nem lehet visszaütni.' };
 const heroOf = pi => S.players[pi].baszo ? BASZO : HERO[S.players[pi].heroId];
 function heroBar(pi) {
@@ -918,7 +918,7 @@ function flyTarget(id, tg) {
   return null;
 }
 async function showPlayed(id, tg) {
-  if (CARD[id].finisher) return;   // a kivégzőnek saját, nagy bevonulása van (playIntro)
+  if (CARD[id].finisher) return;   // a kánon eseménynek saját, nagy bevonulása van (playIntro)
   const secret = !!CARD[id].sneak;
   const back = document.createElement('div'); back.className = 'played';
   back.innerHTML = `<div class="wrap"><span class="tag">${S.pvp ? escH(S.names?.[BOT] || 'Az ellenfél') : HERO[S.players[BOT].heroId].name} ${secret ? 'lerakott egy rejtett lapot' : 'kijátszotta'}</span><span class="flip rev"><span class="flip-in"><span class="face back"></span><span class="face front">${cardHTML(id, { big: true, foil: foilOf(BOT, id) })}</span></span></span>${foilOf(BOT, id) && !CARD[id].sneak ? '<span class="fa-flash">✨ Full Art ✨</span>' : ''}<span class="skip">Koppints a folytatáshoz</span></div>`;

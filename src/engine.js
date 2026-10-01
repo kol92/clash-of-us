@@ -76,7 +76,7 @@ const CARDS = [
   { id:'l_park', type:'loc', name:'Budapest Park', cost:1, rarity:'k', text:'Minden lap kijátszása 1-gyel többe kerül.' },
   { id:'l_barhole', type:'loc', name:'Barhole', cost:1, rarity:'k', text:'Minden lap kijátszása 1-gyel kevesebbe kerül.' },
   { id:'l_laciverse', type:'loc', name:'Laciverse', cost:3, rarity:'e', text:'Csak annak segít, aki kijátszotta: minden karaktere +1 támadást kap.' },
-  // --- Kivégző lapok: hősönként egy, csak annak a hősnek a paklijába. off = még nincs grafika, sehol nem látszik ---
+  // --- Kánon esemény lapok: hősönként egy, csak annak a hősnek a paklijába. off = még nincs grafika, sehol nem látszik ---
   { id:'f_bender', type:'action', name:'Bender', cost:6, rarity:'l', finisher:true, hero:'bence', off:true, tgt:'summon', text:'Minden szabad helyedre egy Árnyékember (1/1) kerül. Minden hiányzó hely után mindegyik +1/+1-et kap (pl. 2 szabad hely: két 3/3-as).' },
   { id:'f_egyutt', type:'action', name:'Együtt sírtok, együtt nevettek', cost:6, rarity:'l', finisher:true, hero:'gabi', off:true, tgt:'summon', text:'Megidéz egy Gyerek Zanát és egy Gyerek Gabit (mindkettő 5/5).' },
   { id:'f_jbl', type:'action', name:'JBL', cost:6, rarity:'l', finisher:true, hero:'laci', off:true, tgt:'ownSlot', text:'Lerakod a JBL hangfalat (0/6). Amíg él, az ellenfél két szélső helye zárva van, és legfeljebb 2 karaktere lehet. Ha kijátszáskor 2-nél több karaktere van, a szélső helyeken állók elpusztulnak.' },
@@ -86,7 +86,7 @@ const CARDS = [
   { id:'f_gepuzem', type:'action', name:'Gépüzemmód', cost:6, rarity:'l', finisher:true, hero:'milo', off:true, text:'Ha Milo meghalna, egyszer visszatér 10 élettel.' },
   { id:'f_capa', type:'action', name:'Hátad mögött, cápa megesz!', cost:6, rarity:'l', finisher:true, hero:'barna', off:true, text:'Megidéz egy 9/9-es Cápát az ellenfél jobb szélső helyére (aki ott áll, azt megeszi). A köröd elején egy hellyel balra úszik, és megeszi, aki ott áll. Nem támad, de visszaüt. A bal szélre érve elpusztul.' },
   { id:'f_gluten', type:'action', name:'Gluténbomba', cost:6, rarity:'l', finisher:true, hero:'sasi', off:true, opts:['5 sebzés + 5 gyógyulás', '8 sebzés, de te is kapsz 8-at'], text:'Válassz: 5 sebzés az ellenfél hősének és 5 életet gyógyulsz, vagy 8 sebzés az ellenfél hősének, de te is kapsz 8-at.' },
-  // a kivégzők által hozott, nem gyűjthető lapok
+  // a kánon események által hozott, nem gyűjthető lapok
   { id:'c_arnyek', type:'char', name:'Árnyékember', cost:0, atk:1, hp:1, rarity:'k', token:true, text:'Csak a Bender idézheti meg.' },
   { id:'c_gyzana', type:'char', name:'Gyerek Zana', cost:0, atk:5, hp:5, rarity:'l', token:true, text:'Csak az Együtt sírtok, együtt nevettek idézheti meg.' },
   { id:'c_gygabi', type:'char', name:'Gyerek Gabi', cost:0, atk:5, hp:5, rarity:'l', token:true, text:'Csak az Együtt sírtok, együtt nevettek idézheti meg.' },
@@ -237,7 +237,7 @@ function cardCost(s, pi, id) {
   const c = CARD[id], p = s.players[pi]; let v = c.cost;
   if (locIs(s, 'l_park') && !isReg(s, pi)) v++;
   if (locIs(s, 'l_barhole')) v -= isReg(s, pi) ? 2 : 1;
-  if (locIs(s, 'l_munkahely')) v += s.location.owner === pi ? -1 : 1;   // Dávid kivégzője
+  if (locIs(s, 'l_munkahely')) v += s.location.owner === pi ? -1 : 1;   // Dávid kánon eseménye
   if (c.type === 'item' && has(p, 'itemHp') && !p.itemThisTurn) v--;   // Tomi: körönként az első eszköz olcsóbb
   if (has(p, 'firstTwo') && (p.played || 0) < 2) v--;   // Krisz: a meccs első két lapja olcsóbb
   return Math.max(0, v);
@@ -465,7 +465,7 @@ function playCard(s, pi, hi, t) {
         damageHero(s, ei, 2); damageHero(s, pi, 2);
         break;
       case 'a_tubi': if (t.k === 'hero') damageHero(s, ei, 6); else damageUnit(s, ei, t.i, 6); damageHero(s, pi, 3); break;
-      // ===== Kivégzők =====
+      // ===== Kánon események =====
       case 'f_bender': {   // minden szabad helyre Árnyékember; minél kevesebb a hely, annál erősebbek
         const sl = openSlots(s, pi), b = LANES - sl.length;
         sl.forEach(j => { const u = makeUnit(s, 'c_arnyek', pi); u.atk += b; u.hp += b; u.maxHp += b; p.board[j] = u; ev(s, { t:'summon', side:pi, i:j, id:'c_arnyek' }); });
@@ -514,7 +514,7 @@ function dropLocation(s, how) {   // a pályán lévő helyszín eltűnik (lecse
   const L = s.location; if (!L) return;
   if (!CARD[L.id].token) bury(s, L.owner, L.id, how);
   s.location = null;
-  if (L.id === 'l_munkahely') healHero(s, L.owner, 5);   // Dávid kivégzője: ha elpusztul a munkahely, 5 életet gyógyul
+  if (L.id === 'l_munkahely') healHero(s, L.owner, 5);   // Dávid kánon eseménye: ha elpusztul a munkahely, 5 életet gyógyul
 }
 const boost = (s, n, side) => n > 0 && locIs(s, 'l_akacfa') && !(side != null && isReg(s, side)) ? n + 1 : n;
 // Sunyulás: a lap lefordítva marad, amíg nem támad, meg nem támadják, vagy nem éri ellenséges hatás
@@ -644,7 +644,7 @@ function attackLane(s, i) {
   return true;
 }
 
-// Baszó (Krisz kivégzője): a karakterek után ő is üt 3-at, mindig a legbalra álló ellenséges karaktert, különben a hőst; nem lehet visszaütni
+// Baszó (Krisz kánon eseménye): a karakterek után ő is üt 3-at, mindig a legbalra álló ellenséges karaktert, különben a hőst; nem lehet visszaütni
 function baszoStrike(s) {
   const pi = s.active, p = s.players[pi];
   if (!p.baszo || p.struck || s.winner != null) return;
@@ -654,7 +654,7 @@ function baszoStrike(s) {
   if (j >= 0) { reveal(s, ei, j); damageUnit(s, ei, j, 3); cleanup(s); } else damageHero(s, ei, 3);
   checkWin(s);
 }
-// Cápa (Barna kivégzője): a gazdája körének elején egy hellyel balra úszik, és megeszi, aki ott áll; a bal szélen elpusztul
+// Cápa (Barna kánon eseménye): a gazdája körének elején egy hellyel balra úszik, és megeszi, aki ott áll; a bal szélen elpusztul
 function sharkSwim(s, pi) {
   const ei = other(pi), b = s.players[ei].board, i = b.findIndex(u => u && u.id === 'c_capa' && u.owner === pi);
   if (i < 0) return;
