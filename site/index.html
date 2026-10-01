@@ -1578,7 +1578,7 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%;}
 <script src="vendor/firebase-auth-compat.js"></script>
 <script src="vendor/firebase-firestore-compat.js"></script>
 <script src="vendor/firebase-database-compat.js"></script>
-<script>window.APP_VERSION = "2026.10.01-1941";</script>
+<script>window.APP_VERSION = "2026.10.01-2127";</script>
 <script>// ===== Best of Us – saját szerver (Firebase) =====
 // A játék eredetileg a Claude-os tárolót használta (window.claude.use('db' | 'user' | 'room')).
 // Ez a fájl ugyanazt a felületet adja Firebase-ből, így a játék kódja szinte változatlan maradhat:
@@ -1901,8 +1901,8 @@ const CARDS = [
   { id:'l_barhole', type:'loc', name:'Barhole', cost:1, rarity:'k', text:'Minden lap kijátszása 1-gyel kevesebbe kerül.' },
   { id:'l_laciverse', type:'loc', name:'Laciverse', cost:3, rarity:'e', text:'Csak annak segít, aki kijátszotta: minden karaktere +1 támadást kap.' },
   // --- Kánon esemény lapok: hősönként egy, csak annak a hősnek a paklijába. off = még nincs grafika, sehol nem látszik ---
-  { id:'f_bender', type:'action', name:'Bender', cost:6, rarity:'l', finisher:true, hero:'bence', off:true, tgt:'summon', text:'Minden szabad helyedre egy Árnyékember (1/1) kerül. Minden hiányzó hely után mindegyik +1/+1-et kap (pl. 2 szabad hely: két 3/3-as).' },
-  { id:'f_egyutt', type:'action', name:'Együtt sírtok, együtt nevettek', cost:6, rarity:'l', finisher:true, hero:'gabi', off:true, tgt:'summon', text:'Megidéz egy Gyerek Zanát és egy Gyerek Gabit (mindkettő 5/5).' },
+  { id:'f_bender', type:'action', name:'Bender', cost:6, rarity:'l', finisher:true, hero:'bence', tgt:'summon', text:'Minden szabad helyedre egy Árnyékember (1/1) kerül. Minden hiányzó hely után mindegyik +1/+1-et kap (pl. 2 szabad hely: két 3/3-as).' },
+  { id:'f_egyutt', type:'action', name:'Együtt sírtok, együtt nevettek', cost:6, rarity:'l', finisher:true, hero:'gabi', tgt:'summon', text:'Megidéz egy Gyerek Zanát és egy Gyerek Gabit (mindkettő 5/5).' },
   { id:'f_jbl', type:'action', name:'JBL', cost:6, rarity:'l', finisher:true, hero:'laci', off:true, tgt:'ownSlot', text:'Lerakod a JBL hangfalat (0/6). Amíg él, az ellenfél két szélső helye zárva van, és legfeljebb 2 karaktere lehet. Ha kijátszáskor 2-nél több karaktere van, a szélső helyeken állók elpusztulnak.' },
   { id:'f_metamorf', type:'action', name:'Metamorfózis', cost:6, rarity:'l', finisher:true, hero:'krisz', off:true, text:'Krisz Baszóvá változik, és 12 élete lesz. Baszó minden köröd végén a karaktereid után 3-at üt: mindig a legbalra álló ellenséges karaktert, ha nincs ilyen, az ellenfél hősét. Neki nem lehet visszaütni.' },
   { id:'f_atok', type:'action', name:'Az összetartás átka', cost:6, rarity:'l', finisher:true, hero:'tomi', off:true, tgt:'grave', text:'Két véletlen karakter visszatér a temetődből a pályára, az eredeti értékeinél +2/+2-vel.' },
@@ -2732,6 +2732,8 @@ const ART = {
   c_veghtomi: { src:'art/veghtomi.webp', pos:'45% 15%' },
   c_zana:   { src:'art/zana.webp', pos:'38% 20%' },
   c_norbi:  { src:'art/norbi.webp', pos:'42% 18%' },
+  f_bender: { src:'art/f_bender.webp', pos:'50% 18%' },   // Kánon esemény lapok
+  f_egyutt: { src:'art/f_egyutt.webp', pos:'55% 24%' },
   c_molnar: { src:'art/molnar.webp', pos:'50% 22%' },
   c_udvarhelyi: { src:'art/udvarhelyi.webp', pos:'47% 5%' },
   c_alekosz: { src:'art/alekosz.webp', pos:'52% 16%' },
