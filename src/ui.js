@@ -940,7 +940,7 @@ function endMatch() {
   o.innerHTML = `<div class="modal result${win ? '' : ' lose'}"><h2>${title}</h2><p>${why}</p>${reward}
     <div class="row"><button class="btn" data-r="menu">Menü</button><button class="btn primary" data-r="again">Új meccs</button></div></div>`;
   o.onclick = e => { const b = e.target.closest('[data-r]'); if (!b) return; o.remove();
-    if (b.dataset.r === 'again') startMatch(ui.hero, ui.deck); else { renderMenuFan(); renderProfileBar(); show('scr-menu'); } };
+    if (b.dataset.r === 'again') { const d = allDecks().find(x => x.id === ui.deck); if (d && !deckIssue(d)) startMatch(d.hero, ui.deck); else { renderPick(); show('scr-pick'); } } else { renderMenuFan(); renderProfileBar(); show('scr-menu'); } };
   setTimeout(() => $('#layer').appendChild(o), 700);
 }
 window.addEventListener('resize', () => { if (S && !$('#scr-game').hidden) render(); });
