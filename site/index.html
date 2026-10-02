@@ -1445,6 +1445,14 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%;}
 .card.framed.xf .ctype .ic-kanon{width:1.5em;}
 .card.kanon .ctype-below{color:#ff8a4c;display:flex;align-items:center;justify-content:center;gap:.4em;}
 .card.kanon .ctype-below .ic-kanon{width:1.6em;}
+/* Full Art Kánon: saját keret (vékonyabb, a kép kitölti az egész lapot), a név és a típus a kép alján, sötét sávon */
+.card.xf-kanonfa{--xframe:url('art/ui/sm/frame-kanon-fa.webp?v=9753a049');--fl:-7.69%;--ft:-5.08%;--fw:115.5%;--fh:110%;--wl:4.97%;--wr:4.95%;--wt:5.21%;--wh:89.68%;
+  --pl:6%;--pr:6%;--pt:78%;--ph:16%;}
+.card.xf-kanonfa.big{--xframe:url('art/ui/frame-kanon-fa.webp?v=a92d49ca');}
+.card.framed.xf-kanonfa .art::after{content:"";position:absolute;left:0;right:0;bottom:0;height:34%;border-radius:inherit;pointer-events:none;z-index:2;
+  background:linear-gradient(transparent,rgba(20,0,6,.92) 55%);}
+.card.framed.xf-kanonfa.big .art::after{height:30%;}
+.card.framed.xf-kanonfa.big .txt{bottom:calc(100% - var(--pt) + .2%);max-height:34%;background:linear-gradient(transparent,rgba(20,0,6,.72) 1.4em)!important;padding-bottom:.2em;}
 /* Full Art Kánon: a Kánon-keret elsőbbséget kap, a különlegességet szivárványos csillogás jelzi a képen */
 .card.kholo .art::before{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;border-radius:inherit;mix-blend-mode:overlay;opacity:.55;
   background:linear-gradient(125deg,#ffe28a,#ff8fd0 25%,#8fd4ff 50%,#b6ffcf 75%,#ffe28a);animation:holoT 5s ease-in-out infinite alternate;}
@@ -1697,7 +1705,7 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%;}
 <script src="vendor/firebase-auth-compat.js"></script>
 <script src="vendor/firebase-firestore-compat.js"></script>
 <script src="vendor/firebase-database-compat.js"></script>
-<script>window.APP_VERSION = "2026.10.02-2306";</script>
+<script>window.APP_VERSION = "2026.10.02-2327";</script>
 <script>// ===== Best of Us – saját szerver (Firebase) =====
 // A játék eredetileg a Claude-os tárolót használta (window.claude.use('db' | 'user' | 'room')).
 // Ez a fájl ugyanazt a felületet adja Firebase-ből, így a játék kódja szinte változatlan maradhat:
@@ -2808,7 +2816,7 @@ function cardHTML(id, o = {}) {
   if (c.foilOnly && !o.foil) o = { ...o, foil: true };   // csak Full Artban létező lap
   const fk = frameKind(c, o);
   const tl = textHTML(c).replace(/<[^>]+>/g, '').length, tlc = tl > 150 ? ' tl-l tl-xl' : tl > 95 ? ' tl-l' : tl > 62 ? ' tl-m' : '';
-  const fcls = fk === 'kanon' ? ' framed xf xf-kanon' + (o.foil ? ' kholo' : '') + tlc : fk === 'foil' ? ' foil' : ' framed' + tlc;
+  const fcls = fk === 'kanon' ? (o.foil ? ' framed xf xf-kanon xf-kanonfa kholo' : ' framed xf xf-kanon') + tlc : fk === 'foil' ? ' foil' : ' framed' + tlc;
   return `<div class="card ${TYPE[c.type][1]}${c.finisher ? ' kanon' : ''}${c.variantOf ? ' variant' : ''}${o.big ? ' big' : ''}${fcls}${o.cls ? ' ' + o.cls : ''}" style="--h:${hueOf(id)}" ${o.attrs || ''}>
     <div class="cframe">
       ${ART[id] ? `<div class="art has-art" style="${artStyle(id, o.big)}"></div>`

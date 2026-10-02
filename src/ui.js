@@ -87,7 +87,7 @@ function cardHTML(id, o = {}) {
   if (c.foilOnly && !o.foil) o = { ...o, foil: true };   // csak Full Artban létező lap
   const fk = frameKind(c, o);
   const tl = textHTML(c).replace(/<[^>]+>/g, '').length, tlc = tl > 150 ? ' tl-l tl-xl' : tl > 95 ? ' tl-l' : tl > 62 ? ' tl-m' : '';
-  const fcls = fk === 'kanon' ? ' framed xf xf-kanon' + (o.foil ? ' kholo' : '') + tlc : fk === 'foil' ? ' foil' : ' framed' + tlc;
+  const fcls = fk === 'kanon' ? (o.foil ? ' framed xf xf-kanon xf-kanonfa kholo' : ' framed xf xf-kanon') + tlc : fk === 'foil' ? ' foil' : ' framed' + tlc;
   return `<div class="card ${TYPE[c.type][1]}${c.finisher ? ' kanon' : ''}${c.variantOf ? ' variant' : ''}${o.big ? ' big' : ''}${fcls}${o.cls ? ' ' + o.cls : ''}" style="--h:${hueOf(id)}" ${o.attrs || ''}>
     <div class="cframe">
       ${ART[id] ? `<div class="art has-art" style="${artStyle(id, o.big)}"></div>`
