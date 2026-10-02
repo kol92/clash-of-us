@@ -1,7 +1,7 @@
 // Best of Us – service worker
 // A képek (art/) és a Firebase-könyvtárak a telefonon maradnak (gyors indulás, kevesebb adatforgalom);
 // a játék maga (index.html, version.json) mindig a netről jön, ha van net – így a frissítés azonnal megérkezik.
-const V = '2026.10.02-2220';
+const V = '2026.10.02-2223';
 const ASSETS = 'bou-assets-a74d157eae', PAGES = 'bou-pages-' + V;
 self.addEventListener('install', e => { self.skipWaiting(); });
 self.addEventListener('activate', e => {

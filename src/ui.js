@@ -83,7 +83,7 @@ function cardHTML(id, o = {}) {
   const c = CARD[id], cost = o.cost ?? c.cost;
   if (c.foilOnly && !o.foil) o = { ...o, foil: true };   // csak Full Artban létező lap
   const fk = frameKind(c, o);
-  const tl = textHTML(c).replace(/<[^>]+>/g, '').length, tlc = tl > 95 ? ' tl-l' : tl > 62 ? ' tl-m' : '';
+  const tl = textHTML(c).replace(/<[^>]+>/g, '').length, tlc = tl > 150 ? ' tl-l tl-xl' : tl > 95 ? ' tl-l' : tl > 62 ? ' tl-m' : '';
   const fcls = fk === 'kanon' ? ' framed xf xf-kanon' + (o.foil ? ' kholo' : '') + tlc : fk === 'foil' ? ' foil' : ' framed' + tlc;
   return `<div class="card ${TYPE[c.type][1]}${c.finisher ? ' kanon' : ''}${c.variantOf ? ' variant' : ''}${o.big ? ' big' : ''}${fcls}${o.cls ? ' ' + o.cls : ''}" style="--h:${hueOf(id)}" ${o.attrs || ''}>
     <div class="cframe">
@@ -230,7 +230,8 @@ function avHTML(h, extra = '') {
 function heroCardHTML(h, o = {}) {
   const gold = !!(o.gold && ART['g_' + h.id]), aid = gold ? 'g_' + h.id : h.id;
   const fk = gold ? 'gold' : o.foil ? 'foil' : 'base';   // arany → Full Art → alap
-  return `<div class="card t-hero${o.big ? ' big' : ''}${fk === 'gold' ? ' framed xf xf-gold gold' : fk === 'foil' ? ' foil' : ' framed'}" style="--h:${h.hue}" ${o.attrs || ''}>
+  const htl = h.text.length, htc = htl > 150 ? ' tl-l tl-xl' : htl > 95 ? ' tl-l' : htl > 62 ? ' tl-m' : '';
+  return `<div class="card t-hero${o.big ? ' big' : ''}${fk === 'gold' ? ' framed xf xf-gold gold' + htc : fk === 'foil' ? ' foil' : ' framed'}" style="--h:${h.hue}" ${o.attrs || ''}>
     <div class="cframe">
       ${ART[aid] ? `<div class="art has-art" style="${artStyle(aid, o.big)}"></div>`
         : `<div class="art"><span class="mono">${initials(h.name)}</span>${o.big && !o.foil ? '<span class="artnote">Illusztráció helye</span>' : ''}</div>`}

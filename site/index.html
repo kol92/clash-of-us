@@ -1400,29 +1400,39 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%;}
 /* ===== ritka változat-lapok: ránézésre is látszódjon ===== */
 .vartag{display:none;}
 /* ===== Saját keretes lapok (xf): Kánon esemény és arany hős =====
-   A keretkép 3:4-es, a lap 5:7-es: a keretet nem nyújtjuk, hanem a lap közepére igazítjuk (fent-lent 2,38% marad),
-   és a kép, a név, a típus és a szöveg helyét keretenként a keretkép saját nyílásaihoz mérjük (--w* = képablak, --p* = alsó panel). */
+   A keretkép 3:4-es, a lap 5:7-es. A keretet NEM nyújtjuk: arányosan nagyobbra tesszük (115,5%), hogy a keret teste
+   akkora legyen, mint a többi lapé (a díszek és a fény kilóghatnak), és a kép/név/szöveg helyét a keretkép saját
+   nyílásaihoz mértük (képpontra kimérve). --f* = a keretkép doboza, --w* = képablak, --p* = alsó panel, mind a lap %-ában. */
 .card.framed.xf{background:none!important;box-shadow:none!important;padding:0;border-radius:0;}
-.card.framed.xf::before{content:"";position:absolute;inset:0;z-index:2;pointer-events:none;background:var(--xframe) center/100% auto no-repeat!important;}
-.card.framed.xf .cframe{position:absolute;left:0;right:0;top:2.38%;bottom:2.38%;inset:2.38% 0;background:none!important;border-radius:0;overflow:visible;display:block;}
-.card.framed.xf .art{position:absolute;left:var(--wl);right:var(--wr);top:var(--wt);height:var(--wh);bottom:auto;border-radius:calc(var(--cw)*.015);background-size:cover;}
+.card.framed.xf::before{content:"";position:absolute;inset:auto;left:var(--fl);top:var(--ft);width:var(--fw);height:var(--fh);z-index:2;pointer-events:none;
+  background:var(--xframe) center/100% 100% no-repeat!important;}
+.card.framed.xf .cframe{position:absolute;inset:0;background:none!important;border-radius:0;overflow:visible;display:block;}
+.card.framed.xf .art{position:absolute;left:var(--wl);right:var(--wr);top:var(--wt);height:var(--wh);bottom:auto;border-radius:calc(var(--cw)*.02);background-size:cover;}
 .card.framed.xf .art .mono{font-size:2.2em;transform:none;}
-.card.framed.xf .name{position:absolute;z-index:3;left:var(--pl);right:var(--pr);top:var(--pt);height:calc(var(--ph)*.56);bottom:auto;display:grid;place-items:center;text-align:center;
-  padding:0 .2em;margin:0;background:none!important;font-size:.72em;line-height:1.02;}
-.card.framed.xf .ctype{display:flex!important;position:absolute;z-index:3;left:var(--pl);right:var(--pr);top:calc(var(--pt) + var(--ph)*.54);height:calc(var(--ph)*.26);
-  padding:0!important;margin:0;justify-content:center;align-items:center;gap:.35em;background:none!important;font-size:.36em;letter-spacing:.1em;white-space:nowrap;}
+/* alsó panel: fent a név (60%), alatta kisebben a típus (28%) */
+.card.framed.xf .name{position:absolute;z-index:3;left:calc(var(--pl) + 2%);right:calc(var(--pr) + 2%);top:calc(var(--pt) + var(--ph)*.08);height:calc(var(--ph)*.56);bottom:auto;
+  display:grid;place-items:center;text-align:center;padding:0;margin:0;background:none!important;font-size:.7em;line-height:1;overflow:hidden;}
+.card.framed.xf .name.long{font-size:.58em;}
+.card.framed.xf .name.xl:not(.long){font-size:.62em;}
+.card.framed.xf .name.xl.long{font-size:.52em;}
+.card.framed.xf .ctype{display:flex!important;position:absolute;z-index:3;left:var(--pl);right:var(--pr);top:calc(var(--pt) + var(--ph)*.64);height:calc(var(--ph)*.24);
+  padding:0!important;margin:0;justify-content:center;align-items:center;gap:.35em;background:none!important;font-size:.3em;letter-spacing:.08em;white-space:nowrap;overflow:hidden;}
 .card.framed.xf .ctype .rar{display:none;}
 .card.framed.xf:not(.big) .txt{display:none!important;}
-.card.framed.xf.big .name{height:calc(var(--ph)*.5);top:calc(var(--pt) + var(--ph)*.06);font-size:.7em;}
-.card.framed.xf.big .ctype{top:calc(var(--pt) + var(--ph)*.5);height:calc(var(--ph)*.18);font-size:.32em;}
-/* nagy nézetben a hatás szövege a kép alján, sötét átmeneten (a panel a névé és a típusé) */
-.card.framed.xf.big .txt{display:flex!important;position:absolute;z-index:3;left:var(--wl);right:var(--wr);top:calc(var(--wt) + var(--wh)*.62);height:calc(var(--wh)*.38);
-  margin:0;padding:0 .8em .7em;align-items:flex-end;justify-content:center;text-align:center;border:0;border-radius:0 0 calc(var(--cw)*.015) calc(var(--cw)*.015);
-  background:linear-gradient(transparent,rgba(12,2,4,.9) 34%)!important;font-size:.34em;line-height:1.3;}
+.card.framed.xf.big .name{font-size:.62em;}
+.card.framed.xf.big .name.long,.card.framed.xf.big .name.xl{font-size:.48em;line-height:1.05;}
+.card.framed.xf.big .ctype{font-size:.27em;}
+/* nagy nézetben a hatás szövege a kép alján, alulra igazítva; hosszú szövegnél kisebb betű */
+.card.framed.xf.big .txt{display:block!important;position:absolute;z-index:3;left:var(--wl);right:var(--wr);top:auto;height:auto;bottom:calc(100% - var(--wt) - var(--wh));
+  max-height:calc(var(--wh)*.62);margin:0;padding:1.6em .8em .6em;text-align:center;border:0;border-radius:0 0 calc(var(--cw)*.02) calc(var(--cw)*.02);overflow:hidden;
+  background:linear-gradient(transparent,rgba(12,2,4,.88) 1.4em)!important;font-size:.32em;line-height:1.28;}
+.card.framed.xf.big.tl-m .txt{font-size:.3em;}
+.card.framed.xf.big.tl-l .txt{font-size:.28em;}
+.card.framed.xf.big.tl-xl .txt{font-size:.255em;}
 .card.framed.xf .cost{z-index:6;}
 .card.framed.xf .gold-dust{left:var(--wl);right:var(--wr);top:var(--wt);height:var(--wh);inset:auto;}
 /* Kánon esemény */
-.card.xf-kanon{--xframe:url('art/ui/sm/frame-kanon.webp');--wl:10.5%;--wr:10.4%;--wt:11.6%;--wh:57.1%;--pl:10.5%;--pr:10.5%;--pt:73.3%;--ph:21.5%;
+.card.xf-kanon{--xframe:url('art/ui/sm/frame-kanon.webp');--fl:-7.69%;--ft:-5.37%;--fw:115.5%;--fh:109.82%;--wl:4.2%;--wr:4.1%;--wt:4.85%;--wh:67.2%;--pl:3.05%;--pr:2.95%;--pt:74.6%;--ph:20.6%;
   filter:drop-shadow(0 0 .28em rgba(255,30,70,.55)) drop-shadow(0 .2em .35em rgba(0,0,0,.6));}
 .card.xf-kanon.big{--xframe:url('art/ui/frame-kanon.webp');animation:kanonGlow 2.8s ease-in-out infinite;}
 @keyframes kanonGlow{50%{filter:drop-shadow(0 0 .6em rgba(255,40,80,.85)) drop-shadow(0 .2em .35em rgba(0,0,0,.6));}}
@@ -1439,9 +1449,9 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%;}
 .card.kholo .art::before{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;border-radius:inherit;mix-blend-mode:overlay;opacity:.55;
   background:linear-gradient(125deg,#ffe28a,#ff8fd0 25%,#8fd4ff 50%,#b6ffcf 75%,#ffe28a);animation:holoT 5s ease-in-out infinite alternate;}
 /* kijátszáskor: a felső kristály felvillan, majd vörös fény fut végig a kereten */
-.kanon-crystal{position:absolute;z-index:9;left:50%;top:10.3%;width:20%;aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;opacity:0;pointer-events:none;
+.kanon-crystal{position:absolute;z-index:9;left:50%;top:1.6%;width:20%;aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;opacity:0;pointer-events:none;
   background:radial-gradient(circle,#fff 0 9%,rgba(255,90,110,.95) 28%,rgba(255,0,50,0) 68%);mix-blend-mode:screen;}
-.kanon-run{position:absolute;left:0;right:0;top:2.38%;bottom:2.38%;z-index:8;overflow:hidden;pointer-events:none;opacity:0;mix-blend-mode:screen;
+.kanon-run{position:absolute;left:var(--fl);top:var(--ft);width:var(--fw);height:var(--fh);z-index:8;overflow:hidden;pointer-events:none;opacity:0;mix-blend-mode:screen;
   -webkit-mask:url('art/ui/frame-kanon-edge.webp') center/100% 100% no-repeat;mask:url('art/ui/frame-kanon-edge.webp') center/100% 100% no-repeat;}
 .kanon-run i{position:absolute;left:50%;top:50%;width:190%;aspect-ratio:1;transform:translate(-50%,-50%);
   background:conic-gradient(from 0deg,rgba(255,0,40,0) 0 66%,rgba(255,40,60,.85) 82%,#fff 87%,rgba(255,60,70,.9) 91%,rgba(255,0,40,0) 100%);}
@@ -1452,15 +1462,13 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%;}
 .card:not(.big) .kanon-hero{width:28%;}
 .card.big .kanon-hero{width:19%;}
 /* Arany hős: új arany keret (a régi teljes képes arany helyett) */
-.card.xf-gold{--xframe:url('art/ui/sm/frame-gold2.webp');--wl:11.6%;--wr:11.4%;--wt:11.6%;--wh:63.6%;--pl:12%;--pr:12%;--pt:76.5%;--ph:14%;
+.card.xf-gold{--xframe:url('art/ui/sm/frame-gold2.webp');--fl:-7.75%;--ft:-5.11%;--fw:115.5%;--fh:110%;--wl:5.3%;--wr:5.3%;--wt:7.54%;--wh:70.07%;--pl:4.95%;--pr:4.95%;--pt:78.7%;--ph:16.06%;
   animation:goldGlowF 2.6s ease-in-out infinite;filter:drop-shadow(0 0 .35em rgba(255,200,60,.6)) drop-shadow(0 .2em .35em rgba(0,0,0,.6));}
 .card.xf-gold.big{--xframe:url('art/ui/frame-gold2.webp');}
 @keyframes goldGlowF{50%{filter:drop-shadow(0 0 .7em rgba(255,210,80,.9)) drop-shadow(0 .2em .35em rgba(0,0,0,.6));}}
 .card.xf-gold .name{color:#ffe9a8;text-shadow:0 0 .35em rgba(255,190,40,.9),0 .06em .2em #000;}
 .card.xf-gold .ctype{color:#ffe07a;}
 .card.xf-gold .cframe::before,.card.xf-gold .cframe::after{left:var(--wl);right:var(--wr);top:var(--wt);height:var(--wh);inset:auto;}
-.card.framed.xf-gold.big .name{height:calc(var(--ph)*.52);top:calc(var(--pt) + var(--ph)*.02);}
-.card.framed.xf-gold.big .ctype{top:calc(var(--pt) + var(--ph)*.52);height:calc(var(--ph)*.24);}
 .card.framed.xf-gold.big .txt{background:linear-gradient(transparent,rgba(20,12,0,.9) 38%)!important;color:#fff3cf;}
 /* ===== Interakciós keretek (a lap fölé tett fényréteg; nem fogja a kattintást, nem takarja az értékeket) =====
    Elsőbbség: célpont → kijelölt → kijátszható; egyszerre csak egy látszik. */
@@ -1687,7 +1695,7 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%;}
 <script src="vendor/firebase-auth-compat.js"></script>
 <script src="vendor/firebase-firestore-compat.js"></script>
 <script src="vendor/firebase-database-compat.js"></script>
-<script>window.APP_VERSION = "2026.10.02-2220";</script>
+<script>window.APP_VERSION = "2026.10.02-2223";</script>
 <script>// ===== Best of Us – saját szerver (Firebase) =====
 // A játék eredetileg a Claude-os tárolót használta (window.claude.use('db' | 'user' | 'room')).
 // Ez a fájl ugyanazt a felületet adja Firebase-ből, így a játék kódja szinte változatlan maradhat:
@@ -2783,7 +2791,7 @@ function cardHTML(id, o = {}) {
   const c = CARD[id], cost = o.cost ?? c.cost;
   if (c.foilOnly && !o.foil) o = { ...o, foil: true };   // csak Full Artban létező lap
   const fk = frameKind(c, o);
-  const tl = textHTML(c).replace(/<[^>]+>/g, '').length, tlc = tl > 95 ? ' tl-l' : tl > 62 ? ' tl-m' : '';
+  const tl = textHTML(c).replace(/<[^>]+>/g, '').length, tlc = tl > 150 ? ' tl-l tl-xl' : tl > 95 ? ' tl-l' : tl > 62 ? ' tl-m' : '';
   const fcls = fk === 'kanon' ? ' framed xf xf-kanon' + (o.foil ? ' kholo' : '') + tlc : fk === 'foil' ? ' foil' : ' framed' + tlc;
   return `<div class="card ${TYPE[c.type][1]}${c.finisher ? ' kanon' : ''}${c.variantOf ? ' variant' : ''}${o.big ? ' big' : ''}${fcls}${o.cls ? ' ' + o.cls : ''}" style="--h:${hueOf(id)}" ${o.attrs || ''}>
     <div class="cframe">
@@ -2930,7 +2938,8 @@ function avHTML(h, extra = '') {
 function heroCardHTML(h, o = {}) {
   const gold = !!(o.gold && ART['g_' + h.id]), aid = gold ? 'g_' + h.id : h.id;
   const fk = gold ? 'gold' : o.foil ? 'foil' : 'base';   // arany → Full Art → alap
-  return `<div class="card t-hero${o.big ? ' big' : ''}${fk === 'gold' ? ' framed xf xf-gold gold' : fk === 'foil' ? ' foil' : ' framed'}" style="--h:${h.hue}" ${o.attrs || ''}>
+  const htl = h.text.length, htc = htl > 150 ? ' tl-l tl-xl' : htl > 95 ? ' tl-l' : htl > 62 ? ' tl-m' : '';
+  return `<div class="card t-hero${o.big ? ' big' : ''}${fk === 'gold' ? ' framed xf xf-gold gold' + htc : fk === 'foil' ? ' foil' : ' framed'}" style="--h:${h.hue}" ${o.attrs || ''}>
     <div class="cframe">
       ${ART[aid] ? `<div class="art has-art" style="${artStyle(aid, o.big)}"></div>`
         : `<div class="art"><span class="mono">${initials(h.name)}</span>${o.big && !o.foil ? '<span class="artnote">Illusztráció helye</span>' : ''}</div>`}
