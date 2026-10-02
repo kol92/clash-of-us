@@ -1007,6 +1007,11 @@ function syncHandFx() {
   if (ui.botHandN != null && bn > ui.botHandN) for (let k = 0; k < bn - ui.botHandN; k++) flyBotDraw(k);
   ui.botHandN = bn;
 }
+// a pakli-jelvény kerek/négyzetes, a kirepülő lap viszont lap alakú (5:7) legyen: a jelvény közepéből indul
+function pileRect(el) {
+  const r = el.getBoundingClientRect(), h = r.height * 1.05, w = h * 5 / 7;
+  return { left: r.left + r.width / 2 - w / 2, top: r.top + r.height / 2 - h / 2, width: w, height: h };
+}
 function drawGhost(from) {
   const g = document.createElement('div'); g.className = 'drawghost';
   g.style.cssText = `left:${from.left}px;top:${from.top}px;width:${from.width}px;height:${from.height}px`;
@@ -1017,7 +1022,7 @@ async function flyDraw(uid, k) {
   await sleep(40 + k * 150);
   const pile = $('#pBar .deckpile'), el = $(`#hand .card[data-uid="${uid}"]`);
   if (!pile || !el) { ui.flying.delete(uid); if (el) el.style.opacity = ''; return; }
-  const a = pile.getBoundingClientRect(), b = el.getBoundingClientRect(), g = drawGhost(a);
+  const a = pileRect(pile), b = el.getBoundingClientRect(), g = drawGhost(a);
   const dx = b.left + b.width / 2 - (a.left + a.width / 2), dy = b.top + b.height / 2 - (a.top + a.height / 2), sc = b.width / a.width;
   await g.animate([
     { transform: 'translate(0,0) scale(1) rotate(0deg)', opacity: .3 },
@@ -1035,7 +1040,7 @@ async function flyDraw(uid, k) {
 async function flyBotDraw(k) {
   await sleep(40 + k * 150);
   const pile = $('#eBar .deckpile'), to = $('#eBar .counts'); if (!pile || !to) return;
-  const a = pile.getBoundingClientRect(), b = to.getBoundingClientRect(), g = drawGhost(a);
+  const a = pileRect(pile), b = to.getBoundingClientRect(), g = drawGhost(a);
   const dx = b.left + 10 - (a.left + a.width / 2), dy = b.top + b.height / 2 - (a.top + a.height / 2);
   await g.animate([{ transform: 'translate(0,0) scale(1)', opacity: 1 }, { transform: `translate(${dx * .5}px,${dy + 40}px) scale(1.2) rotate(-8deg)`, opacity: 1, offset: .5 },
     { transform: `translate(${dx}px,${dy}px) scale(.4)`, opacity: 0 }], { duration: 560, easing: 'ease-in-out', fill: 'forwards' }).finished;
