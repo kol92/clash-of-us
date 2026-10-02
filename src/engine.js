@@ -5,8 +5,8 @@ const HAND_LIMIT = 8;
 
 const CARDS = [
   // --- Karakterek ---
-  { id:'c_pifti', type:'char', name:'Pifti', cost:1, atk:1, hp:1, rarity:'k', text:'' },
-  { id:'c_pifti2', type:'char', name:'Pifti', cost:1, atk:1, hp:1, rarity:'k', variantOf:'c_pifti', passOnly:true, foilOnly:true, text:'' },
+  { id:'c_pifti', type:'char', name:'Pifti', cost:1, atk:2, hp:1, rarity:'k', text:'' },
+  { id:'c_pifti2', type:'char', name:'Pifti', cost:1, atk:2, hp:1, rarity:'k', variantOf:'c_pifti', passOnly:true, foilOnly:true, text:'' },
   { id:'c_tzs', type:'char', name:'TZS', cost:1, atk:3, hp:1, rarity:'r', text:'Amikor támad, 1 sebzést okoz a saját hősödnek is.' },
   { id:'c_tzs2', type:'char', name:'TZS', cost:1, atk:3, hp:1, rarity:'r', variantOf:'c_tzs', passOnly:true, foilOnly:true, text:'Amikor támad, 1 sebzést okoz a saját hősödnek is.' },
   { id:'c_talos', type:'char', name:'Tálos', cost:1, atk:1, hp:1, rarity:'r', text:'A mellette álló karaktereid +2 támadást kapnak, amíg Tálos él.' },

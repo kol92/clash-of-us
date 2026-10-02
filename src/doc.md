@@ -113,7 +113,7 @@ Hősképesség-ötletek a táblázatban (még nem zöldek, nincsenek beépítve)
 ## Base set – lapok (58 + Rehab-változat + Query; plusz a Season Pass Pifti- és TZS-változata)
 **Karakterek (költség · támadás/élet)**
 - Query 0 · 1/1 – csak PP idézi meg; nem gyűjthető, nincs packban, pakliba nem tehető
-- Pifti 1 · 1/1, gyakori
+- Pifti 1 · 2/1, gyakori (2026-10-02: 1/1 → 2/1, a változata is)
 - PP 3 · 1/3, gyakori (nerf: 2→3 energia) – kijátszáskor maga mellé idéz egy 1/1-es Queryt, ha van üres hely (előbb jobbra, aztán balra, ha mellette nincs hely, bárhova)
 - TZS 1 · 3/1, ritka – amikor támad, 1 sebzést okoz a saját hősödnek is
 - Tálos 1 · 1/1, ritka – a mellette álló karaktereid +2 támadást kapnak, amíg él
