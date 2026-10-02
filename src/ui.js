@@ -481,7 +481,7 @@ async function animateEvents(evs) {
         if (e.id === 'l_munkahely') floatAt($('#loc'), '🏢 Munkahely!', 'info');
         else floatAt(anchor, `${CARD[e.id]?.name || 'Query'}!`, 'info');
         hold = Math.max(hold, e.id === 'c_query' ? 300 : 520); break;
-      case 'rise': floatAt(anchor, `✝️ ${CARD[e.id].name} visszatért! +2/+2`, 'buff'); hold = Math.max(hold, 750); break;
+      case 'rise': floatAt(anchor, `✝️ ${CARD[e.id].name} visszatért! +1/+1`, 'buff'); hold = Math.max(hold, 750); break;
       case 'morph': fx(el, 'fx-heroheal'); fx($('#app'), 'fx-quake'); floatAt(anchor, '🦋 Metamorfózis! Itt van Baszó', 'buff'); hold = Math.max(hold, 1000); break;
       case 'machineon': floatAt(anchor, '⚙️ Gépüzemmód bekapcsolva', 'info'); hold = Math.max(hold, 700); break;
       case 'machine': fx(el, 'fx-heroheal'); fx($('#app'), 'fx-quake'); floatAt(anchor, '⚙️ GÉPÜZEMMÓD! Vissza 10 élettel', 'buff'); hold = Math.max(hold, 1200); break;

@@ -1697,7 +1697,7 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%;}
 <script src="vendor/firebase-auth-compat.js"></script>
 <script src="vendor/firebase-firestore-compat.js"></script>
 <script src="vendor/firebase-database-compat.js"></script>
-<script>window.APP_VERSION = "2026.10.02-2258";</script>
+<script>window.APP_VERSION = "2026.10.02-2306";</script>
 <script>// ===== Best of Us – saját szerver (Firebase) =====
 // A játék eredetileg a Claude-os tárolót használta (window.claude.use('db' | 'user' | 'room')).
 // Ez a fájl ugyanazt a felületet adja Firebase-ből, így a játék kódja szinte változatlan maradhat:
@@ -2022,18 +2022,18 @@ const CARDS = [
   { id:'l_laciverse', type:'loc', name:'Laciverse', cost:3, rarity:'e', text:'Csak annak segít, aki kijátszotta: minden karaktere +1 támadást kap.' },
   // --- Kánon esemény lapok: hősönként egy, csak annak a hősnek a paklijába. off = még nincs grafika, sehol nem látszik ---
   { id:'f_bender', type:'action', name:'Bender', cost:6, rarity:'l', finisher:true, hero:'bence', tgt:'summon', text:'Minden szabad helyedre egy Árnyékember (1/1) kerül. Minden hiányzó hely után mindegyik +1/+1-et kap (pl. 2 szabad hely: két 3/3-as).' },
-  { id:'f_egyutt', type:'action', name:'Együtt sírtok, együtt nevettek', cost:6, rarity:'l', finisher:true, hero:'gabi', tgt:'summon', text:'Megidéz egy Gyerek Zanát (4/4, Lendület) és egy Gyerek Gabit (4/4, Izom).' },
+  { id:'f_egyutt', type:'action', name:'Együtt sírtok, együtt nevettek', cost:6, rarity:'l', finisher:true, hero:'gabi', tgt:'summon', text:'Megidéz egy Gyerek Zanát (3/3, Lendület) és egy Gyerek Gabit (3/3, Izom).' },
   { id:'f_jbl', type:'action', name:'JBL', cost:6, rarity:'l', finisher:true, hero:'laci', tgt:'ownSlot', text:'Lerakod a JBL hangfalat (0/4). A köröd végén 1 sebzést okoz minden ellenséges karakternek és az ellenfél hősének. Amíg él, az ellenfél két szélső helye zárva van, és legfeljebb 2 karaktere lehet. Ha kijátszáskor 2-nél több karaktere van, a szélső helyeken állók elpusztulnak.' },
   { id:'f_metamorf', type:'action', name:'Metamorfózis', cost:6, rarity:'l', finisher:true, hero:'krisz', text:'Krisz Baszóvá változik, és 12 élete lesz. Baszó minden köröd végén a karaktereid után 3-at üt: mindig a legbalra álló ellenséges karaktert, ha nincs ilyen, az ellenfél hősét. Neki nem lehet visszaütni.' },
-  { id:'f_atok', type:'action', name:'Az összetartás átka', cost:6, rarity:'l', finisher:true, hero:'tomi', tgt:'grave', text:'Két véletlen karakter visszatér a temetődből a pályára, az eredeti értékeinél +2/+2-vel.' },
+  { id:'f_atok', type:'action', name:'Az összetartás átka', cost:6, rarity:'l', finisher:true, hero:'tomi', tgt:'grave', text:'Két véletlen karakter visszatér a temetődből a pályára, az eredeti értékeinél +1/+1-gyel.' },
   { id:'f_munkahely', type:'action', name:'A munkahely', cost:6, rarity:'l', finisher:true, hero:'david', text:'Húzol 2 lapot, és kijátssza a Munkahely helyszínt: a te lapjaid 1-gyel olcsóbbak, az ellenfélé 1-gyel drágábbak. Ha a Munkahely eltűnik, Dávid 5 életet gyógyul.' },
   { id:'f_gepuzem', type:'action', name:'Gépüzemmód', cost:6, rarity:'l', finisher:true, hero:'milo', text:'Ha Milo meghalna, egyszer visszatér 10 élettel.' },
   { id:'f_capa', type:'action', name:'Hátad mögött, cápa megesz!', cost:6, rarity:'l', finisher:true, hero:'barna', text:'Megidéz egy 9/9-es Cápát az ellenfél jobb szélső helyére (aki ott áll, azt megeszi). 4 körön át a köröd elején egyet úszik afelé a karakter felé, akit az ellenfél utoljára lerakott, és megeszi, aki az útjába kerül. Nem támad, Láthatatlan: a támadások átmennek rajta.' },
   { id:'f_gluten', type:'action', name:'Gluténbomba', cost:6, rarity:'l', finisher:true, hero:'sasi', opts:['5 sebzés + 5 gyógyulás', '8 sebzés, de te is kapsz 8-at'], text:'Válassz: 5 sebzés az ellenfél hősének és 5 életet gyógyulsz, vagy 8 sebzés az ellenfél hősének, de te is kapsz 8-at.' },
   // a kánon események által hozott, nem gyűjthető lapok
   { id:'c_arnyek', type:'char', name:'Árnyékember', cost:0, atk:1, hp:1, rarity:'k', token:true, text:'Csak a Bender idézheti meg.' },
-  { id:'c_gyzana', type:'char', name:'Gyerek Zana', cost:0, atk:4, hp:4, rarity:'l', token:true, haste:true, text:'Csak az Együtt sírtok, együtt nevettek idézheti meg.' },
-  { id:'c_gygabi', type:'char', name:'Gyerek Gabi', cost:0, atk:4, hp:4, rarity:'l', token:true, muscle:true, text:'Csak az Együtt sírtok, együtt nevettek idézheti meg.' },
+  { id:'c_gyzana', type:'char', name:'Gyerek Zana', cost:0, atk:3, hp:3, rarity:'l', token:true, haste:true, text:'Csak az Együtt sírtok, együtt nevettek idézheti meg.' },
+  { id:'c_gygabi', type:'char', name:'Gyerek Gabi', cost:0, atk:3, hp:3, rarity:'l', token:true, muscle:true, text:'Csak az Együtt sírtok, együtt nevettek idézheti meg.' },
   { id:'c_jbl', type:'char', name:'JBL hangfal', cost:0, atk:0, hp:4, rarity:'l', token:true, noAttack:true, text:'Nem támad. A gazdája körének végén 1 sebzés minden ellenséges karakternek és az ellenfél hősének. Amíg él, az ellenfél két szélső helye zárva, és legfeljebb 2 karaktere lehet.' },
   { id:'c_capa', type:'char', name:'Cápa', cost:0, atk:9, hp:9, rarity:'l', token:true, noAttack:true, fixed:true, invis:true, text:'Nem támad. Gazdája körének elején egyet úszik afelé a karakter felé, akit az ellenfél utoljára lerakott, és megeszi, aki az útjába kerül. 4 úszás után eltűnik.' },
   { id:'l_munkahely', type:'loc', name:'Munkahely', cost:0, rarity:'l', token:true, text:'A gazdája lapjai 1-gyel olcsóbbak, az ellenfeléi 1-gyel drágábbak. Ha eltűnik, a gazdája 5 életet gyógyul.' },
@@ -2435,7 +2435,7 @@ function playCard(s, pi, hi, t) {
         while (pick.length < Math.min(2, sl.length) && pool.length) pick.push(pool.splice(Math.floor(rnd() * pool.length), 1)[0]);
         const ids = pick.map(k => p.grave[k].id);
         pick.sort((a, b) => b - a).forEach(k => p.grave.splice(k, 1));
-        ids.forEach((id, k) => { const u = makeUnit(s, id, pi); u.atk += 2; u.hp += 2; u.maxHp += 2; p.board[sl[k]] = u; ev(s, { t:'rise', side:pi, i:sl[k], id }); });
+        ids.forEach((id, k) => { const u = makeUnit(s, id, pi); u.atk += 1; u.hp += 1; u.maxHp += 1; p.board[sl[k]] = u; ev(s, { t:'rise', side:pi, i:sl[k], id }); });
         break; }
       case 'f_munkahely': draw(s, pi); if (s.winner == null) draw(s, pi); dropLocation(s, 'loc'); s.location = { id:'l_munkahely', owner:pi }; ev(s, { t:'summon', side:pi, i:-1, id:'l_munkahely' }); break;
       case 'f_gepuzem': p.machine = 1; ev(s, { t:'machineon', side:pi, i:-1 }); break;
@@ -3202,7 +3202,7 @@ async function animateEvents(evs) {
         if (e.id === 'l_munkahely') floatAt($('#loc'), '🏢 Munkahely!', 'info');
         else floatAt(anchor, `${CARD[e.id]?.name || 'Query'}!`, 'info');
         hold = Math.max(hold, e.id === 'c_query' ? 300 : 520); break;
-      case 'rise': floatAt(anchor, `✝️ ${CARD[e.id].name} visszatért! +2/+2`, 'buff'); hold = Math.max(hold, 750); break;
+      case 'rise': floatAt(anchor, `✝️ ${CARD[e.id].name} visszatért! +1/+1`, 'buff'); hold = Math.max(hold, 750); break;
       case 'morph': fx(el, 'fx-heroheal'); fx($('#app'), 'fx-quake'); floatAt(anchor, '🦋 Metamorfózis! Itt van Baszó', 'buff'); hold = Math.max(hold, 1000); break;
       case 'machineon': floatAt(anchor, '⚙️ Gépüzemmód bekapcsolva', 'info'); hold = Math.max(hold, 700); break;
       case 'machine': fx(el, 'fx-heroheal'); fx($('#app'), 'fx-quake'); floatAt(anchor, '⚙️ GÉPÜZEMMÓD! Vissza 10 élettel', 'buff'); hold = Math.max(hold, 1200); break;
