@@ -84,14 +84,14 @@ const CARDS = [
   { id:'f_atok', type:'action', name:'Az összetartás átka', cost:6, rarity:'l', finisher:true, hero:'tomi', tgt:'grave', text:'Két véletlen karakter visszatér a temetődből a pályára, az eredeti értékeinél +2/+2-vel.' },
   { id:'f_munkahely', type:'action', name:'A munkahely', cost:6, rarity:'l', finisher:true, hero:'david', text:'Húzol 2 lapot, és kijátssza a Munkahely helyszínt: a te lapjaid 1-gyel olcsóbbak, az ellenfélé 1-gyel drágábbak. Ha a Munkahely eltűnik, Dávid 5 életet gyógyul.' },
   { id:'f_gepuzem', type:'action', name:'Gépüzemmód', cost:6, rarity:'l', finisher:true, hero:'milo', text:'Ha Milo meghalna, egyszer visszatér 10 élettel.' },
-  { id:'f_capa', type:'action', name:'Hátad mögött, cápa megesz!', cost:6, rarity:'l', finisher:true, hero:'barna', text:'Megidéz egy 9/9-es Cápát az ellenfél jobb szélső helyére (aki ott áll, azt megeszi). 4 körön át a köröd elején egyet úszik afelé a karakter felé, akit az ellenfél utoljára lerakott, és megeszi, aki az útjába kerül. Nem támad, de visszaüt.' },
+  { id:'f_capa', type:'action', name:'Hátad mögött, cápa megesz!', cost:6, rarity:'l', finisher:true, hero:'barna', text:'Megidéz egy 9/9-es Cápát az ellenfél jobb szélső helyére (aki ott áll, azt megeszi). 4 körön át a köröd elején egyet úszik afelé a karakter felé, akit az ellenfél utoljára lerakott, és megeszi, aki az útjába kerül. Nem támad, Láthatatlan: a támadások átmennek rajta.' },
   { id:'f_gluten', type:'action', name:'Gluténbomba', cost:6, rarity:'l', finisher:true, hero:'sasi', opts:['5 sebzés + 5 gyógyulás', '8 sebzés, de te is kapsz 8-at'], text:'Válassz: 5 sebzés az ellenfél hősének és 5 életet gyógyulsz, vagy 8 sebzés az ellenfél hősének, de te is kapsz 8-at.' },
   // a kánon események által hozott, nem gyűjthető lapok
   { id:'c_arnyek', type:'char', name:'Árnyékember', cost:0, atk:1, hp:1, rarity:'k', token:true, text:'Csak a Bender idézheti meg.' },
   { id:'c_gyzana', type:'char', name:'Gyerek Zana', cost:0, atk:4, hp:4, rarity:'l', token:true, haste:true, text:'Csak az Együtt sírtok, együtt nevettek idézheti meg.' },
   { id:'c_gygabi', type:'char', name:'Gyerek Gabi', cost:0, atk:4, hp:4, rarity:'l', token:true, muscle:true, text:'Csak az Együtt sírtok, együtt nevettek idézheti meg.' },
   { id:'c_jbl', type:'char', name:'JBL hangfal', cost:0, atk:0, hp:4, rarity:'l', token:true, noAttack:true, text:'Nem támad. A gazdája körének végén 1 sebzés minden ellenséges karakternek és az ellenfél hősének. Amíg él, az ellenfél két szélső helye zárva, és legfeljebb 2 karaktere lehet.' },
-  { id:'c_capa', type:'char', name:'Cápa', cost:0, atk:9, hp:9, rarity:'l', token:true, noAttack:true, fixed:true, text:'Nem támad, de visszaüt. Gazdája körének elején egyet úszik afelé a karakter felé, akit az ellenfél utoljára lerakott, és megeszi, aki az útjába kerül. 4 úszás után eltűnik.' },
+  { id:'c_capa', type:'char', name:'Cápa', cost:0, atk:9, hp:9, rarity:'l', token:true, noAttack:true, fixed:true, invis:true, text:'Nem támad. Gazdája körének elején egyet úszik afelé a karakter felé, akit az ellenfél utoljára lerakott, és megeszi, aki az útjába kerül. 4 úszás után eltűnik.' },
   { id:'l_munkahely', type:'loc', name:'Munkahely', cost:0, rarity:'l', token:true, text:'A gazdája lapjai 1-gyel olcsóbbak, az ellenfeléi 1-gyel drágábbak. Ha eltűnik, a gazdája 5 életet gyógyul.' },
   { id:'l_korhaz', type:'loc', name:'Siófoki Kórház', cost:1, rarity:'k', text:'Minden karakter 1 életet gyógyul a gazdája körének végén.' },
 ];
@@ -618,7 +618,7 @@ function strike(s, i) {
   }
   const tj = tauntAt(s, ei), j = tj >= 0 ? tj : i;   // Provokáció: ha van ilyen karakter, mindenki őt üti
   const x = s.players[ei].board[j];
-  if (tj < 0 && (u.id === 'c_nyiti' || !x)) { damageHero(s, ei, a); return; }
+  if (tj < 0 && (u.id === 'c_nyiti' || !x || CARD[x.id].invis)) { damageHero(s, ei, a); return; }
   reveal(s, ei, j);
   const r = x.stun ? 0 : effAtk(s, ei, j);
   const sh = x.shield;
@@ -627,6 +627,7 @@ function strike(s, i) {
   if ((CARD[u.id].muscle || u.muscle) && !sh && x.hp < 0) { ev(s, { t:'overflow', side:ei, i:-1, n:-x.hp }); damageHero(s, ei, -x.hp, true); }
   damageUnit(s, pi, i, r); cleanup(s);
 }
+const invisAt = (s, side, i) => { const u = s.players[side].board[i]; return !!(u && CARD[u.id].invis); };   // Láthatatlan: a támadás átmegy rajta
 function tauntAt(s, side) { return s.players[side].board.findIndex(u => u && !u.hidden && (CARD[u.id].taunt || u.taunt)); }
 
 const atiFree = (s, side, i) => s.players[side].board.every((x, j) => j === i || !x);
@@ -651,7 +652,7 @@ function baszoStrike(s) {
   const pi = s.active, p = s.players[pi];
   if (!p.baszo || p.struck || s.winner != null) return;
   p.struck = true; s.baszoHit = pi;
-  const ei = other(pi), j = s.players[ei].board.findIndex(Boolean);
+  const ei = other(pi), j = s.players[ei].board.findIndex(u => u && !CARD[u.id].invis);
   ev(s, { t:'heroatk', side:pi, i:-1, tj:j });
   if (j >= 0) { reveal(s, ei, j); damageUnit(s, ei, j, 3); cleanup(s); } else damageHero(s, ei, 3);
   s.baszoHit = null;
@@ -732,9 +733,10 @@ function evalState(s, me) {
     return x;
   };
   for (let i = 0; i < LANES; i++) {
-    const u = P.board[i], x = E.board[i];
+    const u = P.board[i], x0 = E.board[i], x = x0 && !CARD[x0.id].invis ? x0 : null;   // a Láthatatlan lap nem áll útban
     if (u) { v += val(me, i); if ((!x || u.id === 'c_nyiti') && !u.stun && !CARD[u.id].noAttack) v += effAtk(s, me, i) * 0.6; }
-    if (x) { v -= val(other(me), i); if ((!u || x.id === 'c_nyiti') && !x.stun && !CARD[x.id].noAttack) v -= effAtk(s, other(me), i) * 0.8; }
+    if (x0) v -= val(other(me), i);
+    if (x && (!u || x.id === 'c_nyiti') && !x.stun && !CARD[x.id].noAttack) v -= effAtk(s, other(me), i) * 0.8;
   }
   v += P.hand.length * 0.6 - E.hand.length * 0.3;
   if (s.location && s.location.owner === me) v += 1.0;

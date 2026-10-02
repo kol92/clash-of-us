@@ -39,6 +39,7 @@ const KW_HELP = {
   stun:  ['Bénult', 'Nem támad, és ha megütik, nem üt vissza. A gazdája minden körének végén 1-gyel csökken.'],
   fresh: ['Pihen', 'Ebben a körben került le, ezért még nem támad. A következő körödtől harcol.'],
   doom:  ['Eltűnik', 'A köröd végén magától elpusztul (előtte még támad).'],
+  invis: ['Láthatatlan', 'A támadások átmennek rajta: aki vele szemben áll, mintha üres lenne a hely, az ellenfél hősét üti. Támadással nem lehet sebezni vagy megölni (akciókkal igen).'],
   legend:['Legendás', 'Egy pakliban legfeljebb 1 lehet belőle.'],
 };
 function cardHelpHTML(id, u) {
@@ -53,6 +54,7 @@ function cardHelpHTML(id, u) {
   if (c.stun || u?.stun || /bén/i.test(c.text)) add('stun');
   if (u && u.fresh && !u.haste && !u.stun) add('fresh');
   if (u && (u.doom || u.expire != null)) add('doom');
+  if (c.invis) add('invis');
   if (c.rarity === 'l') add('legend');
   if (c.finisher) rows.unshift(['Kánon esemény', `Ultra erős lap, csak ${HERO[c.hero].name} paklijába tehető (a jobb felső sarokban az ő portréja). Kijátszáskor elsötétül a pálya, és különleges bevonulással érkezik.`]);
   return `<dl class="help">${rows.map(([a, b]) => `<div><dt>${a}</dt><dd>${b}</dd></div>`).join('')}</dl>`;
@@ -74,6 +76,7 @@ function textHTML(c) {
   if (c.haste) parts.push('<b>Lendület</b>.');
   if (c.taunt) parts.push('<b>Provokáció</b>.');
   if (c.muscle) parts.push('<b>Izom</b>.');
+  if (c.invis) parts.push('<b>Láthatatlan</b>.');
   if (c.text) parts.push(c.text);
   return parts.join(' ');
 }
@@ -598,7 +601,7 @@ function chooseOpt(c) {
 // Baszó támadása: a hős portréja nekilendül a célpontnak (a legbalra álló ellenséges karakter vagy az ellenfél hőse)
 async function baszoAnim(pi) {
   const port = barEl(pi)?.querySelector('.hport'), foe = other(pi);
-  const j = S.players[foe].board.findIndex(Boolean);
+  const j = S.players[foe].board.findIndex(x => x && !CARD[x.id].invis);
   const target = j >= 0 ? (unitAt(foe, j) || cellEl(foe, j)) : barEl(foe);
   if (!port || !target) { await runFx(() => baszoStrike(S)); return; }
   const a = port.getBoundingClientRect(), b = target.getBoundingClientRect();
@@ -909,7 +912,7 @@ async function attackAnim(pi, i, u) {
   const mf = u.id === 'c_laszy' ? (u.nextMisfire = laszyRoll(S, pi, i)) : null;
   if (mf) return misfireAnim(pi, i, el, mf);
   const foe = other(pi), tj = tauntAt(S, foe), j = tj >= 0 ? tj : i, opp = S.players[foe].board[j];
-  const toHero = tj < 0 && (!opp || u.id === 'c_nyiti');
+  const toHero = tj < 0 && (!opp || u.id === 'c_nyiti' || CARD[opp.id].invis);
   const target = toHero ? barEl(foe) : unitAt(foe, j);
   const a = el.getBoundingClientRect(), b = target.getBoundingClientRect();
   const dir = pi === ME ? -1 : 1;
