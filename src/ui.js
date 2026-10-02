@@ -534,12 +534,22 @@ async function finisherIntro(e) {
                       { transform: 'translate(-50%,-50%) scale(1) rotate(0deg)', opacity: 1, filter: 'brightness(1)' }], { duration: 650, easing: 'cubic-bezier(.3,.9,.3,1)', fill: 'forwards' }).finished;
   fx($('#app'), 'fx-quake');
   flash.animate([{ opacity: .85 }, { opacity: 0 }], { duration: 420, easing: 'ease-out', fill: 'forwards' });
+  // a keret „életre kel”: felvillan a felső kristály, aztán vörös fény fut végig a kereten
+  const ce = card.querySelector('.card');
+  if (ce && ce.classList.contains('framed')) {
+    ce.insertAdjacentHTML('beforeend', '<i class="kanon-crystal"></i><i class="kanon-run"><i></i></i>');
+    const cr = ce.querySelector('.kanon-crystal'), run = ce.querySelector('.kanon-run');
+    cr.animate([{ opacity: 0, transform: 'translate(-50%,-50%) scale(.4)' }, { opacity: 1, transform: 'translate(-50%,-50%) scale(1.6)', offset: .35 }, { opacity: 0, transform: 'translate(-50%,-50%) scale(2.2)' }],
+               { duration: 650, delay: 120, easing: 'ease-out', fill: 'forwards' });
+    run.animate([{ opacity: 0 }, { opacity: 1, offset: .12 }, { opacity: 1, offset: .85 }, { opacity: 0 }], { duration: 1500, delay: 420, fill: 'forwards' });
+    run.firstElementChild.animate([{ transform: 'translate(-50%,-50%) rotate(0deg)' }, { transform: 'translate(-50%,-50%) rotate(360deg)' }], { duration: 1500, delay: 420, easing: 'cubic-bezier(.4,.1,.6,.9)', fill: 'forwards' });
+  }
   title.animate([{ opacity: 0, transform: 'translate(-50%,0) scale(1.7)', letterSpacing: '.5em' }, { opacity: 1, transform: 'translate(-50%,0) scale(1)', letterSpacing: '.02em' }],
                 { duration: 520, easing: 'cubic-bezier(.2,1.3,.4,1)', fill: 'forwards' });
   card.animate([{ filter: 'brightness(1) drop-shadow(0 0 0 rgba(255,80,40,0))' }, { filter: 'brightness(1.25) drop-shadow(0 0 28px rgba(255,80,40,.9))' }, { filter: 'brightness(1) drop-shadow(0 0 0 rgba(255,80,40,0))' }],
                { duration: 1100, iterations: 2, easing: 'ease-in-out' });
   const t0 = performance.now();
-  await Promise.race([sleep(2000), new Promise(r => o.addEventListener('pointerdown', () => { if (performance.now() - t0 > 500) r(); }))]);
+  await Promise.race([sleep(2300), new Promise(r => o.addEventListener('pointerdown', () => { if (performance.now() - t0 > 500) r(); }))]);
   card.animate([{ opacity: 1, transform: 'translate(-50%,-50%) scale(1)', filter: 'brightness(1)' }, { opacity: 0, transform: 'translate(-50%,-50%) scale(1.25)', filter: 'brightness(3)' }], { duration: 380, easing: 'ease-in', fill: 'forwards' });
   await o.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 460, delay: 140, fill: 'forwards' }).finished;
   o.remove();
