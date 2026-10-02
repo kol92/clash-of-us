@@ -77,15 +77,15 @@ const CARDS = [
   { id:'l_barhole', type:'loc', name:'Barhole', cost:1, rarity:'k', text:'Minden lap kijátszása 1-gyel kevesebbe kerül.' },
   { id:'l_laciverse', type:'loc', name:'Laciverse', cost:3, rarity:'e', text:'Csak annak segít, aki kijátszotta: minden karaktere +1 támadást kap.' },
   // --- Kánon esemény lapok: hősönként egy, csak annak a hősnek a paklijába. off = még nincs grafika, sehol nem látszik ---
-  { id:'f_bender', type:'action', name:'Bender', cost:6, rarity:'l', finisher:true, hero:'bence', off:true, tgt:'summon', text:'Minden szabad helyedre egy Árnyékember (1/1) kerül. Minden hiányzó hely után mindegyik +1/+1-et kap (pl. 2 szabad hely: két 3/3-as).' },
-  { id:'f_egyutt', type:'action', name:'Együtt sírtok, együtt nevettek', cost:6, rarity:'l', finisher:true, hero:'gabi', off:true, tgt:'summon', text:'Megidéz egy Gyerek Zanát (5/5, Lendület) és egy Gyerek Gabit (5/5, Izom).' },
-  { id:'f_jbl', type:'action', name:'JBL', cost:6, rarity:'l', finisher:true, hero:'laci', off:true, tgt:'ownSlot', text:'Lerakod a JBL hangfalat (0/6). Amíg él, az ellenfél két szélső helye zárva van, és legfeljebb 2 karaktere lehet. Ha kijátszáskor 2-nél több karaktere van, a szélső helyeken állók elpusztulnak.' },
-  { id:'f_metamorf', type:'action', name:'Metamorfózis', cost:6, rarity:'l', finisher:true, hero:'krisz', off:true, text:'Krisz Baszóvá változik, és 12 élete lesz. Baszó minden köröd végén a karaktereid után 3-at üt: mindig a legbalra álló ellenséges karaktert, ha nincs ilyen, az ellenfél hősét. Neki nem lehet visszaütni.' },
-  { id:'f_atok', type:'action', name:'Az összetartás átka', cost:6, rarity:'l', finisher:true, hero:'tomi', off:true, tgt:'grave', text:'Két véletlen karakter visszatér a temetődből a pályára, az eredeti értékeinél +2/+2-vel.' },
-  { id:'f_munkahely', type:'action', name:'A munkahely', cost:6, rarity:'l', finisher:true, hero:'david', off:true, text:'Kijátssza a Munkahely helyszínt: a te lapjaid 1-gyel olcsóbbak, az ellenfélé 1-gyel drágábbak. Ha a Munkahely eltűnik, Dávid 5 életet gyógyul.' },
-  { id:'f_gepuzem', type:'action', name:'Gépüzemmód', cost:6, rarity:'l', finisher:true, hero:'milo', off:true, text:'Ha Milo meghalna, egyszer visszatér 10 élettel.' },
-  { id:'f_capa', type:'action', name:'Hátad mögött, cápa megesz!', cost:6, rarity:'l', finisher:true, hero:'barna', off:true, text:'Megidéz egy 9/9-es Cápát az ellenfél jobb szélső helyére (aki ott áll, azt megeszi). A köröd elején egy hellyel balra úszik, és megeszi, aki ott áll. Nem támad, de visszaüt. A bal szélre érve elpusztul.' },
-  { id:'f_gluten', type:'action', name:'Gluténbomba', cost:6, rarity:'l', finisher:true, hero:'sasi', off:true, opts:['5 sebzés + 5 gyógyulás', '8 sebzés, de te is kapsz 8-at'], text:'Válassz: 5 sebzés az ellenfél hősének és 5 életet gyógyulsz, vagy 8 sebzés az ellenfél hősének, de te is kapsz 8-at.' },
+  { id:'f_bender', type:'action', name:'Bender', cost:6, rarity:'l', finisher:true, hero:'bence', tgt:'summon', text:'Minden szabad helyedre egy Árnyékember (1/1) kerül. Minden hiányzó hely után mindegyik +1/+1-et kap (pl. 2 szabad hely: két 3/3-as).' },
+  { id:'f_egyutt', type:'action', name:'Együtt sírtok, együtt nevettek', cost:6, rarity:'l', finisher:true, hero:'gabi', tgt:'summon', text:'Megidéz egy Gyerek Zanát (5/5, Lendület) és egy Gyerek Gabit (5/5, Izom).' },
+  { id:'f_jbl', type:'action', name:'JBL', cost:6, rarity:'l', finisher:true, hero:'laci', tgt:'ownSlot', text:'Lerakod a JBL hangfalat (0/6). Amíg él, az ellenfél két szélső helye zárva van, és legfeljebb 2 karaktere lehet. Ha kijátszáskor 2-nél több karaktere van, a szélső helyeken állók elpusztulnak.' },
+  { id:'f_metamorf', type:'action', name:'Metamorfózis', cost:6, rarity:'l', finisher:true, hero:'krisz', text:'Krisz Baszóvá változik, és 12 élete lesz. Baszó minden köröd végén a karaktereid után 3-at üt: mindig a legbalra álló ellenséges karaktert, ha nincs ilyen, az ellenfél hősét. Neki nem lehet visszaütni.' },
+  { id:'f_atok', type:'action', name:'Az összetartás átka', cost:6, rarity:'l', finisher:true, hero:'tomi', tgt:'grave', text:'Két véletlen karakter visszatér a temetődből a pályára, az eredeti értékeinél +2/+2-vel.' },
+  { id:'f_munkahely', type:'action', name:'A munkahely', cost:6, rarity:'l', finisher:true, hero:'david', text:'Kijátssza a Munkahely helyszínt: a te lapjaid 1-gyel olcsóbbak, az ellenfélé 1-gyel drágábbak. Ha a Munkahely eltűnik, Dávid 5 életet gyógyul.' },
+  { id:'f_gepuzem', type:'action', name:'Gépüzemmód', cost:6, rarity:'l', finisher:true, hero:'milo', text:'Ha Milo meghalna, egyszer visszatér 10 élettel.' },
+  { id:'f_capa', type:'action', name:'Hátad mögött, cápa megesz!', cost:6, rarity:'l', finisher:true, hero:'barna', text:'Megidéz egy 9/9-es Cápát az ellenfél jobb szélső helyére (aki ott áll, azt megeszi). A köröd elején egy hellyel balra úszik, és megeszi, aki ott áll. Nem támad, de visszaüt. A bal szélre érve elpusztul.' },
+  { id:'f_gluten', type:'action', name:'Gluténbomba', cost:6, rarity:'l', finisher:true, hero:'sasi', opts:['5 sebzés + 5 gyógyulás', '8 sebzés, de te is kapsz 8-at'], text:'Válassz: 5 sebzés az ellenfél hősének és 5 életet gyógyulsz, vagy 8 sebzés az ellenfél hősének, de te is kapsz 8-at.' },
   // a kánon események által hozott, nem gyűjthető lapok
   { id:'c_arnyek', type:'char', name:'Árnyékember', cost:0, atk:1, hp:1, rarity:'k', token:true, text:'Csak a Bender idézheti meg.' },
   { id:'c_gyzana', type:'char', name:'Gyerek Zana', cost:0, atk:5, hp:5, rarity:'l', token:true, haste:true, text:'Csak az Együtt sírtok, együtt nevettek idézheti meg.' },
@@ -713,16 +713,21 @@ function evalState(s, me) {
     if (u.stun) x = u.hp * 0.9 - 1;
     if (u.doom) x = 0;
     if (u.id === 'c_korso') x = 0.6; if (u.id === 'c_zoli') x *= 0.6; if (u.id === 'c_zana') x += a * 0.8;
+    if (CARD[u.id].noAttack) x = u.hp * 0.5;   // JBL hangfal: fal, nem üt
+    if (CARD[u.id].fixed) x = -7;              // Cápa: annak az oldalnak árt, ahol áll
     return x;
   };
   for (let i = 0; i < LANES; i++) {
     const u = P.board[i], x = E.board[i];
-    if (u) { v += val(me, i); if ((!x || u.id === 'c_nyiti') && !u.stun) v += effAtk(s, me, i) * 0.6; }
-    if (x) { v -= val(other(me), i); if ((!u || x.id === 'c_nyiti') && !x.stun) v -= effAtk(s, other(me), i) * 0.8; }
+    if (u) { v += val(me, i); if ((!x || u.id === 'c_nyiti') && !u.stun && !CARD[u.id].noAttack) v += effAtk(s, me, i) * 0.6; }
+    if (x) { v -= val(other(me), i); if ((!u || x.id === 'c_nyiti') && !x.stun && !CARD[x.id].noAttack) v -= effAtk(s, other(me), i) * 0.8; }
   }
   v += P.hand.length * 0.6 - E.hand.length * 0.3;
   if (s.location && s.location.owner === me) v += 1.0;
+  if (locIs(s, 'l_munkahely')) v += s.location.owner === me ? 4 : -4;   // Munkahely: tartós energiaelőny
   if (E.locked) v += 3; if (P.locked) v -= 3;
+  if (P.baszo) v += 6; if (E.baszo) v -= 6;          // Baszó minden körben üt 3-at
+  if (P.machine === 1) v += 7; if (E.machine === 1) v -= 7;   // Gépüzemmód: tartalék 10 élet
   return v;
 }
 function scoreAfterCombat(s, me) {

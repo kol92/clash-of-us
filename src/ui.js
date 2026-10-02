@@ -166,6 +166,16 @@ const ART = {
   c_gygabi: { src:'art/gygabi.webp', av:'52% 26%', pos:'52% 24%' },
   c_gyzana: { src:'art/gyzana.webp', av:'47% 30%', pos:'47% 28%' },
   c_jbl:    { src:'art/jbl.webp', av:'50% 45%', pos:'50% 42%' },
+  f_metamorf: { src:'art/f_metamorf.webp', av:'52% 22%', pos:'52% 22%' },
+  baszo:      { src:'art/f_metamorf.webp', av:'52% 18%', port:'53% 14%' },
+  milo_gep:   { src:'art/f_gepuzem.webp', av:'50% 18%', port:'50% 16%' },   // Milo portréja, miután a Gépüzemmód visszahozta   // Baszó hősportré: a Metamorfózis képe közelebbről
+  f_atok:     { src:'art/f_atok.webp', av:'48% 40%', pos:'48% 36%' },
+  f_gepuzem:  { src:'art/f_gepuzem.webp', av:'50% 22%', pos:'50% 20%' },
+  f_capa:     { src:'art/f_capa.webp', av:'50% 28%', pos:'50% 26%' },
+  c_capa:     { src:'art/capa.webp', av:'62% 26%', pos:'60% 26%' },
+  f_gluten:   { src:'art/f_gluten.webp', av:'55% 26%', pos:'55% 26%' },
+  f_munkahely:{ src:'art/f_munkahely.webp', av:'50% 55%', pos:'50% 55%' },
+  l_munkahely:{ src:'art/f_munkahely.webp', av:'50% 55%', pos:'50% 55%' },
   c_molnar: { src:'art/molnar.webp', pos:'50% 22%' },
   c_udvarhelyi: { src:'art/udvarhelyi.webp', pos:'47% 5%' },
   c_alekosz: { src:'art/alekosz.webp', pos:'52% 16%' },
@@ -224,7 +234,7 @@ function heroCardHTML(h, o = {}) {
     <div class="cframe">
       ${ART[aid] ? `<div class="art has-art" style="${artStyle(aid, o.big)}"></div>`
         : `<div class="art"><span class="mono">${initials(h.name)}</span>${o.big && !o.foil ? '<span class="artnote">Illusztráció helye</span>' : ''}</div>`}
-      <div class="ctype">${gold ? 'Arany hős' : 'Hős'} · ${h.id === PASSIVE.bigHp ? 24 : 20} élet<i class="rar ${gold ? 'r-g' : 'r-l'}"></i></div>${gold ? '<i class="gold-dust"></i>' : ''}
+      <div class="ctype">${gold ? 'Arany hős' : 'Hős'} · ${h.id === 'baszo' ? 12 : h.id === PASSIVE.bigHp ? 24 : 20} élet<i class="rar ${gold ? 'r-g' : 'r-l'}"></i></div>${gold ? '<i class="gold-dust"></i>' : ''}
       <div class="name">${h.name}</div>
       <div class="txt"><span>${h.text}</span></div>
     </div></div>`;
@@ -627,14 +637,16 @@ async function chompFx(e) {
 // ---------- játék renderelés ----------
 // Krisz kánon eseménye után Baszó a hős (saját név, portré és képesség)
 const BASZO = { id:'baszo', name:'Baszó', hue:330, text:'A köröd végén a karaktereid után 3-at üt: mindig a legbalra álló ellenséges karaktert, ha nincs ilyen, az ellenfél hősét. Neki nem lehet visszaütni.' };
-const heroOf = pi => S.players[pi].baszo ? BASZO : HERO[S.players[pi].heroId];
+const heroOf = pi => S.players[pi].baszo ? BASZO
+  : S.players[pi].machine === 2 ? { ...HERO[S.players[pi].heroId], id:'milo_gep', text: HERO[S.players[pi].heroId].text + ' Gépüzemmódban: már visszatért 10 élettel.' }
+  : HERO[S.players[pi].heroId];
 function heroBar(pi) {
-  const p = S.players[pi], h = heroOf(pi), bz = !!p.baszo;
+  const p = S.players[pi], h = heroOf(pi), bz = !!p.baszo || p.machine === 2;   // átváltozott hős: saját portré, arany/Full Art nélkül
   const pips = Array.from({ length: 6 }, (_, k) => `<i class="${k < p.energy ? 'on' : k < p.maxEnergy ? 'used' : 'locked'}"></i>`).join('');
   const gold = !bz && heroGoldOf(pi) && !!ART['g_' + h.id], aid = gold ? 'g_' + h.id : h.id;
   const img = ART[aid] ? `background-image:url('${artSrc(aid, true)}');--hp:${ART[aid].port || '50% 7%'}` : '';
   const fa = !bz && (gold || heroFaOf(pi));
-  return `<div class="hport${ART[h.id] ? '' : ' noart'}${fa ? ' fa' : ''}${gold ? ' gold' : ''}${bz ? ' baszo' : ''}" style="--h:${h.hue};${img}" aria-hidden="true">${ART[h.id] ? '' : `<span>${initials(h.name)}</span>`}${fa ? '<i class="hfa-holo"></i><i class="hfa-shine"></i><i class="hfa-rim"></i>' : ''}</div>
+  return `<div class="hport${ART[h.id] ? '' : ' noart'}${fa ? ' fa' : ''}${gold ? ' gold' : ''}${p.baszo ? ' baszo' : p.machine === 2 ? ' gepmilo' : ''}" style="--h:${h.hue};${img}" aria-hidden="true">${ART[h.id] ? '' : `<span>${initials(h.name)}</span>`}${fa ? '<i class="hfa-holo"></i><i class="hfa-shine"></i><i class="hfa-rim"></i>' : ''}</div>
     <button class="hport-hit" data-hero="${pi}" aria-label="${h.name} képessége"></button>${p.machine === 1 ? '<span class="hmachine" title="Gépüzemmód: egyszer visszatér 10 élettel">⚙️</span>' : ''}${p.locked ? '<span class="hlock" title="Adios Motherfucker!: ebben a körében nem játszhat ki lapot">Bénult</span>' : ''}
     <div class="hinfo"><div class="hname">${h.name}<small>${pi === BOT ? (S.pvp ? escH(S.names?.[pi] || 'barát') : 'bot') : 'te'}</small></div>
       <div class="hpbar"><i style="width:${Math.max(0, p.hp) / p.maxHp * 100}%"></i><b>${Math.max(0, p.hp)} / ${p.maxHp}</b></div></div>

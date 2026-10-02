@@ -441,6 +441,7 @@ h1,h2,h3{font-family:var(--display);font-weight:400;letter-spacing:.01em;text-wr
 .fin-intro .fin-icon{position:absolute;left:50%;top:auto;bottom:calc(9% + env(safe-area-inset-bottom) + clamp(96px,30vw,128px));width:clamp(40px,12vw,56px);transform:translate(-50%,-50%);opacity:0;pointer-events:none;}
 .cell.closed{background:repeating-linear-gradient(135deg,rgba(148,163,184,.22) 0 8px,rgba(30,41,59,.35) 8px 16px);filter:grayscale(1);border-color:rgba(148,163,184,.35)!important;}
 .cell.closed::after{content:'🔊';position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:22px;opacity:.55;pointer-events:none;}
+.hport.gepmilo{box-shadow:0 0 0 2px #38bdf8,0 0 18px rgba(56,189,248,.7);}
 .hport.baszo{box-shadow:0 0 0 2px #ff4fa3,0 0 18px rgba(255,79,163,.7);}
 .hmachine{position:absolute;right:2px;top:2px;z-index:3;font-size:16px;filter:drop-shadow(0 0 4px #000);animation:spinGear 4s linear infinite;}
 @keyframes spinGear{to{transform:rotate(360deg)}}
@@ -1685,7 +1686,7 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%;}
 <script src="vendor/firebase-auth-compat.js"></script>
 <script src="vendor/firebase-firestore-compat.js"></script>
 <script src="vendor/firebase-database-compat.js"></script>
-<script>window.APP_VERSION = "2026.10.02-2136";</script>
+<script>window.APP_VERSION = "2026.10.02-2213";</script>
 <script>// ===== Best of Us – saját szerver (Firebase) =====
 // A játék eredetileg a Claude-os tárolót használta (window.claude.use('db' | 'user' | 'room')).
 // Ez a fájl ugyanazt a felületet adja Firebase-ből, így a játék kódja szinte változatlan maradhat:
@@ -2008,15 +2009,15 @@ const CARDS = [
   { id:'l_barhole', type:'loc', name:'Barhole', cost:1, rarity:'k', text:'Minden lap kijátszása 1-gyel kevesebbe kerül.' },
   { id:'l_laciverse', type:'loc', name:'Laciverse', cost:3, rarity:'e', text:'Csak annak segít, aki kijátszotta: minden karaktere +1 támadást kap.' },
   // --- Kánon esemény lapok: hősönként egy, csak annak a hősnek a paklijába. off = még nincs grafika, sehol nem látszik ---
-  { id:'f_bender', type:'action', name:'Bender', cost:6, rarity:'l', finisher:true, hero:'bence', off:true, tgt:'summon', text:'Minden szabad helyedre egy Árnyékember (1/1) kerül. Minden hiányzó hely után mindegyik +1/+1-et kap (pl. 2 szabad hely: két 3/3-as).' },
-  { id:'f_egyutt', type:'action', name:'Együtt sírtok, együtt nevettek', cost:6, rarity:'l', finisher:true, hero:'gabi', off:true, tgt:'summon', text:'Megidéz egy Gyerek Zanát (5/5, Lendület) és egy Gyerek Gabit (5/5, Izom).' },
-  { id:'f_jbl', type:'action', name:'JBL', cost:6, rarity:'l', finisher:true, hero:'laci', off:true, tgt:'ownSlot', text:'Lerakod a JBL hangfalat (0/6). Amíg él, az ellenfél két szélső helye zárva van, és legfeljebb 2 karaktere lehet. Ha kijátszáskor 2-nél több karaktere van, a szélső helyeken állók elpusztulnak.' },
-  { id:'f_metamorf', type:'action', name:'Metamorfózis', cost:6, rarity:'l', finisher:true, hero:'krisz', off:true, text:'Krisz Baszóvá változik, és 12 élete lesz. Baszó minden köröd végén a karaktereid után 3-at üt: mindig a legbalra álló ellenséges karaktert, ha nincs ilyen, az ellenfél hősét. Neki nem lehet visszaütni.' },
-  { id:'f_atok', type:'action', name:'Az összetartás átka', cost:6, rarity:'l', finisher:true, hero:'tomi', off:true, tgt:'grave', text:'Két véletlen karakter visszatér a temetődből a pályára, az eredeti értékeinél +2/+2-vel.' },
-  { id:'f_munkahely', type:'action', name:'A munkahely', cost:6, rarity:'l', finisher:true, hero:'david', off:true, text:'Kijátssza a Munkahely helyszínt: a te lapjaid 1-gyel olcsóbbak, az ellenfélé 1-gyel drágábbak. Ha a Munkahely eltűnik, Dávid 5 életet gyógyul.' },
-  { id:'f_gepuzem', type:'action', name:'Gépüzemmód', cost:6, rarity:'l', finisher:true, hero:'milo', off:true, text:'Ha Milo meghalna, egyszer visszatér 10 élettel.' },
-  { id:'f_capa', type:'action', name:'Hátad mögött, cápa megesz!', cost:6, rarity:'l', finisher:true, hero:'barna', off:true, text:'Megidéz egy 9/9-es Cápát az ellenfél jobb szélső helyére (aki ott áll, azt megeszi). A köröd elején egy hellyel balra úszik, és megeszi, aki ott áll. Nem támad, de visszaüt. A bal szélre érve elpusztul.' },
-  { id:'f_gluten', type:'action', name:'Gluténbomba', cost:6, rarity:'l', finisher:true, hero:'sasi', off:true, opts:['5 sebzés + 5 gyógyulás', '8 sebzés, de te is kapsz 8-at'], text:'Válassz: 5 sebzés az ellenfél hősének és 5 életet gyógyulsz, vagy 8 sebzés az ellenfél hősének, de te is kapsz 8-at.' },
+  { id:'f_bender', type:'action', name:'Bender', cost:6, rarity:'l', finisher:true, hero:'bence', tgt:'summon', text:'Minden szabad helyedre egy Árnyékember (1/1) kerül. Minden hiányzó hely után mindegyik +1/+1-et kap (pl. 2 szabad hely: két 3/3-as).' },
+  { id:'f_egyutt', type:'action', name:'Együtt sírtok, együtt nevettek', cost:6, rarity:'l', finisher:true, hero:'gabi', tgt:'summon', text:'Megidéz egy Gyerek Zanát (5/5, Lendület) és egy Gyerek Gabit (5/5, Izom).' },
+  { id:'f_jbl', type:'action', name:'JBL', cost:6, rarity:'l', finisher:true, hero:'laci', tgt:'ownSlot', text:'Lerakod a JBL hangfalat (0/6). Amíg él, az ellenfél két szélső helye zárva van, és legfeljebb 2 karaktere lehet. Ha kijátszáskor 2-nél több karaktere van, a szélső helyeken állók elpusztulnak.' },
+  { id:'f_metamorf', type:'action', name:'Metamorfózis', cost:6, rarity:'l', finisher:true, hero:'krisz', text:'Krisz Baszóvá változik, és 12 élete lesz. Baszó minden köröd végén a karaktereid után 3-at üt: mindig a legbalra álló ellenséges karaktert, ha nincs ilyen, az ellenfél hősét. Neki nem lehet visszaütni.' },
+  { id:'f_atok', type:'action', name:'Az összetartás átka', cost:6, rarity:'l', finisher:true, hero:'tomi', tgt:'grave', text:'Két véletlen karakter visszatér a temetődből a pályára, az eredeti értékeinél +2/+2-vel.' },
+  { id:'f_munkahely', type:'action', name:'A munkahely', cost:6, rarity:'l', finisher:true, hero:'david', text:'Kijátssza a Munkahely helyszínt: a te lapjaid 1-gyel olcsóbbak, az ellenfélé 1-gyel drágábbak. Ha a Munkahely eltűnik, Dávid 5 életet gyógyul.' },
+  { id:'f_gepuzem', type:'action', name:'Gépüzemmód', cost:6, rarity:'l', finisher:true, hero:'milo', text:'Ha Milo meghalna, egyszer visszatér 10 élettel.' },
+  { id:'f_capa', type:'action', name:'Hátad mögött, cápa megesz!', cost:6, rarity:'l', finisher:true, hero:'barna', text:'Megidéz egy 9/9-es Cápát az ellenfél jobb szélső helyére (aki ott áll, azt megeszi). A köröd elején egy hellyel balra úszik, és megeszi, aki ott áll. Nem támad, de visszaüt. A bal szélre érve elpusztul.' },
+  { id:'f_gluten', type:'action', name:'Gluténbomba', cost:6, rarity:'l', finisher:true, hero:'sasi', opts:['5 sebzés + 5 gyógyulás', '8 sebzés, de te is kapsz 8-at'], text:'Válassz: 5 sebzés az ellenfél hősének és 5 életet gyógyulsz, vagy 8 sebzés az ellenfél hősének, de te is kapsz 8-at.' },
   // a kánon események által hozott, nem gyűjthető lapok
   { id:'c_arnyek', type:'char', name:'Árnyékember', cost:0, atk:1, hp:1, rarity:'k', token:true, text:'Csak a Bender idézheti meg.' },
   { id:'c_gyzana', type:'char', name:'Gyerek Zana', cost:0, atk:5, hp:5, rarity:'l', token:true, haste:true, text:'Csak az Együtt sírtok, együtt nevettek idézheti meg.' },
@@ -2644,16 +2645,21 @@ function evalState(s, me) {
     if (u.stun) x = u.hp * 0.9 - 1;
     if (u.doom) x = 0;
     if (u.id === 'c_korso') x = 0.6; if (u.id === 'c_zoli') x *= 0.6; if (u.id === 'c_zana') x += a * 0.8;
+    if (CARD[u.id].noAttack) x = u.hp * 0.5;   // JBL hangfal: fal, nem üt
+    if (CARD[u.id].fixed) x = -7;              // Cápa: annak az oldalnak árt, ahol áll
     return x;
   };
   for (let i = 0; i < LANES; i++) {
     const u = P.board[i], x = E.board[i];
-    if (u) { v += val(me, i); if ((!x || u.id === 'c_nyiti') && !u.stun) v += effAtk(s, me, i) * 0.6; }
-    if (x) { v -= val(other(me), i); if ((!u || x.id === 'c_nyiti') && !x.stun) v -= effAtk(s, other(me), i) * 0.8; }
+    if (u) { v += val(me, i); if ((!x || u.id === 'c_nyiti') && !u.stun && !CARD[u.id].noAttack) v += effAtk(s, me, i) * 0.6; }
+    if (x) { v -= val(other(me), i); if ((!u || x.id === 'c_nyiti') && !x.stun && !CARD[x.id].noAttack) v -= effAtk(s, other(me), i) * 0.8; }
   }
   v += P.hand.length * 0.6 - E.hand.length * 0.3;
   if (s.location && s.location.owner === me) v += 1.0;
+  if (locIs(s, 'l_munkahely')) v += s.location.owner === me ? 4 : -4;   // Munkahely: tartós energiaelőny
   if (E.locked) v += 3; if (P.locked) v -= 3;
+  if (P.baszo) v += 6; if (E.baszo) v -= 6;          // Baszó minden körben üt 3-at
+  if (P.machine === 1) v += 7; if (E.machine === 1) v -= 7;   // Gépüzemmód: tartalék 10 élet
   return v;
 }
 function scoreAfterCombat(s, me) {
@@ -2852,6 +2858,16 @@ const ART = {
   c_gygabi: { src:'art/gygabi.webp', av:'52% 26%', pos:'52% 24%' },
   c_gyzana: { src:'art/gyzana.webp', av:'47% 30%', pos:'47% 28%' },
   c_jbl:    { src:'art/jbl.webp', av:'50% 45%', pos:'50% 42%' },
+  f_metamorf: { src:'art/f_metamorf.webp', av:'52% 22%', pos:'52% 22%' },
+  baszo:      { src:'art/f_metamorf.webp', av:'52% 18%', port:'53% 14%' },
+  milo_gep:   { src:'art/f_gepuzem.webp', av:'50% 18%', port:'50% 16%' },   // Milo portréja, miután a Gépüzemmód visszahozta   // Baszó hősportré: a Metamorfózis képe közelebbről
+  f_atok:     { src:'art/f_atok.webp', av:'48% 40%', pos:'48% 36%' },
+  f_gepuzem:  { src:'art/f_gepuzem.webp', av:'50% 22%', pos:'50% 20%' },
+  f_capa:     { src:'art/f_capa.webp', av:'50% 28%', pos:'50% 26%' },
+  c_capa:     { src:'art/capa.webp', av:'62% 26%', pos:'60% 26%' },
+  f_gluten:   { src:'art/f_gluten.webp', av:'55% 26%', pos:'55% 26%' },
+  f_munkahely:{ src:'art/f_munkahely.webp', av:'50% 55%', pos:'50% 55%' },
+  l_munkahely:{ src:'art/f_munkahely.webp', av:'50% 55%', pos:'50% 55%' },
   c_molnar: { src:'art/molnar.webp', pos:'50% 22%' },
   c_udvarhelyi: { src:'art/udvarhelyi.webp', pos:'47% 5%' },
   c_alekosz: { src:'art/alekosz.webp', pos:'52% 16%' },
@@ -2910,7 +2926,7 @@ function heroCardHTML(h, o = {}) {
     <div class="cframe">
       ${ART[aid] ? `<div class="art has-art" style="${artStyle(aid, o.big)}"></div>`
         : `<div class="art"><span class="mono">${initials(h.name)}</span>${o.big && !o.foil ? '<span class="artnote">Illusztráció helye</span>' : ''}</div>`}
-      <div class="ctype">${gold ? 'Arany hős' : 'Hős'} · ${h.id === PASSIVE.bigHp ? 24 : 20} élet<i class="rar ${gold ? 'r-g' : 'r-l'}"></i></div>${gold ? '<i class="gold-dust"></i>' : ''}
+      <div class="ctype">${gold ? 'Arany hős' : 'Hős'} · ${h.id === 'baszo' ? 12 : h.id === PASSIVE.bigHp ? 24 : 20} élet<i class="rar ${gold ? 'r-g' : 'r-l'}"></i></div>${gold ? '<i class="gold-dust"></i>' : ''}
       <div class="name">${h.name}</div>
       <div class="txt"><span>${h.text}</span></div>
     </div></div>`;
@@ -3313,14 +3329,16 @@ async function chompFx(e) {
 // ---------- játék renderelés ----------
 // Krisz kánon eseménye után Baszó a hős (saját név, portré és képesség)
 const BASZO = { id:'baszo', name:'Baszó', hue:330, text:'A köröd végén a karaktereid után 3-at üt: mindig a legbalra álló ellenséges karaktert, ha nincs ilyen, az ellenfél hősét. Neki nem lehet visszaütni.' };
-const heroOf = pi => S.players[pi].baszo ? BASZO : HERO[S.players[pi].heroId];
+const heroOf = pi => S.players[pi].baszo ? BASZO
+  : S.players[pi].machine === 2 ? { ...HERO[S.players[pi].heroId], id:'milo_gep', text: HERO[S.players[pi].heroId].text + ' Gépüzemmódban: már visszatért 10 élettel.' }
+  : HERO[S.players[pi].heroId];
 function heroBar(pi) {
-  const p = S.players[pi], h = heroOf(pi), bz = !!p.baszo;
+  const p = S.players[pi], h = heroOf(pi), bz = !!p.baszo || p.machine === 2;   // átváltozott hős: saját portré, arany/Full Art nélkül
   const pips = Array.from({ length: 6 }, (_, k) => `<i class="${k < p.energy ? 'on' : k < p.maxEnergy ? 'used' : 'locked'}"></i>`).join('');
   const gold = !bz && heroGoldOf(pi) && !!ART['g_' + h.id], aid = gold ? 'g_' + h.id : h.id;
   const img = ART[aid] ? `background-image:url('${artSrc(aid, true)}');--hp:${ART[aid].port || '50% 7%'}` : '';
   const fa = !bz && (gold || heroFaOf(pi));
-  return `<div class="hport${ART[h.id] ? '' : ' noart'}${fa ? ' fa' : ''}${gold ? ' gold' : ''}${bz ? ' baszo' : ''}" style="--h:${h.hue};${img}" aria-hidden="true">${ART[h.id] ? '' : `<span>${initials(h.name)}</span>`}${fa ? '<i class="hfa-holo"></i><i class="hfa-shine"></i><i class="hfa-rim"></i>' : ''}</div>
+  return `<div class="hport${ART[h.id] ? '' : ' noart'}${fa ? ' fa' : ''}${gold ? ' gold' : ''}${p.baszo ? ' baszo' : p.machine === 2 ? ' gepmilo' : ''}" style="--h:${h.hue};${img}" aria-hidden="true">${ART[h.id] ? '' : `<span>${initials(h.name)}</span>`}${fa ? '<i class="hfa-holo"></i><i class="hfa-shine"></i><i class="hfa-rim"></i>' : ''}</div>
     <button class="hport-hit" data-hero="${pi}" aria-label="${h.name} képessége"></button>${p.machine === 1 ? '<span class="hmachine" title="Gépüzemmód: egyszer visszatér 10 élettel">⚙️</span>' : ''}${p.locked ? '<span class="hlock" title="Adios Motherfucker!: ebben a körében nem játszhat ki lapot">Bénult</span>' : ''}
     <div class="hinfo"><div class="hname">${h.name}<small>${pi === BOT ? (S.pvp ? escH(S.names?.[pi] || 'barát') : 'bot') : 'te'}</small></div>
       <div class="hpbar"><i style="width:${Math.max(0, p.hp) / p.maxHp * 100}%"></i><b>${Math.max(0, p.hp)} / ${p.maxHp}</b></div></div>
