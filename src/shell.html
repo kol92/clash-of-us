@@ -1496,6 +1496,8 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%;}
 .deckpile.empty i{background:url('art/ui/hud-deck.webp') center/contain no-repeat!important;border:0;filter:grayscale(1) brightness(.6) drop-shadow(0 0 4px rgba(255,93,108,.9));}
 .deckpile.empty b{color:#ff8a95;}
 @media (max-height:760px){.deckpile{width:40px;height:40px;} .en.hudm{width:80px;height:25px;} .en.hudm b{font-size:13px;}}
+/* a saját keretes lapok fénye (filter) felülírta a halványítást: ha nem kijátszható, itt is legyen halvány */
+.hand .card.xf.dim,.hand .card.xf.big.dim{animation:none!important;filter:brightness(.62) saturate(.5) drop-shadow(0 .2em .35em rgba(0,0,0,.6))!important;}
 .coll-slot.missing .card.xf,.coll-slot.missing .card.xf.big{animation:none!important;filter:grayscale(1) brightness(.45)!important;}
 @media (prefers-reduced-motion:reduce){.card.xf-kanon,.card.xf-gold,.card.kholo .art::before{animation:none!important;}}
 .var-ribbon{position:absolute;z-index:7;left:50%;top:-.55em;transform:translateX(-50%);white-space:nowrap;font-style:normal;font-family:var(--body);font-weight:900;

@@ -84,14 +84,14 @@ const CARDS = [
   { id:'f_atok', type:'action', name:'Az összetartás átka', cost:6, rarity:'l', finisher:true, hero:'tomi', tgt:'grave', text:'Két véletlen karakter visszatér a temetődből a pályára, az eredeti értékeinél +2/+2-vel.' },
   { id:'f_munkahely', type:'action', name:'A munkahely', cost:6, rarity:'l', finisher:true, hero:'david', text:'Húzol 2 lapot, és kijátssza a Munkahely helyszínt: a te lapjaid 1-gyel olcsóbbak, az ellenfélé 1-gyel drágábbak. Ha a Munkahely eltűnik, Dávid 5 életet gyógyul.' },
   { id:'f_gepuzem', type:'action', name:'Gépüzemmód', cost:6, rarity:'l', finisher:true, hero:'milo', text:'Ha Milo meghalna, egyszer visszatér 10 élettel.' },
-  { id:'f_capa', type:'action', name:'Hátad mögött, cápa megesz!', cost:6, rarity:'l', finisher:true, hero:'barna', text:'Megidéz egy 9/9-es Cápát az ellenfél jobb szélső helyére (aki ott áll, azt megeszi). A köröd elején egy hellyel balra úszik, és megeszi, aki ott áll. Nem támad, de visszaüt. A bal szélre érve elpusztul.' },
+  { id:'f_capa', type:'action', name:'Hátad mögött, cápa megesz!', cost:6, rarity:'l', finisher:true, hero:'barna', text:'Megidéz egy 9/9-es Cápát az ellenfél jobb szélső helyére (aki ott áll, azt megeszi). 4 körön át a köröd elején egyet úszik afelé a karakter felé, akit az ellenfél utoljára lerakott, és megeszi, aki az útjába kerül. Nem támad, de visszaüt.' },
   { id:'f_gluten', type:'action', name:'Gluténbomba', cost:6, rarity:'l', finisher:true, hero:'sasi', opts:['5 sebzés + 5 gyógyulás', '8 sebzés, de te is kapsz 8-at'], text:'Válassz: 5 sebzés az ellenfél hősének és 5 életet gyógyulsz, vagy 8 sebzés az ellenfél hősének, de te is kapsz 8-at.' },
   // a kánon események által hozott, nem gyűjthető lapok
   { id:'c_arnyek', type:'char', name:'Árnyékember', cost:0, atk:1, hp:1, rarity:'k', token:true, text:'Csak a Bender idézheti meg.' },
   { id:'c_gyzana', type:'char', name:'Gyerek Zana', cost:0, atk:4, hp:4, rarity:'l', token:true, haste:true, text:'Csak az Együtt sírtok, együtt nevettek idézheti meg.' },
   { id:'c_gygabi', type:'char', name:'Gyerek Gabi', cost:0, atk:4, hp:4, rarity:'l', token:true, muscle:true, text:'Csak az Együtt sírtok, együtt nevettek idézheti meg.' },
   { id:'c_jbl', type:'char', name:'JBL hangfal', cost:0, atk:0, hp:4, rarity:'l', token:true, noAttack:true, text:'Nem támad. A gazdája körének végén 1 sebzés minden ellenséges karakternek és az ellenfél hősének. Amíg él, az ellenfél két szélső helye zárva, és legfeljebb 2 karaktere lehet.' },
-  { id:'c_capa', type:'char', name:'Cápa', cost:0, atk:9, hp:9, rarity:'l', token:true, noAttack:true, fixed:true, text:'Nem támad, de visszaüt. Gazdája körének elején egy hellyel balra úszik, és megeszi, aki ott áll. A bal szélre érve elpusztul.' },
+  { id:'c_capa', type:'char', name:'Cápa', cost:0, atk:9, hp:9, rarity:'l', token:true, noAttack:true, fixed:true, text:'Nem támad, de visszaüt. Gazdája körének elején egyet úszik afelé a karakter felé, akit az ellenfél utoljára lerakott, és megeszi, aki az útjába kerül. 4 úszás után eltűnik.' },
   { id:'l_munkahely', type:'loc', name:'Munkahely', cost:0, rarity:'l', token:true, text:'A gazdája lapjai 1-gyel olcsóbbak, az ellenfeléi 1-gyel drágábbak. Ha eltűnik, a gazdája 5 életet gyógyul.' },
   { id:'l_korhaz', type:'loc', name:'Siófoki Kórház', cost:1, rarity:'k', text:'Minden karakter 1 életet gyógyul a gazdája körének végén.' },
 ];
@@ -334,7 +334,7 @@ function playCard(s, pi, hi, t) {
   }
   if (c.type === 'char') {
     const u = makeUnit(s, c.id, pi);
-    p.board[t.i] = u;
+    p.board[t.i] = u; p.lastPlaced = u.uid;   // a Cápa erre vadászik
     if (has(p, 'firstCharAtk') && !p.charThisTurn && c.id !== 'c_korso' && c.cost <= 2) { u.atk += 1; ev(s, { t:'buff', side:pi, i:t.i }); }
     p.charThisTurn = true;
     if (c.id === 'c_pp') {   // Query idézése: előbb jobbra, aztán balra, ha ott nincs hely, bárhova
@@ -498,7 +498,7 @@ function playCard(s, pi, hi, t) {
       case 'f_capa': {   // a cápa az ellenfél jobb szélére érkezik, és megeszi, aki ott áll
         const j = LANES - 1, x = e.board[j];
         if (x && !isFixed(x)) { reveal(s, ei, j); ev(s, { t:'chomp', side:ei, i:j, from:-1 }); x.shield = false; x.hp = 0; cleanup(s); }
-        if (!e.board[j]) { const u = makeUnit(s, 'c_capa', ei); u.owner = pi; u.fresh = false; e.board[j] = u; ev(s, { t:'summon', side:ei, i:j, id:'c_capa' }); }
+        if (!e.board[j]) { const u = makeUnit(s, 'c_capa', ei); u.owner = pi; u.fresh = false; u.swims = 4; e.board[j] = u; ev(s, { t:'summon', side:ei, i:j, id:'c_capa' }); }
         break; }
       case 'f_gluten':
         if (t.o === 1) { damageHero(s, ei, 8); damageHero(s, pi, 8); }
@@ -558,8 +558,10 @@ function cleanup(s) {
           p.board[i] = null; ev(s, { t:'death', side, i, id:u.id });
           bury(s, side, u.id, 'death'); buryItems(s, side, u);
           if (u.items.includes('i_kabala')) draw(s, side);
-          if (has(p, 'deathPing') && u.id !== 'c_korso' && !CARD[u.id].fixed) damageHero(s, other(side), 1);
-          if (CARD[u.id].deathBlast) {   // Kovács Bence: 2 sebzés a szemben állónak, ha nincs ott senki, az ellenfél hősének
+          const vsBaszo = s.baszoHit === other(side);   // Baszó ütésére meghalt lap nem vághat vissza neki
+          if (has(p, 'deathPing') && u.id !== 'c_korso' && !CARD[u.id].fixed && !vsBaszo) damageHero(s, other(side), 1);
+          if (CARD[u.id].deathBlast && vsBaszo) ev(s, { t:'nocounter', side, i });
+          else if (CARD[u.id].deathBlast) {   // Kovács Bence: 2 sebzés a szemben állónak, ha nincs ott senki, az ellenfél hősének
             const os = other(side), x = s.players[os].board[i];
             ev(s, { t:'zap', side, i, ts:os, ti:x && x.hp > 0 ? i : -1, kind:'blast' });
             if (x && x.hp > 0) damageUnit(s, os, i, CARD[u.id].deathBlast); else damageHero(s, os, CARD[u.id].deathBlast);
@@ -648,24 +650,29 @@ function attackLane(s, i) {
 function baszoStrike(s) {
   const pi = s.active, p = s.players[pi];
   if (!p.baszo || p.struck || s.winner != null) return;
-  p.struck = true;
+  p.struck = true; s.baszoHit = pi;
   const ei = other(pi), j = s.players[ei].board.findIndex(Boolean);
   ev(s, { t:'heroatk', side:pi, i:-1, tj:j });
   if (j >= 0) { reveal(s, ei, j); damageUnit(s, ei, j, 3); cleanup(s); } else damageHero(s, ei, 3);
+  s.baszoHit = null;
   checkWin(s);
 }
 // Cápa (Barna kánon eseménye): a gazdája körének elején egy hellyel balra úszik, és megeszi, aki ott áll; a bal szélen elpusztul
 function sharkSwim(s, pi) {
-  const ei = other(pi), b = s.players[ei].board, i = b.findIndex(u => u && u.id === 'c_capa' && u.owner === pi);
+  // Cápa (Barna Kánon eseménye): a gazdája körének elején EGY helyet úszik afelé a karakter felé, akit az ellenfél utoljára
+  // lerakott (ha az már nincs lent: a legközelebbi karakter felé), és megeszi, aki azon a helyen áll. 4 úszás után eltűnik.
+  const ei = other(pi), E = s.players[ei], b = E.board, i = b.findIndex(u => u && u.id === 'c_capa' && u.owner === pi);
   if (i < 0) return;
-  const sh = b[i], j = i - 1;
-  if (j < 0) { sh.hp = 0; ev(s, { t:'sharkgone', side:ei, i }); cleanup(s); return; }
-  const x = b[j];
-  if (x) { reveal(s, ei, j); ev(s, { t:'chomp', side:ei, i:j, from:i }); x.shield = false; x.hp = 0; cleanup(s); }
-  if (!b[j] && b[i] === sh) {
-    b[j] = sh; b[i] = null; ev(s, { t:'swim', side:ei, i:j });
-    if (j === 0) { sh.hp = 0; ev(s, { t:'sharkgone', side:ei, i:j }); cleanup(s); }
+  const sh = b[i];
+  let t = b.findIndex(u => u && u.uid === E.lastPlaced && u !== sh);
+  if (t < 0) { let best = 99; b.forEach((u, k) => { if (u && u !== sh && Math.abs(k - i) < best) { best = Math.abs(k - i); t = k; } }); }
+  if (t >= 0) {
+    const j = i + Math.sign(t - i), x = b[j];
+    if (x) { reveal(s, ei, j); ev(s, { t:'chomp', side:ei, i:j, from:i }); x.shield = false; x.hp = 0; cleanup(s); }
+    if (!b[j] && b[i] === sh) { b[j] = sh; b[i] = null; ev(s, { t:'swim', side:ei, i:j, dir: Math.sign(t - i) }); }
   }
+  sh.swims = (sh.swims ?? 4) - 1;
+  if (sh.swims <= 0 && sh.hp > 0) { const k = b.indexOf(sh); sh.hp = 0; ev(s, { t:'sharkgone', side:ei, i:k }); cleanup(s); }
 }
 
 function finishTurn(s) {

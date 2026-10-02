@@ -483,7 +483,8 @@ async function animateEvents(evs) {
       case 'machine': fx(el, 'fx-heroheal'); fx($('#app'), 'fx-quake'); floatAt(anchor, '⚙️ GÉPÜZEMMÓD! Vissza 10 élettel', 'buff'); hold = Math.max(hold, 1200); break;
       case 'heroatk': break;   // a lendülést a baszoAnim már lejátszotta
       case 'chomp': await chompFx(e); break;
-      case 'swim': floatAt(anchor, '🦈 ←', 'info'); hold = Math.max(hold, 350); break;
+      case 'swim': floatAt(anchor, e.dir > 0 ? '🦈 →' : '🦈 ←', 'info'); hold = Math.max(hold, 350); break;
+      case 'nocounter': floatAt(anchor, 'Baszót nem lehet visszaütni!', 'info'); hold = Math.max(hold, 500); break;
       case 'jblwave': await jblWaveFx(e); break;
       case 'sharkgone': floatAt(anchor, '🦈 Elúszott…', 'info'); hold = Math.max(hold, 600); break;
       case 'drinkgift': floatAt(anchor, e.side === ME ? `🍸 ${CARD[e.id].name} a kezedbe!` : '🍸 Ital a kezébe!', 'info'); hold = Math.max(hold, 700); break;
@@ -674,7 +675,7 @@ function unitHTML(u, side, i) {
     <span class="uin"><span class="art back-art"></span><span class="uname">Rejtett lap</span></span>
     <span class="st atk">?</span><span class="st hp">?</span>${u.stun ? `<span class="tags"><span class="zz stun" aria-hidden="true">bénult</span><span class="stc" role="img" aria-label="Bénult még ${u.stun} körig" title="Bénult még ${u.stun} körig"><b>${u.stun}</b></span></span>` : ''}</button>`;
   const c = CARD[u.id], atk = S.players[side].board[i]?.uid === u.uid ? effAtk(S, side, i) : u.atk, sleeping = u.fresh && !u.haste && u.id !== 'c_korso' && !c.noAttack && !u.stun;
-  const tags = (sleeping ? '<span class="stb rest" role="img" aria-label="Pihen" title="Pihen: ebben a körben még nem támad"></span>' : c.noAttack ? `<span class="zz">${u.id === 'c_capa' ? '🦈 úszik' : 'nem támad'}</span>` : u.id === 'c_ati' && !u.stun && !atiFree(S, side, i) ? '<span class="zz">nem támad</span>' : '')
+  const tags = (sleeping ? '<span class="stb rest" role="img" aria-label="Pihen" title="Pihen: ebben a körben még nem támad"></span>' : c.noAttack ? `<span class="zz">${u.id === 'c_capa' ? `🦈 még ${u.swims ?? 4}` : 'nem támad'}</span>` : u.id === 'c_ati' && !u.stun && !atiFree(S, side, i) ? '<span class="zz">nem támad</span>' : '')
     + (u.expire != null || u.doom ? '<span class="zz">eltűnik</span>' : '') + (u.stun ? `<span class="zz stun" aria-hidden="true">bénult</span><span class="stc" role="img" aria-label="Bénult még ${u.stun} körig" title="Bénult még ${u.stun} körig"><b>${u.stun}</b></span>` : '')
     + (u.hidden ? '<span class="stb hid" role="img" aria-label="Rejtve" title="Rejtve: az ellenfél nem látja"></span>' : '')
     + (c.taunt || u.taunt ? '<span class="zz taunt" title="Provokáció: mindenki őt támadja">provokál</span>' : '');
