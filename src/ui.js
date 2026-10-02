@@ -77,21 +77,25 @@ function textHTML(c) {
   if (c.text) parts.push(c.text);
   return parts.join(' ');
 }
+// Keretválasztás egy helyen. Elsőbbség: Kánon esemény → arany → Full Art → alap
+function frameKind(c, o) { return c.finisher ? 'kanon' : o.gold ? 'gold' : o.foil ? 'foil' : 'base'; }
 function cardHTML(id, o = {}) {
   const c = CARD[id], cost = o.cost ?? c.cost;
   if (c.foilOnly && !o.foil) o = { ...o, foil: true };   // csak Full Artban létező lap
+  const fk = frameKind(c, o);
   const tl = textHTML(c).replace(/<[^>]+>/g, '').length, tlc = tl > 95 ? ' tl-l' : tl > 62 ? ' tl-m' : '';
-  return `<div class="card ${TYPE[c.type][1]}${c.finisher ? ' kanon' : ''}${c.variantOf ? ' variant' : ''}${o.big ? ' big' : ''}${o.foil ? ' foil' : ' framed' + tlc}${o.cls ? ' ' + o.cls : ''}" style="--h:${hueOf(id)}" ${o.attrs || ''}>
+  const fcls = fk === 'kanon' ? ' framed xf xf-kanon' + (o.foil ? ' kholo' : '') + tlc : fk === 'foil' ? ' foil' : ' framed' + tlc;
+  return `<div class="card ${TYPE[c.type][1]}${c.finisher ? ' kanon' : ''}${c.variantOf ? ' variant' : ''}${o.big ? ' big' : ''}${fcls}${o.cls ? ' ' + o.cls : ''}" style="--h:${hueOf(id)}" ${o.attrs || ''}>
     <div class="cframe">
       ${ART[id] ? `<div class="art has-art" style="${artStyle(id, o.big)}"></div>`
         : `<div class="art"><span class="mono">${initials(c.name)}</span>${o.big && !o.foil ? '<span class="artnote">Illusztráció helye</span>' : ''}</div>`}
-      <div class="ctype">${c.finisher ? 'Kánon esemény' : TYPE[c.type][0]}${c.drink ? ' · Ital' : ''}<i class="rar r-${c.rarity}" title="${RAR[c.rarity]}"></i></div>
+      <div class="ctype">${c.finisher ? '<i class="ic-kanon" aria-hidden="true"></i>Kánon esemény' : TYPE[c.type][0]}${c.drink ? ' · Ital' : ''}<i class="rar r-${c.rarity}" title="${RAR[c.rarity]}"></i></div>
       ${c.finisher ? `<i class="kanon-hero" title="${HERO[c.hero].name}" style="--h:${HERO[c.hero].hue};${ART[c.hero] ? `background-image:url('${artSrc(c.hero, false)}');background-position:${ART[c.hero].av || '50% 15%'}` : ''}">${ART[c.hero] ? '' : initials(HERO[c.hero].name)}</i>` : ''}
       ${c.type !== 'char' && !o.big && !c.finisher ? `<div class="tribbon">${TYPE[c.type][0]}${c.drink ? '<i class="drk">Ital</i>' : ''}</div>` : ''}
-      <div class="name${c.name.length > 16 ? ' long' : ''}${longWord(c.name) > 11 ? ' xl' : ''}">${c.name}</div>${c.variantOf ? '<i class="var-ribbon"><b>✦ Ritka változat</b><span>✦ Változat</span></i>' : ''}${c.finisher ? '<i class="kanon-ribbon"><b>🔥 Kánon esemény</b><span>Kánon</span></i>' : ''}
+      <div class="name${c.name.length > 16 ? ' long' : ''}${longWord(c.name) > 11 ? ' xl' : ''}">${c.name}</div>${c.variantOf ? '<i class="var-ribbon"><b>✦ Ritka változat</b><span>✦ Változat</span></i>' : ''}
       <div class="txt"><span>${textHTML(c)}</span></div>
     </div>
-    ${o.big ? `<div class="ctype-below">${c.finisher ? 'Kánon esemény' : TYPE[c.type][0]}${c.drink ? ' · Ital' : ''}</div>` : ''}
+    ${o.big ? `<div class="ctype-below">${c.finisher ? '<i class="ic-kanon" aria-hidden="true"></i>Kánon esemény' : TYPE[c.type][0]}${c.drink ? ' · Ital' : ''}</div>` : ''}
     <div class="cost${cost < c.cost ? ' cheaper' : ''}">${cost}</div>
     ${c.type === 'char' ? `<div class="st atk">${c.atk}</div><div class="st hp">${c.hp}</div>` : ''}
   </div>`;
@@ -210,8 +214,8 @@ function avHTML(h, extra = '') {
 }
 function heroCardHTML(h, o = {}) {
   const gold = !!(o.gold && ART['g_' + h.id]), aid = gold ? 'g_' + h.id : h.id;
-  if (gold) o = { ...o, foil: true };
-  return `<div class="card t-hero${o.big ? ' big' : ''}${o.foil ? ' foil' : ' framed'}${gold ? ' gold' : ''}" style="--h:${h.hue}" ${o.attrs || ''}>
+  const fk = gold ? 'gold' : o.foil ? 'foil' : 'base';   // arany → Full Art → alap
+  return `<div class="card t-hero${o.big ? ' big' : ''}${fk === 'gold' ? ' framed xf xf-gold gold' : fk === 'foil' ? ' foil' : ' framed'}" style="--h:${h.hue}" ${o.attrs || ''}>
     <div class="cframe">
       ${ART[aid] ? `<div class="art has-art" style="${artStyle(aid, o.big)}"></div>`
         : `<div class="art"><span class="mono">${initials(h.name)}</span>${o.big && !o.foil ? '<span class="artnote">Illusztráció helye</span>' : ''}</div>`}
@@ -518,40 +522,50 @@ async function runFx(fn) {
 // ---------- kánon esemény lapok ----------
 // Bevonulás: elsötétül a pálya, fénysugarak, a lap becsapódik középre, „KIVÉGZŐ” felirat
 async function finisherIntro(e) {
+  // Sorrend (a csapat leírása szerint): 1) a háttér elsötétül, 2) a Kánon-jelvény és a lap felső kristálya felragyog,
+  // 3) vörös fényimpulzus fut végig a kereten, 4) jön a hatás. Maga a fényeffekt ~1,1 mp; koppintásra hamarabb továbbmegy.
   const c = CARD[e.id], h = HERO[c.hero];
   const o = document.createElement('div'); o.className = 'fin-intro';
   const sub = c.opts && e.o != null ? c.opts[e.o] : h ? `${h.name} kánon eseménye` : '';
-  o.innerHTML = `<div class="fin-dark"></div><div class="fin-rays"></div><div class="fin-card">${cardHTML(e.id, { big: true, foil: foilOf(e.side, e.id) })}</div>
-    <div class="fin-title">${e.side === ME ? '' : '<i>Az ellenfél</i>'}<small>Kánon esemény</small><b>${c.name}</b><em>${sub}</em></div><div class="fin-flash"></div>`;
+  o.innerHTML = `<div class="fin-dark"></div><div class="fin-rays"></div><i class="fin-icon ic-kanon" aria-hidden="true"></i><div class="fin-card">${cardHTML(e.id, { big: true, foil: foilOf(e.side, e.id) })}</div>
+    <div class="fin-title" role="status">${e.side === ME ? '' : '<i>Az ellenfél</i>'}<small>Kánon esemény</small><b>${c.name}</b><em>${sub}</em></div><div class="fin-flash"></div>`;
   $('#layer').appendChild(o);
-  const dark = o.querySelector('.fin-dark'), rays = o.querySelector('.fin-rays'), card = o.querySelector('.fin-card'), title = o.querySelector('.fin-title'), flash = o.querySelector('.fin-flash');
-  await dark.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 560, easing: 'ease-in', fill: 'forwards' }).finished;
-  await sleep(120);
-  rays.animate([{ opacity: 0, transform: 'translate(-50%,-50%) scale(.5) rotate(0deg)' }, { opacity: 1, transform: 'translate(-50%,-50%) scale(1) rotate(40deg)' }], { duration: 700, easing: 'ease-out', fill: 'forwards' })
-    .finished.then(() => rays.animate([{ transform: 'translate(-50%,-50%) rotate(40deg)' }, { transform: 'translate(-50%,-50%) rotate(400deg)' }], { duration: 9000, iterations: Infinity }));
-  await card.animate([{ transform: 'translate(-50%,-50%) scale(2.8) rotate(-10deg)', opacity: 0, filter: 'blur(10px) brightness(3)' },
-                      { transform: 'translate(-50%,-50%) scale(.92) rotate(1.5deg)', opacity: 1, filter: 'blur(0) brightness(1.7)', offset: .72 },
-                      { transform: 'translate(-50%,-50%) scale(1) rotate(0deg)', opacity: 1, filter: 'brightness(1)' }], { duration: 650, easing: 'cubic-bezier(.3,.9,.3,1)', fill: 'forwards' }).finished;
+  const dark = o.querySelector('.fin-dark'), rays = o.querySelector('.fin-rays'), card = o.querySelector('.fin-card'), title = o.querySelector('.fin-title'),
+        flash = o.querySelector('.fin-flash'), icon = o.querySelector('.fin-icon');
+  const skip = () => new Promise(r => { const t0 = performance.now(); o.addEventListener('pointerdown', () => { if (performance.now() - t0 > 300) r(); }); });
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) {   // csökkentett mozgás: rövid, álló kiemelés
+    [dark, card, title, icon].forEach(x => x.style.opacity = 1);
+    await Promise.race([sleep(1400), skip()]); o.remove(); return;
+  }
+  // 1) sötétítés
+  await dark.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 320, easing: 'ease-in', fill: 'forwards' }).finished;
+  // a lap becsapódik
+  await card.animate([{ transform: 'translate(-50%,-50%) scale(2.4) rotate(-8deg)', opacity: 0, filter: 'blur(8px) brightness(3)' },
+                      { transform: 'translate(-50%,-50%) scale(.94) rotate(1deg)', opacity: 1, filter: 'blur(0) brightness(1.6)', offset: .72 },
+                      { transform: 'translate(-50%,-50%) scale(1) rotate(0deg)', opacity: 1, filter: 'brightness(1)' }], { duration: 440, easing: 'cubic-bezier(.3,.9,.3,1)', fill: 'forwards' }).finished;
   fx($('#app'), 'fx-quake');
-  flash.animate([{ opacity: .85 }, { opacity: 0 }], { duration: 420, easing: 'ease-out', fill: 'forwards' });
-  // a keret „életre kel”: felvillan a felső kristály, aztán vörös fény fut végig a kereten
+  flash.animate([{ opacity: .7 }, { opacity: 0 }], { duration: 320, easing: 'ease-out', fill: 'forwards' });
+  rays.animate([{ opacity: 0, transform: 'translate(-50%,-50%) scale(.5) rotate(0deg)' }, { opacity: 1, transform: 'translate(-50%,-50%) scale(1) rotate(60deg)' }], { duration: 1100, easing: 'ease-out', fill: 'forwards' });
+  // 2) a jelvény és a felső kristály felragyog
+  icon.animate([{ opacity: 0, transform: 'translate(-50%,-50%) scale(.4)', filter: 'brightness(1)' }, { opacity: 1, transform: 'translate(-50%,-50%) scale(1.25)', filter: 'brightness(2.2) drop-shadow(0 0 18px rgba(255,40,70,1))', offset: .45 },
+                { opacity: 1, transform: 'translate(-50%,-50%) scale(1)', filter: 'brightness(1.1) drop-shadow(0 0 10px rgba(255,40,70,.8))' }], { duration: 420, easing: 'ease-out', fill: 'forwards' });
   const ce = card.querySelector('.card');
-  if (ce && ce.classList.contains('framed')) {
+  let runDone = sleep(0);
+  if (ce && ce.classList.contains('xf-kanon')) {
     ce.insertAdjacentHTML('beforeend', '<i class="kanon-crystal"></i><i class="kanon-run"><i></i></i>');
     const cr = ce.querySelector('.kanon-crystal'), run = ce.querySelector('.kanon-run');
-    cr.animate([{ opacity: 0, transform: 'translate(-50%,-50%) scale(.4)' }, { opacity: 1, transform: 'translate(-50%,-50%) scale(1.6)', offset: .35 }, { opacity: 0, transform: 'translate(-50%,-50%) scale(2.2)' }],
-               { duration: 650, delay: 120, easing: 'ease-out', fill: 'forwards' });
-    run.animate([{ opacity: 0 }, { opacity: 1, offset: .12 }, { opacity: 1, offset: .85 }, { opacity: 0 }], { duration: 1500, delay: 420, fill: 'forwards' });
-    run.firstElementChild.animate([{ transform: 'translate(-50%,-50%) rotate(0deg)' }, { transform: 'translate(-50%,-50%) rotate(360deg)' }], { duration: 1500, delay: 420, easing: 'cubic-bezier(.4,.1,.6,.9)', fill: 'forwards' });
+    cr.animate([{ opacity: 0, transform: 'translate(-50%,-50%) scale(.4)' }, { opacity: 1, transform: 'translate(-50%,-50%) scale(1.7)', offset: .4 }, { opacity: 0, transform: 'translate(-50%,-50%) scale(2.3)' }],
+               { duration: 420, easing: 'ease-out', fill: 'forwards' });
+    // 3) vörös fényimpulzus körbe a kereten
+    run.animate([{ opacity: 0 }, { opacity: 1, offset: .1 }, { opacity: 1, offset: .85 }, { opacity: 0 }], { duration: 700, delay: 320, fill: 'forwards' });
+    runDone = run.firstElementChild.animate([{ transform: 'translate(-50%,-50%) rotate(0deg)' }, { transform: 'translate(-50%,-50%) rotate(360deg)' }], { duration: 700, delay: 320, easing: 'cubic-bezier(.45,.1,.55,.9)', fill: 'forwards' }).finished;
   }
-  title.animate([{ opacity: 0, transform: 'translate(-50%,0) scale(1.7)', letterSpacing: '.5em' }, { opacity: 1, transform: 'translate(-50%,0) scale(1)', letterSpacing: '.02em' }],
-                { duration: 520, easing: 'cubic-bezier(.2,1.3,.4,1)', fill: 'forwards' });
-  card.animate([{ filter: 'brightness(1) drop-shadow(0 0 0 rgba(255,80,40,0))' }, { filter: 'brightness(1.25) drop-shadow(0 0 28px rgba(255,80,40,.9))' }, { filter: 'brightness(1) drop-shadow(0 0 0 rgba(255,80,40,0))' }],
-               { duration: 1100, iterations: 2, easing: 'ease-in-out' });
-  const t0 = performance.now();
-  await Promise.race([sleep(2300), new Promise(r => o.addEventListener('pointerdown', () => { if (performance.now() - t0 > 500) r(); }))]);
-  card.animate([{ opacity: 1, transform: 'translate(-50%,-50%) scale(1)', filter: 'brightness(1)' }, { opacity: 0, transform: 'translate(-50%,-50%) scale(1.25)', filter: 'brightness(3)' }], { duration: 380, easing: 'ease-in', fill: 'forwards' });
-  await o.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 460, delay: 140, fill: 'forwards' }).finished;
+  title.animate([{ opacity: 0, transform: 'translate(-50%,0) scale(1.6)', letterSpacing: '.4em' }, { opacity: 1, transform: 'translate(-50%,0) scale(1)', letterSpacing: '.02em' }],
+                { duration: 420, delay: 160, easing: 'cubic-bezier(.2,1.3,.4,1)', fill: 'forwards' });
+  await Promise.race([Promise.all([runDone, sleep(1150)]), skip()]);
+  // 4) vissza a pályára, jöhet a hatás
+  card.animate([{ opacity: 1, transform: 'translate(-50%,-50%) scale(1)', filter: 'brightness(1)' }, { opacity: 0, transform: 'translate(-50%,-50%) scale(1.18)', filter: 'brightness(2.6)' }], { duration: 300, easing: 'ease-in', fill: 'forwards' });
+  await o.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 340, delay: 80, fill: 'forwards' }).finished;
   o.remove();
 }
 // Gluténbomba: két lehetőség közül választasz
@@ -619,18 +633,18 @@ function heroBar(pi) {
     <button class="hport-hit" data-hero="${pi}" aria-label="${h.name} képessége"></button>${p.machine === 1 ? '<span class="hmachine" title="Gépüzemmód: egyszer visszatér 10 élettel">⚙️</span>' : ''}${p.locked ? '<span class="hlock" title="Adios Motherfucker!: ebben a körében nem játszhat ki lapot">Bénult</span>' : ''}
     <div class="hinfo"><div class="hname">${h.name}<small>${pi === BOT ? (S.pvp ? escH(S.names?.[pi] || 'barát') : 'bot') : 'te'}</small></div>
       <div class="hpbar"><i style="width:${Math.max(0, p.hp) / p.maxHp * 100}%"></i><b>${Math.max(0, p.hp)} / ${p.maxHp}</b></div></div>
-    <div class="res"><div class="en">${pips}<span>${p.energy}/${p.maxEnergy}</span></div>
+    <div class="res"><div class="en hudm" role="img" aria-label="Energia: ${p.energy} / ${p.maxEnergy}" title="Energia (most / legfeljebb)"><b>${p.energy}/${p.maxEnergy}</b></div>
       <div class="counts">Kéz ${p.hand.length} · <button class="gravebtn" data-grave="${pi}" aria-label="Temető">🪦 ${p.grave.length}</button></div></div>
-    <button class="deckpile${p.deck.length ? p.deck.length <= 3 ? ' low' : '' : ' empty'}" data-deck="${pi}" aria-label="Pakli: ${p.deck.length} lap"><i></i><b>${p.deck.length}</b></button>`;
+    <button class="deckpile${p.deck.length ? p.deck.length <= 3 ? ' low' : '' : ' empty'}" data-deck="${pi}" aria-label="Húzópakli: ${p.deck.length} lap maradt" title="Húzópakli: ennyi lap maradt"><i></i><b>${p.deck.length}</b></button>`;
 }
 function unitHTML(u, side, i) {
   if (u.hidden && side !== ME) return `<button data-uid="${u.uid}" class="unit facedown" aria-label="Rejtett lap">
     <span class="uin"><span class="art back-art"></span><span class="uname">Rejtett lap</span></span>
-    <span class="st atk">?</span><span class="st hp">?</span>${u.stun ? `<span class="tags"><span class="zz stun">bénult ${u.stun}</span></span>` : ''}</button>`;
+    <span class="st atk">?</span><span class="st hp">?</span>${u.stun ? `<span class="tags"><span class="zz stun" aria-hidden="true">bénult</span><span class="stc" role="img" aria-label="Bénult még ${u.stun} körig" title="Bénult még ${u.stun} körig"><b>${u.stun}</b></span></span>` : ''}</button>`;
   const c = CARD[u.id], atk = S.players[side].board[i]?.uid === u.uid ? effAtk(S, side, i) : u.atk, sleeping = u.fresh && !u.haste && u.id !== 'c_korso' && !c.noAttack && !u.stun;
-  const tags = (sleeping ? '<span class="zz">pihen</span>' : c.noAttack ? `<span class="zz">${u.id === 'c_capa' ? '🦈 úszik' : 'nem támad'}</span>` : u.id === 'c_ati' && !u.stun && !atiFree(S, side, i) ? '<span class="zz">nem támad</span>' : '')
-    + (u.expire != null || u.doom ? '<span class="zz">eltűnik</span>' : '') + (u.stun ? `<span class="zz stun">bénult ${u.stun}</span>` : '')
-    + (u.hidden ? '<span class="sneak-tag" title="Az ellenfél nem látja">rejtve</span>' : '')
+  const tags = (sleeping ? '<span class="stb rest" role="img" aria-label="Pihen" title="Pihen: ebben a körben még nem támad"></span>' : c.noAttack ? `<span class="zz">${u.id === 'c_capa' ? '🦈 úszik' : 'nem támad'}</span>` : u.id === 'c_ati' && !u.stun && !atiFree(S, side, i) ? '<span class="zz">nem támad</span>' : '')
+    + (u.expire != null || u.doom ? '<span class="zz">eltűnik</span>' : '') + (u.stun ? `<span class="zz stun" aria-hidden="true">bénult</span><span class="stc" role="img" aria-label="Bénult még ${u.stun} körig" title="Bénult még ${u.stun} körig"><b>${u.stun}</b></span>` : '')
+    + (u.hidden ? '<span class="stb hid" role="img" aria-label="Rejtve" title="Rejtve: az ellenfél nem látja"></span>' : '')
     + (c.taunt || u.taunt ? '<span class="zz taunt" title="Provokáció: mindenki őt támadja">provokál</span>' : '');
   const fa = CARD[u.id].foilOnly || foilOf(side, u.id);
   return `<button data-uid="${u.uid}" class="unit ${TYPE.char[1]}${fa ? ' fa' : ''}${u.shield ? ' shield' : ''}${sleeping ? ' sleep' : ''}" style="--h:${hueOf(u.id)}">
@@ -642,7 +656,7 @@ function unitHTML(u, side, i) {
 function laneHTML(pi, tg) {
   return S.players[pi].board.map((u, i) => {
     const isT = tg.some(t => t.side === pi && t.i === i);
-    return `<div class="cell${isT ? ' tgt' : ''}${closedLane(S, pi, i) ? ' closed' : ''}" data-side="${pi}" data-i="${i}">${u ? unitHTML(u, pi, i) : ''}</div>`;
+    return `<div class="cell${isT ? ' tgt' : ''}${closedLane(S, pi, i) ? ' closed' : ''}" data-side="${pi}" data-i="${i}">${u ? unitHTML(u, pi, i) : ''}${isT ? '<span class="sr-only">Érvényes célpont</span>' : closedLane(S, pi, i) ? '<span class="sr-only">Zárt hely</span>' : ''}</div>`;
   }).join('');
 }
 // hosszú nevek automatikus kicsinyítése, hogy ne lógjanak ki a lap névsávjából
@@ -695,7 +709,7 @@ function render() {
   setHTML(h, hand.length ? hand.map((c, i) => cardHTML(c.id, {
     cost: cardCost(S, ME, c.id), foil: ownsFoil(c.id),
     cls: (ui.sel === i ? 'sel' : '') + (myTurn && canPlay(S, ME, i) ? ' ok' : myTurn ? ' dim' : ''),
-    attrs: `data-hi="${i}" data-uid="${c.uid}" role="button" tabindex="0"` })).join('') : '<span class="hand-empty">Üres a kezed</span>');
+    attrs: `data-hi="${i}" data-uid="${c.uid}" role="button" tabindex="0" aria-label="${CARD[c.id].name}${ui.sel === i ? ', kijelölve' : myTurn && canPlay(S, ME, i) ? ', kijátszható' : ''}"` })).join('') : '<span class="hand-empty">Üres a kezed</span>');
   const cw = parseFloat(getComputedStyle(h.querySelector('.card') || h).getPropertyValue('--cw')) || 82;
   const n = hand.length, avail = h.clientWidth - 44;
   h.style.setProperty('--ov', n > 1 ? Math.max(-4, (n * cw - avail) / (n - 1)) + 'px' : '0px');

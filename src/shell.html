@@ -423,6 +423,7 @@ h1,h2,h3{font-family:var(--display);font-weight:400;letter-spacing:.01em;text-wr
 .fin-title b{display:block;margin-top:6px;font-family:var(--display);font-weight:400;font-size:clamp(20px,6.4vw,30px);color:#ffe9a8;text-shadow:0 0 16px rgba(255,200,80,.8);}
 .fin-title em{display:block;margin-top:4px;font-style:normal;font-size:14px;color:#cbd5e1;}
 .fin-flash{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none;}
+.fin-intro .fin-icon{position:absolute;left:50%;top:auto;bottom:calc(9% + env(safe-area-inset-bottom) + clamp(96px,30vw,128px));width:clamp(40px,12vw,56px);transform:translate(-50%,-50%);opacity:0;pointer-events:none;}
 .cell.closed{background:repeating-linear-gradient(135deg,rgba(148,163,184,.22) 0 8px,rgba(30,41,59,.35) 8px 16px);filter:grayscale(1);border-color:rgba(148,163,184,.35)!important;}
 .cell.closed::after{content:'🔊';position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:22px;opacity:.55;pointer-events:none;}
 .hport.baszo{box-shadow:0 0 0 2px #ff4fa3,0 0 18px rgba(255,79,163,.7);}
@@ -1381,50 +1382,112 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%;}
 
 /* ===== ritka változat-lapok: ránézésre is látszódjon ===== */
 .vartag{display:none;}
-/* Kánon esemény lapok: saját izzó vörös-arany keret, lüktető fény, vörös energiakő */
-.t-action.kanon{--frame:url('art/ui/sm/frame-kanon.webp');}
-.big.t-action.kanon{--frame:url('art/ui/frame-kanon.webp');}
-/* saját keret (a díszek kilógnak, ezért alakkövető fény, nem doboz-árnyék) */
-.card.framed.kanon{box-shadow:none;background:none;filter:drop-shadow(0 0 .28em rgba(255,30,70,.55)) drop-shadow(0 .2em .35em rgba(0,0,0,.6));}
-.card.framed.big.kanon{animation:kanonGlow 2.8s ease-in-out infinite;}
+/* ===== Saját keretes lapok (xf): Kánon esemény és arany hős =====
+   A keretkép 3:4-es, a lap 5:7-es: a keretet nem nyújtjuk, hanem a lap közepére igazítjuk (fent-lent 2,38% marad),
+   és a kép, a név, a típus és a szöveg helyét keretenként a keretkép saját nyílásaihoz mérjük (--w* = képablak, --p* = alsó panel). */
+.card.framed.xf{background:none!important;box-shadow:none!important;padding:0;border-radius:0;}
+.card.framed.xf::before{content:"";position:absolute;inset:0;z-index:2;pointer-events:none;background:var(--xframe) center/100% auto no-repeat!important;}
+.card.framed.xf .cframe{position:absolute;left:0;right:0;top:2.38%;bottom:2.38%;inset:2.38% 0;background:none!important;border-radius:0;overflow:visible;display:block;}
+.card.framed.xf .art{position:absolute;left:var(--wl);right:var(--wr);top:var(--wt);height:var(--wh);bottom:auto;border-radius:calc(var(--cw)*.015);background-size:cover;}
+.card.framed.xf .art .mono{font-size:2.2em;transform:none;}
+.card.framed.xf .name{position:absolute;z-index:3;left:var(--pl);right:var(--pr);top:var(--pt);height:calc(var(--ph)*.56);bottom:auto;display:grid;place-items:center;text-align:center;
+  padding:0 .2em;margin:0;background:none!important;font-size:.72em;line-height:1.02;}
+.card.framed.xf .ctype{display:flex!important;position:absolute;z-index:3;left:var(--pl);right:var(--pr);top:calc(var(--pt) + var(--ph)*.54);height:calc(var(--ph)*.26);
+  padding:0!important;margin:0;justify-content:center;align-items:center;gap:.35em;background:none!important;font-size:.36em;letter-spacing:.1em;white-space:nowrap;}
+.card.framed.xf .ctype .rar{display:none;}
+.card.framed.xf:not(.big) .txt{display:none!important;}
+.card.framed.xf.big .name{height:calc(var(--ph)*.5);top:calc(var(--pt) + var(--ph)*.06);font-size:.7em;}
+.card.framed.xf.big .ctype{top:calc(var(--pt) + var(--ph)*.5);height:calc(var(--ph)*.18);font-size:.32em;}
+/* nagy nézetben a hatás szövege a kép alján, sötét átmeneten (a panel a névé és a típusé) */
+.card.framed.xf.big .txt{display:flex!important;position:absolute;z-index:3;left:var(--wl);right:var(--wr);top:calc(var(--wt) + var(--wh)*.62);height:calc(var(--wh)*.38);
+  margin:0;padding:0 .8em .7em;align-items:flex-end;justify-content:center;text-align:center;border:0;border-radius:0 0 calc(var(--cw)*.015) calc(var(--cw)*.015);
+  background:linear-gradient(transparent,rgba(12,2,4,.9) 34%)!important;font-size:.34em;line-height:1.3;}
+.card.framed.xf .cost{z-index:6;}
+.card.framed.xf .gold-dust{left:var(--wl);right:var(--wr);top:var(--wt);height:var(--wh);inset:auto;}
+/* Kánon esemény */
+.card.xf-kanon{--xframe:url('art/ui/sm/frame-kanon.webp');--wl:10.5%;--wr:10.4%;--wt:11.6%;--wh:57.1%;--pl:10.5%;--pr:10.5%;--pt:73.3%;--ph:21.5%;
+  filter:drop-shadow(0 0 .28em rgba(255,30,70,.55)) drop-shadow(0 .2em .35em rgba(0,0,0,.6));}
+.card.xf-kanon.big{--xframe:url('art/ui/frame-kanon.webp');animation:kanonGlow 2.8s ease-in-out infinite;}
 @keyframes kanonGlow{50%{filter:drop-shadow(0 0 .6em rgba(255,40,80,.85)) drop-shadow(0 .2em .35em rgba(0,0,0,.6));}}
-.card.framed.kanon .art{left:10.5%;right:10.5%;top:11.6%;height:57.3%;border-radius:calc(var(--cw)*.015);}
-.card.framed.kanon .name{left:12%;right:12%;top:73.2%;height:21.5%;}
-.card.framed.big.kanon .name{top:auto;bottom:31.2%;height:auto;left:10.5%;right:10.5%;}
-.card.framed.big.kanon .txt{font-size:.37em;}
-.card.framed.big.kanon.tl-l .txt{font-size:.33em;}
-.card.framed.big.kanon .ctype{left:10.5%;right:10.5%;top:11.6%;}
-.card.framed.big.kanon .txt{left:11.5%;right:11.5%;top:73.6%;height:20%;}
-.card.framed .kanon-ribbon{display:none;}   /* a keret maga jelzi a típust; a szalag csak a Full Art változaton marad */
-.card.foil.kanon{box-shadow:0 0 .45em rgba(255,40,70,.7),0 .3em .8em rgba(0,0,0,.5);}
-/* kijátszáskor: felvillan a felső kristály, majd vörös fény fut végig a kereten */
-.kanon-crystal{position:absolute;z-index:9;left:50%;top:6.4%;width:20%;aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;opacity:0;pointer-events:none;
+.card.kanon .cost{filter:hue-rotate(150deg) saturate(1.5) brightness(1.08);}
+.card.kanon .name{color:#ffe2a8;text-shadow:0 0 .45em rgba(255,100,30,.95),0 1px 0 #000;}
+.card.kanon .ctype{color:#ff9a7a;}
+.card.kanon .txt{color:#ffeccc;}
+.card.kanon .art.has-art::after{content:"";position:absolute;inset:0;pointer-events:none;border-radius:inherit;box-shadow:inset 0 0 1.2em rgba(255,60,40,.5);}
+.ic-kanon{display:inline-block;width:1.25em;aspect-ratio:200/304;background:url('art/ui/ic-kanon.webp') center/contain no-repeat;vertical-align:middle;flex:none;}
+.card.framed.xf .ctype .ic-kanon{width:1.5em;}
+.card.kanon .ctype-below{color:#ff8a4c;display:flex;align-items:center;justify-content:center;gap:.4em;}
+.card.kanon .ctype-below .ic-kanon{width:1.6em;}
+/* Full Art Kánon: a Kánon-keret elsőbbséget kap, a különlegességet szivárványos csillogás jelzi a képen */
+.card.kholo .art::before{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;border-radius:inherit;mix-blend-mode:overlay;opacity:.55;
+  background:linear-gradient(125deg,#ffe28a,#ff8fd0 25%,#8fd4ff 50%,#b6ffcf 75%,#ffe28a);animation:holoT 5s ease-in-out infinite alternate;}
+/* kijátszáskor: a felső kristály felvillan, majd vörös fény fut végig a kereten */
+.kanon-crystal{position:absolute;z-index:9;left:50%;top:10.3%;width:20%;aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;opacity:0;pointer-events:none;
   background:radial-gradient(circle,#fff 0 9%,rgba(255,90,110,.95) 28%,rgba(255,0,50,0) 68%);mix-blend-mode:screen;}
-.kanon-run{position:absolute;inset:0;z-index:8;overflow:hidden;pointer-events:none;opacity:0;mix-blend-mode:screen;
+.kanon-run{position:absolute;left:0;right:0;top:2.38%;bottom:2.38%;z-index:8;overflow:hidden;pointer-events:none;opacity:0;mix-blend-mode:screen;
   -webkit-mask:url('art/ui/frame-kanon-edge.webp') center/100% 100% no-repeat;mask:url('art/ui/frame-kanon-edge.webp') center/100% 100% no-repeat;}
 .kanon-run i{position:absolute;left:50%;top:50%;width:190%;aspect-ratio:1;transform:translate(-50%,-50%);
   background:conic-gradient(from 0deg,rgba(255,0,40,0) 0 66%,rgba(255,40,60,.85) 82%,#fff 87%,rgba(255,60,70,.9) 91%,rgba(255,0,40,0) 100%);}
-.card.kanon .cost{filter:hue-rotate(150deg) saturate(1.5) brightness(1.08);}
-.card.kanon .name{color:#ffe2a8;text-shadow:0 0 .45em rgba(255,100,30,.95),0 1px 0 #000;}
-.card.kanon .txt{color:#ffeccc;}
-.card.kanon .art.has-art::after{content:"";position:absolute;inset:0;pointer-events:none;border-radius:inherit;box-shadow:inset 0 0 1.2em rgba(255,80,20,.55);}
-.kanon-ribbon{position:absolute;z-index:7;left:50%;top:-.55em;transform:translateX(-50%);white-space:nowrap;font-style:normal;font-family:var(--body);font-weight:900;
-  font-size:.42em;letter-spacing:.08em;text-transform:uppercase;color:#2a0600;padding:.25em .85em;border-radius:1em;
-  background:linear-gradient(90deg,#ff5a1f,#ffd27a 50%,#ff5a1f);box-shadow:0 0 .7em rgba(255,90,30,.9),0 .15em .3em rgba(0,0,0,.6);}
-.card.big .kanon-ribbon{font-size:.32em;}
-.kanon-ribbon b{font-weight:900;} .kanon-ribbon span{display:none;}
-.card:not(.big) .kanon-ribbon{left:58%;font-size:.5em;top:-.45em;} .card:not(.big) .kanon-ribbon b{display:none;} .card:not(.big) .kanon-ribbon span{display:inline;}
-.card.foil .kanon-ribbon,.card.foil:not(.big) .kanon-ribbon{top:.5em;z-index:8;}
-@media (prefers-reduced-motion:reduce){.card.kanon{animation:none!important;}}
-.kanon-hero{position:absolute;z-index:6;right:12.5%;top:13.5%;width:22%;aspect-ratio:1;border-radius:50%;background:hsl(var(--h) 45% 32%) center/cover no-repeat;
+/* hős-portré a jobb felső sarokban: ki használhatja */
+.kanon-hero{position:absolute;z-index:6;right:calc(var(--wr) + 2.5%);top:calc(var(--wt) + 2%);width:22%;aspect-ratio:1;border-radius:50%;background:hsl(var(--h) 45% 32%) center/cover no-repeat;
   display:grid;place-items:center;font-style:normal;font-weight:900;color:#fff;font-size:.5em;
   box-shadow:0 0 0 .09em #ffd27a,0 0 0 .17em #7a1405,0 0 .55em .1em rgba(255,90,30,.85),0 .15em .35em rgba(0,0,0,.7);}
 .card:not(.big) .kanon-hero{width:28%;}
-.card.foil .kanon-hero{right:5%;top:5%;}
-.card.big .kanon-hero{width:19%;right:12.5%;top:13.5%;}
-
-.card.kanon .ctype-below{color:#ff8a4c;}
-.card:not(.big) .kanon-ribbon{left:50%;}
+.card.big .kanon-hero{width:19%;}
+/* Arany hős: új arany keret (a régi teljes képes arany helyett) */
+.card.xf-gold{--xframe:url('art/ui/sm/frame-gold2.webp');--wl:11.6%;--wr:11.4%;--wt:11.6%;--wh:63.6%;--pl:12%;--pr:12%;--pt:76.5%;--ph:14%;
+  animation:goldGlowF 2.6s ease-in-out infinite;filter:drop-shadow(0 0 .35em rgba(255,200,60,.6)) drop-shadow(0 .2em .35em rgba(0,0,0,.6));}
+.card.xf-gold.big{--xframe:url('art/ui/frame-gold2.webp');}
+@keyframes goldGlowF{50%{filter:drop-shadow(0 0 .7em rgba(255,210,80,.9)) drop-shadow(0 .2em .35em rgba(0,0,0,.6));}}
+.card.xf-gold .name{color:#ffe9a8;text-shadow:0 0 .35em rgba(255,190,40,.9),0 .06em .2em #000;}
+.card.xf-gold .ctype{color:#ffe07a;}
+.card.xf-gold .cframe::before,.card.xf-gold .cframe::after{left:var(--wl);right:var(--wr);top:var(--wt);height:var(--wh);inset:auto;}
+.card.framed.xf-gold.big .name{height:calc(var(--ph)*.52);top:calc(var(--pt) + var(--ph)*.02);}
+.card.framed.xf-gold.big .ctype{top:calc(var(--pt) + var(--ph)*.52);height:calc(var(--ph)*.24);}
+.card.framed.xf-gold.big .txt{background:linear-gradient(transparent,rgba(20,12,0,.9) 38%)!important;color:#fff3cf;}
+/* ===== Interakciós keretek (a lap fölé tett fényréteg; nem fogja a kattintást, nem takarja az értékeket) =====
+   Elsőbbség: célpont → kijelölt → kijátszható; egyszerre csak egy látszik. */
+.hand .card.ok,.hand .card.ok:not(:first-child){box-shadow:-.35em 0 .6em rgba(0,0,0,.75),0 .3em .8em rgba(0,0,0,.45);}
+.hand .card.sel{box-shadow:0 10px 22px rgba(0,0,0,.6);}
+.hand .card.ok::after,.hand .card.sel::after,.cell.tgt .unit::after,.cell.picked .unit::after,.cell.tgt:not(:has(.unit))::after,.cell.picked:not(:has(.unit))::after{
+  content:"";position:absolute;left:-6%;right:-6%;top:-6%;bottom:-6%;z-index:2;pointer-events:none;background:center/100% auto no-repeat;}
+.hand .card.ok::after{background-image:url('art/ui/sm/ov-play.webp');animation:ovPulse 1.8s ease-in-out infinite;}
+.hand .card.sel::after{background-image:url('art/ui/sm/ov-sel.webp');animation:none;}
+.cell.picked .unit::after,.cell.picked:not(:has(.unit))::after{background-image:url('art/ui/sm/ov-sel.webp');}
+.cell.tgt .unit::after,.cell.tgt:not(:has(.unit))::after{background-image:url('art/ui/sm/ov-tgt.webp');animation:ovPulse 1.1s ease-in-out infinite;}
+.cell.tgt:not(:has(.unit))::after,.cell.picked:not(:has(.unit))::after{left:50%;top:50%;right:auto;bottom:auto;transform:translate(-50%,-50%);
+  height:calc(min(calc(100cqh - 8px),172px,calc((100cqw - 10px)*1.4))*1.12);aspect-ratio:5/7;}
+.cell.tgt .unit{box-shadow:none;}
+.cell.tgt{border-color:rgba(255,80,80,.55);background:rgba(255,60,60,.08);}
+.cell.picked{outline:0;box-shadow:none;}
+@keyframes ovPulse{50%{opacity:.62;}}
+.sr-only{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0;}
+@media (prefers-reduced-motion:reduce){.hand .card.ok::after,.cell.tgt .unit::after,.cell.tgt:not(:has(.unit))::after{animation:none!important;}}
+/* ===== Állapotjelzők: képes táblák (a feliratot a kép tartalmazza) + borostyán számláló a bénulás köreire ===== */
+.tags{flex-wrap:wrap;row-gap:1px;align-items:center;}
+.tags .stb{flex:0 0 96%;display:block;aspect-ratio:240/59;background:center/contain no-repeat;filter:drop-shadow(0 1px 2px rgba(0,0,0,.7));}
+.tags .stb.rest{background-image:url('art/ui/st-rest.webp');}
+.tags .stb.hid{background-image:url('art/ui/st-hid.webp');aspect-ratio:240/65;}
+.unit.sleep .art{filter:brightness(.82) saturate(.85);}
+.tags .zz.stun{flex:1;}
+.stc{flex:0 0 auto;width:24px;height:24px;display:grid;place-items:center;margin:-4px -2px -4px 1px;background:url('art/ui/st-count.webp') center/contain no-repeat;
+  filter:drop-shadow(0 1px 2px rgba(0,0,0,.7));}
+.stc b{font-family:var(--display);font-weight:400;font-size:12px;line-height:1;color:#fff4d6;text-shadow:0 1px 0 #000,0 0 4px rgba(0,0,0,.9);}
+/* ===== HUD: energia-panel és húzópakli-jelvény (mindkét játékosnál ugyanaz) ===== */
+.en.hudm{display:block;position:relative;width:88px;height:28px;gap:0;background:url('art/ui/hud-mana.webp') center/contain no-repeat;filter:drop-shadow(0 1px 3px rgba(0,0,0,.6));}
+.en.hudm b{position:absolute;left:30%;right:7%;top:22%;bottom:24%;display:grid;place-items:center;font-family:var(--display);font-weight:400;font-size:15px;line-height:1;
+  color:#d6ecff;text-shadow:0 0 6px rgba(80,160,255,.8),0 1px 0 #000;font-variant-numeric:tabular-nums;}
+.deckpile{width:46px;height:46px;margin:0 2px 0 2px;}
+.deckpile i{inset:0;border:0;border-radius:0;box-shadow:none;background:url('art/ui/hud-deck.webp') center/contain no-repeat!important;filter:drop-shadow(0 1px 3px rgba(0,0,0,.6));}
+.deckpile b{left:50%;top:67.6%;bottom:auto;transform:translate(-50%,-50%);min-width:0;padding:0;border:0!important;border-radius:0;background:none!important;
+  font-family:var(--display);font-weight:400;font-size:14px;line-height:1;color:#fff;text-shadow:0 1px 0 #000,0 0 5px rgba(0,0,0,.9);}
+.deckpile.low i{filter:drop-shadow(0 0 4px rgba(255,93,108,.9)) saturate(.8);}
+.deckpile.low b{color:#ffb3bb;}
+.deckpile.empty i{background:url('art/ui/hud-deck.webp') center/contain no-repeat!important;border:0;filter:grayscale(1) brightness(.6) drop-shadow(0 0 4px rgba(255,93,108,.9));}
+.deckpile.empty b{color:#ff8a95;}
+@media (max-height:760px){.deckpile{width:40px;height:40px;} .en.hudm{width:80px;height:25px;} .en.hudm b{font-size:13px;}}
+.coll-slot.missing .card.xf,.coll-slot.missing .card.xf.big{animation:none!important;filter:grayscale(1) brightness(.45)!important;}
+@media (prefers-reduced-motion:reduce){.card.xf-kanon,.card.xf-gold,.card.kholo .art::before{animation:none!important;}}
 .var-ribbon{position:absolute;z-index:7;left:50%;top:-.55em;transform:translateX(-50%);white-space:nowrap;font-style:normal;font-family:var(--body);font-weight:900;
   font-size:.42em;letter-spacing:.08em;text-transform:uppercase;color:#062a1c;padding:.25em .8em;border-radius:1em;
   background:linear-gradient(90deg,#7dffc4,#e6ffb0 50%,#7dffc4);background-size:200% 100%;animation:varShine 3s linear infinite;box-shadow:0 0 .6em rgba(80,255,170,.8),0 .15em .3em rgba(0,0,0,.6);}

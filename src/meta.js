@@ -1003,7 +1003,7 @@ const tutHand = id => { const i = S.players[ME].hand.findIndex(c => c.id === id)
 const TUT_STEPS = [
   { turn: 1, kind: 'info', at: () => null, txt: '<b>Üdv a Best of Us-ban!</b> Ez egy gyakorló meccs: lépésről lépésre megmutatom, hogyan kell játszani. Te vagy lent (Tomi), fent az ellenfél (Dávid).' },
   { turn: 1, kind: 'info', at: () => $('#eBar .hpbar'), txt: 'Ez az ellenfél hősének élete: <b>12</b>. Az nyer, aki előbb <b>nullára viszi az ellenfél hősét</b>.' },
-  { turn: 1, kind: 'info', at: () => $('#pBar .en'), txt: 'Ezek a kék gyémántok az <b>energiád</b>. Most 1 van, és <b>minden körben eggyel több</b> lesz (legfeljebb 6). Ebből fizeted a lapokat.' },
+  { turn: 1, kind: 'info', at: () => $('#pBar .en'), txt: 'Ez a kék kristály és a mellette lévő szám az <b>energiád</b>: most 1/1. <b>Minden körben eggyel több</b> lesz (legfeljebb 6). Ebből fizeted a lapokat.' },
   { turn: 1, kind: 'play', card: 'c_pifti', t: { k:'slot', side: 'me', i: 1 }, at: () => ui.sel != null ? cellEl(ME, 1) : tutHand('c_pifti'),
     txt: '<b>Húzd fel Piftit a kiemelt helyre!</b> A lap bal felső sarkában lévő szám az ára: 1 energia. (Ha csak rákoppintasz, nagyban megnézheted.)' },
   { turn: 1, kind: 'info', at: () => unitAt(ME, 1), txt: 'Pifti a táblán van. Az újonnan lerakott karakter <b>egy kört pihen</b>, a következő körödtől támad. <b>Fontos:</b> a karaktereidet nem kell irányítanod – <b>minden köröd végén maguktól támadnak</b>!' },
