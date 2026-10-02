@@ -68,6 +68,17 @@ html = f'''<!doctype html>
 </body>
 </html>
 '''
+# Képek verziózása: minden art/... hivatkozás kap egy ?v=<tartalom-hash> végződést, így ha egy kép tartalma
+# megváltozik (ugyanazzal a fájlnévvel), a telefon nem a régi, gyorsítótárazott képet mutatja.
+def _vh(rel):
+    fp = os.path.join(DIST, rel)
+    return hashlib.sha1(open(fp, 'rb').read()).hexdigest()[:8] if os.path.isfile(fp) else None
+def _ver(m):
+    rel = m.group(0); h = _vh(rel)
+    if not h: return rel
+    sm = rel.replace('art/', 'art/sm/', 1); hs = _vh(sm)   # a kis változatot az app a nagy útvonalából képzi
+    return f'{rel}?v={h}{hs or ""}'
+html = re.sub(r'art/[\w/.-]+\.webp(?![?\w])', _ver, html)
 open(os.path.join(DIST, 'index.html'), 'w', encoding='utf-8').write(html)
 
 # 3) manifest, service worker, verzió, Cloudflare fejlécek
