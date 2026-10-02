@@ -26,6 +26,7 @@ const CARDS = [
   { id:'c_norbi', type:'char', name:'Lukács Norbi', cost:3, atk:2, hp:3, rarity:'r', text:'Ha mellette áll egy másik karaktered, +2 támadást kap.' },
   { id:'c_udvarhelyi', type:'char', name:'Udvarhelyi Zoli', cost:6, atk:5, hp:5, rarity:'k', text:'' },
   { id:'c_molnar', type:'char', name:'Molnár Zsolti', cost:5, atk:2, hp:4, rarity:'r', deathKill:true, text:'Amikor meghal, elpusztít egy véletlen ellenséges karaktert.' },
+  { id:'c_barnaelet', type:'char', name:'Barna, az életunt', cost:2, atk:1, hp:2, rarity:'r', sneak:true, deathDraw:true, text:'Amikor meghal, húzol egy lapot.' },
   { id:'c_zana', type:'char', name:'Zana', cost:4, atk:3, hp:3, rarity:'e', text:'Körönként kétszer támad.' },
   { id:'c_ati', type:'char', name:'Ati', cost:4, atk:8, hp:4, rarity:'e', muscle:true, text:'Csak akkor támad, ha nincs más karaktered a táblán.' },
   { id:'c_veghtomi', type:'char', name:'Végh Tomi', cost:4, atk:3, hp:5, rarity:'k', taunt:true, text:'Amíg él, az ellenfél karakterei mindig őt támadják, bárhol áll.' },
@@ -558,6 +559,7 @@ function cleanup(s) {
           p.board[i] = null; ev(s, { t:'death', side, i, id:u.id });
           bury(s, side, u.id, 'death'); buryItems(s, side, u);
           if (u.items.includes('i_kabala')) draw(s, side);
+          if (CARD[u.id].deathDraw) draw(s, side);   // Barna, az életunt
           const vsBaszo = s.baszoHit === other(side);   // Baszó ütésére meghalt lap nem vághat vissza neki
           if (has(p, 'deathPing') && u.id !== 'c_korso' && !CARD[u.id].fixed && !vsBaszo) damageHero(s, other(side), 1);
           if (CARD[u.id].deathBlast && vsBaszo) ev(s, { t:'nocounter', side, i });

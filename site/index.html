@@ -1697,7 +1697,7 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%;}
 <script src="vendor/firebase-auth-compat.js"></script>
 <script src="vendor/firebase-firestore-compat.js"></script>
 <script src="vendor/firebase-database-compat.js"></script>
-<script>window.APP_VERSION = "2026.10.02-2245";</script>
+<script>window.APP_VERSION = "2026.10.02-2258";</script>
 <script>// ===== Best of Us – saját szerver (Firebase) =====
 // A játék eredetileg a Claude-os tárolót használta (window.claude.use('db' | 'user' | 'room')).
 // Ez a fájl ugyanazt a felületet adja Firebase-ből, így a játék kódja szinte változatlan maradhat:
@@ -1969,6 +1969,7 @@ const CARDS = [
   { id:'c_norbi', type:'char', name:'Lukács Norbi', cost:3, atk:2, hp:3, rarity:'r', text:'Ha mellette áll egy másik karaktered, +2 támadást kap.' },
   { id:'c_udvarhelyi', type:'char', name:'Udvarhelyi Zoli', cost:6, atk:5, hp:5, rarity:'k', text:'' },
   { id:'c_molnar', type:'char', name:'Molnár Zsolti', cost:5, atk:2, hp:4, rarity:'r', deathKill:true, text:'Amikor meghal, elpusztít egy véletlen ellenséges karaktert.' },
+  { id:'c_barnaelet', type:'char', name:'Barna, az életunt', cost:2, atk:1, hp:2, rarity:'r', sneak:true, deathDraw:true, text:'Amikor meghal, húzol egy lapot.' },
   { id:'c_zana', type:'char', name:'Zana', cost:4, atk:3, hp:3, rarity:'e', text:'Körönként kétszer támad.' },
   { id:'c_ati', type:'char', name:'Ati', cost:4, atk:8, hp:4, rarity:'e', muscle:true, text:'Csak akkor támad, ha nincs más karaktered a táblán.' },
   { id:'c_veghtomi', type:'char', name:'Végh Tomi', cost:4, atk:3, hp:5, rarity:'k', taunt:true, text:'Amíg él, az ellenfél karakterei mindig őt támadják, bárhol áll.' },
@@ -2501,6 +2502,7 @@ function cleanup(s) {
           p.board[i] = null; ev(s, { t:'death', side, i, id:u.id });
           bury(s, side, u.id, 'death'); buryItems(s, side, u);
           if (u.items.includes('i_kabala')) draw(s, side);
+          if (CARD[u.id].deathDraw) draw(s, side);   // Barna, az életunt
           const vsBaszo = s.baszoHit === other(side);   // Baszó ütésére meghalt lap nem vághat vissza neki
           if (has(p, 'deathPing') && u.id !== 'c_korso' && !CARD[u.id].fixed && !vsBaszo) damageHero(s, other(side), 1);
           if (CARD[u.id].deathBlast && vsBaszo) ev(s, { t:'nocounter', side, i });
@@ -2881,6 +2883,7 @@ const ART = {
   c_veghtomi: { src:'art/veghtomi.webp?v=0451d256bc710dfc', pos:'45% 15%' },
   c_zana:   { src:'art/zana.webp?v=a8927918f048de29', pos:'38% 20%' },
   c_norbi:  { src:'art/norbi.webp?v=740db1e1acf15673', pos:'42% 18%' },
+  c_barnaelet: { src:'art/barnaelet.webp?v=3a8e3fa5ae680a86', av:'54% 26%', pos:'54% 26%' },
   f_bender: { src:'art/f_bender.webp?v=a0c0508cdfb14425', av:'55% 40%', pos:'55% 34%' },   // Kánon esemény lapok
   f_egyutt: { src:'art/f_egyutt.webp?v=e806f019dc60fb56', av:'50% 28%', pos:'50% 26%' },
   f_jbl:    { src:'art/f_jbl.webp?v=14de013635bd9edf', av:'40% 30%', pos:'38% 34%' },
@@ -4002,7 +4005,7 @@ function starterCollection() {
   return coll;
 }
 // Később bekerült gyakori lapok: a meglévő profilok is megkapják (gv = kiosztási verzió)
-const STARTER_ADDS = { 2: ['a_delfin', 'i_varazsho', 'i_lepke'], 3: ['a_rehab'], 4: ['c_pp'], 5: ['c_nfc'], 6: ['a_cheddar'], 7: ['c_vajda', 'c_veghtomi'], 8: ['c_kovacs'], 9: ['a_kitiltva'], 10: ['a_haver'], 11: PLAYABLE.filter(c => c.rarity === 'r' && !c.variantOf).map(c => c.id), 12: ['c_sasimeselo'], 13: ['c_norbi'], 14: ['c_udvarhelyi'], 15: ['c_molnar'], 16: CARDS.filter(c => c.finisher).map(c => c.id) };   // 16: mindenki megkapja mind a 9 Kánon esemény lapot   // 12: Laci új kezdőpaklijához   // 11: minden ritka lapból 1 (a kezdőpaklikhoz)
+const STARTER_ADDS = { 2: ['a_delfin', 'i_varazsho', 'i_lepke'], 3: ['a_rehab'], 4: ['c_pp'], 5: ['c_nfc'], 6: ['a_cheddar'], 7: ['c_vajda', 'c_veghtomi'], 8: ['c_kovacs'], 9: ['a_kitiltva'], 10: ['a_haver'], 11: PLAYABLE.filter(c => c.rarity === 'r' && !c.variantOf).map(c => c.id), 12: ['c_sasimeselo'], 13: ['c_norbi'], 14: ['c_udvarhelyi'], 15: ['c_molnar'], 16: CARDS.filter(c => c.finisher).map(c => c.id), 17: ['c_barnaelet'] };   // 16: mindenki megkapja mind a 9 Kánon esemény lapot   // 12: Laci új kezdőpaklijához   // 11: minden ritka lapból 1 (a kezdőpaklikhoz)
 const GRANT_V = Math.max(1, ...Object.keys(STARTER_ADDS).map(Number));
 // Ajándékok: minden profil egyszer kapja meg (a meglévők a következő megnyitáskor, az újak létrehozáskor)
 const GIFTS = [{ id: 'g-2026-09-28', packs: 1 }, { id: 'g-2026-09-28b', packs: 5 },
