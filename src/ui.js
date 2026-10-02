@@ -483,6 +483,7 @@ async function animateEvents(evs) {
       case 'heroatk': break;   // a lendülést a baszoAnim már lejátszotta
       case 'chomp': await chompFx(e); break;
       case 'swim': floatAt(anchor, '🦈 ←', 'info'); hold = Math.max(hold, 350); break;
+      case 'jblwave': await jblWaveFx(e); break;
       case 'sharkgone': floatAt(anchor, '🦈 Elúszott…', 'info'); hold = Math.max(hold, 600); break;
       case 'drinkgift': floatAt(anchor, e.side === ME ? `🍸 ${CARD[e.id].name} a kezedbe!` : '🍸 Ital a kezébe!', 'info'); hold = Math.max(hold, 700); break;
       case 'deathblast': floatAt(anchor, '💥 Utolsó ütés!', 'dmg'); hold = Math.max(hold, 450); break;
@@ -611,6 +612,19 @@ async function baszoAnim(pi) {
   const back = fly.animate([{ transform: `translate(${dx * .82}px,${dy * .82}px) scale(1.25) rotate(6deg)` }, { transform: 'none' }], { duration: 420, easing: 'cubic-bezier(.2,.8,.3,1)', fill: 'forwards' });
   await Promise.all([runFx(() => baszoStrike(S)), back.finished]);
   fly.remove(); const p2 = barEl(pi)?.querySelector('.hport'); if (p2) p2.style.visibility = '';
+}
+// JBL hangfal: hanghullám söpör végig az ellenfél oldalán (a sebzéseket utána a megszokott módon mutatjuk)
+async function jblWaveFx(e) {
+  const from = cellEl(e.side, e.i); if (!from) return;
+  const r = from.getBoundingClientRect(), x = r.left + r.width / 2, y = r.top + r.height / 2;
+  fx(unitAt(e.side, e.i), 'fx-buff'); floatAt(from, '🔊 BASSZUS!', 'info');
+  for (let k = 0; k < 3; k++) {
+    const w = document.createElement('div'); w.className = 'jbl-wave'; w.style.left = x + 'px'; w.style.top = y + 'px';
+    $('#layer').appendChild(w);
+    w.animate([{ transform: 'translate(-50%,-50%) scale(.2)', opacity: .95 }, { transform: 'translate(-50%,-50%) scale(9)', opacity: 0 }], { duration: 750, delay: k * 140, easing: 'ease-out', fill: 'forwards' }).finished.then(() => w.remove());
+  }
+  fx($('#app'), 'fx-quake');
+  await sleep(420);
 }
 // Cápa: odaúszik a célponthoz, és összecsapódó állkapoccsal megeszi
 async function chompFx(e) {

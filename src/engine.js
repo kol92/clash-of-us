@@ -79,7 +79,7 @@ const CARDS = [
   // --- Kánon esemény lapok: hősönként egy, csak annak a hősnek a paklijába. off = még nincs grafika, sehol nem látszik ---
   { id:'f_bender', type:'action', name:'Bender', cost:6, rarity:'l', finisher:true, hero:'bence', tgt:'summon', text:'Minden szabad helyedre egy Árnyékember (1/1) kerül. Minden hiányzó hely után mindegyik +1/+1-et kap (pl. 2 szabad hely: két 3/3-as).' },
   { id:'f_egyutt', type:'action', name:'Együtt sírtok, együtt nevettek', cost:6, rarity:'l', finisher:true, hero:'gabi', tgt:'summon', text:'Megidéz egy Gyerek Zanát (5/5, Lendület) és egy Gyerek Gabit (5/5, Izom).' },
-  { id:'f_jbl', type:'action', name:'JBL', cost:6, rarity:'l', finisher:true, hero:'laci', tgt:'ownSlot', text:'Lerakod a JBL hangfalat (0/6). Amíg él, az ellenfél két szélső helye zárva van, és legfeljebb 2 karaktere lehet. Ha kijátszáskor 2-nél több karaktere van, a szélső helyeken állók elpusztulnak.' },
+  { id:'f_jbl', type:'action', name:'JBL', cost:6, rarity:'l', finisher:true, hero:'laci', tgt:'ownSlot', text:'Lerakod a JBL hangfalat (0/4). A köröd végén 1 sebzést okoz minden ellenséges karakternek és az ellenfél hősének. Amíg él, az ellenfél két szélső helye zárva van, és legfeljebb 2 karaktere lehet. Ha kijátszáskor 2-nél több karaktere van, a szélső helyeken állók elpusztulnak.' },
   { id:'f_metamorf', type:'action', name:'Metamorfózis', cost:6, rarity:'l', finisher:true, hero:'krisz', text:'Krisz Baszóvá változik, és 12 élete lesz. Baszó minden köröd végén a karaktereid után 3-at üt: mindig a legbalra álló ellenséges karaktert, ha nincs ilyen, az ellenfél hősét. Neki nem lehet visszaütni.' },
   { id:'f_atok', type:'action', name:'Az összetartás átka', cost:6, rarity:'l', finisher:true, hero:'tomi', tgt:'grave', text:'Két véletlen karakter visszatér a temetődből a pályára, az eredeti értékeinél +2/+2-vel.' },
   { id:'f_munkahely', type:'action', name:'A munkahely', cost:6, rarity:'l', finisher:true, hero:'david', text:'Kijátssza a Munkahely helyszínt: a te lapjaid 1-gyel olcsóbbak, az ellenfélé 1-gyel drágábbak. Ha a Munkahely eltűnik, Dávid 5 életet gyógyul.' },
@@ -90,7 +90,7 @@ const CARDS = [
   { id:'c_arnyek', type:'char', name:'Árnyékember', cost:0, atk:1, hp:1, rarity:'k', token:true, text:'Csak a Bender idézheti meg.' },
   { id:'c_gyzana', type:'char', name:'Gyerek Zana', cost:0, atk:5, hp:5, rarity:'l', token:true, haste:true, text:'Csak az Együtt sírtok, együtt nevettek idézheti meg.' },
   { id:'c_gygabi', type:'char', name:'Gyerek Gabi', cost:0, atk:5, hp:5, rarity:'l', token:true, muscle:true, text:'Csak az Együtt sírtok, együtt nevettek idézheti meg.' },
-  { id:'c_jbl', type:'char', name:'JBL hangfal', cost:0, atk:0, hp:6, rarity:'l', token:true, noAttack:true, text:'Nem támad. Amíg él, az ellenfél két szélső helye zárva van, és legfeljebb 2 karaktere lehet.' },
+  { id:'c_jbl', type:'char', name:'JBL hangfal', cost:0, atk:0, hp:4, rarity:'l', token:true, noAttack:true, text:'Nem támad. A gazdája körének végén 1 sebzés minden ellenséges karakternek és az ellenfél hősének. Amíg él, az ellenfél két szélső helye zárva, és legfeljebb 2 karaktere lehet.' },
   { id:'c_capa', type:'char', name:'Cápa', cost:0, atk:9, hp:9, rarity:'l', token:true, noAttack:true, fixed:true, text:'Nem támad, de visszaüt. Gazdája körének elején egy hellyel balra úszik, és megeszi, aki ott áll. A bal szélre érve elpusztul.' },
   { id:'l_munkahely', type:'loc', name:'Munkahely', cost:0, rarity:'l', token:true, text:'A gazdája lapjai 1-gyel olcsóbbak, az ellenfeléi 1-gyel drágábbak. Ha eltűnik, a gazdája 5 életet gyógyul.' },
   { id:'l_korhaz', type:'loc', name:'Siófoki Kórház', cost:1, rarity:'k', text:'Minden karakter 1 életet gyógyul a gazdája körének végén.' },
@@ -132,23 +132,23 @@ const graveChars = p => p.grave.filter(g => CARD[g.id] && CARD[g.id].type === 'c
 
 const DECKS = {
   roham: { name:'Rohamcsapat', hero:'barna', desc:'Olcsó, gyors karakterek és vodka az arcba. Kovács Bence halála is fáj, Barna minden körben felpörgeti az első emberét.',
-    list:{ c_pifti:2, c_gyuri:2, c_kovacs:2, c_zoli:2, c_tzs:1, c_talos:1, c_rebi:1, c_sasi:1, a_dinnyes:2, i_napszemuveg:1, a_cheddar:2, i_lepke:1, i_buffalo:1, i_varazsho:1 } },
+    list:{ c_pifti:2, c_gyuri:2, c_kovacs:2, c_zoli:2, c_tzs:1, c_talos:1, c_rebi:1, c_sasi:1, a_dinnyes:2, i_napszemuveg:1, a_cheddar:2, i_lepke:1, i_buffalo:1, f_capa:1 } },
   ejszaka: { name:'Éjszakai műszak', hero:'gabi', desc:'Falak és gyógyítás: Végh Tomi és a Bunda provokál, Gabi közben mindenkit foltoz. Húzd el a meccset, a végén nyersz.',
-    list:{ c_veghtomi:1, c_vajda:1, c_gyuri:2, c_pifti:2, c_boros:1, c_fogel:1, c_vera:1, c_rebi:1, i_borkabat:1, a_rehab:1, a_mangos:1, a_abszint:1, l_korhaz:1, a_cheddar:2, a_dinnyes:1, i_bunda:1, a_delfin:1 } },
+    list:{ c_veghtomi:1, c_vajda:1, c_gyuri:2, c_pifti:2, c_boros:1, c_fogel:1, c_vera:1, c_rebi:1, i_borkabat:1, a_rehab:1, a_mangos:1, a_abszint:1, l_korhaz:1, a_cheddar:2, a_dinnyes:1, i_bunda:1, f_egyutt:1 } },
   vodka: { name:'Vodkás est', hero:'krisz', desc:'Italos pakli: minden pohár erősíti Milót, Laczkó Tomi közben tölti a kezed, Kristóf hozza a következő kört. Krisz az első két lapját olcsóbban rakja le – gyors kezdés.',
-    list:{ c_miloivo:1, c_laczko:1, c_kristof:1, c_pp:2, c_gyuri:2, c_vajda:2, a_dinnyes:2, a_cheddar:2, a_rehab:2, a_abszint:1, a_mangos:1, i_vodkakancso:1, i_energiaital:1, c_rebi:1 } },
+    list:{ c_miloivo:1, c_laczko:1, c_kristof:1, c_pp:2, c_gyuri:2, c_vajda:2, a_dinnyes:2, a_cheddar:1, f_metamorf:1, a_rehab:2, a_abszint:1, a_mangos:1, i_vodkakancso:1, i_energiaital:1, c_rebi:1 } },
   felszereles: { name:'Felszerelés', hero:'tomi', desc:'Minden karakterre jut valami: napszemüveg, bunda, vodkás kancsó – Tomi eszközei plusz életet adnak, és körönként az első olcsóbb.',
-    list:{ c_pifti:2, c_gyuri:2, c_talos:1, c_rebi:1, c_sasi:1, i_napszemuveg:2, i_kabala:2, i_borkabat:1, i_vodkakancso:1, i_buffalo:1, i_lepke:1, a_cheddar:1, i_varazsho:1, i_bunda:1, a_delfin:1, c_vajda:1 } },
+    list:{ c_pifti:2, c_gyuri:2, c_talos:1, c_rebi:1, c_sasi:1, i_napszemuveg:2, i_kabala:2, i_borkabat:1, i_vodkakancso:1, i_buffalo:1, i_lepke:1, a_cheddar:1, f_atok:1, i_bunda:1, a_delfin:1, c_vajda:1 } },
   kocsmatura: { name:'Kocsmatúra', hero:'david', desc:'Helyszínről helyszínre: Dávid törzsvendég, minden kocsma neki kedvez – a Budapest Park csak az ellenfelet drágítja. Ha kell, a Ki vagy tiltva! bezárja az ellenfél kocsmáját.',
-    list:{ c_pifti:1, c_gyuri:2, c_vajda:2, c_veghtomi:2, l_akacfa:1, l_barhole:1, l_korhaz:1, l_park:1, a_kitiltva:1, a_dinnyes:2, a_abszint:1, c_boros:1, c_rebi:1, c_sasi:1, c_zsibrita:1, c_kristof:1 } },
+    list:{ f_munkahely:1, c_gyuri:2, c_vajda:2, c_veghtomi:2, l_akacfa:1, l_barhole:1, l_korhaz:1, l_park:1, a_kitiltva:1, a_dinnyes:2, a_abszint:1, c_boros:1, c_rebi:1, c_sasi:1, c_zsibrita:1, c_kristof:1 } },
   mindentbele: { name:'Mindent bele', hero:'bence', desc:'Bence 24 élete elbírja: Delfin póz, Varázshó és TZS önsebzése ide bátran jöhet, a Gyros Tál új kezet hoz.',
-    list:{ c_tzs:1, c_zoli:2, c_gyuri:2, c_kovacs:2, c_vajda:2, c_sasi:1, a_delfin:1, a_dinnyes:2, a_gyros:1, a_abszint:1, i_buffalo:1, c_veghtomi:1, a_cheddar:1, i_napszemuveg:1, c_pifti:1 } },
+    list:{ c_tzs:1, c_zoli:2, c_gyuri:2, c_kovacs:2, c_vajda:2, c_sasi:1, f_bender:1, a_dinnyes:2, a_gyros:1, a_abszint:1, i_buffalo:1, c_veghtomi:1, a_cheddar:1, i_napszemuveg:1, c_pifti:1 } },
   kamikaze: { name:'Kamikaze', hero:'milo', desc:'Olcsó karakterek, akik szívesen kiesnek: Milo minden halálért megsebzi az ellenfelet, Kovács Bence még utoljára odacsap.',
-    list:{ c_kovacs:2, c_pifti:2, c_zoli:2, c_tzs:1, c_pp:2, c_gyuri:2, c_talos:1, c_rebi:1, i_kabala:2, l_morisson:1, a_dinnyes:2, i_varazsho:1, a_cheddar:1 } },
+    list:{ c_kovacs:2, c_pifti:2, c_zoli:2, c_tzs:1, c_pp:2, c_gyuri:2, c_talos:1, c_rebi:1, i_kabala:2, l_morisson:1, a_dinnyes:2, f_gepuzem:1, a_cheddar:1 } },
   hosszu: { name:'Hosszú éjszaka', hero:'laci', desc:'Védekezz, bénítsd le az ellenfelet, gyógyíts – Laci extra lapjai és a falak a végére elhúznak.',
-    list:{ c_veghtomi:1, c_vajda:2, c_gyuri:2, c_fogel:1, c_vera:1, c_rebi:1, c_boros:1, a_abszint:1, a_mangos:1, a_rehab:1, a_dinnyes:1, i_buffalo:1, i_bunda:1, a_kitiltva:1, a_cheddar:1, c_sasimeselo:1, l_korhaz:1, a_delfin:1 } },
+    list:{ c_veghtomi:1, c_vajda:2, c_gyuri:2, c_fogel:1, c_vera:1, c_rebi:1, c_boros:1, a_abszint:1, a_mangos:1, a_rehab:1, a_dinnyes:1, i_buffalo:1, i_bunda:1, a_kitiltva:1, a_cheddar:1, c_sasimeselo:1, l_korhaz:1, f_jbl:1 } },
   banda: { name:'A banda', hero:'sasi', desc:'Minél többen vagytok lent, annál jobb: Sasi minden körben odacsap, Zsibrita és a haverok utat nyitnak.',
-    list:{ c_pp:2, c_pifti:2, c_gyuri:2, c_kovacs:2, c_vajda:2, c_talos:1, c_rebi:1, c_zsibrita:1, c_fogel:1, i_napszemuveg:2, l_korhaz:1, a_dinnyes:2, c_veghtomi:1 } },
+    list:{ c_pp:2, c_pifti:1, f_gluten:1, c_gyuri:2, c_kovacs:2, c_vajda:2, c_talos:1, c_rebi:1, c_zsibrita:1, c_fogel:1, i_napszemuveg:2, l_korhaz:1, a_dinnyes:2, c_veghtomi:1 } },
 };
 const DECK_OF = hid => Object.keys(DECKS).find(k => DECKS[k].hero === hid);
 
@@ -671,6 +671,13 @@ function sharkSwim(s, pi) {
 function finishTurn(s) {
   const pi = s.active, p = s.players[pi];
   baszoStrike(s);
+  // JBL hangfal: a gazdája körének végén 1 sebzés minden ellenséges karakternek és az ellenfél hősének (hangfalanként)
+  p.board.forEach((u, i) => {
+    if (!u || u.id !== 'c_jbl' || s.winner != null) return;
+    const ei = other(pi); ev(s, { t:'jblwave', side:pi, i });
+    s.players[ei].board.forEach((x, j) => { if (x) { reveal(s, ei, j); damageUnit(s, ei, j, 1); } });
+    damageHero(s, ei, 1); cleanup(s);
+  });
   p.locked = false;   // az Adios Motherfucker! bénítása a megbénított játékos körének végén jár le
   if (s.winner == null && has(p, 'endHeal')) {
     let best = -1, gap = 0;
