@@ -1464,9 +1464,9 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%;}
    Elsőbbség: célpont → kijelölt → kijátszható; egyszerre csak egy látszik. */
 .hand .card.ok,.hand .card.ok:not(:first-child){box-shadow:-.35em 0 .6em rgba(0,0,0,.75),0 .3em .8em rgba(0,0,0,.45);}
 .hand .card.sel{box-shadow:0 10px 22px rgba(0,0,0,.6);}
-.hand .card.ok::after,.hand .card.sel::after,.cell.tgt .unit::after,.cell.picked .unit::after,.cell.tgt:not(:has(.unit))::after,.cell.picked:not(:has(.unit))::after{
+.hand .card.sel::after,.cell.tgt .unit::after,.cell.picked .unit::after,.cell.tgt:not(:has(.unit))::after,.cell.picked:not(:has(.unit))::after{
   content:"";position:absolute;left:-6%;right:-6%;top:-6%;bottom:-6%;z-index:2;pointer-events:none;background:center/100% auto no-repeat;}
-.hand .card.ok::after{background-image:url('art/ui/sm/ov-play.webp');animation:ovPulse 1.8s ease-in-out infinite;}
+/* a zöld „kijátszható” keret (ov-play.webp) kivéve: zajos volt; a nem kijátszható lapok úgyis halványak. A kép megvan későbbre. */
 .hand .card.sel::after{background-image:url('art/ui/sm/ov-sel.webp');animation:none;}
 .cell.picked .unit::after,.cell.picked:not(:has(.unit))::after{background-image:url('art/ui/sm/ov-sel.webp');}
 .cell.tgt .unit::after,.cell.tgt:not(:has(.unit))::after{background-image:url('art/ui/sm/ov-tgt.webp');animation:ovPulse 1.1s ease-in-out infinite;}
@@ -1477,7 +1477,7 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%;}
 .cell.picked{outline:0;box-shadow:none;}
 @keyframes ovPulse{50%{opacity:.62;}}
 .sr-only{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0;}
-@media (prefers-reduced-motion:reduce){.hand .card.ok::after,.cell.tgt .unit::after,.cell.tgt:not(:has(.unit))::after{animation:none!important;}}
+@media (prefers-reduced-motion:reduce){.cell.tgt .unit::after,.cell.tgt:not(:has(.unit))::after{animation:none!important;}}
 /* ===== Állapotjelzők: képes táblák (a feliratot a kép tartalmazza) + borostyán számláló a bénulás köreire ===== */
 .tags{flex-wrap:wrap;row-gap:1px;align-items:center;}
 .tags .stb{flex:0 0 96%;display:block;aspect-ratio:240/59;background:center/contain no-repeat;filter:drop-shadow(0 1px 2px rgba(0,0,0,.7));}
@@ -1685,7 +1685,7 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%;}
 <script src="vendor/firebase-auth-compat.js"></script>
 <script src="vendor/firebase-firestore-compat.js"></script>
 <script src="vendor/firebase-database-compat.js"></script>
-<script>window.APP_VERSION = "2026.10.02-2117";</script>
+<script>window.APP_VERSION = "2026.10.02-2123";</script>
 <script>// ===== Best of Us – saját szerver (Firebase) =====
 // A játék eredetileg a Claude-os tárolót használta (window.claude.use('db' | 'user' | 'room')).
 // Ez a fájl ugyanazt a felületet adja Firebase-ből, így a játék kódja szinte változatlan maradhat:
