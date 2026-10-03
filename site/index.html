@@ -460,6 +460,7 @@ h1,h2,h3{font-family:var(--display);font-weight:400;letter-spacing:.01em;text-wr
 .zap-orb.steal{background:radial-gradient(circle,#fff 0 16%,#bfffd0 32%,#22c55e 56%,rgba(0,90,40,0) 72%);box-shadow:0 0 22px 8px rgba(40,200,110,.6);}
 .zap-boom{position:fixed;z-index:61;pointer-events:none;width:30px;height:30px;border-radius:50%;transform:translate(-50%,-50%);border:4px solid #ffb347;box-shadow:0 0 30px 10px rgba(255,140,40,.6);animation:zapBoom .6s ease-out forwards;}
 .zap-boom.kill{border-color:#b98cff;box-shadow:0 0 34px 12px rgba(140,60,255,.7);}
+.water-tip{font-size:14px;line-height:1.45;text-align:left;margin:4px 0 12px;}
 .zap-boom.party{border-color:#ff7ad9;box-shadow:0 0 34px 12px rgba(255,90,200,.65);}
 .played .party-to{max-width:min(300px,82vw);text-align:center;font-size:14px;font-weight:800;line-height:1.35;background:rgba(0,0,0,.72);padding:7px 12px;border-radius:10px;border:1px solid rgba(255,122,217,.45);}
 .played .party-to b{color:#ffd36b;}
@@ -1741,6 +1742,7 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%;}
         <li>Lapot úgy játszol ki, hogy a kezedből a táblára húzod, amíg van rá energiád. Ha csak rákoppintasz egy lapra, nagyban megnézheted, mit csinál.</li>
         <li>Mindkét játékosnak 4 helye van a táblán a karaktereknek.</li>
         <li>A <b>Kör vége</b> gombbal a karaktereid balról jobbra támadnak.</li>
+        <li>Véletlen, ki kezd. A kezdő az első körében nem húz lapot. Aki másodikként jön, kap egy <b>Egy pohár víz</b> lapot: a 3. körétől kijátszhatja (0 energia), és abban a körben +1 energiája lesz. Ez egyenlíti ki a kezdés előnyét.</li>
       </ul>
       <h3>Támadás</h3>
       <p>Minden karakter a vele szemben álló ellenséges karaktert támadja, és mindketten sebeznek egymáson. Ha szemben üres a hely, a sebzés az ellenfél hősét éri. Az újonnan kijátszott karakter csak a következő körödben támad.</p>
@@ -1798,7 +1800,7 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%;}
 <script src="vendor/firebase-auth-compat.js"></script>
 <script src="vendor/firebase-firestore-compat.js"></script>
 <script src="vendor/firebase-database-compat.js"></script>
-<script>window.APP_VERSION = "2026.10.03-1803";</script>
+<script>window.APP_VERSION = "2026.10.03-1822";</script>
 <script>// ===== Best of Us – saját szerver (Firebase) =====
 // A játék eredetileg a Claude-os tárolót használta (window.claude.use('db' | 'user' | 'room')).
 // Ez a fájl ugyanazt a felületet adja Firebase-ből, így a játék kódja szinte változatlan maradhat:
@@ -2135,7 +2137,7 @@ const CARDS = [
   { id:'f_gluten', type:'action', name:'Gluténbomba', cost:6, rarity:'l', finisher:true, hero:'sasi', opts:['5 sebzés + 5 gyógyulás', '8 sebzés, de te is kapsz 8-at'], text:'Válassz: 5 sebzés az ellenfél hősének és 5 életet gyógyulsz, vagy 8 sebzés az ellenfél hősének, de te is kapsz 8-at.' },
   // a kánon események által hozott, nem gyűjthető lapok
   // a második játékos kiegyenlítő lapja (nem gyűjthető): az első körében kapja
-  { id:'a_kor', type:'action', name:'Egy kört rám!', cost:0, rarity:'k', token:true, text:'Ebben a körben +1 energiád van. A 3. körödtől játszható ki. (A második játékos kapja, hogy kiegyenlítse a kezdés előnyét.)' },
+  { id:'a_kor', type:'action', name:'Egy pohár víz', cost:0, rarity:'k', token:true, text:'Ebben a körben +1 energiád van. A 3. körödtől játszható ki. Aki másodikként jön, megkapja, mert a kezdés előny.' },
   { id:'c_arnyek', type:'char', name:'Árnyékember', cost:0, atk:1, hp:1, rarity:'k', token:true, text:'Csak a Bender idézheti meg.' },
   { id:'c_gyzana', type:'char', name:'Gyerek Zana', cost:0, atk:3, hp:3, rarity:'l', token:true, haste:true, text:'Csak az Együtt sírtok, együtt nevettek idézheti meg.' },
   { id:'c_gygabi', type:'char', name:'Gyerek Gabi', cost:0, atk:3, hp:3, rarity:'l', token:true, muscle:true, text:'Csak az Együtt sírtok, együtt nevettek idézheti meg.' },
@@ -2358,7 +2360,7 @@ function whyNot(s, pi, hi) {
   const hc = CARD[h.id];
   if (hc.hero && s.players[pi].heroId !== hc.hero) return `Ezt csak ${HERO[hc.hero].name} játszhatja ki`;
   if (hc.id === 'f_metamorf' && s.players[pi].baszo) return 'Már Baszó vagy';
-  if (hc.id === 'a_kor' && s.players[pi].turns < 3) return 'Az Egy kört rám! a 3. körödtől játszható ki';
+  if (hc.id === 'a_kor' && s.players[pi].turns < 3) return 'Az Egy pohár víz a 3. körödtől játszható ki';
   if (cardCost(s, pi, h.id) > s.players[pi].energy) return 'Nincs elég energiád';
   if (!targetsFor(s, pi, h.id).length) {
     const c = CARD[h.id];
@@ -3031,6 +3033,7 @@ const ART = {
   c_veghtomi: { src:'art/veghtomi.webp?v=0451d256bc710dfc', pos:'45% 15%' },
   c_zana:   { src:'art/zana.webp?v=a8927918f048de29', pos:'38% 20%' },
   c_norbi:  { src:'art/norbi.webp?v=740db1e1acf15673', pos:'42% 18%' },
+  a_kor: { src:'art/viz.webp?v=a17ce0b241a73985', av:'50% 45%', pos:'50% 40%' },
   c_tomiparti: { src:'art/tomiparti.webp?v=b7bb907f03a864ac', av:'47% 26%', pos:'47% 24%' },
   c_amszterdam: { src:'art/amszterdam.webp?v=98c8109d815f01c2', av:'60% 22%', pos:'58% 24%' },
   c_barnaelet: { src:'art/barnaelet.webp?v=3a8e3fa5ae680a86', av:'54% 26%', pos:'54% 26%' },
@@ -3323,6 +3326,16 @@ async function partyFx(e) {
   }
   back.remove();
 }
+// Egy pohár víz: az első alkalommal elmagyarázzuk, miért kapta (profilonként egyszer)
+async function waterTip() {
+  Store.p.tips = { ...(Store.p.tips || {}), water: true }; save();
+  await sleep(500);
+  const o = document.createElement('div'); o.className = 'overlay';
+  o.innerHTML = `<div class="modal">${cardHTML('a_kor', { big: true })}<div class="live"><b>Miért kaptam egy pohár vizet?</b></div><p class="water-tip">Az ellenfeled kezdett, és aki kezd, annak előnye van: mindig egy körrel előrébb jár. Ezért aki másodikként jön, kap egy <b>Egy pohár víz</b> lapot.<br><br>💧 A <b>3. körödtől</b> bármikor kijátszhatod (0 energia), és abban a körben <b>+1 energiád</b> lesz – így egy drágább lapot is lerakhatsz, mint az ellenfél.</p><button class="btn primary">Értem</button></div>`;
+  $('#layer').appendChild(o);
+  await new Promise(r => { o.querySelector('.btn').onclick = r; });
+  o.remove();
+}
 let revealed = new Set();
 // kijátszás: előbb maga a lap jelenik meg (karakter leszáll a helyére, akció/eszköz/helyszín felvillan), csak utána jönnek a hatásai
 const preLanded = new Set();
@@ -3398,7 +3411,9 @@ async function animateEvents(evs) {
       case 'machine': fx(el, 'fx-heroheal'); fx($('#app'), 'fx-quake'); floatAt(anchor, '⚙️ GÉPÜZEMMÓD! Vissza 10 élettel', 'buff'); hold = Math.max(hold, 1200); break;
       case 'heroatk': break;   // a lendülést a baszoAnim már lejátszotta
       case 'chomp': await chompFx(e); break;
-      case 'coin': floatAt(anchor, e.side === ME ? '🍻 Második vagy: kaptál egy „Egy kört rám!” lapot' : '🍻 Az ellenfél kapott egy „Egy kört rám!” lapot', 'info'); hold = Math.max(hold, 900); break;
+      case 'coin': floatAt(anchor, e.side === ME ? '💧 Második vagy: kaptál egy pohár vizet' : '💧 Az ellenfél kapott egy pohár vizet', 'info'); hold = Math.max(hold, 900);
+        if (e.side === ME && !S.tut && Store.p && !Store.p.tips?.water) await waterTip();
+        break;
       case 'swim': floatAt(anchor, e.dir > 0 ? '🦈 →' : '🦈 ←', 'info'); hold = Math.max(hold, 350); break;
       case 'nocounter': floatAt(anchor, 'Baszót nem lehet visszaütni!', 'info'); hold = Math.max(hold, 500); break;
       case 'jblwave': await jblWaveFx(e); break;

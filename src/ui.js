@@ -162,6 +162,7 @@ const ART = {
   c_veghtomi: { src:'art/veghtomi.webp', pos:'45% 15%' },
   c_zana:   { src:'art/zana.webp', pos:'38% 20%' },
   c_norbi:  { src:'art/norbi.webp', pos:'42% 18%' },
+  a_kor: { src:'art/viz.webp', av:'50% 45%', pos:'50% 40%' },
   c_tomiparti: { src:'art/tomiparti.webp', av:'47% 26%', pos:'47% 24%' },
   c_amszterdam: { src:'art/amszterdam.webp', av:'60% 22%', pos:'58% 24%' },
   c_barnaelet: { src:'art/barnaelet.webp', av:'54% 26%', pos:'54% 26%' },
@@ -454,6 +455,16 @@ async function partyFx(e) {
   }
   back.remove();
 }
+// Egy pohár víz: az első alkalommal elmagyarázzuk, miért kapta (profilonként egyszer)
+async function waterTip() {
+  Store.p.tips = { ...(Store.p.tips || {}), water: true }; save();
+  await sleep(500);
+  const o = document.createElement('div'); o.className = 'overlay';
+  o.innerHTML = `<div class="modal">${cardHTML('a_kor', { big: true })}<div class="live"><b>Miért kaptam egy pohár vizet?</b></div><p class="water-tip">Az ellenfeled kezdett, és aki kezd, annak előnye van: mindig egy körrel előrébb jár. Ezért aki másodikként jön, kap egy <b>Egy pohár víz</b> lapot.<br><br>💧 A <b>3. körödtől</b> bármikor kijátszhatod (0 energia), és abban a körben <b>+1 energiád</b> lesz – így egy drágább lapot is lerakhatsz, mint az ellenfél.</p><button class="btn primary">Értem</button></div>`;
+  $('#layer').appendChild(o);
+  await new Promise(r => { o.querySelector('.btn').onclick = r; });
+  o.remove();
+}
 let revealed = new Set();
 // kijátszás: előbb maga a lap jelenik meg (karakter leszáll a helyére, akció/eszköz/helyszín felvillan), csak utána jönnek a hatásai
 const preLanded = new Set();
@@ -529,7 +540,9 @@ async function animateEvents(evs) {
       case 'machine': fx(el, 'fx-heroheal'); fx($('#app'), 'fx-quake'); floatAt(anchor, '⚙️ GÉPÜZEMMÓD! Vissza 10 élettel', 'buff'); hold = Math.max(hold, 1200); break;
       case 'heroatk': break;   // a lendülést a baszoAnim már lejátszotta
       case 'chomp': await chompFx(e); break;
-      case 'coin': floatAt(anchor, e.side === ME ? '🍻 Második vagy: kaptál egy „Egy kört rám!” lapot' : '🍻 Az ellenfél kapott egy „Egy kört rám!” lapot', 'info'); hold = Math.max(hold, 900); break;
+      case 'coin': floatAt(anchor, e.side === ME ? '💧 Második vagy: kaptál egy pohár vizet' : '💧 Az ellenfél kapott egy pohár vizet', 'info'); hold = Math.max(hold, 900);
+        if (e.side === ME && !S.tut && Store.p && !Store.p.tips?.water) await waterTip();
+        break;
       case 'swim': floatAt(anchor, e.dir > 0 ? '🦈 →' : '🦈 ←', 'info'); hold = Math.max(hold, 350); break;
       case 'nocounter': floatAt(anchor, 'Baszót nem lehet visszaütni!', 'info'); hold = Math.max(hold, 500); break;
       case 'jblwave': await jblWaveFx(e); break;

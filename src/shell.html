@@ -445,6 +445,7 @@ h1,h2,h3{font-family:var(--display);font-weight:400;letter-spacing:.01em;text-wr
 .zap-orb.steal{background:radial-gradient(circle,#fff 0 16%,#bfffd0 32%,#22c55e 56%,rgba(0,90,40,0) 72%);box-shadow:0 0 22px 8px rgba(40,200,110,.6);}
 .zap-boom{position:fixed;z-index:61;pointer-events:none;width:30px;height:30px;border-radius:50%;transform:translate(-50%,-50%);border:4px solid #ffb347;box-shadow:0 0 30px 10px rgba(255,140,40,.6);animation:zapBoom .6s ease-out forwards;}
 .zap-boom.kill{border-color:#b98cff;box-shadow:0 0 34px 12px rgba(140,60,255,.7);}
+.water-tip{font-size:14px;line-height:1.45;text-align:left;margin:4px 0 12px;}
 .zap-boom.party{border-color:#ff7ad9;box-shadow:0 0 34px 12px rgba(255,90,200,.65);}
 .played .party-to{max-width:min(300px,82vw);text-align:center;font-size:14px;font-weight:800;line-height:1.35;background:rgba(0,0,0,.72);padding:7px 12px;border-radius:10px;border:1px solid rgba(255,122,217,.45);}
 .played .party-to b{color:#ffd36b;}
@@ -1723,6 +1724,7 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%;}
         <li>Lapot úgy játszol ki, hogy a kezedből a táblára húzod, amíg van rá energiád. Ha csak rákoppintasz egy lapra, nagyban megnézheted, mit csinál.</li>
         <li>Mindkét játékosnak 4 helye van a táblán a karaktereknek.</li>
         <li>A <b>Kör vége</b> gombbal a karaktereid balról jobbra támadnak.</li>
+        <li>Véletlen, ki kezd. A kezdő az első körében nem húz lapot. Aki másodikként jön, kap egy <b>Egy pohár víz</b> lapot: a 3. körétől kijátszhatja (0 energia), és abban a körben +1 energiája lesz. Ez egyenlíti ki a kezdés előnyét.</li>
       </ul>
       <h3>Támadás</h3>
       <p>Minden karakter a vele szemben álló ellenséges karaktert támadja, és mindketten sebeznek egymáson. Ha szemben üres a hely, a sebzés az ellenfél hősét éri. Az újonnan kijátszott karakter csak a következő körödben támad.</p>
