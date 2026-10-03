@@ -24,6 +24,7 @@ const CARDS = [
   { id:'c_vajda', type:'char', name:'Vajda Peti', cost:3, atk:3, hp:4, rarity:'k', text:'' },
   { id:'c_tomiparti', type:'char', name:'Tomi, a parti lelke', cost:5, atk:4, hp:4, rarity:'e', text:'Kijátszáskor egy véletlen ellenséges karakterre rányom egy véletlen Ital lapot. Lehet, hogy jól jár vele, lehet, hogy nem!' },
   { id:'c_kriszrantott', type:'char', name:'Krisz, a rántott húsok ura', cost:6, atk:4, hp:5, rarity:'e', text:'Kijátszáskor a kezedbe ad egy Rántott hús lapot.' },
+  { id:'c_lacifinale', type:'char', name:'Laci, La Grand Finale', cost:6, atk:5, hp:2, rarity:'l', muscle:true, deathGift:'i_ing', text:'Amikor meghal, a kezedbe kerül a Grand Finale ing.' },
   { id:'c_alekosz', type:'char', name:'Alekosz Tibi', cost:4, atk:2, hp:2, rarity:'e', text:'Kijátszáskor ellop egy véletlen ellenséges karaktert, és maga mellé teszi (ha van mellette üres hely).' },
   { id:'c_norbi', type:'char', name:'Lukács Norbi', cost:3, atk:2, hp:3, rarity:'r', text:'Ha mellette áll egy másik karaktered, +2 támadást kap.' },
   { id:'c_udvarhelyi', type:'char', name:'Udvarhelyi Zoli', cost:6, atk:5, hp:5, rarity:'k', text:'' },
@@ -92,6 +93,7 @@ const CARDS = [
   { id:'f_gluten', type:'action', name:'Gluténbomba', cost:6, rarity:'l', finisher:true, hero:'sasi', opts:['5 sebzés + 5 gyógyulás', '8 sebzés, de te is kapsz 8-at'], text:'Válassz: 5 sebzés az ellenfél hősének és 5 életet gyógyulsz, vagy 8 sebzés az ellenfél hősének, de te is kapsz 8-at.' },
   // a kánon események által hozott, nem gyűjthető lapok
   // a második játékos kiegyenlítő lapja (nem gyűjthető): az első körében kapja
+  { id:'i_ing', type:'item', name:'Grand Finale ing', cost:2, atk:3, hp:3, rarity:'l', token:true, muscle:true, text:'' },
   { id:'a_rantott', type:'action', name:'Rántott hús', cost:0, tgt:'ownOrHero', rarity:'k', token:true, text:'Egy saját karaktered vagy a hősöd 3 életet gyógyul.' },
   { id:'a_kor', type:'action', name:'Egy pohár víz', cost:0, rarity:'k', token:true, text:'Ebben a körben +1 energiád van. A 3. körödtől játszható ki. Aki másodikként jön, megkapja, mert a kezdés előny.' },
   { id:'c_arnyek', type:'char', name:'Árnyékember', cost:0, atk:1, hp:1, rarity:'k', token:true, text:'Csak a Bender idézheti meg.' },
@@ -612,6 +614,7 @@ function cleanup(s) {
           if (u.items.includes('i_kabala')) draw(s, side);
           if (CARD[u.id].deathDraw) draw(s, side);   // Barna, az életunt
           if (CARD[u.id].deathHeal) healHero(s, side, CARD[u.id].deathHeal);   // Bence, Amszterdam hőse
+          if (CARD[u.id].deathGift) { ev(s, { t:'gift', side, i, id:CARD[u.id].deathGift }); addToHand(s, side, CARD[u.id].deathGift); }   // Laci, La Grand Finale: az ing a kézbe
           const vsBaszo = s.baszoHit === other(side);   // Baszó ütésére meghalt lap nem vághat vissza neki
           if (has(p, 'deathPing') && u.id !== 'c_korso' && !CARD[u.id].fixed && !vsBaszo) damageHero(s, other(side), 1);
           if (CARD[u.id].deathBlast && vsBaszo) ev(s, { t:'nocounter', side, i });

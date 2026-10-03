@@ -163,6 +163,8 @@ const ART = {
   c_zana:   { src:'art/zana.webp', pos:'38% 20%' },
   c_norbi:  { src:'art/norbi.webp', pos:'42% 18%' },
   a_kor: { src:'art/viz.webp', av:'50% 45%', pos:'50% 40%' },
+  c_lacifinale: { src:'art/lacifinale.webp', av:'48% 16%', pos:'48% 16%' },
+  i_ing: { src:'art/ing.webp', av:'50% 40%', pos:'50% 35%' },
   c_kriszrantott: { src:'art/kriszrantott.webp', av:'58% 22%', pos:'56% 22%' },
   a_rantott: { src:'art/rantott.webp', av:'45% 40%', pos:'50% 38%' },
   c_tomiparti: { src:'art/tomiparti.webp', av:'47% 26%', pos:'47% 24%' },
@@ -549,7 +551,7 @@ async function animateEvents(evs) {
       case 'nocounter': floatAt(anchor, 'Baszót nem lehet visszaütni!', 'info'); hold = Math.max(hold, 500); break;
       case 'jblwave': await jblWaveFx(e); break;
       case 'sharkgone': floatAt(anchor, '🦈 Elúszott…', 'info'); hold = Math.max(hold, 600); break;
-      case 'gift': floatAt(anchor, e.side === ME ? `🍗 ${CARD[e.id].name} a kezedbe!` : `🍗 ${CARD[e.id].name} a kezébe!`, 'info'); hold = Math.max(hold, 700); break;
+      case 'gift': floatAt(anchor, `${e.id === 'i_ing' ? '👔' : '🍗'} ${CARD[e.id].name} a ${e.side === ME ? 'kezedbe' : 'kezébe'}!`, 'info'); hold = Math.max(hold, 700); break;
       case 'drinkgift': floatAt(anchor, e.side === ME ? `🍸 ${CARD[e.id].name} a kezedbe!` : '🍸 Ital a kezébe!', 'info'); hold = Math.max(hold, 700); break;
       case 'deathblast': floatAt(anchor, '💥 Utolsó ütés!', 'dmg'); hold = Math.max(hold, 450); break;
       case 'zap': await zapFx(e); break;
