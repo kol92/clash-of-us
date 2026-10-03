@@ -96,6 +96,7 @@ const CARDS = [
   // a második játékos kiegyenlítő lapja (nem gyűjthető): az első körében kapja
   { id:'i_ing', type:'item', name:'Grand Finale ing', cost:2, atk:3, hp:3, rarity:'l', token:true, muscle:true, text:'' },
   { id:'a_rantott', type:'action', name:'Rántott hús', cost:0, tgt:'ownOrHero', rarity:'k', token:true, text:'Egy saját karaktered vagy a hősöd 3 életet gyógyul.' },
+  { id:'a_szulinap', type:'action', name:'Boldog szülinapot Pifti!', cost:6, tgt:'summon', rarity:'r', text:'Három Piftit idéz a szabad helyeidre (ha kevesebb a hely, annyit).' },
   { id:'a_kor', type:'action', name:'Egy pohár víz', cost:0, rarity:'k', token:true, text:'Ebben a körben +1 energiád van. A 3. körödtől játszható ki. Aki másodikként jön, megkapja, mert a kezdés előny.' },
   { id:'c_arnyek', type:'char', name:'Árnyékember', cost:0, atk:1, hp:1, rarity:'k', token:true, text:'Csak a Bender idézheti meg.' },
   { id:'c_gyzana', type:'char', name:'Gyerek Zana', cost:0, atk:3, hp:3, rarity:'l', token:true, haste:true, text:'Csak az Együtt sírtok, együtt nevettek idézheti meg.' },
@@ -189,7 +190,8 @@ function makeUnit(s, id, owner) {
 
 function newGame(h0, d0, h1, d1, first, opt = {}) {
   const s = { players:[makePlayer(h0,d0), makePlayer(h1,d1)], active:first, half:0, location:null,
-              uidc:0, events:[], winner:null, reason:null };
+              uidc:0, events:[], winner:null, reason:null,
+              foilCnt: [0, 1].map(k => ({ ...((opt.foils || [])[k] || {}) })) };   // Full Art példányok száma lapfajtánként (az első húzott példányok csillognak)
   for (let k = 0; k < 4; k++) { draw(s, 0); draw(s, 1); }
   s.events = [];
   if (opt.mulligan) { s.phase = 'mulligan'; s.mulled = [false, false]; return s; }
@@ -202,8 +204,8 @@ function mulligan(s, pi, idxs) {
   const p = s.players[pi]; if (s.phase !== 'mulligan' || s.mulled[pi]) return;
   s.mulled[pi] = true;
   const out = idxs.slice().sort((a, b) => b - a).map(i => p.hand.splice(i, 1)[0]).filter(Boolean);
-  for (let k = 0; k < out.length; k++) { const id = p.deck.pop(); if (id) p.hand.push({ uid: ++s.uidc, id }); }
-  for (const c of out) p.deck.push(c.id);
+  for (let k = 0; k < out.length; k++) { const id = p.deck.pop(); if (id) p.hand.push(takeFoil(s, pi, id) ? { uid: ++s.uidc, id, foil:true } : { uid: ++s.uidc, id }); }
+  for (const c of out) { p.deck.push(c.id); if (c.foil && s.foilCnt) s.foilCnt[pi][c.id] = (s.foilCnt[pi][c.id] || 0) + 1; }
   shuffle(p.deck);
 }
 function botMulligan(s, pi) {   // a bot a drága (5+) lapokat és a második helyszínt cseréli
@@ -214,20 +216,22 @@ function botMulligan(s, pi) {   // a bot a drága (5+) lapokat és a második he
 function beginGame(s) { if (s.phase !== 'mulligan') return; s.phase = null; s.events = []; startTurn(s); }
 
 // Temető: minden elhasznált / elpusztult / elégett lap ide kerül, a gazdája oldalán
-function bury(s, side, id, how) { s.players[side].grave.push({ id, how, rnd: Math.ceil(s.half / 2) }); }
+function bury(s, side, id, how, foil) { s.players[side].grave.push({ id, how, rnd: Math.ceil(s.half / 2), ...(foil != null ? { foil: !!foil } : {}) }); }
+function takeFoil(s, pi, id) { const f = s.foilCnt && s.foilCnt[pi]; if (f && f[id] > 0) { f[id]--; return true; } return false; }
 function buryItems(s, side, u) {
   const foe = [...(u.foe || [])];
   for (const id of u.items) { const k = foe.indexOf(id); if (k >= 0) { foe.splice(k, 1); bury(s, other(side), id, 'item'); } else bury(s, side, id, 'item'); }
 }
-function addToHand(s, pi, id) {
+function addToHand(s, pi, id, foil) {
   const p = s.players[pi];
-  if (p.hand.length >= HAND_LIMIT) { ev(s, { t:'burn', side:pi, id }); bury(s, pi, id, 'burn'); return false; }
-  p.hand.push({ uid: ++s.uidc, id }); return true;
+  if (p.hand.length >= HAND_LIMIT) { ev(s, { t:'burn', side:pi, id }); bury(s, pi, id, 'burn', foil); return false; }
+  p.hand.push(foil ? { uid: ++s.uidc, id, foil:true } : { uid: ++s.uidc, id }); return true;
 }
 function draw(s, pi) {
   const p = s.players[pi];
   if (!p.deck.length) { p.fatigue++; ev(s, { t:'fatigue', side:pi, n:p.fatigue }); damageHero(s, pi, p.fatigue); return; }
-  if (addToHand(s, pi, p.deck.pop())) ev(s, { t:'draw', side:pi });
+  const id = p.deck.pop();
+  if (addToHand(s, pi, id, takeFoil(s, pi, id))) ev(s, { t:'draw', side:pi });
 }
 
 function startTurn(s) {
@@ -250,7 +254,7 @@ function cardCost(s, pi, id) {
   if (locIs(s, 'l_barhole')) v -= isReg(s, pi) ? 2 : 1;
   if (locIs(s, 'l_munkahely')) v += s.location.owner === pi ? -1 : 1;   // Dávid kánon eseménye
   if (c.type === 'item' && has(p, 'itemHp') && !p.itemThisTurn) v--;   // Tomi: körönként az első eszköz olcsóbb
-  if (has(p, 'firstTwo') && (p.played || 0) < 2) v--;   // Krisz: a meccs első két lapja olcsóbb
+  if (has(p, 'firstTwo') && c.cost > 0 && (p.cheap || 0) < 2) v--;   // Krisz: a meccs első két (nem 0 költségű) lapja olcsóbb
   return Math.max(0, v);
 }
 
@@ -340,14 +344,15 @@ function playCard(s, pi, hi, t) {
   const p = s.players[pi], ei = other(pi), e = s.players[ei];
   const h = p.hand[hi], c = CARD[h.id];
   p.energy -= cardCost(s, pi, h.id); p.played = (p.played || 0) + 1;
+  if (has(p, 'firstTwo') && c.cost > 0 && (p.cheap || 0) < 2) p.cheap = (p.cheap || 0) + 1;
   p.hand.splice(hi, 1);
-  ev(s, { t:'play', side:pi, id:c.id, at: c.type === 'char' && t && t.k === 'slot' ? t.i : null, o: t && t.o != null ? t.o : undefined });
+  ev(s, { t:'play', side:pi, id:c.id, foil:!!h.foil, at: c.type === 'char' && t && t.k === 'slot' ? t.i : null, o: t && t.o != null ? t.o : undefined });
   if (c.drink) {   // Italos szinergiák: Milo, az örökivó erősödik, Laczkó Tomi húzat (körönként egyszer)
     p.board.forEach((x, j) => { if (x && x.id === 'c_miloivo') { x.atk += 1; ev(s, { t:'buff', side:pi, i:j, n:1 }); } });
     if (!p.drinkDraw && p.board.some(x => x && x.id === 'c_laczko')) { p.drinkDraw = true; const j = p.board.findIndex(x => x && x.id === 'c_laczko'); ev(s, { t:'drinkdraw', side:pi, i:j }); draw(s, pi); }
   }
   if (c.type === 'char') {
-    const u = makeUnit(s, c.id, pi);
+    const u = makeUnit(s, c.id, pi); if (h.foil) u.foil = true;
     p.board[t.i] = u; p.lastPlaced = u.uid;   // a Cápa erre vadászik
     if (has(p, 'firstCharAtk') && !p.charThisTurn && c.id !== 'c_korso' && c.cost <= 2) { u.atk += 1; ev(s, { t:'buff', side:pi, i:t.i }); }
     p.charThisTurn = true;
@@ -390,7 +395,7 @@ function playCard(s, pi, hi, t) {
     }
     if (c.id === 'c_vera' && t.t2) {
       const x = e.board[t.t2.i];
-      if (x) { e.board[t.t2.i] = null; ev(s, { t:'bounce', side:ei, i:t.t2.i }); buryItems(s, ei, x); if (!CARD[x.id].token) addToHand(s, ei, x.id); }
+      if (x) { e.board[t.t2.i] = null; ev(s, { t:'bounce', side:ei, i:t.t2.i }); buryItems(s, ei, x); if (!CARD[x.id].token) addToHand(s, ei, x.id, x.foil); }
     }
   } else if (c.type === 'item' && c.tgt === 'enemy') {
     p.itemThisTurn = true;
@@ -409,7 +414,7 @@ function playCard(s, pi, hi, t) {
     if (c.selfDmg) damageHero(s, pi, c.selfDmg);
   } else if (c.type === 'loc') {
     dropLocation(s, 'loc');
-    s.location = { id:c.id, owner:pi };
+    s.location = { id:c.id, owner:pi, foil:!!h.foil };
   } else {
     switch (c.id) {
       case 'a_dinnyes': if (t.k === 'hero') damageHero(s, ei, 3); else damageUnit(s, ei, t.i, 3); break;
@@ -483,6 +488,9 @@ function playCard(s, pi, hi, t) {
         break;
       case 'a_tubi': if (t.k === 'hero') damageHero(s, ei, 6); else damageUnit(s, ei, t.i, 6); damageHero(s, pi, 3); break;
       // ===== Kánon események =====
+      case 'a_szulinap':   // három Pifti a szabad helyekre
+        openSlots(s, pi).slice(0, 3).forEach(j => { p.board[j] = makeUnit(s, 'c_pifti', pi); ev(s, { t:'summon', side:pi, i:j, id:'c_pifti' }); });
+        break;
       case 'f_bender': {   // minden szabad helyre Árnyékember; minél kevesebb a hely, annál erősebbek
         const sl = openSlots(s, pi), b = LANES - sl.length;
         sl.forEach(j => { const u = makeUnit(s, 'c_arnyek', pi); u.atk += b; u.hp += b; u.maxHp += b; p.board[j] = u; ev(s, { t:'summon', side:pi, i:j, id:'c_arnyek' }); });
@@ -527,7 +535,7 @@ function playCard(s, pi, hi, t) {
         else { damageHero(s, ei, 5); if (s.winner == null) healHero(s, pi, 5); }
         break;
     }
-    bury(s, pi, c.id, 'action');
+    bury(s, pi, c.id, 'action', !!h.foil);
   }
   cleanup(s); checkWin(s);
 }
@@ -567,7 +575,7 @@ const PARTY_FX = { i_energiaital:'+2 támadás', i_akuma:'+5 támadás, de a kö
 
 function dropLocation(s, how) {   // a pályán lévő helyszín eltűnik (lecserélik vagy kitiltják)
   const L = s.location; if (!L) return;
-  if (!CARD[L.id].token) bury(s, L.owner, L.id, how);
+  if (!CARD[L.id].token) bury(s, L.owner, L.id, how, L.foil);
   s.location = null;
   if (L.id === 'l_munkahely') healHero(s, L.owner, 5);   // Dávid kánon eseménye: ha elpusztul a munkahely, 5 életet gyógyul
 }
@@ -611,7 +619,7 @@ function cleanup(s) {
         if (u && u.hp <= 0) {
           any = true;
           p.board[i] = null; ev(s, { t:'death', side, i, id:u.id });
-          bury(s, side, u.id, 'death'); buryItems(s, side, u);
+          bury(s, side, u.id, 'death', !!u.foil); buryItems(s, side, u);
           if (u.items.includes('i_kabala')) draw(s, side);
           if (CARD[u.id].deathDraw) draw(s, side);   // Barna, az életunt
           if (CARD[u.id].deathHeal) healHero(s, side, CARD[u.id].deathHeal);   // Bence, Amszterdam hőse

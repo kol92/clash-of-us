@@ -163,6 +163,7 @@ const ART = {
   c_zana:   { src:'art/zana.webp', pos:'38% 20%' },
   c_norbi:  { src:'art/norbi.webp', pos:'42% 18%' },
   a_kor: { src:'art/viz.webp', av:'50% 45%', pos:'50% 40%' },
+  a_szulinap: { src:'art/szulinap.webp', av:'50% 40%', pos:'50% 42%' },
   c_davidsofor: { src:'art/davidsofor.webp', av:'35% 20%', pos:'35% 20%' },
   c_lacifinale: { src:'art/lacifinale.webp', av:'48% 16%', pos:'48% 16%' },
   i_ing: { src:'art/ing.webp', av:'50% 40%', pos:'50% 35%' },
@@ -337,13 +338,13 @@ function openGrave(pi) {
   const o = document.createElement('div'); o.className = 'overlay';
   o.innerHTML = `<div class="modal grave-modal"><h3>${who}</h3>
     ${g.length ? `<p class="live">Legfrissebb elöl · koppints egy lapra a részletekért</p><div class="grave-grid">${g.map((x, k) =>
-      `<button class="gslot" data-g="${k}">${cardHTML(x.id, { foil: foilOf(pi, x.id) })}<small><b>${x.rnd}. kör</b>${GRAVE_HOW[x.how]}</small></button>`).join('')}</div>`
+      `<button class="gslot" data-g="${k}">${cardHTML(x.id, { foil: x.foil ?? foilOf(pi, x.id) })}<small><b>${x.rnd}. kör</b>${GRAVE_HOW[x.how]}</small></button>`).join('')}</div>`
       : '<p class="live">Még üres. Ide kerülnek a kijátszott akciók, az elpusztult karakterek és eszközeik, a lecserélt helyszínek és az elégett lapok.</p>'}
     <div class="close-hint">Koppints mellé a bezáráshoz</div></div>`;
   const t0 = performance.now();
   o.onclick = e => {
     const b = e.target.closest('[data-g]');
-    if (b) { const x = g[+b.dataset.g]; openModal(cardHTML(x.id, { big: true, foil: foilOf(pi, x.id) }), `${pi === ME ? 'Tőled' : 'Az ellenféltől'} · ${x.rnd}. kör · ${GRAVE_HOW[x.how]}`, cardHelpHTML(x.id)); return; }
+    if (b) { const x = g[+b.dataset.g]; openModal(cardHTML(x.id, { big: true, foil: x.foil ?? foilOf(pi, x.id) }), `${pi === ME ? 'Tőled' : 'Az ellenféltől'} · ${x.rnd}. kör · ${GRAVE_HOW[x.how]}`, cardHelpHTML(x.id)); return; }
     if (performance.now() - t0 > 350) o.remove();
   };
   $('#layer').appendChild(o);
@@ -362,6 +363,8 @@ function openModal(inner, live, help = '') {
 }
 // Full Art: a saját lapjaidnál a gyűjteményed dönt; PvP-ben az ellenfélnél az, amit a meccs elején magáról megosztott
 const longWord = n => Math.max(...n.split(/[\s\u00AD]+/).map(w => w.length));   // a leghosszabb szó (ezt nem lehet tördelni)
+// a pakliban lévő Full Art példányok száma lapfajtánként (meccs közben csak ennyi példány csillog)
+const myFoils = list => { const o = {}; for (const [id, n] of Object.entries(list || {})) { const f = Math.min(n, Store.p?.coll[id]?.f || 0); if (f > 0) o[id] = f; } return o; };
 const foilOf = (side, id) => side === ME ? ownsFoil(id) : !!(S && S.cos && S.cos[side] && S.cos[side].foils && S.cos[side].foils.includes(id));
 const heroGoldOf = side => !!S && (side === ME ? heroSkin(S.players[side].heroId) === 'gold' : !!(S.cos && S.cos[side] && S.cos[side].heroGold));
 const heroFaOf = side => side === ME ? heroSkin(S.players[side].heroId) === 'fa' : !!(S && S.cos && S.cos[side] && S.cos[side].heroFa);
@@ -485,7 +488,7 @@ async function playIntro(e, hasFx) {
     return;
   }
   if (e.side !== ME || !hasFx) return;   // az ellenfél lapját a nagy felfordítás már megmutatta
-  const o = document.createElement('div'); o.className = 'cast'; o.innerHTML = cardHTML(e.id, { foil: foilOf(ME, e.id) });
+  const o = document.createElement('div'); o.className = 'cast'; o.innerHTML = cardHTML(e.id, { foil: e.foil ?? foilOf(ME, e.id) });
   $('#layer').appendChild(o);
   await o.animate([{ transform: 'translate(-50%,-30%) scale(.55)', opacity: 0 }, { transform: 'translate(-50%,-50%) scale(1)', opacity: 1 }], { duration: 220, easing: 'cubic-bezier(.2,1.3,.4,1)' }).finished;
   await sleep(260);
@@ -612,7 +615,7 @@ async function finisherIntro(e) {
   const c = CARD[e.id], h = HERO[c.hero];
   const o = document.createElement('div'); o.className = 'fin-intro';
   const sub = c.opts && e.o != null ? c.opts[e.o] : h ? `${h.name} kánon eseménye` : '';
-  o.innerHTML = `<div class="fin-dark"></div><div class="fin-rays"></div><i class="fin-icon ic-kanon" aria-hidden="true"></i><div class="fin-card">${cardHTML(e.id, { big: true, foil: foilOf(e.side, e.id) })}</div>
+  o.innerHTML = `<div class="fin-dark"></div><div class="fin-rays"></div><i class="fin-icon ic-kanon" aria-hidden="true"></i><div class="fin-card">${cardHTML(e.id, { big: true, foil: e.foil ?? foilOf(e.side, e.id) })}</div>
     <div class="fin-title" role="status">${e.side === ME ? '' : '<i>Az ellenfél</i>'}<small>Kánon esemény</small><b>${c.name}</b><em>${sub}</em></div><div class="fin-flash"></div>`;
   $('#layer').appendChild(o);
   const dark = o.querySelector('.fin-dark'), rays = o.querySelector('.fin-rays'), card = o.querySelector('.fin-card'), title = o.querySelector('.fin-title'),
@@ -748,7 +751,7 @@ function unitHTML(u, side, i) {
     + (u.expire != null || u.doom ? '<span class="stb doom" role="img" aria-label="Eltűnik" title="Eltűnik: a köröd végén magától elpusztul"></span>' : '') + (u.stun ? `<span class="zz stun" aria-hidden="true">bénult</span><span class="stc" role="img" aria-label="Bénult még ${u.stun} körig" title="Bénult még ${u.stun} körig"><b>${u.stun}</b></span>` : '')
     + (u.hidden ? '<span class="stb hid" role="img" aria-label="Rejtve" title="Rejtve: az ellenfél nem látja"></span>' : '')
     + (c.taunt || u.taunt ? '<span class="stb taunt" role="img" aria-label="Provokál" title="Provokáció: mindenki őt támadja"></span>' : '');
-  const fa = CARD[u.id].foilOnly || foilOf(side, u.id);
+  const fa = CARD[u.id].foilOnly || !!u.foil;
   return `<button data-uid="${u.uid}" class="unit ${TYPE.char[1]}${fa ? ' fa' : ''}${u.shield ? ' shield' : ''}${sleeping ? ' sleep' : ''}" style="--h:${hueOf(u.id)}">
     <span class="uin">${ART[u.id] ? `<span class="art has-art" style="${artStyle(u.id)}"></span>` : `<span class="art"><span class="mono">${initials(c.name)}</span></span>`}<span class="uname${c.name.length > 14 ? ' long' : ''}${longWord(c.name) > 10 ? ' xl' : ''}">${c.name}</span></span>
     <span class="st atk${atk > c.atk ? ' up' : ''}">${atk}</span>
@@ -810,7 +813,7 @@ function render() {
   const h = $('#hand');
   if (!ui.drag) {
   setHTML(h, hand.length ? hand.map((c, i) => cardHTML(c.id, {
-    cost: cardCost(S, ME, c.id), foil: ownsFoil(c.id),
+    cost: cardCost(S, ME, c.id), foil: !!c.foil,
     cls: (ui.sel === i ? 'sel' : '') + (myTurn && canPlay(S, ME, i) ? ' ok' : myTurn ? ' dim' : ''),
     attrs: `data-hi="${i}" data-uid="${c.uid}" role="button" tabindex="0" aria-label="${CARD[c.id].name}${ui.sel === i ? ', kijelölve' : myTurn && canPlay(S, ME, i) ? ', kijátszható' : ''}"` })).join('') : '<span class="hand-empty">Üres a kezed</span>');
   const cw = parseFloat(getComputedStyle(h.querySelector('.card') || h).getPropertyValue('--cw')) || 82;
@@ -855,7 +858,7 @@ function openPreview(i, el) {
   if (ui.pend != null) { ui.sel = null; ui.pend = null; render(); }
   const why = whyNot(S, ME, i);
   const canDrag = !why && !busy && S.active === ME;
-  openModal(cardHTML(h.id, { big: true, foil: ownsFoil(h.id), cost: cardCost(S, ME, h.id), attrs: canDrag ? 'data-drag="1"' : '' }),
+  openModal(cardHTML(h.id, { big: true, foil: !!h.foil, cost: cardCost(S, ME, h.id), attrs: canDrag ? 'data-drag="1"' : '' }),
     why ? `${why}.` : 'Kijátszáshoz húzd fel ezt a lapot a táblára (vagy a kezedből).', cardHelpHTML(h.id));
   if (canDrag) {
     const ov = $('#layer').lastElementChild, big = ov.querySelector('.card');
@@ -920,7 +923,7 @@ $('#scr-game').addEventListener('click', e => {
     const gear = u.items.map(id => { const k = foe.indexOf(id), byFoe = k >= 0; if (byFoe) foe.splice(k, 1);
       const owner = byFoe ? 1 - side : side;
       return `<button class="gear-card" data-gear="${id}" data-own="${owner}">${cardHTML(id, { foil: foilOf(owner, id) })}<small>${owner === ME ? 'tőled' : 'az ellenféltől'}</small></button>`; }).join('');
-    openModal(cardHTML(u.id, { big: true, foil: foilOf(side, u.id) }), `Most: ${effAtk(S, side, +cell.dataset.i)} támadás, ${u.hp}/${u.maxHp} élet${u.shield ? ', Pajzs' : ''}${u.stun ? `, bénult még ${u.stun} körig` : ''}`,
+    openModal(cardHTML(u.id, { big: true, foil: CARD[u.id].foilOnly || !!u.foil }), `Most: ${effAtk(S, side, +cell.dataset.i)} támadás, ${u.hp}/${u.maxHp} élet${u.shield ? ', Pajzs' : ''}${u.stun ? `, bénult még ${u.stun} körig` : ''}`,
       (gear ? `<div class="gear-box"><div class="gear-lbl">Eszközök rajta (${u.items.length}) · koppints a részletekért</div><div class="gear-row">${gear}</div></div>` : '') + cardHelpHTML(u.id, u));
     const ov = $('#layer').lastElementChild;
     ov.querySelector('.gear-row')?.addEventListener('click', ev => { const g = ev.target.closest('[data-gear]'); if (!g) return; ev.stopPropagation();
@@ -928,7 +931,7 @@ $('#scr-game').addEventListener('click', e => {
   }
   const hb = e.target.closest('[data-hero]');
   if (hb) { const gp = heroGoldOf(+hb.dataset.hero); openModal(heroCardHTML(heroOf(+hb.dataset.hero), { big: true, foil: !S.players[+hb.dataset.hero].baszo && heroFaOf(+hb.dataset.hero), gold: gp && !S.players[+hb.dataset.hero].baszo }), (+hb.dataset.hero === ME ? 'A te hősöd' : 'Az ellenfél hőse') + (gp ? ' · ✦ Arany' : '')); }
-  if (e.target.closest('#loc') && S.location) openModal(cardHTML(S.location.id, { big: true, foil: foilOf(S.location.owner, S.location.id) }), `Kijátszotta: ${S.location.owner === ME ? 'te' : 'az ellenfél'}`, cardHelpHTML(S.location.id));
+  if (e.target.closest('#loc') && S.location) openModal(cardHTML(S.location.id, { big: true, foil: S.location.foil ?? foilOf(S.location.owner, S.location.id) }), `Kijátszotta: ${S.location.owner === ME ? 'te' : 'az ellenfél'}`, cardHelpHTML(S.location.id));
 });
 $('#hand').addEventListener('keydown', e => { if ((e.key === 'Enter' || e.key === ' ') && e.target.dataset.hi) { e.preventDefault(); e.target.click(); } });
 
@@ -1052,11 +1055,12 @@ function flyTarget(id, tg) {
   if (id === 'a_mangos') return $('#eBar');
   return null;
 }
-async function showPlayed(id, tg) {
+async function showPlayed(id, tg, foil) {
+  if (foil == null) foil = foilOf(BOT, id);
   if (CARD[id].finisher) return;   // a kánon eseménynek saját, nagy bevonulása van (playIntro)
   const secret = !!CARD[id].sneak;
   const back = document.createElement('div'); back.className = 'played';
-  back.innerHTML = `<div class="wrap"><span class="tag">${S.pvp ? escH(S.names?.[BOT] || 'Az ellenfél') : HERO[S.players[BOT].heroId].name} ${secret ? 'lerakott egy rejtett lapot' : 'kijátszotta'}</span><span class="flip rev"><span class="flip-in"><span class="face back"></span><span class="face front">${cardHTML(id, { big: true, foil: foilOf(BOT, id) })}</span></span></span>${foilOf(BOT, id) && !CARD[id].sneak ? '<span class="fa-flash">✨ Full Art ✨</span>' : ''}<span class="skip">Koppints a folytatáshoz</span></div>`;
+  back.innerHTML = `<div class="wrap"><span class="tag">${S.pvp ? escH(S.names?.[BOT] || 'Az ellenfél') : HERO[S.players[BOT].heroId].name} ${secret ? 'lerakott egy rejtett lapot' : 'kijátszotta'}</span><span class="flip rev"><span class="flip-in"><span class="face back"></span><span class="face front">${cardHTML(id, { big: true, foil })}</span></span></span>${foil && !CARD[id].sneak ? '<span class="fa-flash">✨ Full Art ✨</span>' : ''}<span class="skip">Koppints a folytatáshoz</span></div>`;
   $('#layer').appendChild(back);
   const wrap = back.querySelector('.wrap');
   const eb = $('#eBar').getBoundingClientRect(), wr = wrap.getBoundingClientRect();
@@ -1091,7 +1095,7 @@ async function botTurn() {
   const nextMove = () => { if (!plan) return botChoose(S); const m = plan.shift(); if (!m) return null;
     const hi = S.players[BOT].hand.findIndex(c => c.id === m[0]); return hi < 0 ? null : { hi, t: { ...m[1], side: BOT } }; };
   while (S.winner == null && (ch = nextMove())) {
-    await showPlayed(S.players[BOT].hand[ch.hi].id, ch.t);
+    await showPlayed(S.players[BOT].hand[ch.hi].id, ch.t, !!S.players[BOT].hand[ch.hi].foil);
     await runFx(() => playCard(S, BOT, ch.hi, ch.t));
     await sleep(350);
   }
@@ -1160,7 +1164,7 @@ function startMatch(heroId, deckId) {
   const bd = DECK_OF(bh) || Object.keys(DECKS)[0];   // a bot a saját hősének kezdőpaklijával játszik
   const first = Math.random() < .5 ? ME : BOT;
   const mine = (allDecks().find(d => d.id === deckId) || allDecks()[0]).list;
-  S = newGame(heroId, { ...mine }, bh, bd, first, { mulligan: true }); S.events = [];
+  S = newGame(heroId, { ...mine }, bh, bd, first, { mulligan: true, foils: [0, 1].map(k => k === ME ? myFoils(mine) : {}) }); S.events = [];
   ui.sel = null; busy = true; ui.handSeen = null; ui.botHandN = null; ui.flying = new Set(); show('scr-game');
   $('#layer').innerHTML = ''; render();
   setTimeout(() => showMulligan(first), 250 + S.players[ME].hand.length * 150 + 450);
@@ -1171,7 +1175,7 @@ function showMulligan(first) {
   const hand = S.players[ME].hand, pick = new Set();
   const o = document.createElement('div'); o.className = 'overlay mull';
   const look = id => `<span class="mull-look" data-look="${id}" role="button" aria-label="Megnézem">🔍 Megnézem</span>`;
-  const cardsHTML = () => hand.map((c, i) => `<div class="mull-slot"><button class="mull-c${pick.has(i) ? ' swap' : ''}" data-mi="${i}" data-uid="${c.uid}">${cardHTML(c.id, { foil: ownsFoil(c.id) })}<span class="mull-x">Csere</span></button>${look(c.id)}</div>`).join('');
+  const cardsHTML = () => hand.map((c, i) => `<div class="mull-slot"><button class="mull-c${pick.has(i) ? ' swap' : ''}" data-mi="${i}" data-uid="${c.uid}">${cardHTML(c.id, { foil: !!c.foil })}<span class="mull-x">Csere</span></button>${look(c.id)}</div>`).join('');
   o.innerHTML = `<div class="mull-box">
       <h2>Kezdő kéz</h2>
       <p>${first === ME ? '<b>Te kezdesz.</b>' : '<b>Az ellenfél kezd.</b>'}<br>Koppints azokra a lapokra, amiket visszakevernél a pakliba – helyettük újakat húzol (csak egyszer lehet). A <b>🔍 Megnézem</b> gombbal nagyban látod, mit csinál a lap.</p>
@@ -1199,7 +1203,7 @@ function showMulligan(first) {
       [...pick].sort((a, b) => a - b).forEach((i, k) => {
         const c = fresh[k]; if (!c) return;
         const el = els[i]; el.getAnimations().forEach(a => a.cancel()); el.classList.remove('swap'); el.classList.add('fresh'); const lk = el.parentElement.querySelector('.mull-look'); if (lk) lk.dataset.look = c.id;
-        el.innerHTML = `<span class="mull-flip"><span class="mf-back"></span><span class="mf-front">${cardHTML(c.id, { foil: ownsFoil(c.id) })}</span></span><span class="mull-new">Új</span>`;
+        el.innerHTML = `<span class="mull-flip"><span class="mf-back"></span><span class="mf-front">${cardHTML(c.id, { foil: !!c.foil })}</span></span><span class="mull-new">Új</span>`;
         el.animate([{ opacity: 0, transform: 'translateY(-40px)' }, { opacity: 1, transform: 'none' }], { duration: 260, delay: k * 120, fill: 'backwards' });
         el.querySelector('.mull-flip').animate([{ transform: 'rotateY(180deg)' }, { transform: 'rotateY(0deg)' }], { duration: 480, delay: 260 + k * 120, easing: 'ease-out', fill: 'backwards' });
       });

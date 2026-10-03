@@ -20,7 +20,7 @@ function starterCollection() {
   return coll;
 }
 // Később bekerült gyakori lapok: a meglévő profilok is megkapják (gv = kiosztási verzió)
-const STARTER_ADDS = { 2: ['a_delfin', 'i_varazsho', 'i_lepke'], 3: ['a_rehab'], 4: ['c_pp'], 5: ['c_nfc'], 6: ['a_cheddar'], 7: ['c_vajda', 'c_veghtomi'], 8: ['c_kovacs'], 9: ['a_kitiltva'], 10: ['a_haver'], 11: PLAYABLE.filter(c => c.rarity === 'r' && !c.variantOf).map(c => c.id), 12: ['c_sasimeselo'], 13: ['c_norbi'], 14: ['c_udvarhelyi'], 15: ['c_molnar'], 16: CARDS.filter(c => c.finisher).map(c => c.id), 17: ['c_barnaelet'], 18: ['c_amszterdam'], 19: ['c_davidsofor'] };   // 16: mindenki megkapja mind a 9 Kánon esemény lapot   // 12: Laci új kezdőpaklijához   // 11: minden ritka lapból 1 (a kezdőpaklikhoz)
+const STARTER_ADDS = { 2: ['a_delfin', 'i_varazsho', 'i_lepke'], 3: ['a_rehab'], 4: ['c_pp'], 5: ['c_nfc'], 6: ['a_cheddar'], 7: ['c_vajda', 'c_veghtomi'], 8: ['c_kovacs'], 9: ['a_kitiltva'], 10: ['a_haver'], 11: PLAYABLE.filter(c => c.rarity === 'r' && !c.variantOf).map(c => c.id), 12: ['c_sasimeselo'], 13: ['c_norbi'], 14: ['c_udvarhelyi'], 15: ['c_molnar'], 16: CARDS.filter(c => c.finisher).map(c => c.id), 17: ['c_barnaelet'], 18: ['c_amszterdam'], 19: ['c_davidsofor'], 20: ['a_szulinap'] };   // 16: mindenki megkapja mind a 9 Kánon esemény lapot   // 12: Laci új kezdőpaklijához   // 11: minden ritka lapból 1 (a kezdőpaklikhoz)
 const GRANT_V = Math.max(1, ...Object.keys(STARTER_ADDS).map(Number));
 // Ajándékok: minden profil egyszer kapja meg (a meglévők a következő megnyitáskor, az újak létrehozáskor)
 const GIFTS = [{ id: 'g-2026-09-28', packs: 1 }, { id: 'g-2026-09-28b', packs: 5 },
@@ -1274,7 +1274,7 @@ function pvpPickDeck(title, done) {
   $('#layer').appendChild(o);
 }
 const pvpMe = dk => ({ ver: window.APP_VERSION || '', uid: Store.uid, name: Store.p.name || 'Játékos', hero: dk.hero, deckName: dk.name, list: { ...dk.list },
-  cos: { heroGold: heroSkin(dk.hero) === 'gold', heroFa: heroSkin(dk.hero) === 'fa', foils: Object.keys(dk.list).filter(id => ownsFoil(id)) } });   // amit az ellenfél is lát: Full Art hős és lapok
+  cos: { heroGold: heroSkin(dk.hero) === 'gold', heroFa: heroSkin(dk.hero) === 'fa', foils: Object.keys(dk.list).filter(id => ownsFoil(id)), foilN: myFoils(dk.list) } });   // amit az ellenfél is lát: Full Art hős és lapok
 async function pvpCreate(dk) {
   try { await Store.db.collection('pvp').add({ parts: [Store.uid], status: 'open', created: Date.now(), updated: Date.now(), host: pvpMe(dk), guest: null, v: 0 }); toast('Kihívás létrehozva – szólj a haveroknak!'); }
   catch (e) { toast(e?.code === 'quota_exceeded' ? 'Megtelt a tárhely, próbáld később' : 'Nem sikerült létrehozni (lehet, hogy nincs írási jogod)'); }
@@ -1288,7 +1288,7 @@ async function pvpJoin(id, dk) {
     if (!d || d.status !== 'open' || d.guest) { toast('Ezt a kihívást már elfogadta valaki'); return false; }
     const guest = pvpMe(dk), first = Math.random() < .5 ? 0 : 1;
     PVP.id = id; seedRng(pvpHash(id + ':start'));
-    const s = newGame(d.host.hero, { ...d.host.list }, guest.hero, { ...guest.list }, first, { mulligan: true });
+    const s = newGame(d.host.hero, { ...d.host.list }, guest.hero, { ...guest.list }, first, { mulligan: true, foils: [d.host.cos?.foilN || {}, guest.cos?.foilN || {}] });
     unseedRng();
     s.names = [d.host.name, guest.name];
     s.cos = [d.host.cos || { heroFa: false, foils: [] }, guest.cos];
@@ -1391,7 +1391,7 @@ async function pvpDrain() {
         try {
           if (L.kind === 'play') {
             const hi = S.players[BOT].hand.findIndex((c, i) => i === L.hi && c.id === L.id);
-            if (hi >= 0) { await showPlayed(L.id, L.t); await runFx(() => playCard(S, BOT, hi, L.t)); }
+            if (hi >= 0) { await showPlayed(L.id, L.t, !!S.players[BOT].hand[hi].foil); await runFx(() => playCard(S, BOT, hi, L.t)); }
           } else await resolveEnd();
         } catch {}
         unseedRng();
