@@ -202,6 +202,8 @@ h1,h2,h3{font-family:var(--display);font-weight:400;letter-spacing:.01em;text-wr
 .selbar b{font-family:var(--display);font-weight:400;font-size:15px;}
 .selbar .hint{color:var(--gold);font-weight:800;display:block;}
 .selbar .acts{display:flex;gap:6px;}
+.selbar:has(.acts .btn + .btn){grid-template-columns:1fr;}
+.selbar:has(.acts .btn + .btn) .acts{justify-content:flex-end;}
 
 .hand{position:relative;height:128px;flex:none;display:flex;justify-content:center;align-items:flex-end;padding-bottom:10px;}
 .hand .card{--cw:82px;margin-left:calc(var(--ov,0px) * -1);transition:transform .18s;}

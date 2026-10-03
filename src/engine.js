@@ -274,8 +274,10 @@ function targetsFor(s, pi, id) {
         if (u || !canPlace(s, pi, i)) return;
         const empt = e.board.map((u, j) => u || closedLane(s, ei, j) ? -1 : j).filter(j => j >= 0);
         if (c.playTgt === 'enemy' && foesM.length) foesM.forEach(j => T.push({ k:'slot', side:pi, i, t2:{ side:ei, i:j } }));
-        else if (c.playTgt === 'push' && foesM.length && empt.length)   // Zsibrita: melyik ellenséget, és hova
+        else if (c.playTgt === 'push' && foesM.length && empt.length) {   // Zsibrita: melyik ellenséget, és hova – a tolás nem kötelező
           foesM.forEach(j => empt.forEach(k => T.push({ k:'slot', side:pi, i, t2:{ side:ei, i:j, t3:{ k:'eslot', side:ei, i:k } } })));
+          T.push({ k:'slot', side:pi, i });
+        }
         else T.push({ k:'slot', side:pi, i });
       });
       break;

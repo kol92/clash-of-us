@@ -825,14 +825,14 @@ function render() {
     const c = CARD[selCard.id], needs = all.length > 0;
     const hint = ui.pend != null ? (c.tgt === 'two' ? 'Megvan az első célpont. Most koppints a másodikra.'
       : c.tgt === 'swap' ? 'Most koppints egy másik saját karakteredre (helycsere) vagy egy üres helyedre.'
-      : c.playTgt === 'push' ? (ui.pend.length < 2 ? 'Válaszd ki, melyik ellenséges karaktert tolod arrébb.' : 'Most koppints az ellenfél egyik üres helyére, oda kerül.')
+      : c.playTgt === 'push' ? (ui.pend.length < 2 ? 'Koppints arra az ellenséges karakterre, akit arrébb tolsz – vagy ne tolj senkit.' : 'Most koppints az ellenfél egyik üres helyére, oda kerül.')
       : 'Most válaszd ki, melyik ellenséges karaktert küldöd vissza.')
       : c.type === 'char' ? 'Húzd vagy koppints egy üres helyre.' : c.type === 'item' ? (c.tgt === 'enemy' ? 'Húzd rá vagy koppints egy ellenséges karakterre.' : 'Húzd rá vagy koppints a saját karakteredre.')
       : c.tgt === 'enemyEmpty' ? 'Húzd vagy koppints az ellenfél egyik üres helyére.' : c.tgt === 'ownOrHero' ? 'Húzd rá egy saját karakteredre vagy a hősödre.' : needs ? 'Húzd rá vagy koppints egy ellenséges karakterre.'
       : 'Húzd fel a táblára, vagy nyomd meg a Kijátszás gombot.';
     sb.hidden = false;
     sb.innerHTML = `<div><b>${c.name}</b> · ${textHTML(c) || (c.type === 'char' ? `${c.atk} támadás, ${c.hp} élet.` : '')}${hint ? `<span class="hint">${hint}</span>` : ''}</div>
-      <div class="acts"><button class="btn small" data-act="cancel">Mégse</button></div>`;
+      <div class="acts">${c.playTgt === 'push' && ui.pend.length ? '<button class="btn small primary" data-act="nopush">Senkit nem tolok</button>' : ''}<button class="btn small" data-act="cancel">Mégse</button></div>`;
   } else sb.hidden = true;
 }
 
@@ -862,6 +862,10 @@ $('#selbar').onclick = e => {
   const b = e.target.closest('[data-act]'); if (!b) return;
   if (b.dataset.act === 'cancel') { ui.sel = null; ui.pend = null; render(); }
   else if (b.dataset.act === 'play') doPlay(ui.sel, { k:'none' });
+  else if (b.dataset.act === 'nopush' && ui.pend?.length) {   // Zsibrita: lerakás tolás nélkül
+    const q = ui.pend[0], t = targetsFor(S, ME, S.players[ME].hand[ui.sel].id).find(x => x.k === 'slot' && x.side === q.side && x.i === q.i && !x.t2);
+    if (t) doPlay(ui.sel, t);
+  }
 };
 // célpont választása koppintással (két lépcsős célzásnál – Vera, Kancsó – előbb az első, aztán a második)
 // többlépcsős célzás: egy célpont láncolata [t, t.t2, t.t2.t3]; ui.pend = az eddig kiválasztott lépések
@@ -878,7 +882,7 @@ function pickTarget(side, i) {
     ui.pend = [...ui.pend, { side, i }]; render(); return true;
   }
   const m = all.filter(t => t.side === side && t.i === i && (i === -1 ? t.k === 'hero' : t.k !== 'hero'));
-  if (m.length && m[0].t2) { ui.pend = [{ side, i }]; render(); return true; }
+  if (m.some(t => t.t2)) { ui.pend = [{ side, i }]; render(); return true; }
   if (m.length) { doPlay(ui.sel, m[0]); return true; }
   return false;
 }
@@ -1248,7 +1252,7 @@ function dropOnCell(hi, side, i) {
   const all = targetsFor(S, ME, S.players[ME].hand[hi].id);
   const m = all.filter(t => t.side === side && t.i === i);
   if (!m.length) return false;
-  if (m[0].t2) { ui.pend = [{ side, i }]; return 'pend'; }
+  if (m.some(t => t.t2)) { ui.pend = [{ side, i }]; return 'pend'; }
   doPlay(hi, m[0]); return 'played';
 }
 function cellUnder(x, y) {

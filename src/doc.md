@@ -127,7 +127,7 @@ Hősképesség-ötletek a táblázatban (még nem zöldek, nincsenek beépítve)
 - Milo, az örökivó 2 · 1/2, ritka (nerf: 1/3→1/2) – valahányszor Italt játszol ki, végleg +1 támadást kap
 - Laczkó Tomi 4 · 3/3, ritka – ha Italt játszol ki, húzol egy lapot (körönként egyszer, akárhány Laczkó van lent)
 - Gabi, a legyőzhetetlen 5 · 4/4, legendás – amikor először meghal, újraéled a helyén 1 élettel (az eszközei lekerülnek, a támadása visszaáll 4-re; másodszorra már végleg meghal)
-- Zsibrita 3 · 2/3, ritka – kijátszáskor egy ellenséges karaktert áttolhatsz az ellenfél egy üres sávjába (előbb a helye, aztán a célpont, végül az üres hely; ha nincs ellenséges karakter vagy üres hely, hatás nélkül kerül le)
+- Zsibrita 3 · 2/3, ritka – kijátszáskor egy ellenséges karaktert áttolhatsz az ellenfél egy üres sávjába (előbb a helye, aztán a célpont, végül az üres hely; ha nincs ellenséges karakter vagy üres hely, hatás nélkül kerül le) (2026-10-03: a tolás nem kötelező – lerakás után „Senkit nem tolok” gomb; ha nincs kit vagy hova tolni, simán lerakható.)
 - Kristóf 3 · 2/2, ritka – kijátszáskor egy véletlen Ital lap kerül a kezedbe (nem kell birtokolnod, csak arra a meccsre szól; tele kéznél elég)
 - Sasi, a mesélő 3 · 2/2, ritka – kijátszáskor húzol egy lapot (2026-09-30)
 - Zana 4 · 3/3, epikus (nerf: 3→4 energia) – körönként kétszer támad
