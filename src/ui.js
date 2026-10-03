@@ -490,6 +490,7 @@ async function animateEvents(evs) {
       case 'machine': fx(el, 'fx-heroheal'); fx($('#app'), 'fx-quake'); floatAt(anchor, '⚙️ GÉPÜZEMMÓD! Vissza 10 élettel', 'buff'); hold = Math.max(hold, 1200); break;
       case 'heroatk': break;   // a lendülést a baszoAnim már lejátszotta
       case 'chomp': await chompFx(e); break;
+      case 'coin': floatAt(anchor, e.side === ME ? '🍻 Második vagy: kaptál egy „Egy kört rám!” lapot' : '🍻 Az ellenfél kapott egy „Egy kört rám!” lapot', 'info'); hold = Math.max(hold, 900); break;
       case 'swim': floatAt(anchor, e.dir > 0 ? '🦈 →' : '🦈 ←', 'info'); hold = Math.max(hold, 350); break;
       case 'nocounter': floatAt(anchor, 'Baszót nem lehet visszaütni!', 'info'); hold = Math.max(hold, 500); break;
       case 'jblwave': await jblWaveFx(e); break;

@@ -1033,7 +1033,7 @@ const tutSide = x => x === 'me' ? ME : BOT;
 function startTutorial(opt = {}) {
   const mine = { c_gyuri:2, c_sasi:2, a_cheddar:2, c_kovacs:2, a_dinnyes:2, c_zoli:2, i_napszemuveg:2, c_rebi:1, c_boros:1, i_energiaital:1, c_vajda:1, c_pifti:1, c_veghtomi:1 };
   const bot = { c_pifti:2, c_gyuri:2, c_kovacs:2, c_rebi:2, a_dinnyes:2, c_zoli:2, i_napszemuveg:2, a_cheddar:2, c_vajda:2, a_delfin:2 };
-  S = newGame('tomi', mine, 'david', bot, ME); S.events = [];
+  S = newGame('tomi', mine, 'david', bot, ME); S.noCoin = true; S.events = [];
   const P = S.players[ME], B = S.players[BOT], card = id => ({ uid: ++S.uidc, id });
   P.hand = ['c_pifti', 'i_napszemuveg', 'a_dinnyes', 'c_vajda'].map(card);
   P.deck = [...shuffle(['c_gyuri', 'a_cheddar', 'c_kovacs', 'c_zoli', 'i_napszemuveg', 'c_rebi', 'c_boros', 'i_energiaital', 'a_dinnyes', 'c_sasi', 'a_cheddar', 'c_gyuri', 'c_kovacs']), 'c_veghtomi', 'c_sasi', 'c_gyuri'];

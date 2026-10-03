@@ -65,6 +65,7 @@
 - Felváltott körök. Energia: 1. körben 1, körönként +1, legfeljebb 6.
 - Kör eleje: 1 lap húzás (a kezdő játékos az első körében nem húz). Kézlimit 8. Üres paklinál egyre nagyobb sebzés.
 - **Kezdő kéz cseréje (mulligan):** a meccs elején mindkét játékos egyszer kiválaszthatja, mely kezdőlapjait keveri vissza a pakliba; helyettük ugyanannyi újat húz (a visszakevert lapok csak a húzás után kerülnek vissza). Mindkét játékos 4 lappal indul (a második játékos extra lapját kivettük: vele a kezdő csak 38%-ban nyert, nélküle 50%). A bot az 5+ költségű lapokat és a második helyszínt cseréli.
+- **Kezdés kiegyenlítése – „Egy kört rám!” (2026-10-03):** a második játékos az első körében kap egy „Egy kört rám!” lapot (0 energia, akció, token: nem gyűjthető, nem tehető pakliba). A saját 3. körétől játszható ki, és abban a körben +1 energiát ad. Bot ellen, élő meccsen és barátok közt is jár; a bevezetőben nincs. A bot csak akkor játssza ki, ha utána egy drágább lapot is le tud tenni. Mérés (3000 bot-meccs, kezdőpaklik, kezdőkéz-cserével): nélküle a kezdő 55,9% / második 44,1%, vele 51,5% / 48,5%. Kipróbált változatok: azonnal játszható +1 energia → 44/56 (átbillent), +1 lap → 46/54, +2 élet a másodiknak → 50/50 (de láthatatlan, unalmas), a 2. körtől → 48/52.
 - Tábla: játékosonként 4 hely + egy közös helyszín.
 - Lapot kijátszani csak húzással lehet; koppintásra a lap nagyban megjelenik.
 - Kör vége: a te karaktereid balról jobbra támadnak, mindegyik a szemben állót (kölcsönös sebzés), üres hely esetén a hőst. Az új karakter csak a következő körödben támad.
@@ -252,7 +253,7 @@ Hősképesség-ötletek a táblázatban (még nem zöldek, nincsenek beépítve)
 - Legerősebbek voltak: PP 56,2%, Zana 56,0%, Vera 55,5%, Kovács Bence 54,9%, Milo az örökivó 54,7%, Vajda Peti 54,4%, Végh Tomi 53,4% (kezdőpaklikban ennél jóval erősebb), Abszint 52,8%.
 - Változtatások: Abszint 3→4 energia · Zana 3→4 energia · PP 2→3 energia · Vera 2→3 energia · Kovács Bence 2/1→1/1 · Milo, az örökivó 1/3→1/2 · Végh Tomi 4/5→3/5. Vajda Peti (3 energia 3/4) maradt, de figyelni kell.
 - Leggyengébbek (esetleges későbbi buff): Barhole 44,8%, Laszy 45,2%, Koktélarmageddon 45,2%, Akácfa söröző 45,5%, Ki vagy tiltva! 45,5%, Mosh Pit 45,7%, Musztafa Gyros Tál 45,7%, Delfin póz 45,8%.
-- A kezdőpaklik a nerfek után újra hangolva (lásd lent). A kezdő játékos továbbra is kb. 57%-ban nyer – ez nem lapkérdés.
+- A kezdőpaklik a nerfek után újra hangolva (lásd lent). A kezdő játékos továbbra is kb. 57%-ban nyer – ez nem lapkérdés (2026-10-03: az „Egy kört rám!” lappal kb. 51,5%).
 
 ## Lapötletek a hiányokra (2026-09-29 – név és grafika még nincs, Tomi találja ki)
 1. ✅ Vajda Peti – Karakter 3 · 3/4, gyakori – nincs képesség

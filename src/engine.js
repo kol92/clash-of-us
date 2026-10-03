@@ -88,6 +88,8 @@ const CARDS = [
   { id:'f_capa', type:'action', name:'Hátad mögött, cápa megesz!', cost:6, rarity:'l', finisher:true, hero:'barna', text:'Megidéz egy 9/9-es Cápát az ellenfél jobb szélső helyére (aki ott áll, azt megeszi). 4 körön át a köröd elején egyet úszik afelé a karakter felé, akit az ellenfél utoljára lerakott, és megeszi, aki az útjába kerül. Nem támad, Láthatatlan: a támadások átmennek rajta.' },
   { id:'f_gluten', type:'action', name:'Gluténbomba', cost:6, rarity:'l', finisher:true, hero:'sasi', opts:['5 sebzés + 5 gyógyulás', '8 sebzés, de te is kapsz 8-at'], text:'Válassz: 5 sebzés az ellenfél hősének és 5 életet gyógyulsz, vagy 8 sebzés az ellenfél hősének, de te is kapsz 8-at.' },
   // a kánon események által hozott, nem gyűjthető lapok
+  // a második játékos kiegyenlítő lapja (nem gyűjthető): az első körében kapja
+  { id:'a_kor', type:'action', name:'Egy kört rám!', cost:0, rarity:'k', token:true, text:'Ebben a körben +1 energiád van. A 3. körödtől játszható ki. (A második játékos kapja, hogy kiegyenlítse a kezdés előnyét.)' },
   { id:'c_arnyek', type:'char', name:'Árnyékember', cost:0, atk:1, hp:1, rarity:'k', token:true, text:'Csak a Bender idézheti meg.' },
   { id:'c_gyzana', type:'char', name:'Gyerek Zana', cost:0, atk:3, hp:3, rarity:'l', token:true, haste:true, text:'Csak az Együtt sírtok, együtt nevettek idézheti meg.' },
   { id:'c_gygabi', type:'char', name:'Gyerek Gabi', cost:0, atk:3, hp:3, rarity:'l', token:true, muscle:true, text:'Csak az Együtt sírtok, együtt nevettek idézheti meg.' },
@@ -229,6 +231,7 @@ function startTurn(s) {
   p.board.forEach(u => { if (u) u.fresh = false; });
   ev(s, { t:'turn', side:pi });
   if (s.half > 1) draw(s, pi);
+  if (s.half === 2 && !s.noCoin) { addToHand(s, pi, 'a_kor'); ev(s, { t:'coin', side:pi, i:-1 }); }   // a második játékos kiegyenlítése
   sharkSwim(s, pi);
   if (has(p, 'extraDraw') && p.turns % 3 === 0) draw(s, pi);
   checkWin(s);
@@ -309,6 +312,7 @@ function whyNot(s, pi, hi) {
   const hc = CARD[h.id];
   if (hc.hero && s.players[pi].heroId !== hc.hero) return `Ezt csak ${HERO[hc.hero].name} játszhatja ki`;
   if (hc.id === 'f_metamorf' && s.players[pi].baszo) return 'Már Baszó vagy';
+  if (hc.id === 'a_kor' && s.players[pi].turns < 3) return 'Az Egy kört rám! a 3. körödtől játszható ki';
   if (cardCost(s, pi, h.id) > s.players[pi].energy) return 'Nincs elég energiád';
   if (!targetsFor(s, pi, h.id).length) {
     const c = CARD[h.id];
@@ -501,6 +505,7 @@ function playCard(s, pi, hi, t) {
         if (x && !isFixed(x)) { reveal(s, ei, j); ev(s, { t:'chomp', side:ei, i:j, from:-1 }); x.shield = false; x.hp = 0; cleanup(s); }
         if (!e.board[j]) { const u = makeUnit(s, 'c_capa', ei); u.owner = pi; u.fresh = false; u.swims = 4; e.board[j] = u; ev(s, { t:'summon', side:ei, i:j, id:'c_capa' }); }
         break; }
+      case 'a_kor': p.energy += 1; ev(s, { t:'buff', side:pi, i:-1 }); break;
       case 'f_gluten':
         if (t.o === 1) { damageHero(s, ei, 8); damageHero(s, pi, 8); }
         else { damageHero(s, ei, 5); if (s.winner == null) healHero(s, pi, 5); }
@@ -768,7 +773,12 @@ function botChoose(real) {
     for (const t of targetsFor(s, me, h.id)) {
       const c = clone(s); c.events = [];
       playCard(c, me, hi, t);
-      const sc = scoreAfterCombat(c, me);
+      let sc = scoreAfterCombat(c, me);
+      if (h.id === 'a_kor') {   // egy lépés előre: mit tudnék vele kijátszani?
+        sc = -1e9; const P2 = c.players[me];
+        P2.hand.forEach((h2, h2i) => { if (h2.id === 'a_kor' || !canPlay(c, me, h2i) || cardCost(c, me, h2.id) <= p.energy) return;
+          for (const t2 of targetsFor(c, me, h2.id)) { const c2 = clone(c); c2.events = []; playCard(c2, me, h2i, t2); sc = Math.max(sc, scoreAfterCombat(c2, me) + 0.1); } });
+      }
       if (sc > bestSc) { bestSc = sc; best = { hi, t }; }
     }
   });
