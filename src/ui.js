@@ -162,6 +162,7 @@ const ART = {
   c_veghtomi: { src:'art/veghtomi.webp', pos:'45% 15%' },
   c_zana:   { src:'art/zana.webp', pos:'38% 20%' },
   c_norbi:  { src:'art/norbi.webp', pos:'42% 18%' },
+  c_amszterdam: { src:'art/amszterdam.webp', av:'60% 22%', pos:'58% 24%' },
   c_barnaelet: { src:'art/barnaelet.webp', av:'54% 26%', pos:'54% 26%' },
   f_bender: { src:'art/f_bender.webp', av:'55% 40%', pos:'55% 34%' },   // Kánon esemény lapok
   f_egyutt: { src:'art/f_egyutt.webp', av:'50% 28%', pos:'50% 26%' },
