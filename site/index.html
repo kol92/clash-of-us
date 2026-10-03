@@ -1615,6 +1615,17 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%;}
 .result .banner-h{margin:-6px auto 4px;max-width:300px;}
 .result .banner-h img{display:block;width:100%;height:auto;filter:drop-shadow(0 4px 8px rgba(0,0,0,.6));}
 @media (prefers-reduced-motion:reduce){#endBtn.nudge{animation:none!important;}}
+
+/* Csillogás a saját keretes lapokon: a mozgó fényréteg 3× akkora, mint a kép, és a kép levágja – így nem látszik a széle (csík) */
+.card.framed.xf .art{overflow:hidden;isolation:isolate;}
+.card.kholo .art::before{inset:-100%!important;border-radius:0;will-change:transform;animation:holoT 7s ease-in-out infinite alternate!important;}
+.card.xf-gold .cframe::before,.card.xf-gold .cframe::after{display:none!important;}
+.card.framed.xf-gold .art::before{content:"";position:absolute;inset:-100%;z-index:1;pointer-events:none;mix-blend-mode:soft-light;opacity:.55;
+  background:linear-gradient(125deg,#fff3b0,#ffcf40 25%,#a86f00 50%,#ffe38a 75%,#fff3b0);will-change:transform;animation:holoT 6s ease-in-out infinite alternate;}
+.card.framed.xf-gold .art::after{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;mix-blend-mode:screen;
+  background:linear-gradient(115deg,transparent 42%,rgba(255,250,220,.75) 48.5%,rgba(255,210,80,.5) 51%,transparent 56%) no-repeat;background-size:100% 100%;
+  will-change:transform;animation:sheenT 3.2s ease-in-out infinite;}
+@media (prefers-reduced-motion:reduce){.card.kholo .art::before,.card.framed.xf-gold .art::before,.card.framed.xf-gold .art::after{animation:none!important;}}
 </style>
 </head>
 <body>
@@ -1773,7 +1784,7 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%;}
 <script src="vendor/firebase-auth-compat.js"></script>
 <script src="vendor/firebase-firestore-compat.js"></script>
 <script src="vendor/firebase-database-compat.js"></script>
-<script>window.APP_VERSION = "2026.10.03-1127";</script>
+<script>window.APP_VERSION = "2026.10.03-1248";</script>
 <script>// ===== Best of Us – saját szerver (Firebase) =====
 // A játék eredetileg a Claude-os tárolót használta (window.claude.use('db' | 'user' | 'room')).
 // Ez a fájl ugyanazt a felületet adja Firebase-ből, így a játék kódja szinte változatlan maradhat:
