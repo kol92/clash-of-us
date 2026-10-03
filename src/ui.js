@@ -281,7 +281,7 @@ function renderColl() {
     (dup.out.length ? `<button class="btn dupe-btn" id="dupeBtn">♻️ ${dup.out.reduce((s, x) => s + x.n + x.f, 0)} fölösleges lap beváltása · +${dup.coins} coin</button>` : '') + groups.map(([t, type]) => `<div class="lbl">${t}</div><div class="coll-grid">${
     type ? PLAYABLE.filter(c => c.type === type).sort((a, b) => a.cost - b.cost).map(c => {
       const n = ui.foil || c.foilOnly ? (Store.p?.coll[c.id]?.f || 0) : (Store.p?.coll[c.id]?.n || 0);
-      return `<div class="coll-slot${n ? '' : ' missing'}">${cardHTML(c.id, { foil: ui.foil, attrs: `data-card="${c.id}" tabindex="0"` })}<span class="own-n">${n ? '×' + n : 'Nincs meg'}</span></div>`;
+      return `<div class="coll-slot${n ? '' : ' missing'}">${cardHTML(c.id, { foil: ui.foil, attrs: `data-card="${c.id}" tabindex="0"` })}<span class="own-n"><i class="rar r-${c.rarity}" title="${RAR[c.rarity]}" aria-label="${RAR[c.rarity]}"></i>${n ? '×' + n : 'Nincs meg'}</span></div>`;
     }).join('')
          : HEROES.map(h => { const miss = ui.foil && !ownsHeroFa(h.id);
              const multi = !ui.foil && Store.p && heroSkins(h.id).length > 1, sk = multi ? heroSkin(h.id) : 'base';
@@ -293,7 +293,7 @@ $('#vFoil').onclick = () => { ui.foil = true; $('#vFoil').setAttribute('aria-pre
 // egy lap nagy nézete a Gyűjteményben – ha 2 példány fölött van belőle, egyenként beváltható
 function collCardModal(id, cap) {
   const e = Store.p?.coll[id] || { n: 0, f: 0 }, extra = e.n + e.f - DUPE_KEEP;
-  cap = cap || `${RAR[CARD[id].rarity]} · ${e.n} db${e.f ? ` + ${e.f} Full Art` : ''}${CARD[id].passOnly ? ' · csak a Season Passból szerezhető' : !e.n && !e.f ? ' · boosterből szerezhető' : ''}`;
+  cap = cap || `<i class="rar r-${CARD[id].rarity}" aria-hidden="true"></i> ${RAR[CARD[id].rarity]} · ${e.n} db${e.f ? ` + ${e.f} Full Art` : ''}${CARD[id].passOnly ? ' · csak a Season Passból szerezhető' : !e.n && !e.f ? ' · boosterből szerezhető' : ''}`;
   const btns = extra > 0 ? `<div class="cv-row">${e.n > 0 ? `<button class="btn cv-btn" data-cv="n">♻️ 1 lap beváltása · +${dupeVal(id, false)} coin</button>` : ''}${e.f > 0 ? `<button class="btn cv-btn fa" data-cv="f">♻️ 1 Full Art beváltása · +${dupeVal(id, true)} coin</button>` : ''}</div><small class="cv-note">${extra} fölösleges példány – 2 mindig megmarad</small>` : '';
   openModal(cardHTML(id, { big: true, foil: ui.foil || (e.f > 0 && !e.n) }), cap, btns + cardHelpHTML(id));
   const o = $('#layer').lastElementChild;
@@ -1115,7 +1115,7 @@ function showMulligan(first) {
   const ok = o.querySelector('#mullOk');
   o.querySelector('.mull-cards').addEventListener('click', e => {
     const lk = e.target.closest('[data-look]');
-    if (lk) { const id = lk.dataset.look; openModal(cardHTML(id, { big: true, foil: ownsFoil(id) }), RAR[CARD[id].rarity], cardHelpHTML(id)); return; }
+    if (lk) { const id = lk.dataset.look; openModal(cardHTML(id, { big: true, foil: ownsFoil(id) }), `<i class="rar r-${CARD[id].rarity}" aria-hidden="true"></i> ${RAR[CARD[id].rarity]}`, cardHelpHTML(id)); return; }
     const b = e.target.closest('[data-mi]'); if (!b || ok.disabled) return;
     const i = +b.dataset.mi; pick.has(i) ? pick.delete(i) : pick.add(i); b.classList.toggle('swap', pick.has(i));
     ok.textContent = pick.size ? `${pick.size} lap cseréje` : 'Megtartom';

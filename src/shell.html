@@ -1611,6 +1611,17 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%;}
   background:linear-gradient(115deg,transparent 42%,rgba(255,250,220,.75) 48.5%,rgba(255,210,80,.5) 51%,transparent 56%) no-repeat;background-size:100% 100%;
   will-change:transform;animation:sheenT 3.2s ease-in-out infinite;}
 @media (prefers-reduced-motion:reduce){.card.kholo .art::before,.card.framed.xf-gold .art::before,.card.framed.xf-gold .art::after{animation:none!important;}}
+
+/* ===== Ritkaságjelvények (képek, azonos négyzetes dobozban; a díszítés mind belefér) ===== */
+.rar,.rar.r-k,.rar.r-r,.rar.r-e,.rar.r-l,.rar.r-g{display:inline-block;width:1.15em;height:1.15em;flex:none;border-radius:0;transform:none;box-shadow:none;vertical-align:-.2em;
+  background:center/contain no-repeat;filter:drop-shadow(0 1px 1px rgba(0,0,0,.6));}
+.rar.r-k{background-image:url('art/ui/rar-k.webp');} .rar.r-r{background-image:url('art/ui/rar-r.webp');} .rar.r-e{background-image:url('art/ui/rar-e.webp');}
+.rar.r-l{background-image:url('art/ui/rar-l.webp');} .rar.r-g{background-image:url('art/ui/rar-g.webp');}
+.card .ctype .rar{width:1.6em;height:1.6em;}
+.odd .rar{width:22px;height:22px;}
+.coll-slot .own-n{display:inline-flex;align-items:center;justify-content:center;gap:4px;}
+.coll-slot .own-n .rar{width:16px;height:16px;}
+.modal .live .rar{width:18px;height:18px;vertical-align:-4px;}
 </style>
 
 <div id="app">
