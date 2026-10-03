@@ -25,6 +25,7 @@ const CARDS = [
   { id:'c_tomiparti', type:'char', name:'Tomi, a parti lelke', cost:5, atk:4, hp:4, rarity:'e', text:'Kijátszáskor egy véletlen ellenséges karakterre rányom egy véletlen Ital lapot. Lehet, hogy jól jár vele, lehet, hogy nem!' },
   { id:'c_kriszrantott', type:'char', name:'Krisz, a rántott húsok ura', cost:6, atk:4, hp:5, rarity:'e', text:'Kijátszáskor a kezedbe ad egy Rántott hús lapot.' },
   { id:'c_lacifinale', type:'char', name:'Laci, La Grand Finale', cost:6, atk:5, hp:2, rarity:'l', muscle:true, deathGift:'i_ing', text:'Amikor meghal, a kezedbe kerül a Grand Finale ing.' },
+  { id:'c_davidsofor', type:'char', name:'Dávid, a sofőr', cost:6, atk:2, hp:8, rarity:'r', sneak:true, taunt:true, text:'Amíg rejtve van, nem provokál – csak miután felfordult.' },
   { id:'c_alekosz', type:'char', name:'Alekosz Tibi', cost:4, atk:2, hp:2, rarity:'e', text:'Kijátszáskor ellop egy véletlen ellenséges karaktert, és maga mellé teszi (ha van mellette üres hely).' },
   { id:'c_norbi', type:'char', name:'Lukács Norbi', cost:3, atk:2, hp:3, rarity:'r', text:'Ha mellette áll egy másik karaktered, +2 támadást kap.' },
   { id:'c_udvarhelyi', type:'char', name:'Udvarhelyi Zoli', cost:6, atk:5, hp:5, rarity:'k', text:'' },

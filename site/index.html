@@ -1802,7 +1802,7 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%;}
 <script src="vendor/firebase-auth-compat.js"></script>
 <script src="vendor/firebase-firestore-compat.js"></script>
 <script src="vendor/firebase-database-compat.js"></script>
-<script>window.APP_VERSION = "2026.10.03-2230";</script>
+<script>window.APP_VERSION = "2026.10.03-2242";</script>
 <script>// ===== Best of Us – saját szerver (Firebase) =====
 // A játék eredetileg a Claude-os tárolót használta (window.claude.use('db' | 'user' | 'room')).
 // Ez a fájl ugyanazt a felületet adja Firebase-ből, így a játék kódja szinte változatlan maradhat:
@@ -2073,6 +2073,7 @@ const CARDS = [
   { id:'c_tomiparti', type:'char', name:'Tomi, a parti lelke', cost:5, atk:4, hp:4, rarity:'e', text:'Kijátszáskor egy véletlen ellenséges karakterre rányom egy véletlen Ital lapot. Lehet, hogy jól jár vele, lehet, hogy nem!' },
   { id:'c_kriszrantott', type:'char', name:'Krisz, a rántott húsok ura', cost:6, atk:4, hp:5, rarity:'e', text:'Kijátszáskor a kezedbe ad egy Rántott hús lapot.' },
   { id:'c_lacifinale', type:'char', name:'Laci, La Grand Finale', cost:6, atk:5, hp:2, rarity:'l', muscle:true, deathGift:'i_ing', text:'Amikor meghal, a kezedbe kerül a Grand Finale ing.' },
+  { id:'c_davidsofor', type:'char', name:'Dávid, a sofőr', cost:6, atk:2, hp:8, rarity:'r', sneak:true, taunt:true, text:'Amíg rejtve van, nem provokál – csak miután felfordult.' },
   { id:'c_alekosz', type:'char', name:'Alekosz Tibi', cost:4, atk:2, hp:2, rarity:'e', text:'Kijátszáskor ellop egy véletlen ellenséges karaktert, és maga mellé teszi (ha van mellette üres hely).' },
   { id:'c_norbi', type:'char', name:'Lukács Norbi', cost:3, atk:2, hp:3, rarity:'r', text:'Ha mellette áll egy másik karaktered, +2 támadást kap.' },
   { id:'c_udvarhelyi', type:'char', name:'Udvarhelyi Zoli', cost:6, atk:5, hp:5, rarity:'k', text:'' },
@@ -3049,6 +3050,7 @@ const ART = {
   c_zana:   { src:'art/zana.webp?v=a8927918f048de29', pos:'38% 20%' },
   c_norbi:  { src:'art/norbi.webp?v=740db1e1acf15673', pos:'42% 18%' },
   a_kor: { src:'art/viz.webp?v=a17ce0b241a73985', av:'50% 45%', pos:'50% 40%' },
+  c_davidsofor: { src:'art/davidsofor.webp?v=02dc86dba9551b19', av:'35% 20%', pos:'35% 20%' },
   c_lacifinale: { src:'art/lacifinale.webp?v=e418a56b8cf48724', av:'48% 16%', pos:'48% 16%' },
   i_ing: { src:'art/ing.webp?v=102023358e87523a', av:'50% 40%', pos:'50% 35%' },
   c_kriszrantott: { src:'art/kriszrantott.webp?v=1b89215302acb952', av:'58% 22%', pos:'56% 22%' },
@@ -4239,7 +4241,7 @@ function starterCollection() {
   return coll;
 }
 // Később bekerült gyakori lapok: a meglévő profilok is megkapják (gv = kiosztási verzió)
-const STARTER_ADDS = { 2: ['a_delfin', 'i_varazsho', 'i_lepke'], 3: ['a_rehab'], 4: ['c_pp'], 5: ['c_nfc'], 6: ['a_cheddar'], 7: ['c_vajda', 'c_veghtomi'], 8: ['c_kovacs'], 9: ['a_kitiltva'], 10: ['a_haver'], 11: PLAYABLE.filter(c => c.rarity === 'r' && !c.variantOf).map(c => c.id), 12: ['c_sasimeselo'], 13: ['c_norbi'], 14: ['c_udvarhelyi'], 15: ['c_molnar'], 16: CARDS.filter(c => c.finisher).map(c => c.id), 17: ['c_barnaelet'], 18: ['c_amszterdam'] };   // 16: mindenki megkapja mind a 9 Kánon esemény lapot   // 12: Laci új kezdőpaklijához   // 11: minden ritka lapból 1 (a kezdőpaklikhoz)
+const STARTER_ADDS = { 2: ['a_delfin', 'i_varazsho', 'i_lepke'], 3: ['a_rehab'], 4: ['c_pp'], 5: ['c_nfc'], 6: ['a_cheddar'], 7: ['c_vajda', 'c_veghtomi'], 8: ['c_kovacs'], 9: ['a_kitiltva'], 10: ['a_haver'], 11: PLAYABLE.filter(c => c.rarity === 'r' && !c.variantOf).map(c => c.id), 12: ['c_sasimeselo'], 13: ['c_norbi'], 14: ['c_udvarhelyi'], 15: ['c_molnar'], 16: CARDS.filter(c => c.finisher).map(c => c.id), 17: ['c_barnaelet'], 18: ['c_amszterdam'], 19: ['c_davidsofor'] };   // 16: mindenki megkapja mind a 9 Kánon esemény lapot   // 12: Laci új kezdőpaklijához   // 11: minden ritka lapból 1 (a kezdőpaklikhoz)
 const GRANT_V = Math.max(1, ...Object.keys(STARTER_ADDS).map(Number));
 // Ajándékok: minden profil egyszer kapja meg (a meglévők a következő megnyitáskor, az újak létrehozáskor)
 const GIFTS = [{ id: 'g-2026-09-28', packs: 1 }, { id: 'g-2026-09-28b', packs: 5 },

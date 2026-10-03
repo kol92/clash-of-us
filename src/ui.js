@@ -163,6 +163,7 @@ const ART = {
   c_zana:   { src:'art/zana.webp', pos:'38% 20%' },
   c_norbi:  { src:'art/norbi.webp', pos:'42% 18%' },
   a_kor: { src:'art/viz.webp', av:'50% 45%', pos:'50% 40%' },
+  c_davidsofor: { src:'art/davidsofor.webp', av:'35% 20%', pos:'35% 20%' },
   c_lacifinale: { src:'art/lacifinale.webp', av:'48% 16%', pos:'48% 16%' },
   i_ing: { src:'art/ing.webp', av:'50% 40%', pos:'50% 35%' },
   c_kriszrantott: { src:'art/kriszrantott.webp', av:'58% 22%', pos:'56% 22%' },
