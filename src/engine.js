@@ -22,6 +22,7 @@ const CARDS = [
   { id:'c_kristof', type:'char', name:'Kristóf', cost:3, atk:2, hp:2, rarity:'r', text:'Kijátszáskor: a kezedbe kerül egy véletlen Ital lap.' },
   { id:'c_sasimeselo', type:'char', name:'Sasi, a mesélő', cost:3, atk:2, hp:2, rarity:'r', text:'Kijátszáskor: húzol egy lapot.' },
   { id:'c_vajda', type:'char', name:'Vajda Peti', cost:3, atk:3, hp:4, rarity:'k', text:'' },
+  { id:'c_tomiparti', type:'char', name:'Tomi, a parti lelke', cost:5, atk:4, hp:4, rarity:'e', text:'Kijátszáskor egy véletlen ellenséges karakterre rányom egy véletlen Ital lapot. Lehet, hogy jól jár vele, lehet, hogy te!' },
   { id:'c_alekosz', type:'char', name:'Alekosz Tibi', cost:4, atk:2, hp:2, rarity:'e', text:'Kijátszáskor ellop egy véletlen ellenséges karaktert, és maga mellé teszi (ha van mellette üres hely).' },
   { id:'c_norbi', type:'char', name:'Lukács Norbi', cost:3, atk:2, hp:3, rarity:'r', text:'Ha mellette áll egy másik karaktered, +2 támadást kap.' },
   { id:'c_udvarhelyi', type:'char', name:'Udvarhelyi Zoli', cost:6, atk:5, hp:5, rarity:'k', text:'' },
@@ -355,6 +356,7 @@ function playCard(s, pi, hi, t) {
       addToHand(s, pi, d);
     }
     if (c.id === 'c_sasimeselo') draw(s, pi);
+    if (c.id === 'c_tomiparti') partyDrink(s, pi, t.i);
     if (c.id === 'c_alekosz') {   // véletlen ellenséges karaktert ellop, és maga mellé teszi (előbb jobbra, aztán balra, aztán bárhova)
       const os = openSlots(s, pi), spots = [t.i + 1, t.i - 1].filter(j => os.includes(j));
       const j = spots.length ? spots[0] : os.length ? os[0] : -1;
@@ -516,6 +518,39 @@ function playCard(s, pi, hi, t) {
   }
   cleanup(s); checkWin(s);
 }
+
+// Tomi, a parti lelke: véletlen Ital véletlen ellenséges karakterre – minden ital a célpontra hat
+const PARTY_POOL = () => CARDS.filter(x => x.drink && !x.variantOf && !x.token).map(x => x.id);
+function partyDrink(s, pi, si) {
+  const ei = other(pi), e = s.players[ei];
+  const cand = e.board.map((x, k) => x && !isFixed(x) ? k : -1).filter(k => k >= 0);
+  const pool = PARTY_POOL(), d = pool[Math.floor(rnd() * pool.length)];
+  if (!cand.length) { ev(s, { t:'party', side:pi, i:si, ts:ei, ti:-1, id:d, none:true }); return; }
+  const j = cand[Math.floor(rnd() * cand.length)], u = e.board[j], c = CARD[d];
+  let o = null;
+  if (d === 'a_koktel') o = rnd() < 0.5 ? 'buff' : 'dmg';   // Koktélarmageddon: vagy +5 támadás, vagy 5 sebzés
+  ev(s, { t:'party', side:pi, i:si, ts:ei, ti:j, id:d, o, tid:u.id });
+  reveal(s, ei, j);
+  if (c.type === 'item') {   // az ital rákerül (idegen eszközként), a hatásaival együtt
+    u.atk += c.atk || 0; if (c.haste) u.haste = true; if (c.doom) u.doom = true; if (c.muscle) u.muscle = true; if (c.hangover) u.hangover = true;
+    u.items.push(d); (u.foe = u.foe || []).push(d);
+    ev(s, { t:'buff', side:ei, i:j, n:c.atk });
+  } else switch (d) {
+    case 'a_dinnyes': damageUnit(s, ei, j, 3); break;
+    case 'a_abszint': damageUnit(s, ei, j, 7); break;
+    case 'a_tubi': damageUnit(s, ei, j, 6); damageHero(s, pi, 3); break;
+    case 'a_kancso': damageUnit(s, ei, j, 3); damageHero(s, ei, 3); break;
+    case 'a_talca': damageUnit(s, ei, j, 2); break;
+    case 'a_koktel': if (o === 'buff') { u.atk += 5; ev(s, { t:'buff', side:ei, i:j, n:5 }); } else damageUnit(s, ei, j, 5); break;
+    case 'a_mangos': healUnit(s, ei, j, 4); break;
+    case 'a_rehab': healUnit(s, ei, j, 3); if (u.stun) { u.stun = 0; ev(s, { t:'unstun', side:ei, i:j }); } break;
+    case 'a_adios': u.stun = Math.max(u.stun || 0, 1); ev(s, { t:'stun', side:ei, i:j }); break;
+  }
+  cleanup(s); checkWin(s);
+}
+const PARTY_FX = { i_energiaital:'+2 támadás', i_akuma:'+5 támadás, de a köre végén meghal', i_vodkakancso:'+4 támadás, utána bénult',
+  a_dinnyes:'3 sebzés', a_abszint:'7 sebzés', a_tubi:'6 sebzés (és 3 a te hősödnek)', a_kancso:'3 sebzés neki és 3 a hősének', a_talca:'2 sebzés',
+  a_koktel:'+5 támadás vagy 5 sebzés', a_mangos:'4 életet gyógyul', a_rehab:'3 életet gyógyul, és magához tér', a_adios:'a következő körében bénult' };
 
 function dropLocation(s, how) {   // a pályán lévő helyszín eltűnik (lecserélik vagy kitiltják)
   const L = s.location; if (!L) return;

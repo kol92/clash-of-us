@@ -162,6 +162,7 @@ const ART = {
   c_veghtomi: { src:'art/veghtomi.webp', pos:'45% 15%' },
   c_zana:   { src:'art/zana.webp', pos:'38% 20%' },
   c_norbi:  { src:'art/norbi.webp', pos:'42% 18%' },
+  c_tomiparti: { src:'art/tomiparti.webp', av:'47% 26%', pos:'47% 24%' },
   c_amszterdam: { src:'art/amszterdam.webp', av:'60% 22%', pos:'58% 24%' },
   c_barnaelet: { src:'art/barnaelet.webp', av:'54% 26%', pos:'54% 26%' },
   f_bender: { src:'art/f_bender.webp', av:'55% 40%', pos:'55% 34%' },   // Kánon esemény lapok
@@ -416,6 +417,43 @@ async function zapFx(e) {
   if (e.kind === 'blast') floatAt(to, '💥 Utolsó ütés!', 'dmg');
   await sleep(e.kind === 'kill' || e.kind === 'sound' ? 380 : 200);
 }
+// Tomi, a parti lelke: előbb felfordul, melyik italt húzta, aztán az ital rárepül a célpontra
+async function partyFx(e) {
+  const c = CARD[e.id]; if (!c) return;
+  const who = e.side === ME ? 'Tomi, a parti lelke' : 'Az ellenfél parti lelke';
+  const tName = e.tid ? CARD[e.tid].name : '';
+  const what = e.id === 'a_koktel' ? (e.o === 'buff' ? '+5 támadás' : '5 sebzés') : e.id === 'a_tubi' ? `6 sebzés (és 3 ${e.side === ME ? 'a te hősödnek' : 'a saját hősének'})` : PARTY_FX[e.id] || '';
+  const back = document.createElement('div'); back.className = 'played party';
+  back.innerHTML = `<div class="wrap"><span class="tag">🥳 ${who} kioszt egy italt…</span><span class="flip rev"><span class="flip-in"><span class="face back"></span><span class="face front">${cardHTML(e.id, { big: true })}</span></span></span><span class="party-to">${e.none ? 'Nincs kire önteni – kárba veszett! 🫗' : `🍸 → <b>${escH(tName)}</b>: ${what}`}</span><span class="skip">Koppints a folytatáshoz</span></div>`;
+  $('#layer').appendChild(back);
+  const wrap = back.querySelector('.wrap'), to = back.querySelector('.party-to');
+  const src = cellEl(e.side, e.i), sr = src ? src.getBoundingClientRect() : null, wr = wrap.getBoundingClientRect();
+  back.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 200, fill: 'forwards' });
+  to.style.opacity = 0;
+  await wrap.animate([{ transform: sr ? `translate(${sr.left + sr.width / 2 - (wr.left + wr.width / 2)}px,${sr.top + sr.height / 2 - (wr.top + wr.height / 2)}px) scale(.25) rotate(8deg)` : 'scale(.3)', opacity: 0 },
+                      { transform: 'none', opacity: 1 }], { duration: 420, easing: 'cubic-bezier(.2,1.3,.4,1)', fill: 'forwards' }).finished;
+  await back.querySelector('.flip-in').animate([{ transform: 'rotateY(180deg)' }, { transform: 'rotateY(0deg)' }], { duration: 520, easing: 'cubic-bezier(.3,.1,.3,1.2)', fill: 'forwards' }).finished;
+  to.animate([{ opacity: 0, transform: 'translateY(6px)' }, { opacity: 1, transform: 'none' }], { duration: 260, fill: 'forwards' });
+  const dest = e.none ? null : cellEl(e.ts, e.ti);
+  if (dest) dest.classList.add('aim');
+  await Promise.race([sleep(1700), new Promise(r => back.addEventListener('pointerdown', r, { once: true }))]);
+  back.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 420, fill: 'forwards' });
+  if (dest) {
+    const r = dest.getBoundingClientRect(), w2 = wrap.getBoundingClientRect();
+    const dx = (r.left + r.width / 2) - (w2.left + w2.width / 2), dy = (r.top + r.height / 2) - (w2.top + w2.height / 2);
+    await wrap.animate([{ transform: 'none', opacity: 1 }, { transform: `translate(${dx}px,${dy}px) scale(.2) rotate(-14deg)`, opacity: .5 }],
+                       { duration: 400, easing: 'cubic-bezier(.5,0,.8,.4)', fill: 'forwards' }).finished;
+    dest.classList.remove('aim');
+    const boom = document.createElement('div'); boom.className = 'zap-boom party';
+    boom.style.left = (r.left + r.width / 2) + 'px'; boom.style.top = (r.top + r.height / 2) + 'px'; $('#layer').appendChild(boom); setTimeout(() => boom.remove(), 650);
+    const u = unitAt(e.ts, e.ti); if (u) fx(u, 'fx-hit');
+    floatAt(dest, `🍸 ${c.name}`, 'info');
+    await sleep(320);
+  } else {
+    await wrap.animate([{ transform: 'none', opacity: 1 }, { transform: 'scale(1.1) rotate(6deg)', opacity: 0 }], { duration: 320, fill: 'forwards' }).finished;
+  }
+  back.remove();
+}
 let revealed = new Set();
 // kijátszás: előbb maga a lap jelenik meg (karakter leszáll a helyére, akció/eszköz/helyszín felvillan), csak utána jönnek a hatásai
 const preLanded = new Set();
@@ -499,6 +537,7 @@ async function animateEvents(evs) {
       case 'drinkgift': floatAt(anchor, e.side === ME ? `🍸 ${CARD[e.id].name} a kezedbe!` : '🍸 Ital a kezébe!', 'info'); hold = Math.max(hold, 700); break;
       case 'deathblast': floatAt(anchor, '💥 Utolsó ütés!', 'dmg'); hold = Math.max(hold, 450); break;
       case 'zap': await zapFx(e); break;
+      case 'party': await partyFx(e); break;
       case 'locgone': floatAt(anchor, `🚫 ${CARD[e.id].name} bezárt`, 'info'); hold = Math.max(hold, 600); break;
       case 'swap': floatAt(anchor, 'Helycsere!', 'info'); hold = Math.max(hold, 300); break;
       case 'push': floatAt(anchor, 'Arrébb tolva!', 'info'); hold = Math.max(hold, 300); break;
