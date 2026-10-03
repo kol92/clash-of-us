@@ -88,7 +88,7 @@ function cardHTML(id, o = {}) {
   const fk = frameKind(c, o);
   const tl = textHTML(c).replace(/<[^>]+>/g, '').length, tlc = tl > 150 ? ' tl-l tl-xl' : tl > 95 ? ' tl-l' : tl > 62 ? ' tl-m' : '';
   const fcls = fk === 'kanon' ? (o.foil ? ' framed xf xf-kanon xf-kanonfa kholo' : ' framed xf xf-kanon') + tlc : fk === 'foil' ? ' foil' : ' framed' + tlc;
-  return `<div class="card ${TYPE[c.type][1]}${c.finisher ? ' kanon' : ''}${c.variantOf ? ' variant' : ''}${o.big ? ' big' : ''}${fcls}${o.cls ? ' ' + o.cls : ''}" style="--h:${hueOf(id)}" ${o.attrs || ''}>
+  return `<div class="card ${TYPE[c.type][1]}${c.finisher ? ' kanon' : ''}${c.variantOf ? ' variant' : ''}${o.big ? ' big' : ''}${fcls}${o.cls ? ' ' + o.cls : ''}" style="--h:${hueOf(id)}" ${o.big ? `data-rar="${c.rarity}"` : ''} ${o.attrs || ''}>
     <div class="cframe">
       ${ART[id] ? `<div class="art has-art" style="${artStyle(id, o.big)}"></div>`
         : `<div class="art"><span class="mono">${initials(c.name)}</span>${o.big && !o.foil ? '<span class="artnote">Illusztráció helye</span>' : ''}</div>`}
@@ -343,6 +343,9 @@ function openGrave(pi) {
 
 // ---------- modal, toast, lebegő számok ----------
 function openModal(inner, live, help = '') {
+  // nagy lapnézet: a felirat elé a lap ritkaságjelvénye (gyűjteményben, meccs közben, temetőben egyaránt)
+  const rm = /data-rar="(\w)"/.exec(inner);
+  if (rm && RAR[rm[1]] && !(live || '').includes('class="rar')) live = `<i class="rar r-${rm[1]}" title="${RAR[rm[1]]}" aria-label="${RAR[rm[1]]}"></i> ${RAR[rm[1]]}${live ? ' · ' + live : ''}`;
   const o = document.createElement('div'); o.className = 'overlay';
   o.innerHTML = `<div class="modal">${inner}${live ? `<div class="live">${live}</div>` : ''}${help}<div class="close-hint">Koppints bárhova a bezáráshoz</div></div>`;
   const t0 = performance.now();
