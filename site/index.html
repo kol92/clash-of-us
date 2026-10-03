@@ -207,6 +207,14 @@ h1,h2,h3{font-family:var(--display);font-weight:400;letter-spacing:.01em;text-wr
 .locchip small{display:block;font-size:11px;line-height:1.25;color:var(--mute);}
 .turnbox{display:grid;gap:4px;justify-items:center;align-content:center;}
 .rrow{display:flex;align-items:center;gap:6px;}
+.logbox{max-height:80vh;display:flex;flex-direction:column;gap:8px;text-align:left;}
+.logbox h3{margin:0;text-align:center;}
+.logbox .lg-list{overflow:auto;flex:1;min-height:0;display:grid;gap:10px;padding-right:2px;}
+.logbox .lg-turn h4{margin:0 0 4px;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--gold);}
+.logbox ul{margin:0;padding:0;list-style:none;display:grid;gap:3px;font-size:13px;line-height:1.35;}
+.logbox li{padding:4px 8px;border-radius:8px;background:rgba(255,255,255,.05);text-align:left;}
+.logbox .lg-turn h4{text-align:left;}
+.logbox li b{color:#fff;}
 .flagbtn{width:24px;height:24px;border-radius:50%;padding:0;border:1px solid rgba(255,255,255,.25);background:rgba(0,0,0,.35);color:#cfe;font-size:12px;cursor:pointer;line-height:1;}
 .round{font-size:10px;font-weight:900;letter-spacing:.12em;text-transform:uppercase;color:var(--mute);font-variant-numeric:tabular-nums;}
 .round.last{color:var(--red);}
@@ -1618,6 +1626,17 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%;}
   color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.8);padding:3px 4px;}
 .seg button{border:5px solid transparent;border-width:5px 14px;padding:3px 4px;}
 /* ---- Döntetlen banner ---- */
+.result.resart{max-width:340px;gap:10px;}
+.result .res-art{position:relative;width:min(300px,74vw);margin:0 auto;animation:resPop .55s cubic-bezier(.2,1.3,.4,1) both;}
+.result .res-art img{display:block;width:100%;height:auto;filter:drop-shadow(0 10px 24px rgba(0,0,0,.7));}
+.result .res-go{position:absolute;border:0;background:transparent;cursor:pointer;border-radius:14px;padding:0;}
+.result .res-art.win .res-go{left:11%;top:76.5%;width:78%;height:8.5%;}
+.result .res-art.lose .res-go{left:18%;top:76.5%;width:64%;height:10%;}
+.result .res-go:focus-visible{outline:3px solid #fff;}
+.result.resart .row{grid-template-columns:1fr;}
+.result.resart .row [data-r="menu"]{display:none;}
+@keyframes resPop{from{transform:scale(.6);opacity:0}to{transform:none;opacity:1}}
+@media (prefers-reduced-motion: reduce){.result .res-art{animation:none;}}
 .result .banner-h{margin:-6px auto 4px;max-width:300px;}
 .result .banner-h img{display:block;width:100%;height:auto;filter:drop-shadow(0 4px 8px rgba(0,0,0,.6));}
 @media (prefers-reduced-motion:reduce){#endBtn.nudge{animation:none!important;}}
@@ -1789,7 +1808,7 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%;}
     <div class="hbar" id="eBar"></div>
     <div class="lane" id="eLane"></div>
     <div class="mid"><button class="locchip empty" id="loc"></button>
-      <div class="turnbox"><div class="rrow"><button class="flagbtn" id="flagBtn" aria-label="Meccs menü">⚑</button><button class="flagbtn" id="emoBtn" aria-label="Gyors üzenet" hidden>💬</button><span class="round" id="round"></span></div><button class="btn small primary" id="endBtn">Kör vége</button><div class="ttbar" id="ttBar" hidden><i></i><span></span></div></div></div>
+      <div class="turnbox"><div class="rrow"><button class="flagbtn" id="flagBtn" aria-label="Meccs menü">⚑</button><button class="flagbtn" id="logBtn" aria-label="Mi történt? (előzmények)">📜</button><button class="flagbtn" id="emoBtn" aria-label="Gyors üzenet" hidden>💬</button><span class="round" id="round"></span></div><button class="btn small primary" id="endBtn">Kör vége</button><div class="ttbar" id="ttBar" hidden><i></i><span></span></div></div></div>
     <div class="lane" id="pLane"></div>
     <div class="selbar" id="selbar" hidden></div>
     <div class="hand" id="hand"></div>
@@ -1802,7 +1821,7 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%;}
 <script src="vendor/firebase-auth-compat.js"></script>
 <script src="vendor/firebase-firestore-compat.js"></script>
 <script src="vendor/firebase-database-compat.js"></script>
-<script>window.APP_VERSION = "2026.10.04-0004";</script>
+<script>window.APP_VERSION = "2026.10.04-0015";</script>
 <script>// ===== Best of Us – saját szerver (Firebase) =====
 // A játék eredetileg a Claude-os tárolót használta (window.claude.use('db' | 'user' | 'room')).
 // Ez a fájl ugyanazt a felületet adja Firebase-ből, így a játék kódja szinte változatlan maradhat:
@@ -2394,7 +2413,7 @@ function playCard(s, pi, hi, t) {
   p.energy -= cardCost(s, pi, h.id); p.played = (p.played || 0) + 1;
   if (has(p, 'firstTwo') && c.cost > 0 && (p.cheap || 0) < 2) p.cheap = (p.cheap || 0) + 1;
   p.hand.splice(hi, 1);
-  ev(s, { t:'play', side:pi, id:c.id, foil:!!h.foil, at: c.type === 'char' && t && t.k === 'slot' ? t.i : null, o: t && t.o != null ? t.o : undefined });
+  ev(s, { t:'play', side:pi, id:c.id, foil:!!h.foil, tg: t && (t.k === 'unit' || t.k === 'hero') ? { k:t.k, side:t.side, i:t.i } : undefined, at: c.type === 'char' && t && t.k === 'slot' ? t.i : null, o: t && t.o != null ? t.o : undefined });
   if (c.drink) {   // Italos szinergiák: Milo, az örökivó erősödik, Laczkó Tomi húzat (körönként egyszer)
     p.board.forEach((x, j) => { if (x && x.id === 'c_miloivo') { x.atk += 1; ev(s, { t:'buff', side:pi, i:j, n:1 }); } });
     if (!p.drinkDraw && p.board.some(x => x && x.id === 'c_laczko')) { p.drinkDraw = true; const j = p.board.findIndex(x => x && x.id === 'c_laczko'); ev(s, { t:'drinkdraw', side:pi, i:j }); draw(s, pi); }
@@ -3321,6 +3340,74 @@ async function zapFx(e) {
   if (e.kind === 'blast') floatAt(to, '💥 Utolsó ütés!', 'dmg');
   await sleep(e.kind === 'kill' || e.kind === 'sound' ? 380 : 200);
 }
+// ---------- meccs-előzmények: körönként, ki mit csinált (a 📜 gombbal nézhető vissza) ----------
+function logEvents(evs, snap) {
+  if (!S) return; S.log = S.log || [];
+  const who = sd => sd === ME ? 'Te' : (S.pvp ? (S.names?.[sd] || 'Ellenfél') : HERO[S.players[sd].heroId].name);
+  const unitName = (sd, i, hid) => {
+    const now = S.players[sd].board[i], was = snap[sd] && snap[sd][i];
+    const u = was || now; if (!u) return 'egy karakter';
+    if (sd !== ME && (hid ?? u.hidden)) return 'egy rejtett lap';
+    return CARD[u.id].name;
+  };
+  const nm = (sd, i) => i === -1 ? (sd === ME ? 'a hősöd' : who(sd) + ' (hős)') : unitName(sd, i);
+  const group = () => {   // az aktuális kör csoportja (a 'turn' esemény nyit újat)
+    let g = S.log[S.log.length - 1];
+    if (!g) { g = { half: S.half || 1, turn: Math.max(1, Math.ceil((S.half || 1) / 2)), side: S.active, lines: [] }; S.log.push(g); }
+    return g;
+  };
+  for (const e of evs) {
+    if (e.t === 'turn') { const prev = S.log[S.log.length - 1], h = prev ? prev.half + 1 : (S.half || 1);
+      S.log.push({ half: h, turn: Math.ceil(h / 2), side: e.side, lines: [] }); if (S.log.length > 60) S.log.shift(); continue; }
+    const g = group(), L = x => g.lines.push(x);
+    const c = e.id && CARD[e.id];
+    switch (e.t) {
+      case 'play': {
+        const secret = e.side !== ME && c.sneak;
+        const tg = e.tg ? ' → ' + nm(e.tg.side, e.tg.i) : '';
+        L(secret ? `🂠 ${who(e.side)} lerakott egy rejtett lapot` : `▶ ${who(e.side)} kijátszotta: <b>${escH(c.name)}</b>${tg}`); break; }
+      case 'attack': L(`⚔ ${unitName(e.side, e.i)} támad`); break;
+      case 'heroatk': L(`⚔ ${who(e.side)} (Baszó) odacsap`); break;
+      case 'dmg': L(`💥 ${nm(e.side, e.i)}: −${e.n}`); break;
+      case 'heal': L(`💚 ${nm(e.side, e.i)}: +${e.n}`); break;
+      case 'overflow': L(`💪 Izom: ${e.n} átüt a hősre`); break;
+      case 'death': L(`💀 ${CARD[e.id].name} meghalt (${e.side === ME ? 'tiéd' : 'ellenfélé'})`); break;
+      case 'summon': case 'rise': L(`✨ ${CARD[e.id]?.name || 'Egy lap'} a pályára került (${e.side === ME ? 'nálad' : 'az ellenfélnél'})`); break;
+      case 'revive': L(`✨ ${unitName(e.side, e.i)} feltámadt`); break;
+      case 'buff': if (e.i >= 0 && e.n) L(`▲ ${unitName(e.side, e.i)}: +${e.n} támadás`); break;
+      case 'debuff': L(`▼ ${unitName(e.side, e.i)}: −${e.n} támadás`); break;
+      case 'stun': L(`💫 ${unitName(e.side, e.i)} bénult`); break;
+      case 'shield': L(`🛡 ${unitName(e.side, e.i)} pajzsa elnyelte az ütést`); break;
+      case 'bounce': L(`↩ ${unitName(e.side, e.i)} visszakerült a kézbe`); break;
+      case 'stolen': L(`🫳 ${unitName(e.side, e.i)} átállt a másik oldalra`); break;
+      case 'push': L(`➡ Egy karakter arrébb tolva`); break;
+      case 'misfire': L(`🍺 ${unitName(e.side, e.i)} mellé ütött`); break;
+      case 'reveal': if (e.side !== ME) L(`🂠 Felfordult: ${CARD[e.id].name}`); break;
+      case 'party': L(e.none ? `🍸 A parti lelke kiosztott egy italt (${CARD[e.id].name}), de nem volt kire` : `🍸 ${CARD[e.id].name} → ${CARD[e.tid]?.name || 'egy karakter'}`); break;
+      case 'drinkgift': case 'gift': L(`🎁 ${e.side === ME ? CARD[e.id].name + ' a kezedbe' : 'Egy lap az ellenfél kezébe'}`); break;
+      case 'coin': L(`💧 ${e.side === ME ? 'Kaptál' : 'Az ellenfél kapott'} egy pohár vizet`); break;
+      case 'chomp': L(`🦈 A Cápa megette: ${unitName(e.side, e.i)}`); break;
+      case 'sharkgone': L('🦈 A Cápa eltűnt'); break;
+      case 'doom': case 'expire': L(`⌛ ${unitName(e.side, e.i)} eltűnt`); break;
+      case 'lock': L(`🔒 ${e.side === ME ? 'Le vagy bénítva' : 'Az ellenfél le van bénítva'}: a következő körben nem játszhat ki lapot`); break;
+      case 'locgone': L(`🚫 Kitiltva: ${CARD[e.id].name}`); break;
+      case 'mosh': L('🤘 Mosh Pit: az ellenfél karakterei odébb csúsztak'); break;
+      case 'morph': L(`🦹 ${who(e.side)} Baszóvá változott`); break;
+      case 'machine': L(`🤖 ${who(e.side)} Gépüzemmódban visszatért`); break;
+      case 'discard': L(`🗑 ${who(e.side)} eldobta a kezét (${e.n} lap)`); break;
+      case 'burn': L(`🔥 Tele a kéz: elégett egy lap`); break;
+      case 'fatigue': L(`🪫 ${who(e.side)}: üres pakli, ${e.n} sebzés`); break;
+    }
+  }
+}
+function openLog() {
+  const groups = (S && S.log || []).filter(g => g.lines.length).slice(-12).reverse();
+  const body = groups.length ? groups.map(g => `<div class="lg-turn"><h4>${g.turn}. kör · ${g.side === ME ? 'a te köröd' : (S.pvp ? escH(S.names?.[g.side] || 'ellenfél') : HERO[S.players[g.side].heroId].name) + ' köre'}</h4><ul>${g.lines.map(l => `<li>${l}</li>`).join('')}</ul></div>`).join('') : '<p class="live">Még nem történt semmi.</p>';
+  const o = document.createElement('div'); o.className = 'overlay';
+  o.innerHTML = `<div class="modal logbox"><h3>📜 Mi történt?</h3><div class="lg-list">${body}</div><button class="btn primary" data-x>Bezárás</button></div>`;
+  o.onclick = e => { if (e.target === o || e.target.closest('[data-x]')) o.remove(); };
+  $('#layer').appendChild(o);
+}
 // Tomi, a parti lelke: előbb felfordul, melyik italt húzta, aztán az ital rárepül a célpontra
 async function partyFx(e) {
   const c = CARD[e.id]; if (!c) return;
@@ -3486,8 +3573,10 @@ function tallyQuest(evs) {
 async function runFx(fn) {
   const before = new Set([...document.querySelectorAll('.unit[data-uid]')].map(x => x.dataset.uid));
   const pos = new Map([...document.querySelectorAll('.unit[data-uid]')].map(x => [x.dataset.uid, x.getBoundingClientRect()]));
+  const snap = [0, 1].map(sd => S.players[sd].board.map(u => u && { id: u.id, hidden: !!u.hidden }));
   S.events = []; fn();
   const evs = S.events; S.events = [];
+  try { logEvents(evs, snap); } catch {}
   tallyQuest(evs);
   await animateEvents(evs);
   render();
@@ -3844,6 +3933,7 @@ async function doPlay(hi, t) {
   busy = false; render();
   if (S.winner != null) endMatch();
 }
+$('#logBtn').onclick = e => { e.stopPropagation(); if (S) openLog(); };
 $('#flagBtn').onclick = () => {
   if (!S || S.winner != null) return;
   if (S.tut?.onboard) return toast('Előbb játszd végig a gyakorló meccset – utána jön a főmenü 🙂');
@@ -4127,6 +4217,8 @@ function showMulligan(first) {
   };
 }
 
+// Nyertél / Vesztettél tábla: a képen lévő „Folytatás” gomb a menübe visz
+const resultArt = win => `<div class="res-art${win ? ' win' : ' lose'}"><img src="art/ui/result-${win ? 'win' : 'lose'}.webp" alt="${win ? 'Nyertél – szép győzelem!' : 'Vesztettél – a következő csata a tiéd lehet!'}"><button class="res-go" data-r="menu" aria-label="Folytatás"></button></div>`;
 function endMatch() {
   if (S.tut) { tutHide(); return tutFinish(); }
   if (S.pvp) return pvpEndMatch();
@@ -4143,7 +4235,7 @@ function endMatch() {
     + qd.map(q => `<div class="q-done-pop">✓ Küldetés teljesítve: <b>${q.txt}</b><em>+${q.rew}</em></div>`).join('')
     + (px ? `<div class="sp-pop${px.up ? ' up' : ''}"><b>+${px.gain} XP</b> Season Pass${px.up ? ` · <em>Szintlépés! ${px.lv}. szint – vedd át a jutalmat</em>` : ` · ${px.lv}. szint (${px.inLv}/${PASS_XP.perLevel})`}</div>` : '');
   const o = document.createElement('div'); o.className = 'overlay';
-  o.innerHTML = `<div class="modal result${win ? '' : ' lose'}">${draw ? '<h2 class="banner-h"><img src="art/ui/banner-draw.webp?v=48228a44" alt="Döntetlen"></h2>' : `<h2>${title}</h2>`}<p>${why}</p>${reward}
+  o.innerHTML = `<div class="modal result${win ? '' : ' lose'}${draw ? '' : ' resart'}">${draw ? '<h2 class="banner-h"><img src="art/ui/banner-draw.webp?v=48228a44" alt="Döntetlen"></h2>' : resultArt(win)}<p>${why}</p>${reward}
     <div class="row"><button class="btn" data-r="menu">Menü</button><button class="btn primary" data-r="again">Új meccs</button></div></div>`;
   o.onclick = e => { const b = e.target.closest('[data-r]'); if (!b) return; o.remove();
     if (b.dataset.r === 'again') { const d = allDecks().find(x => x.id === ui.deck); if (d && !deckIssue(d)) startMatch(d.hero, ui.deck); else { renderPick(); show('scr-pick'); } } else { renderMenuFan(); renderProfileBar(); show('scr-menu'); } };
@@ -5417,7 +5509,7 @@ function pvpSeed(tag) { seedRng(pvpHash(PVP.id + ':' + (tag || PVP.v + 1))); }
 const pvpDoc = id => Store.db.doc('pvp/' + id);
 const pvpMine = d => d.host?.uid === Store.uid || d.guest?.uid === Store.uid;
 const pvpSideOf = d => d.host?.uid === Store.uid ? 0 : 1;
-const pvpClean = s => { const c = JSON.parse(JSON.stringify(s)); delete c.events; delete c.qs; delete c.pvp; delete c.qDone; return c; };
+const pvpClean = s => { const c = JSON.parse(JSON.stringify(s)); delete c.events; delete c.qs; delete c.pvp; delete c.qDone; delete c.log; return c; };
 function pvpMyTurn(d) {
   if (!pvpMine(d)) return false;
   const me = pvpSideOf(d);
@@ -5633,7 +5725,7 @@ async function pvpDrain() {
       PVP.v = d.v;   // a beírt állás a mérvadó
       if (d.turnAt) PVP.turnAt = d.turnAt; if (d.afk) PVP.afk = d.afk;
       const keepSeen = ui.handSeen;
-      S = { ...JSON.parse(JSON.stringify(d.state)), events: [], pvp: S.pvp, qs: S.qs, qDone: S.qDone };
+      S = { ...JSON.parse(JSON.stringify(d.state)), events: [], pvp: S.pvp, qs: S.qs, qDone: S.qDone, log: S.log };
       if (wasMull) ui.handSeen = null; else ui.handSeen = keepSeen;
       busy = false; render();
       if (S.winner != null) { endMatch(); break; }
@@ -5672,7 +5764,7 @@ function pvpEndMatch() {
     : S.reason === 'time' ? `Letelt a ${MAX_HALF / 2} kör. Életek: te ${S.players[ME].hp}, ${opp} ${S.players[BOT].hp}.`
     : draw ? 'Mindkét hős egyszerre dőlt ki.' : win ? `${opp} hőse kiütve!` : `${opp} kiütötte a hősödet.`;
   const o = document.createElement('div'); o.className = 'overlay';
-  o.innerHTML = `<div class="modal result${win ? '' : ' lose'}">${draw ? '<h2 class="banner-h"><img src="art/ui/banner-draw.webp?v=48228a44" alt="Döntetlen"></h2>' : `<h2>${win ? 'Győzelem!' : 'Vereség'}</h2>`}<p>${why}</p>${reward}
+  o.innerHTML = `<div class="modal result${win ? '' : ' lose'}${draw ? '' : ' resart'}">${draw ? '<h2 class="banner-h"><img src="art/ui/banner-draw.webp?v=48228a44" alt="Döntetlen"></h2>' : resultArt(win)}<p>${why}</p>${reward}
     <div class="row"><button class="btn" data-r="menu">Menü</button><button class="btn primary" data-r="pvp">PvP</button></div></div>`;
   o.onclick = e => { const b = e.target.closest('[data-r]'); if (!b) return; o.remove();
     if (b.dataset.r === 'pvp') pvpLeave(); else { pvpLeave(); renderMenuFan(); renderProfileBar(); show('scr-menu'); } };

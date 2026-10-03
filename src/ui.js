@@ -426,6 +426,74 @@ async function zapFx(e) {
   if (e.kind === 'blast') floatAt(to, '💥 Utolsó ütés!', 'dmg');
   await sleep(e.kind === 'kill' || e.kind === 'sound' ? 380 : 200);
 }
+// ---------- meccs-előzmények: körönként, ki mit csinált (a 📜 gombbal nézhető vissza) ----------
+function logEvents(evs, snap) {
+  if (!S) return; S.log = S.log || [];
+  const who = sd => sd === ME ? 'Te' : (S.pvp ? (S.names?.[sd] || 'Ellenfél') : HERO[S.players[sd].heroId].name);
+  const unitName = (sd, i, hid) => {
+    const now = S.players[sd].board[i], was = snap[sd] && snap[sd][i];
+    const u = was || now; if (!u) return 'egy karakter';
+    if (sd !== ME && (hid ?? u.hidden)) return 'egy rejtett lap';
+    return CARD[u.id].name;
+  };
+  const nm = (sd, i) => i === -1 ? (sd === ME ? 'a hősöd' : who(sd) + ' (hős)') : unitName(sd, i);
+  const group = () => {   // az aktuális kör csoportja (a 'turn' esemény nyit újat)
+    let g = S.log[S.log.length - 1];
+    if (!g) { g = { half: S.half || 1, turn: Math.max(1, Math.ceil((S.half || 1) / 2)), side: S.active, lines: [] }; S.log.push(g); }
+    return g;
+  };
+  for (const e of evs) {
+    if (e.t === 'turn') { const prev = S.log[S.log.length - 1], h = prev ? prev.half + 1 : (S.half || 1);
+      S.log.push({ half: h, turn: Math.ceil(h / 2), side: e.side, lines: [] }); if (S.log.length > 60) S.log.shift(); continue; }
+    const g = group(), L = x => g.lines.push(x);
+    const c = e.id && CARD[e.id];
+    switch (e.t) {
+      case 'play': {
+        const secret = e.side !== ME && c.sneak;
+        const tg = e.tg ? ' → ' + nm(e.tg.side, e.tg.i) : '';
+        L(secret ? `🂠 ${who(e.side)} lerakott egy rejtett lapot` : `▶ ${who(e.side)} kijátszotta: <b>${escH(c.name)}</b>${tg}`); break; }
+      case 'attack': L(`⚔ ${unitName(e.side, e.i)} támad`); break;
+      case 'heroatk': L(`⚔ ${who(e.side)} (Baszó) odacsap`); break;
+      case 'dmg': L(`💥 ${nm(e.side, e.i)}: −${e.n}`); break;
+      case 'heal': L(`💚 ${nm(e.side, e.i)}: +${e.n}`); break;
+      case 'overflow': L(`💪 Izom: ${e.n} átüt a hősre`); break;
+      case 'death': L(`💀 ${CARD[e.id].name} meghalt (${e.side === ME ? 'tiéd' : 'ellenfélé'})`); break;
+      case 'summon': case 'rise': L(`✨ ${CARD[e.id]?.name || 'Egy lap'} a pályára került (${e.side === ME ? 'nálad' : 'az ellenfélnél'})`); break;
+      case 'revive': L(`✨ ${unitName(e.side, e.i)} feltámadt`); break;
+      case 'buff': if (e.i >= 0 && e.n) L(`▲ ${unitName(e.side, e.i)}: +${e.n} támadás`); break;
+      case 'debuff': L(`▼ ${unitName(e.side, e.i)}: −${e.n} támadás`); break;
+      case 'stun': L(`💫 ${unitName(e.side, e.i)} bénult`); break;
+      case 'shield': L(`🛡 ${unitName(e.side, e.i)} pajzsa elnyelte az ütést`); break;
+      case 'bounce': L(`↩ ${unitName(e.side, e.i)} visszakerült a kézbe`); break;
+      case 'stolen': L(`🫳 ${unitName(e.side, e.i)} átállt a másik oldalra`); break;
+      case 'push': L(`➡ Egy karakter arrébb tolva`); break;
+      case 'misfire': L(`🍺 ${unitName(e.side, e.i)} mellé ütött`); break;
+      case 'reveal': if (e.side !== ME) L(`🂠 Felfordult: ${CARD[e.id].name}`); break;
+      case 'party': L(e.none ? `🍸 A parti lelke kiosztott egy italt (${CARD[e.id].name}), de nem volt kire` : `🍸 ${CARD[e.id].name} → ${CARD[e.tid]?.name || 'egy karakter'}`); break;
+      case 'drinkgift': case 'gift': L(`🎁 ${e.side === ME ? CARD[e.id].name + ' a kezedbe' : 'Egy lap az ellenfél kezébe'}`); break;
+      case 'coin': L(`💧 ${e.side === ME ? 'Kaptál' : 'Az ellenfél kapott'} egy pohár vizet`); break;
+      case 'chomp': L(`🦈 A Cápa megette: ${unitName(e.side, e.i)}`); break;
+      case 'sharkgone': L('🦈 A Cápa eltűnt'); break;
+      case 'doom': case 'expire': L(`⌛ ${unitName(e.side, e.i)} eltűnt`); break;
+      case 'lock': L(`🔒 ${e.side === ME ? 'Le vagy bénítva' : 'Az ellenfél le van bénítva'}: a következő körben nem játszhat ki lapot`); break;
+      case 'locgone': L(`🚫 Kitiltva: ${CARD[e.id].name}`); break;
+      case 'mosh': L('🤘 Mosh Pit: az ellenfél karakterei odébb csúsztak'); break;
+      case 'morph': L(`🦹 ${who(e.side)} Baszóvá változott`); break;
+      case 'machine': L(`🤖 ${who(e.side)} Gépüzemmódban visszatért`); break;
+      case 'discard': L(`🗑 ${who(e.side)} eldobta a kezét (${e.n} lap)`); break;
+      case 'burn': L(`🔥 Tele a kéz: elégett egy lap`); break;
+      case 'fatigue': L(`🪫 ${who(e.side)}: üres pakli, ${e.n} sebzés`); break;
+    }
+  }
+}
+function openLog() {
+  const groups = (S && S.log || []).filter(g => g.lines.length).slice(-12).reverse();
+  const body = groups.length ? groups.map(g => `<div class="lg-turn"><h4>${g.turn}. kör · ${g.side === ME ? 'a te köröd' : (S.pvp ? escH(S.names?.[g.side] || 'ellenfél') : HERO[S.players[g.side].heroId].name) + ' köre'}</h4><ul>${g.lines.map(l => `<li>${l}</li>`).join('')}</ul></div>`).join('') : '<p class="live">Még nem történt semmi.</p>';
+  const o = document.createElement('div'); o.className = 'overlay';
+  o.innerHTML = `<div class="modal logbox"><h3>📜 Mi történt?</h3><div class="lg-list">${body}</div><button class="btn primary" data-x>Bezárás</button></div>`;
+  o.onclick = e => { if (e.target === o || e.target.closest('[data-x]')) o.remove(); };
+  $('#layer').appendChild(o);
+}
 // Tomi, a parti lelke: előbb felfordul, melyik italt húzta, aztán az ital rárepül a célpontra
 async function partyFx(e) {
   const c = CARD[e.id]; if (!c) return;
@@ -591,8 +659,10 @@ function tallyQuest(evs) {
 async function runFx(fn) {
   const before = new Set([...document.querySelectorAll('.unit[data-uid]')].map(x => x.dataset.uid));
   const pos = new Map([...document.querySelectorAll('.unit[data-uid]')].map(x => [x.dataset.uid, x.getBoundingClientRect()]));
+  const snap = [0, 1].map(sd => S.players[sd].board.map(u => u && { id: u.id, hidden: !!u.hidden }));
   S.events = []; fn();
   const evs = S.events; S.events = [];
+  try { logEvents(evs, snap); } catch {}
   tallyQuest(evs);
   await animateEvents(evs);
   render();
@@ -949,6 +1019,7 @@ async function doPlay(hi, t) {
   busy = false; render();
   if (S.winner != null) endMatch();
 }
+$('#logBtn').onclick = e => { e.stopPropagation(); if (S) openLog(); };
 $('#flagBtn').onclick = () => {
   if (!S || S.winner != null) return;
   if (S.tut?.onboard) return toast('Előbb játszd végig a gyakorló meccset – utána jön a főmenü 🙂');
@@ -1232,6 +1303,8 @@ function showMulligan(first) {
   };
 }
 
+// Nyertél / Vesztettél tábla: a képen lévő „Folytatás” gomb a menübe visz
+const resultArt = win => `<div class="res-art${win ? ' win' : ' lose'}"><img src="art/ui/result-${win ? 'win' : 'lose'}.webp" alt="${win ? 'Nyertél – szép győzelem!' : 'Vesztettél – a következő csata a tiéd lehet!'}"><button class="res-go" data-r="menu" aria-label="Folytatás"></button></div>`;
 function endMatch() {
   if (S.tut) { tutHide(); return tutFinish(); }
   if (S.pvp) return pvpEndMatch();
@@ -1248,7 +1321,7 @@ function endMatch() {
     + qd.map(q => `<div class="q-done-pop">✓ Küldetés teljesítve: <b>${q.txt}</b><em>+${q.rew}</em></div>`).join('')
     + (px ? `<div class="sp-pop${px.up ? ' up' : ''}"><b>+${px.gain} XP</b> Season Pass${px.up ? ` · <em>Szintlépés! ${px.lv}. szint – vedd át a jutalmat</em>` : ` · ${px.lv}. szint (${px.inLv}/${PASS_XP.perLevel})`}</div>` : '');
   const o = document.createElement('div'); o.className = 'overlay';
-  o.innerHTML = `<div class="modal result${win ? '' : ' lose'}">${draw ? '<h2 class="banner-h"><img src="art/ui/banner-draw.webp" alt="Döntetlen"></h2>' : `<h2>${title}</h2>`}<p>${why}</p>${reward}
+  o.innerHTML = `<div class="modal result${win ? '' : ' lose'}${draw ? '' : ' resart'}">${draw ? '<h2 class="banner-h"><img src="art/ui/banner-draw.webp" alt="Döntetlen"></h2>' : resultArt(win)}<p>${why}</p>${reward}
     <div class="row"><button class="btn" data-r="menu">Menü</button><button class="btn primary" data-r="again">Új meccs</button></div></div>`;
   o.onclick = e => { const b = e.target.closest('[data-r]'); if (!b) return; o.remove();
     if (b.dataset.r === 'again') { const d = allDecks().find(x => x.id === ui.deck); if (d && !deckIssue(d)) startMatch(d.hero, ui.deck); else { renderPick(); show('scr-pick'); } } else { renderMenuFan(); renderProfileBar(); show('scr-menu'); } };

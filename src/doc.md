@@ -317,6 +317,10 @@ Hősképesség-ötletek a táblázatban (még nem zöldek, nincsenek beépítve)
 - Hősportré: ezüst-kék kör keret; az éppen soron lévő játékosé a világító változat.
 - A Siófoki Kórház panorámát nem használjuk.
 
+## Meccs-előzmények és eredményablak (2026-10-04)
+- Meccs közben a ⚑ melletti 📜 gomb megnyitja a „Mi történt?” ablakot: körönként (legújabb felül, az utolsó 12 kör) ki mit játszott ki és kire, ki támadott, sebzések, gyógyulások, halálok, idézések, bénulás, pajzs, lopás, Cápa, kitiltás stb. Az ellenfél rejtett lapja „egy rejtett lap”, amíg fel nem fordul. PvP-ben is működik (helyben gyűlik, nem kerül a szerverre).
+- Nyertél / Vesztettél: a meccs végén a ChatGPT-s táblakép jelenik meg (art/ui/result-win|lose.webp); a képen lévő „Folytatás” gomb a menübe visz, alatta az ok, a coin-, küldetés- és Season Pass-jutalom, és az „Új meccs” (PvP-ben „PvP”) gomb. Döntetlennél marad a régi szalag.
+
 ## Technikai megjegyzések
 - Minden illusztrációból két méret van: 360 px széles a kis lapokhoz (kéz, tábla, gyűjtemény, temető) és 800 px a nagy nézethez. A keretekből is van kicsi (300 px). Új képnél mindkettőt el kell készíteni.
 - Induláskor a kis képek és keretek előre letöltődnek és dekódolódnak, a nagyok utána, a háttérben.

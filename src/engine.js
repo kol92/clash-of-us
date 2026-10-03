@@ -346,7 +346,7 @@ function playCard(s, pi, hi, t) {
   p.energy -= cardCost(s, pi, h.id); p.played = (p.played || 0) + 1;
   if (has(p, 'firstTwo') && c.cost > 0 && (p.cheap || 0) < 2) p.cheap = (p.cheap || 0) + 1;
   p.hand.splice(hi, 1);
-  ev(s, { t:'play', side:pi, id:c.id, foil:!!h.foil, at: c.type === 'char' && t && t.k === 'slot' ? t.i : null, o: t && t.o != null ? t.o : undefined });
+  ev(s, { t:'play', side:pi, id:c.id, foil:!!h.foil, tg: t && (t.k === 'unit' || t.k === 'hero') ? { k:t.k, side:t.side, i:t.i } : undefined, at: c.type === 'char' && t && t.k === 'slot' ? t.i : null, o: t && t.o != null ? t.o : undefined });
   if (c.drink) {   // Italos szinergiák: Milo, az örökivó erősödik, Laczkó Tomi húzat (körönként egyszer)
     p.board.forEach((x, j) => { if (x && x.id === 'c_miloivo') { x.atk += 1; ev(s, { t:'buff', side:pi, i:j, n:1 }); } });
     if (!p.drinkDraw && p.board.some(x => x && x.id === 'c_laczko')) { p.drinkDraw = true; const j = p.board.findIndex(x => x && x.id === 'c_laczko'); ev(s, { t:'drinkdraw', side:pi, i:j }); draw(s, pi); }

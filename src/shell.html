@@ -192,6 +192,14 @@ h1,h2,h3{font-family:var(--display);font-weight:400;letter-spacing:.01em;text-wr
 .locchip small{display:block;font-size:11px;line-height:1.25;color:var(--mute);}
 .turnbox{display:grid;gap:4px;justify-items:center;align-content:center;}
 .rrow{display:flex;align-items:center;gap:6px;}
+.logbox{max-height:80vh;display:flex;flex-direction:column;gap:8px;text-align:left;}
+.logbox h3{margin:0;text-align:center;}
+.logbox .lg-list{overflow:auto;flex:1;min-height:0;display:grid;gap:10px;padding-right:2px;}
+.logbox .lg-turn h4{margin:0 0 4px;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--gold);}
+.logbox ul{margin:0;padding:0;list-style:none;display:grid;gap:3px;font-size:13px;line-height:1.35;}
+.logbox li{padding:4px 8px;border-radius:8px;background:rgba(255,255,255,.05);text-align:left;}
+.logbox .lg-turn h4{text-align:left;}
+.logbox li b{color:#fff;}
 .flagbtn{width:24px;height:24px;border-radius:50%;padding:0;border:1px solid rgba(255,255,255,.25);background:rgba(0,0,0,.35);color:#cfe;font-size:12px;cursor:pointer;line-height:1;}
 .round{font-size:10px;font-weight:900;letter-spacing:.12em;text-transform:uppercase;color:var(--mute);font-variant-numeric:tabular-nums;}
 .round.last{color:var(--red);}
@@ -1603,6 +1611,17 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%;}
   color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.8);padding:3px 4px;}
 .seg button{border:5px solid transparent;border-width:5px 14px;padding:3px 4px;}
 /* ---- Döntetlen banner ---- */
+.result.resart{max-width:340px;gap:10px;}
+.result .res-art{position:relative;width:min(300px,74vw);margin:0 auto;animation:resPop .55s cubic-bezier(.2,1.3,.4,1) both;}
+.result .res-art img{display:block;width:100%;height:auto;filter:drop-shadow(0 10px 24px rgba(0,0,0,.7));}
+.result .res-go{position:absolute;border:0;background:transparent;cursor:pointer;border-radius:14px;padding:0;}
+.result .res-art.win .res-go{left:11%;top:76.5%;width:78%;height:8.5%;}
+.result .res-art.lose .res-go{left:18%;top:76.5%;width:64%;height:10%;}
+.result .res-go:focus-visible{outline:3px solid #fff;}
+.result.resart .row{grid-template-columns:1fr;}
+.result.resart .row [data-r="menu"]{display:none;}
+@keyframes resPop{from{transform:scale(.6);opacity:0}to{transform:none;opacity:1}}
+@media (prefers-reduced-motion: reduce){.result .res-art{animation:none;}}
 .result .banner-h{margin:-6px auto 4px;max-width:300px;}
 .result .banner-h img{display:block;width:100%;height:auto;filter:drop-shadow(0 4px 8px rgba(0,0,0,.6));}
 @media (prefers-reduced-motion:reduce){#endBtn.nudge{animation:none!important;}}
@@ -1771,7 +1790,7 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%;}
     <div class="hbar" id="eBar"></div>
     <div class="lane" id="eLane"></div>
     <div class="mid"><button class="locchip empty" id="loc"></button>
-      <div class="turnbox"><div class="rrow"><button class="flagbtn" id="flagBtn" aria-label="Meccs menü">⚑</button><button class="flagbtn" id="emoBtn" aria-label="Gyors üzenet" hidden>💬</button><span class="round" id="round"></span></div><button class="btn small primary" id="endBtn">Kör vége</button><div class="ttbar" id="ttBar" hidden><i></i><span></span></div></div></div>
+      <div class="turnbox"><div class="rrow"><button class="flagbtn" id="flagBtn" aria-label="Meccs menü">⚑</button><button class="flagbtn" id="logBtn" aria-label="Mi történt? (előzmények)">📜</button><button class="flagbtn" id="emoBtn" aria-label="Gyors üzenet" hidden>💬</button><span class="round" id="round"></span></div><button class="btn small primary" id="endBtn">Kör vége</button><div class="ttbar" id="ttBar" hidden><i></i><span></span></div></div></div>
     <div class="lane" id="pLane"></div>
     <div class="selbar" id="selbar" hidden></div>
     <div class="hand" id="hand"></div>

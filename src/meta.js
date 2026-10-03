@@ -1184,7 +1184,7 @@ function pvpSeed(tag) { seedRng(pvpHash(PVP.id + ':' + (tag || PVP.v + 1))); }
 const pvpDoc = id => Store.db.doc('pvp/' + id);
 const pvpMine = d => d.host?.uid === Store.uid || d.guest?.uid === Store.uid;
 const pvpSideOf = d => d.host?.uid === Store.uid ? 0 : 1;
-const pvpClean = s => { const c = JSON.parse(JSON.stringify(s)); delete c.events; delete c.qs; delete c.pvp; delete c.qDone; return c; };
+const pvpClean = s => { const c = JSON.parse(JSON.stringify(s)); delete c.events; delete c.qs; delete c.pvp; delete c.qDone; delete c.log; return c; };
 function pvpMyTurn(d) {
   if (!pvpMine(d)) return false;
   const me = pvpSideOf(d);
@@ -1400,7 +1400,7 @@ async function pvpDrain() {
       PVP.v = d.v;   // a beírt állás a mérvadó
       if (d.turnAt) PVP.turnAt = d.turnAt; if (d.afk) PVP.afk = d.afk;
       const keepSeen = ui.handSeen;
-      S = { ...JSON.parse(JSON.stringify(d.state)), events: [], pvp: S.pvp, qs: S.qs, qDone: S.qDone };
+      S = { ...JSON.parse(JSON.stringify(d.state)), events: [], pvp: S.pvp, qs: S.qs, qDone: S.qDone, log: S.log };
       if (wasMull) ui.handSeen = null; else ui.handSeen = keepSeen;
       busy = false; render();
       if (S.winner != null) { endMatch(); break; }
@@ -1439,7 +1439,7 @@ function pvpEndMatch() {
     : S.reason === 'time' ? `Letelt a ${MAX_HALF / 2} kör. Életek: te ${S.players[ME].hp}, ${opp} ${S.players[BOT].hp}.`
     : draw ? 'Mindkét hős egyszerre dőlt ki.' : win ? `${opp} hőse kiütve!` : `${opp} kiütötte a hősödet.`;
   const o = document.createElement('div'); o.className = 'overlay';
-  o.innerHTML = `<div class="modal result${win ? '' : ' lose'}">${draw ? '<h2 class="banner-h"><img src="art/ui/banner-draw.webp" alt="Döntetlen"></h2>' : `<h2>${win ? 'Győzelem!' : 'Vereség'}</h2>`}<p>${why}</p>${reward}
+  o.innerHTML = `<div class="modal result${win ? '' : ' lose'}${draw ? '' : ' resart'}">${draw ? '<h2 class="banner-h"><img src="art/ui/banner-draw.webp" alt="Döntetlen"></h2>' : resultArt(win)}<p>${why}</p>${reward}
     <div class="row"><button class="btn" data-r="menu">Menü</button><button class="btn primary" data-r="pvp">PvP</button></div></div>`;
   o.onclick = e => { const b = e.target.closest('[data-r]'); if (!b) return; o.remove();
     if (b.dataset.r === 'pvp') pvpLeave(); else { pvpLeave(); renderMenuFan(); renderProfileBar(); show('scr-menu'); } };
