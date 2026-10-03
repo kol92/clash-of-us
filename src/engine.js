@@ -19,6 +19,7 @@ const CARDS = [
   { id:'c_zsibrita', type:'char', name:'Zsibrita', cost:3, atk:2, hp:3, rarity:'r', playTgt:'push', text:'Kijátszáskor egy ellenséges karaktert áttolhatsz az ellenfél egy üres sávjába.' },
   { id:'c_vera', type:'char', name:'Vera', cost:3, atk:1, hp:2, rarity:'r', playTgt:'enemy', text:'Kijátszáskor: válassz egy ellenséges karaktert, az visszakerül az ellenfél kezébe.' },
   { id:'c_zoli', type:'char', name:'Gál Zoli', cost:3, atk:3, hp:1, rarity:'k', haste:true, text:'Egy támadás után magától elpusztul.' },
+  { id:'c_zoli2', type:'char', name:'Gál Zoli', cost:3, atk:3, hp:1, rarity:'k', variantOf:'c_zoli', shopOnly:true, price:100, haste:true, text:'Egy támadás után magától elpusztul.' },
   { id:'c_kristof', type:'char', name:'Kristóf', cost:3, atk:2, hp:2, rarity:'r', text:'Kijátszáskor: a kezedbe kerül egy véletlen Ital lap.' },
   { id:'c_sasimeselo', type:'char', name:'Sasi, a mesélő', cost:3, atk:2, hp:2, rarity:'r', text:'Kijátszáskor: húzol egy lapot.' },
   { id:'c_vajda', type:'char', name:'Vajda Peti', cost:3, atk:3, hp:4, rarity:'k', text:'' },
@@ -37,6 +38,7 @@ const CARDS = [
   { id:'c_veghtomi', type:'char', name:'Végh Tomi', cost:4, atk:3, hp:5, rarity:'k', taunt:true, text:'Amíg él, az ellenfél karakterei mindig őt támadják, bárhol áll.' },
   { id:'c_sasi', type:'char', name:'Toma', cost:4, atk:4, hp:4, rarity:'r', text:'' },
   { id:'c_fogel', type:'char', name:'Fogel', cost:5, atk:2, hp:4, rarity:'r', text:'Kijátszáskor: a többi karaktered +2 életet kap. Ez akkor is megmarad, ha Fogel meghal.' },
+  { id:'c_fogel2', type:'char', name:'Fogel', cost:5, atk:2, hp:4, rarity:'r', variantOf:'c_fogel', shopOnly:true, price:100, text:'Kijátszáskor: a többi karaktered +2 életet kap. Ez akkor is megmarad, ha Fogel meghal.' },
   { id:'c_boros', type:'char', name:'Boros', cost:5, atk:3, hp:5, rarity:'r', taunt:true, text:'Amíg él, az ellenfél karakterei mindig őt támadják, bárhol áll.' },
   { id:'c_nyiti', type:'char', name:'Nyiti', cost:5, atk:5, hp:4, rarity:'l', text:'Mindig közvetlenül az ellenfél hősét támadja, akkor is, ha áll vele szemben karakter.' },
   { id:'c_nfc', type:'char', name:'A Nagy Fehér Cigány', cost:6, atk:8, hp:2, rarity:'k', muscle:true, text:'' },
@@ -138,6 +140,7 @@ function openSlots(s, side) {   // ahová most új karaktert lehet tenni (balró
   return out;
 }
 const canPlace = (s, side, j) => openSlots(s, side).includes(j);
+const bid = id => (CARD[id] && CARD[id].variantOf) || id;   // változat-lap = az alaplap (ugyanaz a hatás)
 const isFixed = u => !!(u && CARD[u.id].fixed);
 const graveChars = p => p.grave.filter(g => CARD[g.id] && CARD[g.id].type === 'char' && !CARD[g.id].token);   // Dávid, a törzsvendég: a helyszínek neki kedveznek
 
@@ -356,21 +359,21 @@ function playCard(s, pi, hi, t) {
     p.board[t.i] = u; p.lastPlaced = u.uid;   // a Cápa erre vadászik
     if (has(p, 'firstCharAtk') && !p.charThisTurn && c.id !== 'c_korso' && c.cost <= 2) { u.atk += 1; ev(s, { t:'buff', side:pi, i:t.i }); }
     p.charThisTurn = true;
-    if (c.id === 'c_pp') {   // Query idézése: előbb jobbra, aztán balra, ha ott nincs hely, bárhova
+    if (bid(c.id) === 'c_pp') {   // Query idézése: előbb jobbra, aztán balra, ha ott nincs hely, bárhova
       const os = openSlots(s, pi), spots = [t.i + 1, t.i - 1].filter(j => os.includes(j));
       const j = spots.length ? spots[0] : os.length ? os[0] : -1;
       if (j >= 0) { p.board[j] = makeUnit(s, 'c_query', pi); ev(s, { t:'summon', side:pi, i:j, id:'c_query' }); }
     }
-    if (c.id === 'c_kristof') {   // véletlen Ital lap a kézbe (nem kell birtokolni, csak erre a meccsre)
+    if (bid(c.id) === 'c_kristof') {   // véletlen Ital lap a kézbe (nem kell birtokolni, csak erre a meccsre)
       const pool = CARDS.filter(x => x.drink && !x.variantOf && !x.token);
       const d = pool[Math.floor(rnd() * pool.length)].id;
       ev(s, { t:'drinkgift', side:pi, i:t.i, id:d });
       addToHand(s, pi, d);
     }
-    if (c.id === 'c_sasimeselo') draw(s, pi);
-    if (c.id === 'c_kriszrantott') { ev(s, { t:'gift', side:pi, i:t.i, id:'a_rantott' }); addToHand(s, pi, 'a_rantott'); }
-    if (c.id === 'c_tomiparti') partyDrink(s, pi, t.i);
-    if (c.id === 'c_alekosz') {   // véletlen ellenséges karaktert ellop, és maga mellé teszi (előbb jobbra, aztán balra, aztán bárhova)
+    if (bid(c.id) === 'c_sasimeselo') draw(s, pi);
+    if (bid(c.id) === 'c_kriszrantott') { ev(s, { t:'gift', side:pi, i:t.i, id:'a_rantott' }); addToHand(s, pi, 'a_rantott'); }
+    if (bid(c.id) === 'c_tomiparti') partyDrink(s, pi, t.i);
+    if (bid(c.id) === 'c_alekosz') {   // véletlen ellenséges karaktert ellop, és maga mellé teszi (előbb jobbra, aztán balra, aztán bárhova)
       const os = openSlots(s, pi), spots = [t.i + 1, t.i - 1].filter(j => os.includes(j));
       const j = spots.length ? spots[0] : (CARD.c_alekosz.anywhere && os.length) ? os[0] : -1;   // csak közvetlenül mellé (ahogy a lap írja)
       const cand = e.board.map((x, k) => x && x.id !== 'c_korso' && !isFixed(x) && CARD[x.id].cost <= (CARD.c_alekosz.maxCost ?? 99) ? k : -1).filter(k => k >= 0);
@@ -388,12 +391,12 @@ function playCard(s, pi, hi, t) {
         ev(s, { t:'steal', side:pi, i:j, id:u.id });
       }
     }
-    if (c.id === 'c_fogel') p.board.forEach((x, j) => { if (x && j !== t.i) { x.hp += 2; x.maxHp += 2; ev(s, { t:'buff', side:pi, i:j }); } });
-    if (c.id === 'c_zsibrita' && t.t2 && t.t2.t3) {
+    if (bid(c.id) === 'c_fogel') p.board.forEach((x, j) => { if (x && j !== t.i) { x.hp += 2; x.maxHp += 2; ev(s, { t:'buff', side:pi, i:j }); } });
+    if (bid(c.id) === 'c_zsibrita' && t.t2 && t.t2.t3) {
       const a = t.t2.i, b = t.t2.t3.i;
       if (e.board[a] && !e.board[b]) { reveal(s, ei, a); e.board[b] = e.board[a]; e.board[a] = null; ev(s, { t:'push', side:ei, i:b }); }
     }
-    if (c.id === 'c_vera' && t.t2) {
+    if (bid(c.id) === 'c_vera' && t.t2) {
       const x = e.board[t.t2.i];
       if (x) { e.board[t.t2.i] = null; ev(s, { t:'bounce', side:ei, i:t.t2.i }); buryItems(s, ei, x); if (!CARD[x.id].token) addToHand(s, ei, x.id, x.foil); }
     }
@@ -708,7 +711,7 @@ function attackLane(s, i) {
     if (s.winner != null || s.players[pi].board[i] !== u) break;
     strike(s, i);
   }
-  if (u.id === 'c_zoli' && s.players[pi].board[i] === u) { u.hp = 0; ev(s, { t:'expire', side:pi, i }); cleanup(s); }
+  if (bid(u.id) === 'c_zoli' && s.players[pi].board[i] === u) { u.hp = 0; ev(s, { t:'expire', side:pi, i }); cleanup(s); }
   checkWin(s);
   return true;
 }
@@ -793,7 +796,7 @@ function evalState(s, me) {
     let x = a * 1.1 + u.hp * 0.9 + (u.shield ? 1.5 : 0);
     if (u.stun) x = u.hp * 0.9 - 1;
     if (u.doom) x = 0;
-    if (u.id === 'c_korso') x = 0.6; if (u.id === 'c_zoli') x *= 0.6; if (u.id === 'c_zana') x += a * 0.8;
+    if (u.id === 'c_korso') x = 0.6; if (bid(u.id) === 'c_zoli') x *= 0.6; if (u.id === 'c_zana') x += a * 0.8;
     if (CARD[u.id].noAttack) x = u.hp * 0.5;   // JBL hangfal: fal, nem üt
     if (CARD[u.id].fixed) x = -7;              // Cápa: annak az oldalnak árt, ahol áll
     return x;

@@ -284,6 +284,26 @@ h1,h2,h3{font-family:var(--display);font-weight:400;letter-spacing:.01em;text-wr
 .btn-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
 .btn.ghost{background:transparent;box-shadow:none;border-color:transparent;color:var(--mute);min-height:40px;font-size:17px;}
 .btn .badge{font-family:var(--body);font-weight:900;font-size:11px;letter-spacing:.06em;text-transform:uppercase;background:var(--green);color:#003321;padding:3px 8px;border-radius:8px;animation:pulse 1.2s ease-in-out infinite;}
+.m-shop-img{position:relative;display:block;width:100%;padding:0;margin:4px 0 0;border:0;background:none;cursor:pointer;}
+.m-shop-img img{display:block;width:calc(100% + 16px);margin:0 -8px;height:auto;filter:drop-shadow(0 6px 12px rgba(0,0,0,.55));}
+.m-shop-img .chev{display:none;}
+.m-shop-img .badge{position:absolute;top:8%;right:16%;font-weight:900;font-size:11px;letter-spacing:.06em;text-transform:uppercase;padding:4px 10px;border-radius:999px;background:#e8463a;color:#fff;box-shadow:0 2px 6px rgba(0,0,0,.5);}
+.m-shop-img:active img{transform:scale(.98);}
+.shop-tabs{display:grid;width:100%;margin:0 0 12px;}
+.shop-note{margin:0 0 12px;font-size:13px;color:var(--mute);line-height:1.4;}
+.shop-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;}
+.shop-card{position:relative;display:block;width:100%;aspect-ratio:1064/1430;padding:0;border:0;background:none;cursor:pointer;color:#fff;font-family:var(--body);}
+.shop-card .sc-frame{position:absolute;inset:0;background:url('art/ui/shop-card.webp?v=fcaa1f38') center/100% 100% no-repeat;filter:drop-shadow(0 6px 12px rgba(0,0,0,.55));pointer-events:none;}
+.shop-card .sc-art{position:absolute;left:12.6%;right:12.6%;top:15.4%;bottom:28.9%;background-size:cover;border-radius:5%/4%;z-index:1;box-shadow:inset 0 0 0 1px rgba(255,215,120,.35),inset 0 0 18px rgba(0,0,0,.45);}
+.shop-card .sc-name{position:absolute;left:19%;right:19%;top:8.6%;height:5.6%;display:grid;place-items:center;font-family:var(--display);font-size:clamp(11px,3.6vw,15px);line-height:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;z-index:1;}
+.shop-card .sc-sub{position:absolute;left:17%;right:17%;top:72.6%;height:5.8%;display:grid;place-items:center;white-space:nowrap;font-size:clamp(8px,2.5vw,10px);font-weight:800;color:#d9c8ff;letter-spacing:.04em;z-index:1;}
+.shop-card .sc-price{position:absolute;left:27%;right:14%;top:80.6%;height:11%;display:flex;align-items:center;justify-content:center;white-space:nowrap;font-weight:900;font-size:clamp(12px,3.8vw,16px);color:#3a2600;z-index:1;}
+.shop-card .sc-price b{font-size:1.25em;margin-right:4px;}
+.shop-card .sc-price.poor{color:#7a3a1a;}
+.shop-card.owned .sc-art{filter:saturate(.8);}
+.shop-card.owned .sc-price{color:#1f5c2a;}
+.shop-card:active{transform:scale(.98);}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%;}
 .wallet{display:flex;align-items:center;gap:8px;justify-content:flex-end;font-family:var(--display);font-size:26px;color:var(--gold);margin:6px 0 10px;}
 .wallet b{font-weight:400}.wallet small{font-family:var(--body);font-size:12px;font-weight:800;color:var(--mute);}
 .pack-offer{display:grid;grid-template-columns:auto 1fr;gap:16px;align-items:center;padding:16px;border-radius:18px;background:linear-gradient(160deg,#16404b,#0d252c);border:1px solid var(--line);}
@@ -1676,7 +1696,7 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%;}
       <button class="m-play" id="goPlay"><i class="m-ic swords" aria-hidden="true"></i><span><b>Játék indítása</b><small>Bot elleni csata</small></span></button>
       <button class="m-tile orn m-pvp" id="goPvp"><span class="m-ic ic-img ic-pvp" aria-hidden="true"></span><span class="m-txt"><b>PvP</b><small id="pvpSub">Játssz a barátaid ellen</small></span><span class="q-badge sp-badge" id="pvpBadge" hidden></span><i class="chev" aria-hidden="true"></i></button>
       <button class="m-tile orn m-friends" id="goFriends" hidden><span class="m-ic ic-img ic-friends" aria-hidden="true"></span><span class="m-txt"><b>Barátok</b><small>Kihívás és lapcsere</small></span><span class="q-badge" id="friendBadge" hidden></span><i class="chev" aria-hidden="true"></i></button>
-      <button class="m-tile orn m-shop" id="goShop"><span class="m-pack" aria-hidden="true"></span><span class="m-txt"><b>Boosterek</b><small>Nyisd ki a következőt</small></span><span class="badge" id="shopBadge" hidden>Ingyen pack!</span><i class="chev" aria-hidden="true"></i></button>
+      <button class="m-shop-img" id="goShop" aria-label="Bolt – boosterek, változatok, portrék"><img src="art/ui/shop-btn.webp?v=5703300c" alt="" aria-hidden="true"><span class="badge" id="shopBadge" hidden>Ingyen pack!</span><i class="chev" aria-hidden="true"></i></button>
       <button class="m-tile orn m-pass" id="goPass"><span class="m-ic pass" aria-hidden="true">🏆</span><span class="m-txt"><b>Season Pass</b><small id="passSub">Ingyenes szezonjutalmak</small></span><span class="q-badge sp-badge" id="passBadge">0. szint</span><i class="chev" aria-hidden="true"></i></button>
       <button class="m-tile orn m-quests" id="goQuests"><span class="m-ic quests" aria-hidden="true">📜</span><span class="m-txt"><b>Küldetések</b><small>3 napi + 1 heti feladat</small></span><span class="q-badge" id="questBadge">0/4</span><i class="chev" aria-hidden="true"></i></button>
       <div class="btn-row">
@@ -1722,7 +1742,7 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%;}
   </section>
 
   <section class="screen" id="scr-shop" hidden>
-    <div class="top"><button class="back" data-back aria-label="Vissza">‹</button><h2>Boosterek</h2></div>
+    <div class="top"><button class="back" data-back aria-label="Vissza">‹</button><h2>Bolt</h2></div>
     <div id="shopBody"></div>
   </section>
 
@@ -1821,7 +1841,7 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%;}
 <script src="vendor/firebase-auth-compat.js"></script>
 <script src="vendor/firebase-firestore-compat.js"></script>
 <script src="vendor/firebase-database-compat.js"></script>
-<script>window.APP_VERSION = "2026.10.04-0015";</script>
+<script>window.APP_VERSION = "2026.10.04-0020";</script>
 <script>// ===== Best of Us – saját szerver (Firebase) =====
 // A játék eredetileg a Claude-os tárolót használta (window.claude.use('db' | 'user' | 'room')).
 // Ez a fájl ugyanazt a felületet adja Firebase-ből, így a játék kódja szinte változatlan maradhat:
@@ -2086,6 +2106,7 @@ const CARDS = [
   { id:'c_zsibrita', type:'char', name:'Zsibrita', cost:3, atk:2, hp:3, rarity:'r', playTgt:'push', text:'Kijátszáskor egy ellenséges karaktert áttolhatsz az ellenfél egy üres sávjába.' },
   { id:'c_vera', type:'char', name:'Vera', cost:3, atk:1, hp:2, rarity:'r', playTgt:'enemy', text:'Kijátszáskor: válassz egy ellenséges karaktert, az visszakerül az ellenfél kezébe.' },
   { id:'c_zoli', type:'char', name:'Gál Zoli', cost:3, atk:3, hp:1, rarity:'k', haste:true, text:'Egy támadás után magától elpusztul.' },
+  { id:'c_zoli2', type:'char', name:'Gál Zoli', cost:3, atk:3, hp:1, rarity:'k', variantOf:'c_zoli', shopOnly:true, price:100, haste:true, text:'Egy támadás után magától elpusztul.' },
   { id:'c_kristof', type:'char', name:'Kristóf', cost:3, atk:2, hp:2, rarity:'r', text:'Kijátszáskor: a kezedbe kerül egy véletlen Ital lap.' },
   { id:'c_sasimeselo', type:'char', name:'Sasi, a mesélő', cost:3, atk:2, hp:2, rarity:'r', text:'Kijátszáskor: húzol egy lapot.' },
   { id:'c_vajda', type:'char', name:'Vajda Peti', cost:3, atk:3, hp:4, rarity:'k', text:'' },
@@ -2104,6 +2125,7 @@ const CARDS = [
   { id:'c_veghtomi', type:'char', name:'Végh Tomi', cost:4, atk:3, hp:5, rarity:'k', taunt:true, text:'Amíg él, az ellenfél karakterei mindig őt támadják, bárhol áll.' },
   { id:'c_sasi', type:'char', name:'Toma', cost:4, atk:4, hp:4, rarity:'r', text:'' },
   { id:'c_fogel', type:'char', name:'Fogel', cost:5, atk:2, hp:4, rarity:'r', text:'Kijátszáskor: a többi karaktered +2 életet kap. Ez akkor is megmarad, ha Fogel meghal.' },
+  { id:'c_fogel2', type:'char', name:'Fogel', cost:5, atk:2, hp:4, rarity:'r', variantOf:'c_fogel', shopOnly:true, price:100, text:'Kijátszáskor: a többi karaktered +2 életet kap. Ez akkor is megmarad, ha Fogel meghal.' },
   { id:'c_boros', type:'char', name:'Boros', cost:5, atk:3, hp:5, rarity:'r', taunt:true, text:'Amíg él, az ellenfél karakterei mindig őt támadják, bárhol áll.' },
   { id:'c_nyiti', type:'char', name:'Nyiti', cost:5, atk:5, hp:4, rarity:'l', text:'Mindig közvetlenül az ellenfél hősét támadja, akkor is, ha áll vele szemben karakter.' },
   { id:'c_nfc', type:'char', name:'A Nagy Fehér Cigány', cost:6, atk:8, hp:2, rarity:'k', muscle:true, text:'' },
@@ -2205,6 +2227,7 @@ function openSlots(s, side) {   // ahová most új karaktert lehet tenni (balró
   return out;
 }
 const canPlace = (s, side, j) => openSlots(s, side).includes(j);
+const bid = id => (CARD[id] && CARD[id].variantOf) || id;   // változat-lap = az alaplap (ugyanaz a hatás)
 const isFixed = u => !!(u && CARD[u.id].fixed);
 const graveChars = p => p.grave.filter(g => CARD[g.id] && CARD[g.id].type === 'char' && !CARD[g.id].token);   // Dávid, a törzsvendég: a helyszínek neki kedveznek
 
@@ -2423,21 +2446,21 @@ function playCard(s, pi, hi, t) {
     p.board[t.i] = u; p.lastPlaced = u.uid;   // a Cápa erre vadászik
     if (has(p, 'firstCharAtk') && !p.charThisTurn && c.id !== 'c_korso' && c.cost <= 2) { u.atk += 1; ev(s, { t:'buff', side:pi, i:t.i }); }
     p.charThisTurn = true;
-    if (c.id === 'c_pp') {   // Query idézése: előbb jobbra, aztán balra, ha ott nincs hely, bárhova
+    if (bid(c.id) === 'c_pp') {   // Query idézése: előbb jobbra, aztán balra, ha ott nincs hely, bárhova
       const os = openSlots(s, pi), spots = [t.i + 1, t.i - 1].filter(j => os.includes(j));
       const j = spots.length ? spots[0] : os.length ? os[0] : -1;
       if (j >= 0) { p.board[j] = makeUnit(s, 'c_query', pi); ev(s, { t:'summon', side:pi, i:j, id:'c_query' }); }
     }
-    if (c.id === 'c_kristof') {   // véletlen Ital lap a kézbe (nem kell birtokolni, csak erre a meccsre)
+    if (bid(c.id) === 'c_kristof') {   // véletlen Ital lap a kézbe (nem kell birtokolni, csak erre a meccsre)
       const pool = CARDS.filter(x => x.drink && !x.variantOf && !x.token);
       const d = pool[Math.floor(rnd() * pool.length)].id;
       ev(s, { t:'drinkgift', side:pi, i:t.i, id:d });
       addToHand(s, pi, d);
     }
-    if (c.id === 'c_sasimeselo') draw(s, pi);
-    if (c.id === 'c_kriszrantott') { ev(s, { t:'gift', side:pi, i:t.i, id:'a_rantott' }); addToHand(s, pi, 'a_rantott'); }
-    if (c.id === 'c_tomiparti') partyDrink(s, pi, t.i);
-    if (c.id === 'c_alekosz') {   // véletlen ellenséges karaktert ellop, és maga mellé teszi (előbb jobbra, aztán balra, aztán bárhova)
+    if (bid(c.id) === 'c_sasimeselo') draw(s, pi);
+    if (bid(c.id) === 'c_kriszrantott') { ev(s, { t:'gift', side:pi, i:t.i, id:'a_rantott' }); addToHand(s, pi, 'a_rantott'); }
+    if (bid(c.id) === 'c_tomiparti') partyDrink(s, pi, t.i);
+    if (bid(c.id) === 'c_alekosz') {   // véletlen ellenséges karaktert ellop, és maga mellé teszi (előbb jobbra, aztán balra, aztán bárhova)
       const os = openSlots(s, pi), spots = [t.i + 1, t.i - 1].filter(j => os.includes(j));
       const j = spots.length ? spots[0] : (CARD.c_alekosz.anywhere && os.length) ? os[0] : -1;   // csak közvetlenül mellé (ahogy a lap írja)
       const cand = e.board.map((x, k) => x && x.id !== 'c_korso' && !isFixed(x) && CARD[x.id].cost <= (CARD.c_alekosz.maxCost ?? 99) ? k : -1).filter(k => k >= 0);
@@ -2455,12 +2478,12 @@ function playCard(s, pi, hi, t) {
         ev(s, { t:'steal', side:pi, i:j, id:u.id });
       }
     }
-    if (c.id === 'c_fogel') p.board.forEach((x, j) => { if (x && j !== t.i) { x.hp += 2; x.maxHp += 2; ev(s, { t:'buff', side:pi, i:j }); } });
-    if (c.id === 'c_zsibrita' && t.t2 && t.t2.t3) {
+    if (bid(c.id) === 'c_fogel') p.board.forEach((x, j) => { if (x && j !== t.i) { x.hp += 2; x.maxHp += 2; ev(s, { t:'buff', side:pi, i:j }); } });
+    if (bid(c.id) === 'c_zsibrita' && t.t2 && t.t2.t3) {
       const a = t.t2.i, b = t.t2.t3.i;
       if (e.board[a] && !e.board[b]) { reveal(s, ei, a); e.board[b] = e.board[a]; e.board[a] = null; ev(s, { t:'push', side:ei, i:b }); }
     }
-    if (c.id === 'c_vera' && t.t2) {
+    if (bid(c.id) === 'c_vera' && t.t2) {
       const x = e.board[t.t2.i];
       if (x) { e.board[t.t2.i] = null; ev(s, { t:'bounce', side:ei, i:t.t2.i }); buryItems(s, ei, x); if (!CARD[x.id].token) addToHand(s, ei, x.id, x.foil); }
     }
@@ -2775,7 +2798,7 @@ function attackLane(s, i) {
     if (s.winner != null || s.players[pi].board[i] !== u) break;
     strike(s, i);
   }
-  if (u.id === 'c_zoli' && s.players[pi].board[i] === u) { u.hp = 0; ev(s, { t:'expire', side:pi, i }); cleanup(s); }
+  if (bid(u.id) === 'c_zoli' && s.players[pi].board[i] === u) { u.hp = 0; ev(s, { t:'expire', side:pi, i }); cleanup(s); }
   checkWin(s);
   return true;
 }
@@ -2860,7 +2883,7 @@ function evalState(s, me) {
     let x = a * 1.1 + u.hp * 0.9 + (u.shield ? 1.5 : 0);
     if (u.stun) x = u.hp * 0.9 - 1;
     if (u.doom) x = 0;
-    if (u.id === 'c_korso') x = 0.6; if (u.id === 'c_zoli') x *= 0.6; if (u.id === 'c_zana') x += a * 0.8;
+    if (u.id === 'c_korso') x = 0.6; if (bid(u.id) === 'c_zoli') x *= 0.6; if (u.id === 'c_zana') x += a * 0.8;
     if (CARD[u.id].noAttack) x = u.hp * 0.5;   // JBL hangfal: fal, nem üt
     if (CARD[u.id].fixed) x = -7;              // Cápa: annak az oldalnak árt, ahol áll
     return x;
@@ -3043,6 +3066,8 @@ const ART = {
   c_gyuri:{ src:'art/gyuri.webp?v=e5f3b481bda5be42', pos:'60% 17%' },
   c_rebi: { src:'art/rebi.webp?v=3bda07e0da32ee89', pos:'76% 36%' },
   c_zoli: { src:'art/zoli.webp?v=a6aac1aa293f1eb1', pos:'64% 30%' },
+  c_zoli2: { src:'art/zoli2.webp?v=61d270f843c7c59e', av:'62% 22%', pos:'62% 22%' },
+  c_fogel2: { src:'art/fogel2.webp?v=8474d86893bcd363', av:'50% 18%', pos:'50% 18%' },
   c_tzs:  { src:'art/tzs.webp?v=25713800cec3ddb4',  pos:'54% 28%' },
   c_tzs2: { src:'art/tzs2.webp?v=1b4db958ff8405c7', pos:'50% 20%' },
   c_pifti2: { src:'art/pifti2.webp?v=84c0c45a6cc724a4', pos:'50% 25%' },
@@ -3239,7 +3264,7 @@ $('#collBody').onclick = e => {
   if (hg && ownsHeroGold(hg.dataset.hgold) && heroSkins(hg.dataset.hgold).length > 1) return skinModal(hg.dataset.hgold);
   if (hg) { const hid = hg.dataset.hgold; openModal(heroCardHTML(HERO[hid], { big: true, gold: true }), ownsHeroGold(hid) ? '✦ Arany hős · a tiéd!' : `✦ Arany hős · boosterből ${ECON.goldPlain * 100}%, Shiny boosterből ${ECON.goldShiny * 100}% eséllyel`); return; }
   if (c) { const id = c.dataset.card, e = Store.p?.coll[id] || { n: 0, f: 0 };
-    if (CARD[id].variantOf) return collCardModal(id, `✦ Ritka változat: a(z) ${CARD[CARD[id].variantOf].name} különleges kinézete – ugyanúgy játszható, ugyanaz a hatása · ${e.n + e.f} db${CARD[id].passOnly ? ' · csak a Season Passból' : !e.n && !e.f ? ' · Shiny boosterből szerezhető' : ''}`, null);
+    if (CARD[id].variantOf) return collCardModal(id, `✦ Ritka változat: a(z) ${CARD[CARD[id].variantOf].name} különleges kinézete – ugyanúgy játszható, ugyanaz a hatása · ${e.n + e.f} db${CARD[id].passOnly ? ' · csak a Season Passból' : CARD[id].shopOnly ? ` · csak a Boltban kapható (${CARD[id].price || 100} coin)` : !e.n && !e.f ? ' · Shiny boosterből szerezhető' : ''}`, null);
     collCardModal(id); }
   if (h) openModal(heroCardHTML(HERO[h.dataset.hcard], { big: true, foil: ui.foil }), ui.foil ? (ownsHeroFa(h.dataset.hcard) ? 'Full Art hős' : 'Full Art hős · boosterből szerezhető') : 'Hős');
 };
@@ -4657,7 +4682,7 @@ function openPackRoll(setId, forceFoil = false, shiny = false) {
   slots.sort((a, b) => order[a] - order[b]);
   const faSlot = forceFoil || shiny ? 2 : -1;   // garantált Full Art: a pack legjobb lapja lesz az
   // Shiny pack: a különleges hely 25% eséllyel változat-lap (pl. a zöld Rehab), különben Full Art
-  const allVars = CARDS.filter(v => v.variantOf && !v.passOnly);
+  const allVars = CARDS.filter(v => v.variantOf && !v.passOnly && !v.shopOnly);
   const sr = Math.random();
   const varSlot = shiny && allVars.length && sr < ECON.shinyVariant ? 2 : -1;
   // Full Art hős: sima packban kis eséllyel a leggyengébb lap helyén, Shiny packban a különleges helyen
@@ -4668,7 +4693,7 @@ function openPackRoll(setId, forceFoil = false, shiny = false) {
     if (si === heroSlot) return rollHeroFa(p);
     const ids = pool.filter(id => CARD[id].rarity === rar);
     let id = ids[Math.floor(Math.random() * ids.length)];
-    const vars = CARDS.filter(v => v.variantOf === id && !v.passOnly);
+    const vars = CARDS.filter(v => v.variantOf === id && !v.passOnly && !v.shopOnly);
     if (vars.length && Math.random() < VARIANT_CHANCE) id = vars[Math.floor(Math.random() * vars.length)].id;
     if (si === varSlot) id = allVars[Math.floor(Math.random() * allVars.length)].id;
     const foil = (si === faSlot && si !== varSlot) || Math.random() < ECON.foilChance;
@@ -4699,11 +4724,50 @@ async function buyPack(setId, free) {
 }
 
 // ---- bolt képernyő ----
+// a boltban coinért megvehető különleges lapok (változatok); egyszer vehető meg mindegyik
+const SHOP_ITEMS = () => CARDS.filter(c => c.shopOnly && ART[c.id]).map(c => ({ id: c.id, price: c.price || 100 }));
+let shopTab = 'packs';
+function shopOfferHTML(it) {
+  const c = CARD[it.id], have = owned(it.id) > 0, p = Store.p, can = p.coins >= it.price;
+  return `<button class="shop-card${have ? ' owned' : ''}" data-buy="${it.id}" ${have ? 'aria-disabled="true"' : ''}>
+    <span class="sc-art" style="background-image:url('${ART[it.id].src}');background-position:${ART[it.id].pos || '50% 20%'}"></span>
+    <span class="sc-frame" aria-hidden="true"></span>
+    <span class="sc-name">${c.name}</span>
+    <span class="sc-sub">✦ Különleges változat</span>
+    <span class="sc-price${!have && !can ? ' poor' : ''}">${have ? '✓ Megvan' : `<b>${it.price}</b> coin`}</span>
+  </button>`;
+}
+async function buyShopItem(id) {
+  const it = SHOP_ITEMS().find(x => x.id === id), p = Store.p; if (!it || !p) return;
+  const c = CARD[id];
+  if (owned(id) > 0) return openModal(cardHTML(id, { big: true }), '✓ Ez már megvan neked – a Paklik menüben ugyanúgy beteheted, mint az alaplapot.', cardHelpHTML(id));
+  if (p.coins < it.price) return toast(`Nincs elég coinod (${p.coins}/${it.price})`);
+  const o = document.createElement('div'); o.className = 'overlay';
+  o.innerHTML = `<div class="modal">${cardHTML(id, { big: true })}<div class="live">✦ ${c.name} – különleges változat. Ugyanúgy játszható, mint a(z) ${CARD[c.variantOf].name}, csak más a képe.</div><div class="row2"><button class="btn" data-x>Mégse</button><button class="btn primary" data-ok><span class="coin sm" aria-hidden="true"></span> ${it.price} · Megveszem</button></div></div>`;
+  $('#layer').appendChild(o);
+  const ok = await new Promise(r => { o.onclick = e => { if (e.target.closest('[data-ok]')) r(true); else if (e.target.closest('[data-x]') || e.target === o) r(false); }; });
+  o.remove(); if (!ok) return;
+  if (p.coins < it.price || owned(id) > 0) return;
+  p.coins -= it.price; const e = p.coll[id] || (p.coll[id] = { n: 0, f: 0 }); e.n++;
+  await save(); renderProfileBar(); renderShop();
+  openModal(cardHTML(id, { big: true }), `🎉 Megvetted: ${c.name}! Bekerült a gyűjteményedbe – a pakliépítőben az alaplap helyett is beteheted.`, '');
+}
 function renderShop() {
   const p = Store.p; if (!p) return;
   const free = freePackReady();
+  const tabs = `<div class="seg shop-tabs" role="group" aria-label="Bolt"><button aria-pressed="${shopTab === 'packs'}" data-stab="packs">Boosterek</button><button aria-pressed="${shopTab === 'vars'}" data-stab="vars">Különleges lapok</button></div>`;
+  if (shopTab === 'vars') {
+    const items = SHOP_ITEMS();
+    $('#shopBody').innerHTML = `
+    <div class="wallet"><span class="coin" aria-hidden="true"></span><b>${p.coins}</b><small>coin</small></div>${tabs}
+    <p class="shop-note">Különleges változatok, amik csak itt kaphatók: ugyanúgy játszanak, mint az alaplap, csak más a képük. Mindegyikből egyet vehetsz.</p>
+    <div class="shop-grid">${items.map(shopOfferHTML).join('') || '<p class="live">Most nincs különleges lap a boltban.</p>'}</div>`;
+    $('#shopBody').querySelectorAll('[data-buy]').forEach(b => b.onclick = () => buyShopItem(b.dataset.buy));
+    $('#shopBody').querySelectorAll('[data-stab]').forEach(b => b.onclick = () => { shopTab = b.dataset.stab; renderShop(); });
+    return;
+  }
   $('#shopBody').innerHTML = `
-    <div class="wallet"><span class="coin" aria-hidden="true"></span><b>${p.coins}</b><small>coin</small></div>
+    <div class="wallet"><span class="coin" aria-hidden="true"></span><b>${p.coins}</b><small>coin</small></div>${tabs}
     <div class="pack-offer">
       <div class="pack-art">${packHTML('base')}</div>
       <div class="pack-info">
@@ -4731,6 +4795,7 @@ function renderShop() {
       <div class="odd gold-odd"><i class="rar r-g"></i><span>✦ Arany hős (packonként · Shiny packban)</span><b>${String(ECON.goldPlain * 100).replace('.', ',')}% · ${ECON.goldShiny * 100}%</b></div>
       <small>Ha ${ECON.pityAfter} packon át nem jön epikus vagy legendás lap, a következőben biztosan lesz. Napi coin: győzelem ${ECON.win}, döntetlen ${ECON.draw}, vereség ${ECON.loss}, legfeljebb ${ECON.dailyCap}. Egy lapból legfeljebb ${DUPE_KEEP} példány marad meg, a többit a játék automatikusan beváltja: lapként ${DUPE_COIN} coin, Full Art vagy változat lap esetén ${DUPE_COIN_RARE} coin.</small>
     </div>`;
+  $('#shopBody').querySelectorAll('[data-stab]').forEach(b => b.onclick = () => { shopTab = b.dataset.stab; renderShop(); });
   $('#freePack').onclick = () => buyPack('base', true);
   if ($('#giftPack')) $('#giftPack').onclick = () => buyPack('base', 'gift');
   if ($('#faPack')) $('#faPack').onclick = () => buyPack('base', 'fa');

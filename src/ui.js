@@ -129,6 +129,8 @@ const ART = {
   c_gyuri:{ src:'art/gyuri.webp', pos:'60% 17%' },
   c_rebi: { src:'art/rebi.webp', pos:'76% 36%' },
   c_zoli: { src:'art/zoli.webp', pos:'64% 30%' },
+  c_zoli2: { src:'art/zoli2.webp', av:'62% 22%', pos:'62% 22%' },
+  c_fogel2: { src:'art/fogel2.webp', av:'50% 18%', pos:'50% 18%' },
   c_tzs:  { src:'art/tzs.webp',  pos:'54% 28%' },
   c_tzs2: { src:'art/tzs2.webp', pos:'50% 20%' },
   c_pifti2: { src:'art/pifti2.webp', pos:'50% 25%' },
@@ -325,7 +327,7 @@ $('#collBody').onclick = e => {
   if (hg && ownsHeroGold(hg.dataset.hgold) && heroSkins(hg.dataset.hgold).length > 1) return skinModal(hg.dataset.hgold);
   if (hg) { const hid = hg.dataset.hgold; openModal(heroCardHTML(HERO[hid], { big: true, gold: true }), ownsHeroGold(hid) ? '✦ Arany hős · a tiéd!' : `✦ Arany hős · boosterből ${ECON.goldPlain * 100}%, Shiny boosterből ${ECON.goldShiny * 100}% eséllyel`); return; }
   if (c) { const id = c.dataset.card, e = Store.p?.coll[id] || { n: 0, f: 0 };
-    if (CARD[id].variantOf) return collCardModal(id, `✦ Ritka változat: a(z) ${CARD[CARD[id].variantOf].name} különleges kinézete – ugyanúgy játszható, ugyanaz a hatása · ${e.n + e.f} db${CARD[id].passOnly ? ' · csak a Season Passból' : !e.n && !e.f ? ' · Shiny boosterből szerezhető' : ''}`, null);
+    if (CARD[id].variantOf) return collCardModal(id, `✦ Ritka változat: a(z) ${CARD[CARD[id].variantOf].name} különleges kinézete – ugyanúgy játszható, ugyanaz a hatása · ${e.n + e.f} db${CARD[id].passOnly ? ' · csak a Season Passból' : CARD[id].shopOnly ? ` · csak a Boltban kapható (${CARD[id].price || 100} coin)` : !e.n && !e.f ? ' · Shiny boosterből szerezhető' : ''}`, null);
     collCardModal(id); }
   if (h) openModal(heroCardHTML(HERO[h.dataset.hcard], { big: true, foil: ui.foil }), ui.foil ? (ownsHeroFa(h.dataset.hcard) ? 'Full Art hős' : 'Full Art hős · boosterből szerezhető') : 'Hős');
 };

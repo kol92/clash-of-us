@@ -332,7 +332,7 @@ function openPackRoll(setId, forceFoil = false, shiny = false) {
   slots.sort((a, b) => order[a] - order[b]);
   const faSlot = forceFoil || shiny ? 2 : -1;   // garantált Full Art: a pack legjobb lapja lesz az
   // Shiny pack: a különleges hely 25% eséllyel változat-lap (pl. a zöld Rehab), különben Full Art
-  const allVars = CARDS.filter(v => v.variantOf && !v.passOnly);
+  const allVars = CARDS.filter(v => v.variantOf && !v.passOnly && !v.shopOnly);
   const sr = Math.random();
   const varSlot = shiny && allVars.length && sr < ECON.shinyVariant ? 2 : -1;
   // Full Art hős: sima packban kis eséllyel a leggyengébb lap helyén, Shiny packban a különleges helyen
@@ -343,7 +343,7 @@ function openPackRoll(setId, forceFoil = false, shiny = false) {
     if (si === heroSlot) return rollHeroFa(p);
     const ids = pool.filter(id => CARD[id].rarity === rar);
     let id = ids[Math.floor(Math.random() * ids.length)];
-    const vars = CARDS.filter(v => v.variantOf === id && !v.passOnly);
+    const vars = CARDS.filter(v => v.variantOf === id && !v.passOnly && !v.shopOnly);
     if (vars.length && Math.random() < VARIANT_CHANCE) id = vars[Math.floor(Math.random() * vars.length)].id;
     if (si === varSlot) id = allVars[Math.floor(Math.random() * allVars.length)].id;
     const foil = (si === faSlot && si !== varSlot) || Math.random() < ECON.foilChance;
@@ -374,11 +374,50 @@ async function buyPack(setId, free) {
 }
 
 // ---- bolt képernyő ----
+// a boltban coinért megvehető különleges lapok (változatok); egyszer vehető meg mindegyik
+const SHOP_ITEMS = () => CARDS.filter(c => c.shopOnly && ART[c.id]).map(c => ({ id: c.id, price: c.price || 100 }));
+let shopTab = 'packs';
+function shopOfferHTML(it) {
+  const c = CARD[it.id], have = owned(it.id) > 0, p = Store.p, can = p.coins >= it.price;
+  return `<button class="shop-card${have ? ' owned' : ''}" data-buy="${it.id}" ${have ? 'aria-disabled="true"' : ''}>
+    <span class="sc-art" style="background-image:url('${ART[it.id].src}');background-position:${ART[it.id].pos || '50% 20%'}"></span>
+    <span class="sc-frame" aria-hidden="true"></span>
+    <span class="sc-name">${c.name}</span>
+    <span class="sc-sub">✦ Különleges változat</span>
+    <span class="sc-price${!have && !can ? ' poor' : ''}">${have ? '✓ Megvan' : `<b>${it.price}</b> coin`}</span>
+  </button>`;
+}
+async function buyShopItem(id) {
+  const it = SHOP_ITEMS().find(x => x.id === id), p = Store.p; if (!it || !p) return;
+  const c = CARD[id];
+  if (owned(id) > 0) return openModal(cardHTML(id, { big: true }), '✓ Ez már megvan neked – a Paklik menüben ugyanúgy beteheted, mint az alaplapot.', cardHelpHTML(id));
+  if (p.coins < it.price) return toast(`Nincs elég coinod (${p.coins}/${it.price})`);
+  const o = document.createElement('div'); o.className = 'overlay';
+  o.innerHTML = `<div class="modal">${cardHTML(id, { big: true })}<div class="live">✦ ${c.name} – különleges változat. Ugyanúgy játszható, mint a(z) ${CARD[c.variantOf].name}, csak más a képe.</div><div class="row2"><button class="btn" data-x>Mégse</button><button class="btn primary" data-ok><span class="coin sm" aria-hidden="true"></span> ${it.price} · Megveszem</button></div></div>`;
+  $('#layer').appendChild(o);
+  const ok = await new Promise(r => { o.onclick = e => { if (e.target.closest('[data-ok]')) r(true); else if (e.target.closest('[data-x]') || e.target === o) r(false); }; });
+  o.remove(); if (!ok) return;
+  if (p.coins < it.price || owned(id) > 0) return;
+  p.coins -= it.price; const e = p.coll[id] || (p.coll[id] = { n: 0, f: 0 }); e.n++;
+  await save(); renderProfileBar(); renderShop();
+  openModal(cardHTML(id, { big: true }), `🎉 Megvetted: ${c.name}! Bekerült a gyűjteményedbe – a pakliépítőben az alaplap helyett is beteheted.`, '');
+}
 function renderShop() {
   const p = Store.p; if (!p) return;
   const free = freePackReady();
+  const tabs = `<div class="seg shop-tabs" role="group" aria-label="Bolt"><button aria-pressed="${shopTab === 'packs'}" data-stab="packs">Boosterek</button><button aria-pressed="${shopTab === 'vars'}" data-stab="vars">Különleges lapok</button></div>`;
+  if (shopTab === 'vars') {
+    const items = SHOP_ITEMS();
+    $('#shopBody').innerHTML = `
+    <div class="wallet"><span class="coin" aria-hidden="true"></span><b>${p.coins}</b><small>coin</small></div>${tabs}
+    <p class="shop-note">Különleges változatok, amik csak itt kaphatók: ugyanúgy játszanak, mint az alaplap, csak más a képük. Mindegyikből egyet vehetsz.</p>
+    <div class="shop-grid">${items.map(shopOfferHTML).join('') || '<p class="live">Most nincs különleges lap a boltban.</p>'}</div>`;
+    $('#shopBody').querySelectorAll('[data-buy]').forEach(b => b.onclick = () => buyShopItem(b.dataset.buy));
+    $('#shopBody').querySelectorAll('[data-stab]').forEach(b => b.onclick = () => { shopTab = b.dataset.stab; renderShop(); });
+    return;
+  }
   $('#shopBody').innerHTML = `
-    <div class="wallet"><span class="coin" aria-hidden="true"></span><b>${p.coins}</b><small>coin</small></div>
+    <div class="wallet"><span class="coin" aria-hidden="true"></span><b>${p.coins}</b><small>coin</small></div>${tabs}
     <div class="pack-offer">
       <div class="pack-art">${packHTML('base')}</div>
       <div class="pack-info">
@@ -406,6 +445,7 @@ function renderShop() {
       <div class="odd gold-odd"><i class="rar r-g"></i><span>✦ Arany hős (packonként · Shiny packban)</span><b>${String(ECON.goldPlain * 100).replace('.', ',')}% · ${ECON.goldShiny * 100}%</b></div>
       <small>Ha ${ECON.pityAfter} packon át nem jön epikus vagy legendás lap, a következőben biztosan lesz. Napi coin: győzelem ${ECON.win}, döntetlen ${ECON.draw}, vereség ${ECON.loss}, legfeljebb ${ECON.dailyCap}. Egy lapból legfeljebb ${DUPE_KEEP} példány marad meg, a többit a játék automatikusan beváltja: lapként ${DUPE_COIN} coin, Full Art vagy változat lap esetén ${DUPE_COIN_RARE} coin.</small>
     </div>`;
+  $('#shopBody').querySelectorAll('[data-stab]').forEach(b => b.onclick = () => { shopTab = b.dataset.stab; renderShop(); });
   $('#freePack').onclick = () => buyPack('base', true);
   if ($('#giftPack')) $('#giftPack').onclick = () => buyPack('base', 'gift');
   if ($('#faPack')) $('#faPack').onclick = () => buyPack('base', 'fa');

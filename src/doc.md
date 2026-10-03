@@ -317,6 +317,14 @@ Hősképesség-ötletek a táblázatban (még nem zöldek, nincsenek beépítve)
 - Hősportré: ezüst-kék kör keret; az éppen soron lévő játékosé a világító változat.
 - A Siófoki Kórház panorámát nem használjuk.
 
+## Bolt (2026-10-04)
+- A főmenüben a „Boosterek” csempe helyén az új **Bolt** gomb (ChatGPT UI: art/ui/shop-btn.webp; az „Ingyen pack!” jelzés rajta marad). A Bolt két füllel nyílik: **Boosterek** (a korábbi pack-kínálat: napi ingyen, ajándék, 50 coinos és Shiny pack) és **Különleges lapok**.
+- Különleges lapok: csak a boltban kapható változat-lapok (`shopOnly`, `price`), az árkártya-kereten (art/ui/shop-card.webp): felül a név, középen a kép, alatta „✦ Különleges változat”, lent az ár. Koppintás → nagy lapnézet + „Megveszem” megerősítés → a lap a gyűjteménybe kerül (mindegyikből egy vehető; utána „✓ Megvan”). Packban, Season Passban nincsenek, és nem cserélhetők.
+  - **Gál Zoli – változat** (c_zoli2), 100 coin.
+  - **Fogel – változat** (c_fogel2), 100 coin.
+- A változat-lapok a motorban mindenhol az alaplapként működnek (`bid()`), a pakliban az alaplappal együtt számít a darabszám.
+- A gomb feliratán szereplő „Portrék” rész még üres: ide jöhetnek a megvehető hős-portrék (pl. Full Art / arany hősök), ha lesz hozzájuk döntés.
+
 ## Meccs-előzmények és eredményablak (2026-10-04)
 - Meccs közben a ⚑ melletti 📜 gomb megnyitja a „Mi történt?” ablakot: körönként (legújabb felül, az utolsó 12 kör) ki mit játszott ki és kire, ki támadott, sebzések, gyógyulások, halálok, idézések, bénulás, pajzs, lopás, Cápa, kitiltás stb. Az ellenfél rejtett lapja „egy rejtett lap”, amíg fel nem fordul. PvP-ben is működik (helyben gyűlik, nem kerül a szerverre).
 - Nyertél / Vesztettél: a meccs végén a ChatGPT-s táblakép jelenik meg (art/ui/result-win|lose.webp); a képen lévő „Folytatás” gomb a menübe visz, alatta az ok, a coin-, küldetés- és Season Pass-jutalom, és az „Új meccs” (PvP-ben „PvP”) gomb. Döntetlennél marad a régi szalag.
