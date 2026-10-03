@@ -1547,6 +1547,74 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%;}
 .cv-btn{min-height:44px;font-size:15px;border-color:var(--green);}
 .cv-btn.fa{background:linear-gradient(115deg,#9fd8ff,#ffb3e6,#fff1a8,#b6ffcf,#9fd8ff);background-size:300% 100%;animation:holo 5s linear infinite;color:#1d1030;}
 .cv-note{display:block;font-size:12px;font-weight:800;color:var(--mute);text-align:center;}
+
+/* ===================== UI-grafikák, 2. csomag (2026-10-03) ===================== */
+/* ---- Kör vége gomb: 3 állapot (a felirat a képen van; a szöveg csak képernyőolvasónak marad) ---- */
+#endBtn,#endBtn.btn{width:136px;min-height:0;height:auto;aspect-ratio:420/113;padding:0;border:0!important;border-image:none!important;border-radius:0;box-shadow:none!important;
+  background:url('art/ui/btn-end.webp?v=9e9fbced') center/contain no-repeat!important;color:transparent!important;font-size:0;filter:drop-shadow(0 3px 4px rgba(0,0,0,.55));}
+#endBtn.wait,#endBtn[disabled]{background-image:url('art/ui/btn-end-wait.webp?v=32f910be')!important;opacity:1;aspect-ratio:420/89;width:136px;}
+#endBtn.nudge:not([disabled]){background-image:url('art/ui/btn-end-glow.webp?v=b4084ffa')!important;aspect-ratio:440/118;width:142px;animation:endPulse 1.4s ease-in-out infinite;}
+@keyframes endPulse{50%{transform:scale(1.05);filter:drop-shadow(0 0 10px rgba(255,214,90,.8)) drop-shadow(0 3px 4px rgba(0,0,0,.55));}}
+#endBtn:active{transform:translateY(2px) scale(.98);}
+@media (max-height:700px){#endBtn,#endBtn.btn,#endBtn.wait,#endBtn[disabled]{width:118px;} #endBtn.nudge:not([disabled]){width:123px;}}
+/* ---- Kör-számláló homokórával ---- */
+.round{display:grid;place-items:center;width:124px;aspect-ratio:360/114;padding:0 7% 0 31%;box-sizing:border-box;background:url('art/ui/turn-counter.webp?v=270a4bfb') center/contain no-repeat;
+  font-size:9px;letter-spacing:.03em;color:#dbe8ff;text-shadow:0 1px 0 #000;white-space:nowrap;}
+.round.last{color:#ff9aa5;}
+/* ---- Hős-életcsík: a keret a csík fölött, a csík a keret nyílásában ---- */
+.hbar .hpbar,.hpbar{position:relative;height:auto;aspect-ratio:420/78;margin-top:4px;border-radius:0;background:none;overflow:visible;}
+.hpbar .hps{position:absolute;left:16.4%;right:9.8%;top:33.3%;bottom:33.3%;overflow:hidden;border-radius:999px;background:#2a0f14;z-index:0;}
+.hpbar .hps i{position:absolute;inset:0 auto 0 0;background:linear-gradient(90deg,#b81f33,#ff5d6c);transition:width .4s;}
+.hpbar::after{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;background:url('art/ui/hp-frame.webp?v=35eef9c7') center/100% 100% no-repeat;}
+.hpbar b{left:16.4%;right:9.8%;z-index:2;font-size:13px;line-height:1;text-shadow:0 1px 0 #000,0 0 4px rgba(0,0,0,.9);}
+/* ---- Helyszín-sáv: üres (kék) és foglalt (zöld) panel; a kép a bal oldali négyzetbe kerül ---- */
+.locchip,.locchip.on,.locchip.empty{position:relative;display:block;align-self:center;width:100%;min-height:0;padding:0;border:0!important;border-radius:0;box-shadow:none;
+  background:url('art/ui/loc-full.webp?v=ee3a1612') center/100% 100% no-repeat!important;aspect-ratio:600/153;}
+.locchip.empty{background-image:url('art/ui/loc-empty.webp?v=675ca70f')!important;aspect-ratio:600/137;}
+.locchip .pin{position:absolute;left:7.3%;top:20.5%;width:15.3%;height:58.5%;border-radius:6px;font-size:14px;}
+.locchip .pin.has-art{width:15.3%;height:58.5%;border:0;}
+.locchip.empty .pin{display:none;}
+.locchip > span:last-child{position:absolute;left:25.8%;right:7.6%;top:18%;bottom:18%;display:flex;flex-direction:column;justify-content:center;overflow:hidden;padding:0 .3em;}
+.locchip.empty > span:last-child{left:21.5%;right:5.5%;top:16%;bottom:16%;align-items:center;}
+.locchip b{font-size:13px;}
+.locchip small{font-size:9.5px;line-height:1.2;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.locchip.empty b{font-size:10px;}
+/* ---- Temető ikon ---- */
+.gravebtn{background:none;border:0;padding:0 2px;display:inline-flex;align-items:center;gap:2px;}
+.ic-grave{display:inline-block;width:17px;height:17px;background:url('art/ui/ic-grave.webp?v=934eb2e4') center/contain no-repeat;}
+/* ---- Állapottáblák (a felirat a képen) ---- */
+.tags .stb.taunt{background-image:url('art/ui/st-taunt.webp?v=c33bedea');aspect-ratio:240/55;}
+.tags .stb.noatk{background-image:url('art/ui/st-noatk.webp?v=460f83f9');aspect-ratio:240/64;}
+.tags .stb.doom{background-image:url('art/ui/st-doom.webp?v=b30650b5');aspect-ratio:240/59;}
+.tags .stb.invis{background-image:url('art/ui/st-invis.webp?v=7f9afec5');aspect-ratio:240/60;flex-basis:76%;}
+/* ---- Pajzs: kék buborék a karakteren + pajzsjelvény az oldalán ---- */
+.dshield{border-color:rgba(140,220,255,.95);background:radial-gradient(ellipse 70% 62% at 50% 45%,rgba(200,240,255,.05) 0%,rgba(90,190,255,.18) 62%,rgba(150,225,255,.55) 100%);
+  box-shadow:0 0 14px 2px rgba(60,180,255,.7),inset 0 0 16px rgba(120,210,255,.7);animation:dsPulseB 2.2s ease-in-out infinite;overflow:visible;}
+@keyframes dsPulseB{50%{box-shadow:0 0 20px 4px rgba(80,200,255,.9),inset 0 0 22px rgba(150,225,255,.85);}}
+.dshield::before{content:"";position:absolute;right:-12%;top:34%;width:42%;aspect-ratio:1;background:url('art/ui/ic-shield.webp?v=f7b5cf04') center/contain no-repeat;filter:drop-shadow(0 2px 3px rgba(0,0,0,.7));}
+.dshield::after{border-radius:inherit;overflow:hidden;}
+/* ---- Menü ikonok ---- */
+.m-ic.ic-img{width:50px;height:50px;font-size:0;background:center/contain no-repeat;filter:drop-shadow(0 2px 4px rgba(0,0,0,.6));}
+.m-ic.ic-pvp{background-image:url('art/ui/ic-pvp.webp?v=a3e6dd1d');}
+.m-ic.ic-friends{background-image:url('art/ui/ic-friends.webp?v=22590871');}
+/* ---- Gombok: kilencszeletes keret, így bármilyen szélességen torzítás nélkül ---- */
+.btn:not(.ghost):not(.gift):not(.shiny-btn):not(.fa){border-style:solid;border-color:transparent;border-width:8px 27px 8px;border-radius:0;box-shadow:none;background:none;
+  border-image:url('art/ui/button-secondary.webp?v=bae70bce') 22 76 22 76 fill / 8px 27px 8px / 0 stretch;color:#e8f1ff;text-shadow:0 1px 0 rgba(0,0,0,.6);padding:0 6px;
+  filter:drop-shadow(0 3px 3px rgba(0,0,0,.45));}
+.btn.primary:not(.ghost):not(.gift):not(.shiny-btn):not(.fa){border-image:url('art/ui/button-primary.webp?v=000779a5') 24 80 28 80 fill / 8px 28px 9px / 0 stretch;color:#16213f;text-shadow:0 1px 0 rgba(255,240,180,.6);}
+.btn.small:not(.ghost):not(.gift):not(.shiny-btn):not(.fa){border-width:6px 21px 6px;border-image-width:6px 21px 6px;min-height:38px;}
+.btn:not(.ghost):not(.gift):not(.shiny-btn):not(.fa):active{transform:translateY(2px);box-shadow:none;filter:brightness(.92) drop-shadow(0 1px 2px rgba(0,0,0,.45));}
+/* ---- Vissza gomb (a nyíl a képen) ---- */
+.back{width:44px;height:44px;border-radius:0;background:url('art/ui/button-back.webp?v=839ca2fa') center/contain no-repeat;color:transparent;font-size:0;filter:drop-shadow(0 2px 3px rgba(0,0,0,.5));}
+.back:active{transform:translateY(1px);filter:brightness(.9);}
+/* ---- Fülek: az aktív fül háttere (a szöveget az app írja rá) ---- */
+.seg button[aria-pressed="true"]{background:none;border-style:solid;border-color:transparent;border-width:5px 14px;border-image:url('art/ui/tab-active.webp?v=4e9b1f41') 26 60 30 60 fill / 5px 14px 6px / 0 stretch;
+  color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.8);padding:3px 4px;}
+.seg button{border:5px solid transparent;border-width:5px 14px;padding:3px 4px;}
+/* ---- Döntetlen banner ---- */
+.result .banner-h{margin:-6px auto 4px;max-width:300px;}
+.result .banner-h img{display:block;width:100%;height:auto;filter:drop-shadow(0 4px 8px rgba(0,0,0,.6));}
+@media (prefers-reduced-motion:reduce){#endBtn.nudge{animation:none!important;}}
 </style>
 </head>
 <body>
@@ -1559,8 +1627,8 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%;}
     <div class="profile-bar orn" id="profileBar"></div>
     <div class="menu-btns">
       <button class="m-play" id="goPlay"><i class="m-ic swords" aria-hidden="true"></i><span><b>Játék indítása</b><small>Bot elleni csata</small></span></button>
-      <button class="m-tile orn m-pvp" id="goPvp"><span class="m-ic pvp" aria-hidden="true">⚔️</span><span class="m-txt"><b>PvP</b><small id="pvpSub">Játssz a barátaid ellen</small></span><span class="q-badge sp-badge" id="pvpBadge" hidden></span><i class="chev" aria-hidden="true"></i></button>
-      <button class="m-tile orn m-friends" id="goFriends" hidden><span class="m-ic pvp" aria-hidden="true">👥</span><span class="m-txt"><b>Barátok</b><small>Kihívás és lapcsere</small></span><span class="q-badge" id="friendBadge" hidden></span><i class="chev" aria-hidden="true"></i></button>
+      <button class="m-tile orn m-pvp" id="goPvp"><span class="m-ic ic-img ic-pvp" aria-hidden="true"></span><span class="m-txt"><b>PvP</b><small id="pvpSub">Játssz a barátaid ellen</small></span><span class="q-badge sp-badge" id="pvpBadge" hidden></span><i class="chev" aria-hidden="true"></i></button>
+      <button class="m-tile orn m-friends" id="goFriends" hidden><span class="m-ic ic-img ic-friends" aria-hidden="true"></span><span class="m-txt"><b>Barátok</b><small>Kihívás és lapcsere</small></span><span class="q-badge" id="friendBadge" hidden></span><i class="chev" aria-hidden="true"></i></button>
       <button class="m-tile orn m-shop" id="goShop"><span class="m-pack" aria-hidden="true"></span><span class="m-txt"><b>Boosterek</b><small>Nyisd ki a következőt</small></span><span class="badge" id="shopBadge" hidden>Ingyen pack!</span><i class="chev" aria-hidden="true"></i></button>
       <button class="m-tile orn m-pass" id="goPass"><span class="m-ic pass" aria-hidden="true">🏆</span><span class="m-txt"><b>Season Pass</b><small id="passSub">Ingyenes szezonjutalmak</small></span><span class="q-badge sp-badge" id="passBadge">0. szint</span><i class="chev" aria-hidden="true"></i></button>
       <button class="m-tile orn m-quests" id="goQuests"><span class="m-ic quests" aria-hidden="true">📜</span><span class="m-txt"><b>Küldetések</b><small>3 napi + 1 heti feladat</small></span><span class="q-badge" id="questBadge">0/4</span><i class="chev" aria-hidden="true"></i></button>
@@ -1705,7 +1773,7 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%;}
 <script src="vendor/firebase-auth-compat.js"></script>
 <script src="vendor/firebase-firestore-compat.js"></script>
 <script src="vendor/firebase-database-compat.js"></script>
-<script>window.APP_VERSION = "2026.10.02-2327";</script>
+<script>window.APP_VERSION = "2026.10.03-1127";</script>
 <script>// ===== Best of Us – saját szerver (Firebase) =====
 // A játék eredetileg a Claude-os tárolót használta (window.claude.use('db' | 'user' | 'room')).
 // Ez a fájl ugyanazt a felületet adja Firebase-ből, így a játék kódja szinte változatlan maradhat:
@@ -3398,20 +3466,22 @@ function heroBar(pi) {
   return `<div class="hport${ART[h.id] ? '' : ' noart'}${fa ? ' fa' : ''}${gold ? ' gold' : ''}${p.baszo ? ' baszo' : p.machine === 2 ? ' gepmilo' : ''}" style="--h:${h.hue};${img}" aria-hidden="true">${ART[h.id] ? '' : `<span>${initials(h.name)}</span>`}${fa ? '<i class="hfa-holo"></i><i class="hfa-shine"></i><i class="hfa-rim"></i>' : ''}</div>
     <button class="hport-hit" data-hero="${pi}" aria-label="${h.name} képessége"></button>${p.machine === 1 ? '<span class="hmachine" title="Gépüzemmód: egyszer visszatér 10 élettel">⚙️</span>' : ''}${p.locked ? '<span class="hlock" title="Adios Motherfucker!: ebben a körében nem játszhat ki lapot">Bénult</span>' : ''}
     <div class="hinfo"><div class="hname">${h.name}<small>${pi === BOT ? (S.pvp ? escH(S.names?.[pi] || 'barát') : 'bot') : 'te'}</small></div>
-      <div class="hpbar"><i style="width:${Math.max(0, p.hp) / p.maxHp * 100}%"></i><b>${Math.max(0, p.hp)} / ${p.maxHp}</b></div></div>
+      <div class="hpbar" role="img" aria-label="Élet: ${Math.max(0, p.hp)} / ${p.maxHp}"><span class="hps"><i style="width:${Math.max(0, p.hp) / p.maxHp * 100}%"></i></span><b>${Math.max(0, p.hp)} / ${p.maxHp}</b></div></div>
     <div class="res"><div class="en hudm" role="img" aria-label="Energia: ${p.energy} / ${p.maxEnergy}" title="Energia (most / legfeljebb)"><b>${p.energy}/${p.maxEnergy}</b></div>
-      <div class="counts">Kéz ${p.hand.length} · <button class="gravebtn" data-grave="${pi}" aria-label="Temető">🪦 ${p.grave.length}</button></div></div>
+      <div class="counts">Kéz ${p.hand.length} · <button class="gravebtn" data-grave="${pi}" aria-label="Temető: ${p.grave.length} lap"><i class="ic-grave" aria-hidden="true"></i>${p.grave.length}</button></div></div>
     <button class="deckpile${p.deck.length ? p.deck.length <= 3 ? ' low' : '' : ' empty'}" data-deck="${pi}" aria-label="Húzópakli: ${p.deck.length} lap maradt" title="Húzópakli: ennyi lap maradt"><i></i><b>${p.deck.length}</b></button>`;
 }
+const STB_NOATK = '<span class="stb noatk" role="img" aria-label="Nem támad" title="Nem támad"></span>';
 function unitHTML(u, side, i) {
   if (u.hidden && side !== ME) return `<button data-uid="${u.uid}" class="unit facedown" aria-label="Rejtett lap">
     <span class="uin"><span class="art back-art"></span><span class="uname">Rejtett lap</span></span>
     <span class="st atk">?</span><span class="st hp">?</span>${u.stun ? `<span class="tags"><span class="zz stun" aria-hidden="true">bénult</span><span class="stc" role="img" aria-label="Bénult még ${u.stun} körig" title="Bénult még ${u.stun} körig"><b>${u.stun}</b></span></span>` : ''}</button>`;
   const c = CARD[u.id], atk = S.players[side].board[i]?.uid === u.uid ? effAtk(S, side, i) : u.atk, sleeping = u.fresh && !u.haste && u.id !== 'c_korso' && !c.noAttack && !u.stun;
-  const tags = (sleeping ? '<span class="stb rest" role="img" aria-label="Pihen" title="Pihen: ebben a körben még nem támad"></span>' : c.noAttack ? `<span class="zz">${u.id === 'c_capa' ? `🦈 még ${u.swims ?? 4}` : 'nem támad'}</span>` : u.id === 'c_ati' && !u.stun && !atiFree(S, side, i) ? '<span class="zz">nem támad</span>' : '')
-    + (u.expire != null || u.doom ? '<span class="zz">eltűnik</span>' : '') + (u.stun ? `<span class="zz stun" aria-hidden="true">bénult</span><span class="stc" role="img" aria-label="Bénult még ${u.stun} körig" title="Bénult még ${u.stun} körig"><b>${u.stun}</b></span>` : '')
+  const tags = (sleeping ? '<span class="stb rest" role="img" aria-label="Pihen" title="Pihen: ebben a körben még nem támad"></span>' : u.id === 'c_capa' ? '' : c.noAttack ? STB_NOATK : u.id === 'c_ati' && !u.stun && !atiFree(S, side, i) ? STB_NOATK : '')
+    + (c.invis ? `<span class="stb invis" role="img" aria-label="Láthatatlan" title="Láthatatlan: a támadások átmennek rajta"></span>${u.id === 'c_capa' ? `<span class="stc" role="img" aria-label="Még ${u.swims ?? 4} úszás" title="Még ennyi úszás, utána eltűnik"><b>${u.swims ?? 4}</b></span>` : ''}` : '')
+    + (u.expire != null || u.doom ? '<span class="stb doom" role="img" aria-label="Eltűnik" title="Eltűnik: a köröd végén magától elpusztul"></span>' : '') + (u.stun ? `<span class="zz stun" aria-hidden="true">bénult</span><span class="stc" role="img" aria-label="Bénult még ${u.stun} körig" title="Bénult még ${u.stun} körig"><b>${u.stun}</b></span>` : '')
     + (u.hidden ? '<span class="stb hid" role="img" aria-label="Rejtve" title="Rejtve: az ellenfél nem látja"></span>' : '')
-    + (c.taunt || u.taunt ? '<span class="zz taunt" title="Provokáció: mindenki őt támadja">provokál</span>' : '');
+    + (c.taunt || u.taunt ? '<span class="stb taunt" role="img" aria-label="Provokál" title="Provokáció: mindenki őt támadja"></span>' : '');
   const fa = CARD[u.id].foilOnly || foilOf(side, u.id);
   return `<button data-uid="${u.uid}" class="unit ${TYPE.char[1]}${fa ? ' fa' : ''}${u.shield ? ' shield' : ''}${sleeping ? ' sleep' : ''}" style="--h:${hueOf(u.id)}">
     <span class="uin">${ART[u.id] ? `<span class="art has-art" style="${artStyle(u.id)}"></span>` : `<span class="art"><span class="mono">${initials(c.name)}</span></span>`}<span class="uname${c.name.length > 14 ? ' long' : ''}${longWord(c.name) > 10 ? ' xl' : ''}">${c.name}</span></span>
@@ -3463,7 +3533,8 @@ function render() {
   const R = MAX_HALF / 2, rnd = Math.min(R, Math.ceil(S.half / 2));
   $('#round').textContent = `${rnd}. kör / ${R}`; $('#round').className = 'round' + (rnd >= R - 1 ? ' last' : '');
   const end = $('#endBtn');
-  end.disabled = !myTurn; end.textContent = S.active === ME ? 'Kör vége' : 'Ellenfél…';
+  end.disabled = !myTurn; end.textContent = S.active === ME ? 'Kör vége' : 'Ellenfél köre';
+  end.classList.toggle('wait', S.active !== ME); end.setAttribute('aria-label', end.textContent);
   const anyPlayable = hand.some((_, i) => canPlay(S, ME, i));
   end.classList.toggle('nudge', myTurn && !anyPlayable);
   setTimeout(tutCheck, 0);
@@ -3903,7 +3974,7 @@ function endMatch() {
     + qd.map(q => `<div class="q-done-pop">✓ Küldetés teljesítve: <b>${q.txt}</b><em>+${q.rew}</em></div>`).join('')
     + (px ? `<div class="sp-pop${px.up ? ' up' : ''}"><b>+${px.gain} XP</b> Season Pass${px.up ? ` · <em>Szintlépés! ${px.lv}. szint – vedd át a jutalmat</em>` : ` · ${px.lv}. szint (${px.inLv}/${PASS_XP.perLevel})`}</div>` : '');
   const o = document.createElement('div'); o.className = 'overlay';
-  o.innerHTML = `<div class="modal result${win ? '' : ' lose'}"><h2>${title}</h2><p>${why}</p>${reward}
+  o.innerHTML = `<div class="modal result${win ? '' : ' lose'}">${draw ? '<h2 class="banner-h"><img src="art/ui/banner-draw.webp?v=48228a44" alt="Döntetlen"></h2>' : `<h2>${title}</h2>`}<p>${why}</p>${reward}
     <div class="row"><button class="btn" data-r="menu">Menü</button><button class="btn primary" data-r="again">Új meccs</button></div></div>`;
   o.onclick = e => { const b = e.target.closest('[data-r]'); if (!b) return; o.remove();
     if (b.dataset.r === 'again') { const d = allDecks().find(x => x.id === ui.deck); if (d && !deckIssue(d)) startMatch(d.hero, ui.deck); else { renderPick(); show('scr-pick'); } } else { renderMenuFan(); renderProfileBar(); show('scr-menu'); } };
@@ -5432,7 +5503,7 @@ function pvpEndMatch() {
     : S.reason === 'time' ? `Letelt a ${MAX_HALF / 2} kör. Életek: te ${S.players[ME].hp}, ${opp} ${S.players[BOT].hp}.`
     : draw ? 'Mindkét hős egyszerre dőlt ki.' : win ? `${opp} hőse kiütve!` : `${opp} kiütötte a hősödet.`;
   const o = document.createElement('div'); o.className = 'overlay';
-  o.innerHTML = `<div class="modal result${win ? '' : ' lose'}"><h2>${draw ? 'Döntetlen' : win ? 'Győzelem!' : 'Vereség'}</h2><p>${why}</p>${reward}
+  o.innerHTML = `<div class="modal result${win ? '' : ' lose'}">${draw ? '<h2 class="banner-h"><img src="art/ui/banner-draw.webp?v=48228a44" alt="Döntetlen"></h2>' : `<h2>${win ? 'Győzelem!' : 'Vereség'}</h2>`}<p>${why}</p>${reward}
     <div class="row"><button class="btn" data-r="menu">Menü</button><button class="btn primary" data-r="pvp">PvP</button></div></div>`;
   o.onclick = e => { const b = e.target.closest('[data-r]'); if (!b) return; o.remove();
     if (b.dataset.r === 'pvp') pvpLeave(); else { pvpLeave(); renderMenuFan(); renderProfileBar(); show('scr-menu'); } };

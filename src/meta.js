@@ -1439,7 +1439,7 @@ function pvpEndMatch() {
     : S.reason === 'time' ? `Letelt a ${MAX_HALF / 2} kör. Életek: te ${S.players[ME].hp}, ${opp} ${S.players[BOT].hp}.`
     : draw ? 'Mindkét hős egyszerre dőlt ki.' : win ? `${opp} hőse kiütve!` : `${opp} kiütötte a hősödet.`;
   const o = document.createElement('div'); o.className = 'overlay';
-  o.innerHTML = `<div class="modal result${win ? '' : ' lose'}"><h2>${draw ? 'Döntetlen' : win ? 'Győzelem!' : 'Vereség'}</h2><p>${why}</p>${reward}
+  o.innerHTML = `<div class="modal result${win ? '' : ' lose'}">${draw ? '<h2 class="banner-h"><img src="art/ui/banner-draw.webp" alt="Döntetlen"></h2>' : `<h2>${win ? 'Győzelem!' : 'Vereség'}</h2>`}<p>${why}</p>${reward}
     <div class="row"><button class="btn" data-r="menu">Menü</button><button class="btn primary" data-r="pvp">PvP</button></div></div>`;
   o.onclick = e => { const b = e.target.closest('[data-r]'); if (!b) return; o.remove();
     if (b.dataset.r === 'pvp') pvpLeave(); else { pvpLeave(); renderMenuFan(); renderProfileBar(); show('scr-menu'); } };

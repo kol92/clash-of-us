@@ -669,20 +669,22 @@ function heroBar(pi) {
   return `<div class="hport${ART[h.id] ? '' : ' noart'}${fa ? ' fa' : ''}${gold ? ' gold' : ''}${p.baszo ? ' baszo' : p.machine === 2 ? ' gepmilo' : ''}" style="--h:${h.hue};${img}" aria-hidden="true">${ART[h.id] ? '' : `<span>${initials(h.name)}</span>`}${fa ? '<i class="hfa-holo"></i><i class="hfa-shine"></i><i class="hfa-rim"></i>' : ''}</div>
     <button class="hport-hit" data-hero="${pi}" aria-label="${h.name} képessége"></button>${p.machine === 1 ? '<span class="hmachine" title="Gépüzemmód: egyszer visszatér 10 élettel">⚙️</span>' : ''}${p.locked ? '<span class="hlock" title="Adios Motherfucker!: ebben a körében nem játszhat ki lapot">Bénult</span>' : ''}
     <div class="hinfo"><div class="hname">${h.name}<small>${pi === BOT ? (S.pvp ? escH(S.names?.[pi] || 'barát') : 'bot') : 'te'}</small></div>
-      <div class="hpbar"><i style="width:${Math.max(0, p.hp) / p.maxHp * 100}%"></i><b>${Math.max(0, p.hp)} / ${p.maxHp}</b></div></div>
+      <div class="hpbar" role="img" aria-label="Élet: ${Math.max(0, p.hp)} / ${p.maxHp}"><span class="hps"><i style="width:${Math.max(0, p.hp) / p.maxHp * 100}%"></i></span><b>${Math.max(0, p.hp)} / ${p.maxHp}</b></div></div>
     <div class="res"><div class="en hudm" role="img" aria-label="Energia: ${p.energy} / ${p.maxEnergy}" title="Energia (most / legfeljebb)"><b>${p.energy}/${p.maxEnergy}</b></div>
-      <div class="counts">Kéz ${p.hand.length} · <button class="gravebtn" data-grave="${pi}" aria-label="Temető">🪦 ${p.grave.length}</button></div></div>
+      <div class="counts">Kéz ${p.hand.length} · <button class="gravebtn" data-grave="${pi}" aria-label="Temető: ${p.grave.length} lap"><i class="ic-grave" aria-hidden="true"></i>${p.grave.length}</button></div></div>
     <button class="deckpile${p.deck.length ? p.deck.length <= 3 ? ' low' : '' : ' empty'}" data-deck="${pi}" aria-label="Húzópakli: ${p.deck.length} lap maradt" title="Húzópakli: ennyi lap maradt"><i></i><b>${p.deck.length}</b></button>`;
 }
+const STB_NOATK = '<span class="stb noatk" role="img" aria-label="Nem támad" title="Nem támad"></span>';
 function unitHTML(u, side, i) {
   if (u.hidden && side !== ME) return `<button data-uid="${u.uid}" class="unit facedown" aria-label="Rejtett lap">
     <span class="uin"><span class="art back-art"></span><span class="uname">Rejtett lap</span></span>
     <span class="st atk">?</span><span class="st hp">?</span>${u.stun ? `<span class="tags"><span class="zz stun" aria-hidden="true">bénult</span><span class="stc" role="img" aria-label="Bénult még ${u.stun} körig" title="Bénult még ${u.stun} körig"><b>${u.stun}</b></span></span>` : ''}</button>`;
   const c = CARD[u.id], atk = S.players[side].board[i]?.uid === u.uid ? effAtk(S, side, i) : u.atk, sleeping = u.fresh && !u.haste && u.id !== 'c_korso' && !c.noAttack && !u.stun;
-  const tags = (sleeping ? '<span class="stb rest" role="img" aria-label="Pihen" title="Pihen: ebben a körben még nem támad"></span>' : c.noAttack ? `<span class="zz">${u.id === 'c_capa' ? `🦈 még ${u.swims ?? 4}` : 'nem támad'}</span>` : u.id === 'c_ati' && !u.stun && !atiFree(S, side, i) ? '<span class="zz">nem támad</span>' : '')
-    + (u.expire != null || u.doom ? '<span class="zz">eltűnik</span>' : '') + (u.stun ? `<span class="zz stun" aria-hidden="true">bénult</span><span class="stc" role="img" aria-label="Bénult még ${u.stun} körig" title="Bénult még ${u.stun} körig"><b>${u.stun}</b></span>` : '')
+  const tags = (sleeping ? '<span class="stb rest" role="img" aria-label="Pihen" title="Pihen: ebben a körben még nem támad"></span>' : u.id === 'c_capa' ? '' : c.noAttack ? STB_NOATK : u.id === 'c_ati' && !u.stun && !atiFree(S, side, i) ? STB_NOATK : '')
+    + (c.invis ? `<span class="stb invis" role="img" aria-label="Láthatatlan" title="Láthatatlan: a támadások átmennek rajta"></span>${u.id === 'c_capa' ? `<span class="stc" role="img" aria-label="Még ${u.swims ?? 4} úszás" title="Még ennyi úszás, utána eltűnik"><b>${u.swims ?? 4}</b></span>` : ''}` : '')
+    + (u.expire != null || u.doom ? '<span class="stb doom" role="img" aria-label="Eltűnik" title="Eltűnik: a köröd végén magától elpusztul"></span>' : '') + (u.stun ? `<span class="zz stun" aria-hidden="true">bénult</span><span class="stc" role="img" aria-label="Bénult még ${u.stun} körig" title="Bénult még ${u.stun} körig"><b>${u.stun}</b></span>` : '')
     + (u.hidden ? '<span class="stb hid" role="img" aria-label="Rejtve" title="Rejtve: az ellenfél nem látja"></span>' : '')
-    + (c.taunt || u.taunt ? '<span class="zz taunt" title="Provokáció: mindenki őt támadja">provokál</span>' : '');
+    + (c.taunt || u.taunt ? '<span class="stb taunt" role="img" aria-label="Provokál" title="Provokáció: mindenki őt támadja"></span>' : '');
   const fa = CARD[u.id].foilOnly || foilOf(side, u.id);
   return `<button data-uid="${u.uid}" class="unit ${TYPE.char[1]}${fa ? ' fa' : ''}${u.shield ? ' shield' : ''}${sleeping ? ' sleep' : ''}" style="--h:${hueOf(u.id)}">
     <span class="uin">${ART[u.id] ? `<span class="art has-art" style="${artStyle(u.id)}"></span>` : `<span class="art"><span class="mono">${initials(c.name)}</span></span>`}<span class="uname${c.name.length > 14 ? ' long' : ''}${longWord(c.name) > 10 ? ' xl' : ''}">${c.name}</span></span>
@@ -734,7 +736,8 @@ function render() {
   const R = MAX_HALF / 2, rnd = Math.min(R, Math.ceil(S.half / 2));
   $('#round').textContent = `${rnd}. kör / ${R}`; $('#round').className = 'round' + (rnd >= R - 1 ? ' last' : '');
   const end = $('#endBtn');
-  end.disabled = !myTurn; end.textContent = S.active === ME ? 'Kör vége' : 'Ellenfél…';
+  end.disabled = !myTurn; end.textContent = S.active === ME ? 'Kör vége' : 'Ellenfél köre';
+  end.classList.toggle('wait', S.active !== ME); end.setAttribute('aria-label', end.textContent);
   const anyPlayable = hand.some((_, i) => canPlay(S, ME, i));
   end.classList.toggle('nudge', myTurn && !anyPlayable);
   setTimeout(tutCheck, 0);
@@ -1174,7 +1177,7 @@ function endMatch() {
     + qd.map(q => `<div class="q-done-pop">✓ Küldetés teljesítve: <b>${q.txt}</b><em>+${q.rew}</em></div>`).join('')
     + (px ? `<div class="sp-pop${px.up ? ' up' : ''}"><b>+${px.gain} XP</b> Season Pass${px.up ? ` · <em>Szintlépés! ${px.lv}. szint – vedd át a jutalmat</em>` : ` · ${px.lv}. szint (${px.inLv}/${PASS_XP.perLevel})`}</div>` : '');
   const o = document.createElement('div'); o.className = 'overlay';
-  o.innerHTML = `<div class="modal result${win ? '' : ' lose'}"><h2>${title}</h2><p>${why}</p>${reward}
+  o.innerHTML = `<div class="modal result${win ? '' : ' lose'}">${draw ? '<h2 class="banner-h"><img src="art/ui/banner-draw.webp" alt="Döntetlen"></h2>' : `<h2>${title}</h2>`}<p>${why}</p>${reward}
     <div class="row"><button class="btn" data-r="menu">Menü</button><button class="btn primary" data-r="again">Új meccs</button></div></div>`;
   o.onclick = e => { const b = e.target.closest('[data-r]'); if (!b) return; o.remove();
     if (b.dataset.r === 'again') { const d = allDecks().find(x => x.id === ui.deck); if (d && !deckIssue(d)) startMatch(d.hero, ui.deck); else { renderPick(); show('scr-pick'); } } else { renderMenuFan(); renderProfileBar(); show('scr-menu'); } };
