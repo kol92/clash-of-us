@@ -256,6 +256,23 @@ Hősképesség-ötletek a táblázatban (még nem zöldek, nincsenek beépítve)
 - Csak gyakori (max 2) és ritka (max 1) lapból állnak, így mindenki ki tudja játszani őket az ingyenes kezdőgyűjteménnyel. Minden meglévő játékos megkapja az összes ritka lapból 1 példányt, ha még nincs neki (az újak eleve megkapják).
 - A bot a véletlenül választott hőse saját kezdőpaklijával játszik.
 
+## Kiadás előtti egyensúlyozás (2026-10-04)
+- Lapok ereje (15 000 bot-meccs véletlen paklikkal és hősökkel; a lap „győzelmi aránya”, ha benne van a pakliban): kiugró volt **Alekosz Tibi 63,6%** (minden más lap 45–55% között). Leggyengébbek: Laszy 45,4%, a helyszínek (45–47%), Delfin póz, Mangós Ciroc, Koktélarmageddon, Musztafa Gyros, NFC.
+- **Alekosz Tibi:** 4 → 5 energia, és csak legfeljebb 3 költségű karaktert lophat; csak közvetlenül maga mellé teheti (ahogy a lap mindig is írta – a kód eddig bárhova tette). Teszt: 63% → 55%.
+- **Laszy:** 6/3 → 6/4, a félreütés esélye 50% → 25%. Teszt: 39% → 48% (kezdőpaklis teszt).
+- **A Nagy Fehér Cigány:** 8/1 → 8/2.
+- Az olcsó kisegítő lapok (Mangós, Gyros, Rehab, Delfin) költségcsökkentése a botteszten nem számított (±1%) – maradtak.
+- **Kezdőpaklik** (cél: minden hős 47–53% a saját paklijával; 2000 meccs/hős): előtte Barna 57%, Tomi 55%, Gabi 55%, Milo 54% … Krisz 46%, Sasi 44%, Dávid 43,5%. Utána: Gabi 53,6, Milo 52,8, Sasi 51,0, Krisz 50,9, Laci 49,6, Bence 49,1, Tomi 48,8, Barna 47,8, Dávid 46,5. Kezdő/második játékos: 48,9 / 51,1.
+  - Éjszakai műszak (Gabi): Mangós Ciroc → Bence, Amszterdam hőse.
+  - Vodkás est (Krisz): 1 Rehab és a Mangós → Vera, Bence, Amszterdam hőse.
+  - Kocsmatúra (Dávid): Ki vagy tiltva! → Dávid, a sofőr (a pakliban nagyot üt: Barhole + Munkahely olcsón hozza a 2/8-as provokálót).
+  - Mindent bele (Bence): Musztafa Gyros és Napszemüveg és 1 Pifti → Rebi, Bence, Amszterdam hőse, Tálos.
+  - Kamikaze (Milo): Morrison’s 2 → Csattogós lepke.
+  - Hosszú éjszaka (Laci): Ki vagy tiltva! → Dávid, a sofőr.
+  - A banda (Sasi): Siófoki Kórház, 2 Napszemüveg, Fogel → +1 Pifti, Boldog szülinapot Pifti!, TZS, Lukács Norbi.
+  - Felszerelés (Tomi): Delfin póz → Gál Zoli. Rohamcsapat (Barna): változatlan.
+- Megfigyelés: egy-egy lapcsere 5–10%-ot is mozdít egy hősön (pl. Dávid, a sofőr Dávid paklijában +11%, Barna, az életunt Milónál +10%) – a hősképességekkel összefonódó lapok sokat érnek.
+
 ## Nerfek (2026-09-29)
 - Módszer: 5000 szimulált bot-meccs véletlen 20 lapos paklikkal (bármely lap bármely hőssel); laponként mérve, hány %-ban nyert az a pakli, amiben benne volt. Átlag 50%, ±1,5% a mérési zaj. A bot a helyzeti lapokat (helyszínek, Mosh Pit, Ki vagy tiltva!) valószínűleg alulhasználja, ezért azok számai lefelé torzítanak.
 - Legerősebbek voltak: PP 56,2%, Zana 56,0%, Vera 55,5%, Kovács Bence 54,9%, Milo az örökivó 54,7%, Vajda Peti 54,4%, Végh Tomi 53,4% (kezdőpaklikban ennél jóval erősebb), Abszint 52,8%.

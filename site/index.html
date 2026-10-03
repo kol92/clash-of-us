@@ -1802,7 +1802,7 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%;}
 <script src="vendor/firebase-auth-compat.js"></script>
 <script src="vendor/firebase-firestore-compat.js"></script>
 <script src="vendor/firebase-database-compat.js"></script>
-<script>window.APP_VERSION = "2026.10.03-2308";</script>
+<script>window.APP_VERSION = "2026.10.04-0004";</script>
 <script>// ===== Best of Us – saját szerver (Firebase) =====
 // A játék eredetileg a Claude-os tárolót használta (window.claude.use('db' | 'user' | 'room')).
 // Ez a fájl ugyanazt a felületet adja Firebase-ből, így a játék kódja szinte változatlan maradhat:
@@ -2074,7 +2074,7 @@ const CARDS = [
   { id:'c_kriszrantott', type:'char', name:'Krisz, a rántott húsok ura', cost:6, atk:4, hp:5, rarity:'e', text:'Kijátszáskor a kezedbe ad egy Rántott hús lapot.' },
   { id:'c_lacifinale', type:'char', name:'Laci, La Grand Finale', cost:6, atk:5, hp:2, rarity:'l', muscle:true, deathGift:'i_ing', text:'Amikor meghal, a kezedbe kerül a Grand Finale ing.' },
   { id:'c_davidsofor', type:'char', name:'Dávid, a sofőr', cost:6, atk:2, hp:8, rarity:'r', sneak:true, taunt:true, text:'Amíg rejtve van, nem provokál – csak miután felfordult.' },
-  { id:'c_alekosz', type:'char', name:'Alekosz Tibi', cost:4, atk:2, hp:2, rarity:'e', text:'Kijátszáskor ellop egy véletlen ellenséges karaktert, és maga mellé teszi (ha van mellette üres hely).' },
+  { id:'c_alekosz', type:'char', name:'Alekosz Tibi', cost:5, maxCost:3, atk:2, hp:2, rarity:'e', text:'Kijátszáskor ellop egy véletlen, legfeljebb 3 költségű ellenséges karaktert, és maga mellé teszi (ha van mellette üres hely).' },
   { id:'c_norbi', type:'char', name:'Lukács Norbi', cost:3, atk:2, hp:3, rarity:'r', text:'Ha mellette áll egy másik karaktered, +2 támadást kap.' },
   { id:'c_udvarhelyi', type:'char', name:'Udvarhelyi Zoli', cost:6, atk:5, hp:5, rarity:'k', text:'' },
   { id:'c_molnar', type:'char', name:'Molnár Zsolti', cost:5, atk:2, hp:4, rarity:'r', deathKill:true, text:'Amikor meghal, elpusztít egy véletlen ellenséges karaktert.' },
@@ -2087,8 +2087,8 @@ const CARDS = [
   { id:'c_fogel', type:'char', name:'Fogel', cost:5, atk:2, hp:4, rarity:'r', text:'Kijátszáskor: a többi karaktered +2 életet kap. Ez akkor is megmarad, ha Fogel meghal.' },
   { id:'c_boros', type:'char', name:'Boros', cost:5, atk:3, hp:5, rarity:'r', taunt:true, text:'Amíg él, az ellenfél karakterei mindig őt támadják, bárhol áll.' },
   { id:'c_nyiti', type:'char', name:'Nyiti', cost:5, atk:5, hp:4, rarity:'l', text:'Mindig közvetlenül az ellenfél hősét támadja, akkor is, ha áll vele szemben karakter.' },
-  { id:'c_nfc', type:'char', name:'A Nagy Fehér Cigány', cost:6, atk:8, hp:1, rarity:'k', muscle:true, text:'' },
-  { id:'c_laszy', type:'char', name:'Laszy', cost:6, atk:6, hp:3, rarity:'e', haste:true, muscle:true, text:'Támadáskor 50% eséllyel egy saját karakteredet vagy a saját hősödet találja el.' },
+  { id:'c_nfc', type:'char', name:'A Nagy Fehér Cigány', cost:6, atk:8, hp:2, rarity:'k', muscle:true, text:'' },
+  { id:'c_laszy', type:'char', name:'Laszy', cost:6, atk:6, hp:4, miss:.25, rarity:'e', haste:true, muscle:true, text:'Támadáskor 25% eséllyel egy saját karakteredet vagy a saját hősödet találja el.' },
   // --- Eszközök (helykitöltők) ---
   { id:'c_pp', type:'char', name:'PP', cost:3, atk:1, hp:3, rarity:'k', text:'Kijátszáskor maga mellé idéz egy 1/1-es Queryt, ha van üres hely.' },
   { id:'c_query', type:'char', name:'Query', cost:0, atk:1, hp:1, rarity:'k', token:true, text:'Csak PP idézheti meg, pakliba nem tehető.' },
@@ -2193,21 +2193,21 @@ const DECKS = {
   roham: { name:'Rohamcsapat', hero:'barna', desc:'Olcsó, gyors karakterek és vodka az arcba. Kovács Bence halála is fáj, Barna minden körben felpörgeti az első emberét.',
     list:{ c_pifti:2, c_gyuri:2, c_kovacs:2, c_zoli:2, c_tzs:1, c_talos:1, c_rebi:1, c_sasi:1, a_dinnyes:2, i_napszemuveg:1, a_cheddar:2, i_lepke:1, i_buffalo:1, f_capa:1 } },
   ejszaka: { name:'Éjszakai műszak', hero:'gabi', desc:'Falak és gyógyítás: Végh Tomi és a Bunda provokál, Gabi közben mindenkit foltoz. Húzd el a meccset, a végén nyersz.',
-    list:{ c_veghtomi:1, c_vajda:1, c_gyuri:2, c_pifti:2, c_boros:1, c_fogel:1, c_vera:1, c_rebi:1, i_borkabat:1, a_rehab:1, a_mangos:1, a_abszint:1, l_korhaz:1, a_cheddar:2, a_dinnyes:1, i_bunda:1, f_egyutt:1 } },
+    list:{ c_veghtomi:1, c_vajda:1, c_gyuri:2, c_pifti:2, c_boros:1, c_fogel:1, c_vera:1, c_rebi:1, i_borkabat:1, a_rehab:1, c_amszterdam:1, a_abszint:1, l_korhaz:1, a_cheddar:2, a_dinnyes:1, i_bunda:1, f_egyutt:1 } },
   vodka: { name:'Vodkás est', hero:'krisz', desc:'Italos pakli: minden pohár erősíti Milót, Laczkó Tomi közben tölti a kezed, Kristóf hozza a következő kört. Krisz az első két lapját olcsóbban rakja le – gyors kezdés.',
-    list:{ c_miloivo:1, c_laczko:1, c_kristof:1, c_pp:2, c_gyuri:2, c_vajda:2, a_dinnyes:2, a_cheddar:1, f_metamorf:1, a_rehab:2, a_abszint:1, a_mangos:1, i_vodkakancso:1, i_energiaital:1, c_rebi:1 } },
+    list:{ c_miloivo:1, c_laczko:1, c_kristof:1, c_pp:2, c_gyuri:2, c_vajda:2, a_dinnyes:2, a_cheddar:1, f_metamorf:1, c_vera:1, a_rehab:1, c_amszterdam:1, a_abszint:1, i_vodkakancso:1, i_energiaital:1, c_rebi:1 } },
   felszereles: { name:'Felszerelés', hero:'tomi', desc:'Minden karakterre jut valami: napszemüveg, bunda, vodkás kancsó – Tomi eszközei plusz életet adnak, és körönként az első olcsóbb.',
-    list:{ c_pifti:2, c_gyuri:2, c_talos:1, c_rebi:1, c_sasi:1, i_napszemuveg:2, i_kabala:2, i_borkabat:1, i_vodkakancso:1, i_buffalo:1, i_lepke:1, a_cheddar:1, f_atok:1, i_bunda:1, a_delfin:1, c_vajda:1 } },
-  kocsmatura: { name:'Kocsmatúra', hero:'david', desc:'Helyszínről helyszínre: Dávid törzsvendég, minden kocsma neki kedvez – a Budapest Park csak az ellenfelet drágítja. Ha kell, a Ki vagy tiltva! bezárja az ellenfél kocsmáját.',
-    list:{ f_munkahely:1, c_gyuri:2, c_vajda:2, c_veghtomi:2, l_akacfa:1, l_barhole:1, l_korhaz:1, l_park:1, a_kitiltva:1, a_dinnyes:2, a_abszint:1, c_boros:1, c_rebi:1, c_sasi:1, c_zsibrita:1, c_kristof:1 } },
-  mindentbele: { name:'Mindent bele', hero:'bence', desc:'Bence 24 élete elbírja: Delfin póz, Varázshó és TZS önsebzése ide bátran jöhet, a Gyros Tál új kezet hoz.',
-    list:{ c_tzs:1, c_zoli:2, c_gyuri:2, c_kovacs:2, c_vajda:2, c_sasi:1, f_bender:1, a_dinnyes:2, a_gyros:1, a_abszint:1, i_buffalo:1, c_veghtomi:1, a_cheddar:1, i_napszemuveg:1, c_pifti:1 } },
+    list:{ c_pifti:2, c_gyuri:2, c_talos:1, c_rebi:1, c_sasi:1, i_napszemuveg:2, i_kabala:2, i_borkabat:1, i_vodkakancso:1, i_buffalo:1, i_lepke:1, a_cheddar:1, f_atok:1, i_bunda:1, c_zoli:1, c_vajda:1 } },
+  kocsmatura: { name:'Kocsmatúra', hero:'david', desc:'Helyszínről helyszínre: Dávid törzsvendég, minden kocsma neki kedvez – a Budapest Park csak az ellenfelet drágítja. A sofőr, Dávid lefordítva érkezik, aztán mindenkit magára húz.',
+    list:{ f_munkahely:1, c_gyuri:2, c_vajda:2, c_veghtomi:2, l_akacfa:1, l_barhole:1, l_korhaz:1, l_park:1, c_davidsofor:1, a_dinnyes:2, a_abszint:1, c_boros:1, c_rebi:1, c_sasi:1, c_zsibrita:1, c_kristof:1 } },
+  mindentbele: { name:'Mindent bele', hero:'bence', desc:'Bence 24 élete elbírja: TZS önsebzése ide bátran jöhet, és ha Bence, Amszterdam hőse elesik, még gyógyít is egyet.',
+    list:{ c_tzs:1, c_zoli:2, c_gyuri:2, c_kovacs:2, c_vajda:2, c_sasi:1, f_bender:1, a_dinnyes:2, c_rebi:1, a_abszint:1, i_buffalo:1, c_veghtomi:1, a_cheddar:1, c_amszterdam:1, c_talos:1 } },
   kamikaze: { name:'Kamikaze', hero:'milo', desc:'Olcsó karakterek, akik szívesen kiesnek: Milo minden halálért megsebzi az ellenfelet, Kovács Bence még utoljára odacsap.',
-    list:{ c_kovacs:2, c_pifti:2, c_zoli:2, c_tzs:1, c_pp:2, c_gyuri:2, c_talos:1, c_rebi:1, i_kabala:2, l_morisson:1, a_dinnyes:2, f_gepuzem:1, a_cheddar:1 } },
+    list:{ c_kovacs:2, c_pifti:2, c_zoli:2, c_tzs:1, c_pp:2, c_gyuri:2, c_talos:1, c_rebi:1, i_kabala:2, i_lepke:1, a_dinnyes:2, f_gepuzem:1, a_cheddar:1 } },
   hosszu: { name:'Hosszú éjszaka', hero:'laci', desc:'Védekezz, bénítsd le az ellenfelet, gyógyíts – Laci extra lapjai és a falak a végére elhúznak.',
-    list:{ c_veghtomi:1, c_vajda:2, c_gyuri:2, c_fogel:1, c_vera:1, c_rebi:1, c_boros:1, a_abszint:1, a_mangos:1, a_rehab:1, a_dinnyes:1, i_buffalo:1, i_bunda:1, a_kitiltva:1, a_cheddar:1, c_sasimeselo:1, l_korhaz:1, f_jbl:1 } },
-  banda: { name:'A banda', hero:'sasi', desc:'Minél többen vagytok lent, annál jobb: Sasi minden körben odacsap, Zsibrita és a haverok utat nyitnak.',
-    list:{ c_pp:2, c_pifti:1, f_gluten:1, c_gyuri:2, c_kovacs:2, c_vajda:2, c_talos:1, c_rebi:1, c_zsibrita:1, c_fogel:1, i_napszemuveg:2, l_korhaz:1, a_dinnyes:2, c_veghtomi:1 } },
+    list:{ c_veghtomi:1, c_vajda:2, c_gyuri:2, c_fogel:1, c_vera:1, c_rebi:1, c_boros:1, a_abszint:1, a_mangos:1, a_rehab:1, a_dinnyes:1, i_buffalo:1, i_bunda:1, c_davidsofor:1, a_cheddar:1, c_sasimeselo:1, l_korhaz:1, f_jbl:1 } },
+  banda: { name:'A banda', hero:'sasi', desc:'Minél többen vagytok lent, annál jobb: Sasi minden körben odacsap, a szülinapon három Pifti is beesik, Zsibrita és a haverok utat nyitnak.',
+    list:{ c_pp:2, c_pifti:2, f_gluten:1, c_gyuri:2, c_kovacs:2, c_vajda:2, c_talos:1, c_rebi:1, c_zsibrita:1, a_szulinap:1, c_tzs:1, c_norbi:1, a_dinnyes:2, c_veghtomi:1 } },
 };
 const DECK_OF = hid => Object.keys(DECKS).find(k => DECKS[k].hero === hid);
 
@@ -2420,8 +2420,8 @@ function playCard(s, pi, hi, t) {
     if (c.id === 'c_tomiparti') partyDrink(s, pi, t.i);
     if (c.id === 'c_alekosz') {   // véletlen ellenséges karaktert ellop, és maga mellé teszi (előbb jobbra, aztán balra, aztán bárhova)
       const os = openSlots(s, pi), spots = [t.i + 1, t.i - 1].filter(j => os.includes(j));
-      const j = spots.length ? spots[0] : os.length ? os[0] : -1;
-      const cand = e.board.map((x, k) => x && x.id !== 'c_korso' && !isFixed(x) ? k : -1).filter(k => k >= 0);
+      const j = spots.length ? spots[0] : (CARD.c_alekosz.anywhere && os.length) ? os[0] : -1;   // csak közvetlenül mellé (ahogy a lap írja)
+      const cand = e.board.map((x, k) => x && x.id !== 'c_korso' && !isFixed(x) && CARD[x.id].cost <= (CARD.c_alekosz.maxCost ?? 99) ? k : -1).filter(k => k >= 0);
       if (j >= 0 && cand.length) {
         const k = cand[Math.floor(rnd() * cand.length)];
         reveal(s, ei, k);
@@ -2482,8 +2482,8 @@ function playCard(s, pi, hi, t) {
         const v = L.map(j => e.board[j]); v.unshift(v.pop()); L.forEach((j, k) => { e.board[j] = v[k]; });
         ev(s, { t:'mosh', side:ei, i:-1 }); } break;
       case 'a_cheddar': draw(s, pi); draw(s, pi); break;
-      case 'a_delfin': damageHero(s, pi, 2); if (s.winner == null) { draw(s, pi); draw(s, pi); } break;
-      case 'a_mangos': healHero(s, pi, 4); break;
+      case 'a_delfin': damageHero(s, pi, CARD.a_delfin.self ?? 2); if (s.winner == null) { draw(s, pi); draw(s, pi); } break;
+      case 'a_mangos': healHero(s, pi, 4); if (CARD.a_mangos.draw) draw(s, pi); break;
       case 'a_rantott': if (t.k === 'hero') healHero(s, pi, 3); else healUnit(s, pi, t.i, 3); break;
       case 'a_rehab': case 'a_rehab2':
         if (t.k === 'hero') { healHero(s, pi, 3); break; }
@@ -2711,7 +2711,7 @@ function canAttack(u) { return !!u && (!u.fresh || u.haste) && u.id !== 'c_korso
 
 // Laszy félreütése: 50% eséllyel egy saját karakter (i) vagy a saját hős (i = -1); a felület előre dob, hogy jó irányba animáljon
 function laszyRoll(s, pi, i) {
-  if (rnd() >= 0.5) return null;
+  if (rnd() >= (CARD.c_laszy.miss ?? 0.5)) return null;
   const opts = [{ i:-1 }]; s.players[pi].board.forEach((x, j) => { if (x && j !== i) opts.push({ i:j }); });
   return opts[Math.floor(rnd() * opts.length)];
 }
