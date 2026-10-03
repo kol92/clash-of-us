@@ -87,7 +87,7 @@ const CARDS = [
   { id:'f_atok', type:'action', name:'Az összetartás átka', cost:6, rarity:'l', finisher:true, hero:'tomi', tgt:'grave', text:'Két véletlen karakter visszatér a temetődből a pályára, az eredeti értékeinél +1/+1-gyel.' },
   { id:'f_munkahely', type:'action', name:'A munkahely', cost:6, rarity:'l', finisher:true, hero:'david', text:'Húzol 2 lapot, és kijátssza a Munkahely helyszínt: a te lapjaid 1-gyel olcsóbbak, az ellenfélé 1-gyel drágábbak. Ha a Munkahely eltűnik, Dávid 5 életet gyógyul.' },
   { id:'f_gepuzem', type:'action', name:'Gépüzemmód', cost:6, rarity:'l', finisher:true, hero:'milo', text:'Ha Milo meghalna, egyszer visszatér 10 élettel.' },
-  { id:'f_capa', type:'action', name:'Hátad mögött, cápa megesz!', cost:6, rarity:'l', finisher:true, hero:'barna', text:'Megidéz egy 9/9-es Cápát az ellenfél jobb szélső helyére (aki ott áll, azt megeszi). 4 körön át a köröd elején egyet úszik afelé a karakter felé, akit az ellenfél utoljára lerakott, és megeszi, aki az útjába kerül. Nem támad, Láthatatlan: a támadások átmennek rajta.' },
+  { id:'f_capa', type:'action', name:'Hátad mögött, cápa megesz!', cost:6, rarity:'l', finisher:true, hero:'barna', text:'Megidéz egy 9/9-es Cápát, amely azonnal megeszi az ellenfél egy véletlen karakterét, és a helyére áll (ha nincs ellenséges karakter, a jobb szélre kerül). 4 körön át a köröd elején egyet úszik afelé a karakter felé, akit az ellenfél utoljára lerakott, és megeszi, aki az útjába kerül. Nem támad, Láthatatlan: a támadások átmennek rajta.' },
   { id:'f_gluten', type:'action', name:'Gluténbomba', cost:6, rarity:'l', finisher:true, hero:'sasi', opts:['5 sebzés + 5 gyógyulás', '8 sebzés, de te is kapsz 8-at'], text:'Válassz: 5 sebzés az ellenfél hősének és 5 életet gyógyulsz, vagy 8 sebzés az ellenfél hősének, de te is kapsz 8-at.' },
   // a kánon események által hozott, nem gyűjthető lapok
   // a második játékos kiegyenlítő lapja (nem gyűjthető): az első körében kapja
@@ -505,8 +505,12 @@ function playCard(s, pi, hi, t) {
         break; }
       case 'f_munkahely': draw(s, pi); if (s.winner == null) draw(s, pi); dropLocation(s, 'loc'); s.location = { id:'l_munkahely', owner:pi }; ev(s, { t:'summon', side:pi, i:-1, id:'l_munkahely' }); break;
       case 'f_gepuzem': p.machine = 1; ev(s, { t:'machineon', side:pi, i:-1 }); break;
-      case 'f_capa': {   // a cápa az ellenfél jobb szélére érkezik, és megeszi, aki ott áll
-        const j = LANES - 1, x = e.board[j];
+      case 'f_capa': {   // a cápa egy véletlen ellenséges karakter helyére érkezik, és megeszi; ha nincs kit, a jobb szélre
+        const cand = e.board.map((u, k) => u && !isFixed(u) ? k : -1).filter(k => k >= 0);
+        let j = cand.length ? cand[Math.floor(rnd() * cand.length)] : -1;
+        if (j < 0) for (let k = LANES - 1; k >= 0; k--) if (!e.board[k]) { j = k; break; }
+        if (j < 0) break;
+        const x = e.board[j];
         if (x && !isFixed(x)) { reveal(s, ei, j); ev(s, { t:'chomp', side:ei, i:j, from:-1 }); x.shield = false; x.hp = 0; cleanup(s); }
         if (!e.board[j]) { const u = makeUnit(s, 'c_capa', ei); u.owner = pi; u.fresh = false; u.swims = 4; e.board[j] = u; ev(s, { t:'summon', side:ei, i:j, id:'c_capa' }); }
         break; }
