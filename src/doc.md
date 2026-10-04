@@ -323,7 +323,11 @@ Hősképesség-ötletek a táblázatban (még nem zöldek, nincsenek beépítve)
   - **Gál Zoli – változat** (c_zoli2), 100 coin.
   - **Fogel – változat** (c_fogel2), 100 coin.
 - A változat-lapok a motorban mindenhol az alaplapként működnek (`bid()`), a pakliban az alaplappal együtt számít a darabszám.
-- A gomb feliratán szereplő „Portrék” rész még üres: ide jöhetnek a megvehető hős-portrék (pl. Full Art / arany hősök), ha lesz hozzájuk döntés.
+- **Portrék fül (2026-10-04):** hős-portrék saját névvel, mindig Full Artban (a képük a hős helyén jelenik meg: menü, gyűjtemény, pakliválasztó, meccs hős-sávja, és a PvP-ellenfél is látja – cos.port). Megvétel után rögtön ezt viseli a hős; a Gyűjteményben a hősre koppintva lehet váltani (Sima / Full Art / Arany / portrék). A hős képessége nem változik.
+  - **Bence, Pre-BoU** (Bence) – 150 coin
+  - **Sasi, az Izmos** (Sasi) – 150 coin
+  - **Krisz, az utca ura** (Krisz) – 250 coin
+  - Adat: p.portraits = [portré-id], p.heroSkin[hős] = portré-id; definíció: PORTRAITS (ui.js), kép: art/p_*.webp.
 
 ## Meccs-előzmények és eredményablak (2026-10-04)
 - Meccs közben a ⚑ melletti 📜 gomb megnyitja a „Mi történt?” ablakot: körönként (legújabb felül, az utolsó 12 kör) ki mit játszott ki és kire, ki támadott, sebzések, gyógyulások, halálok, idézések, bénulás, pajzs, lopás, Cápa, kitiltás stb. Az ellenfél rejtett lapja „egy rejtett lap”, amíg fel nem fordul. PvP-ben is működik (helyben gyűlik, nem kerül a szerverre).

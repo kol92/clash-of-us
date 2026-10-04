@@ -117,6 +117,9 @@ const ART = {
   // Arany hősök (a legritkább lapok)
   g_krisz: { src:'art/g_krisz.webp', av:'60% 22%', pos:'60% 24%', port:'62% 20%' },
   g_tomi:  { src:'art/g_tomi.webp',  av:'56% 14%', pos:'56% 16%', port:'57% 12%' },
+  p_bence_prebou: { src:'art/p_bence_prebou.webp', av:'50% 26%', pos:'50% 24%', port:'52% 22%' },
+  p_sasi_izmos:   { src:'art/p_sasi_izmos.webp', av:'78% 24%', pos:'64% 22%', port:'80% 20%' },
+  p_krisz_utca:   { src:'art/p_krisz_utca.webp', av:'58% 44%', pos:'56% 30%', port:'58% 44%' },
   g_barna: { src:'art/g_barna.webp', av:'64% 20%', pos:'62% 20%', port:'64% 16%' },
   g_laci:  { src:'art/g_laci.webp',  av:'46% 20%', pos:'46% 20%', port:'46% 16%' },
   g_sasi:  { src:'art/g_sasi.webp',  av:'46% 17%', pos:'46% 16%', port:'46% 12%' },
@@ -242,16 +245,24 @@ function avHTML(h, extra = '') {
   return ART[h.id] ? `class="av has-art" style="--h:${h.hue};${artStyle(h.id)}" ${extra}>`
                    : `class="av" style="--h:${h.hue}" ${extra}>${initials(h.name)}`;
 }
+// boltban vehető hős-portrék: mindig Full Art, saját névvel
+const PORTRAITS = {
+  p_bence_prebou: { hero: 'bence', name: 'Bence, Pre-BoU', price: 150 },
+  p_sasi_izmos:   { hero: 'sasi',  name: 'Sasi, az Izmos', price: 150 },
+  p_krisz_utca:   { hero: 'krisz', name: 'Krisz, az utca ura', price: 250 },
+};
+const isPort = v => !!(v && PORTRAITS[v] && ART[v]);
 function heroCardHTML(h, o = {}) {
-  const gold = !!(o.gold && ART['g_' + h.id]), aid = gold ? 'g_' + h.id : h.id;
-  const fk = gold ? 'gold' : o.foil ? 'foil' : 'base';   // arany → Full Art → alap
+  const port = isPort(o.port) && PORTRAITS[o.port].hero === h.id ? o.port : null;
+  const gold = !port && !!(o.gold && ART['g_' + h.id]), aid = port || (gold ? 'g_' + h.id : h.id);
+  const fk = gold ? 'gold' : (o.foil || port) ? 'foil' : 'base';   // arany → Full Art (a portré mindig Full Art) → alap
   const htl = h.text.length, htc = htl > 150 ? ' tl-l tl-xl' : htl > 95 ? ' tl-l' : htl > 62 ? ' tl-m' : '';
   return `<div class="card t-hero${o.big ? ' big' : ''}${fk === 'gold' ? ' framed xf xf-gold gold' + htc : fk === 'foil' ? ' foil' : ' framed'}" style="--h:${h.hue}" ${o.attrs || ''}>
     <div class="cframe">
       ${ART[aid] ? `<div class="art has-art" style="${artStyle(aid, o.big)}"></div>`
         : `<div class="art"><span class="mono">${initials(h.name)}</span>${o.big && !o.foil ? '<span class="artnote">Illusztráció helye</span>' : ''}</div>`}
       <div class="ctype">${gold ? 'Arany hős' : 'Hős'} · ${h.id === 'baszo' ? 12 : h.id === PASSIVE.bigHp ? 24 : 20} élet<i class="rar ${gold ? 'r-g' : 'r-l'}"></i></div>${gold ? '<i class="gold-dust"></i>' : ''}
-      <div class="name">${h.name}</div>
+      <div class="name">${port ? PORTRAITS[port].name : h.name}</div>
       <div class="txt"><span>${h.text}</span></div>
     </div></div>`;
 }
@@ -264,7 +275,8 @@ function renderMenuFan() {
   for (let i = pool.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [pool[i], pool[j]] = [pool[j], pool[i]]; }
   let gold = []; try { if (Store.p) gold = GOLD_HEROES.filter(h => heroSkin(h) === 'gold'); } catch {}   // induláskor még nincs betöltve a profil   // ha van arany hősöd, az is a menüben díszeleg
   const pick = pool.slice(0, 3); if (gold.length) pick[1] = HERO[gold[Math.floor(Math.random() * gold.length)]];
-  $('#menuFan').innerHTML = pick.map(h => heroCardHTML(h, { foil: true, gold: gold.includes(h.id) })).join('');
+  const pt = h => { try { const v = Store.p && heroSkin(h.id); return isPort(v) ? v : null; } catch { return null; } };
+  $('#menuFan').innerHTML = pick.map(h => heroCardHTML(h, { foil: true, gold: gold.includes(h.id), port: pt(h) })).join('');
 }
 renderMenuFan();
 $('#goPlay').onclick = () => { if (!Store.p) return showCreate(); const P = Store.p;
@@ -296,7 +308,7 @@ function renderColl() {
     }).join('')
          : HEROES.map(h => { const miss = ui.foil && !ownsHeroFa(h.id);
              const multi = !ui.foil && Store.p && heroSkins(h.id).length > 1, sk = multi ? heroSkin(h.id) : 'base';
-             return `<div class="coll-slot${miss ? ' missing' : ''}">${heroCardHTML(h, { foil: ui.foil || sk === 'fa', gold: !ui.foil && sk === 'gold', attrs: `data-hcard="${h.id}" tabindex="0"` })}${ui.foil ? `<span class="own-n">${miss ? 'Nincs meg' : '×' + Store.p.heroFa[h.id]}</span>` : multi ? `<span class="own-n skin-n">🎨 ${SKIN_NAME[sk]}</span>` : ''}</div>`; }).join('')}</div>${type ? '' : `<div class="lbl gold-lbl">✦ Arany hősök – a legritkább lapok</div><div class="coll-grid">${GOLD_HEROES.map(hid => { const has = ownsHeroGold(hid);
+             return `<div class="coll-slot${miss ? ' missing' : ''}">${heroCardHTML(h, { foil: ui.foil || sk === 'fa', gold: !ui.foil && sk === 'gold', port: !ui.foil && isPort(sk) ? sk : null, attrs: `data-hcard="${h.id}" tabindex="0"` })}${ui.foil ? `<span class="own-n">${miss ? 'Nincs meg' : '×' + Store.p.heroFa[h.id]}</span>` : multi ? `<span class="own-n skin-n">🎨 ${skinName(sk)}</span>` : ''}</div>`; }).join('')}</div>${type ? '' : `<div class="lbl gold-lbl">✦ Arany hősök – a legritkább lapok</div><div class="coll-grid">${GOLD_HEROES.map(hid => { const has = ownsHeroGold(hid);
              return `<div class="coll-slot${has ? '' : ' missing gold-miss'}">${heroCardHTML(HERO[hid], { gold: true, attrs: `data-hgold="${hid}" tabindex="0"` })}<span class="own-n">${has ? '✦ Megvan' : 'Nincs meg'}</span></div>`; }).join('')}</div>`}`).join('');
 }
 $('#vBase').onclick = () => { ui.foil = false; $('#vBase').setAttribute('aria-pressed', 'true'); $('#vFoil').setAttribute('aria-pressed', 'false'); renderColl(); };
@@ -368,6 +380,7 @@ const longWord = n => Math.max(...n.split(/[\s\u00AD]+/).map(w => w.length));   
 // a pakliban lévő Full Art példányok száma lapfajtánként (meccs közben csak ennyi példány csillog)
 const myFoils = list => { const o = {}; for (const [id, n] of Object.entries(list || {})) { const f = Math.min(n, Store.p?.coll[id]?.f || 0); if (f > 0) o[id] = f; } return o; };
 const foilOf = (side, id) => side === ME ? ownsFoil(id) : !!(S && S.cos && S.cos[side] && S.cos[side].foils && S.cos[side].foils.includes(id));
+const heroPortOf = side => { if (!S) return null; const v = side === ME ? heroSkin(S.players[side].heroId) : S.cos && S.cos[side] && S.cos[side].port; return isPort(v) && PORTRAITS[v].hero === S.players[side].heroId ? v : null; };
 const heroGoldOf = side => !!S && (side === ME ? heroSkin(S.players[side].heroId) === 'gold' : !!(S.cos && S.cos[side] && S.cos[side].heroGold));
 const heroFaOf = side => side === ME ? heroSkin(S.players[side].heroId) === 'fa' : !!(S && S.cos && S.cos[side] && S.cos[side].heroFa);
 const escH = s => String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
@@ -801,9 +814,9 @@ const heroOf = pi => S.players[pi].baszo ? BASZO
 function heroBar(pi) {
   const p = S.players[pi], h = heroOf(pi), bz = !!p.baszo || p.machine === 2;   // átváltozott hős: saját portré, arany/Full Art nélkül
   const pips = Array.from({ length: Math.max(6, p.energy) }, (_, k) => `<i class="${k < p.energy ? 'on' + (k >= 6 ? ' bonus' : '') : k < p.maxEnergy ? 'used' : 'locked'}"></i>`).join('');   // Egy pohár víz: 6 fölött a 7. kristály is kigyullad
-  const gold = !bz && heroGoldOf(pi) && !!ART['g_' + h.id], aid = gold ? 'g_' + h.id : h.id;
+  const port = !bz && heroPortOf(pi), gold = !bz && !port && heroGoldOf(pi) && !!ART['g_' + h.id], aid = port || (gold ? 'g_' + h.id : h.id);
   const img = ART[aid] ? `background-image:url('${artSrc(aid, true)}');--hp:${ART[aid].port || '50% 7%'}` : '';
-  const fa = !bz && (gold || heroFaOf(pi));
+  const fa = !bz && (gold || !!port || heroFaOf(pi));
   return `<div class="hport${ART[h.id] ? '' : ' noart'}${fa ? ' fa' : ''}${gold ? ' gold' : ''}${p.baszo ? ' baszo' : p.machine === 2 ? ' gepmilo' : ''}" style="--h:${h.hue};${img}" aria-hidden="true">${ART[h.id] ? '' : `<span>${initials(h.name)}</span>`}${fa ? '<i class="hfa-holo"></i><i class="hfa-shine"></i><i class="hfa-rim"></i>' : ''}</div>
     <button class="hport-hit" data-hero="${pi}" aria-label="${h.name} képessége"></button>${p.machine === 1 ? '<span class="hmachine" title="Gépüzemmód: egyszer visszatér 10 élettel">⚙️</span>' : ''}${p.locked ? '<span class="hlock" title="Adios Motherfucker!: ebben a körében nem játszhat ki lapot">Bénult</span>' : ''}
     <div class="hinfo"><div class="hname">${h.name}<small>${pi === BOT ? (S.pvp ? escH(S.names?.[pi] || 'barát') : 'bot') : 'te'}</small></div>
@@ -1002,7 +1015,7 @@ $('#scr-game').addEventListener('click', e => {
       openModal(cardHTML(g.dataset.gear, { big: true, foil: foilOf(+g.dataset.own, g.dataset.gear) }), `${CARD[u.id].name} karakteren · ${+g.dataset.own === ME ? 'te tetted rá' : 'az ellenfél tette rá'}`, cardHelpHTML(g.dataset.gear)); });
   }
   const hb = e.target.closest('[data-hero]');
-  if (hb) { const gp = heroGoldOf(+hb.dataset.hero); openModal(heroCardHTML(heroOf(+hb.dataset.hero), { big: true, foil: !S.players[+hb.dataset.hero].baszo && heroFaOf(+hb.dataset.hero), gold: gp && !S.players[+hb.dataset.hero].baszo }), (+hb.dataset.hero === ME ? 'A te hősöd' : 'Az ellenfél hőse') + (gp ? ' · ✦ Arany' : '')); }
+  if (hb) { const gp = heroGoldOf(+hb.dataset.hero); openModal(heroCardHTML(heroOf(+hb.dataset.hero), { big: true, foil: !S.players[+hb.dataset.hero].baszo && heroFaOf(+hb.dataset.hero), gold: gp && !S.players[+hb.dataset.hero].baszo, port: !S.players[+hb.dataset.hero].baszo && heroPortOf(+hb.dataset.hero) }), (+hb.dataset.hero === ME ? 'A te hősöd' : 'Az ellenfél hőse') + (gp ? ' · ✦ Arany' : '')); }
   if (e.target.closest('#loc') && S.location) openModal(cardHTML(S.location.id, { big: true, foil: S.location.foil ?? foilOf(S.location.owner, S.location.id) }), `Kijátszotta: ${S.location.owner === ME ? 'te' : 'az ellenfél'}`, cardHelpHTML(S.location.id));
 });
 $('#hand').addEventListener('keydown', e => { if ((e.key === 'Enter' || e.key === ' ') && e.target.dataset.hi) { e.preventDefault(); e.target.click(); } });
