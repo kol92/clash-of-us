@@ -319,7 +319,7 @@ Hősképesség-ötletek a táblázatban (még nem zöldek, nincsenek beépítve)
 
 ## Bolt (2026-10-04)
 - A főmenüben a „Boosterek” csempe helyén az új **Bolt** gomb (ChatGPT UI: art/ui/shop-btn.webp; az „Ingyen pack!” jelzés rajta marad). A Bolt két füllel nyílik: **Boosterek** (a korábbi pack-kínálat: napi ingyen, ajándék, 50 coinos és Shiny pack) és **Különleges lapok**.
-- Különleges lapok: csak a boltban kapható változat-lapok (`shopOnly`, `price`), az árkártya-kereten (art/ui/shop-card.webp): felül a név, középen a kép, alatta „✦ Különleges változat”, lent az ár. Koppintás → nagy lapnézet + „Megveszem” megerősítés → a lap a gyűjteménybe kerül (mindegyikből egy vehető; utána „✓ Megvan”). Packban, Season Passban nincsenek, és nem cserélhetők.
+- Különleges lapok: csak a boltban kapható változat-lapok (`shopOnly`, `price`), az árkártya-kereten (art/ui/shop-card.webp): felül a név, középen a kép, alatta „✦ Különleges változat”, lent az ár. Koppintás → nagy lapnézet + „Megveszem” megerősítés → rögtön **2 példány** kerül a gyűjteménybe (egyszer vehető meg; utána „✓ Megvan”). A Season Pass változat-jutalmai (Pifti, TZS) is 2 példányt adnak (2026-10-04); akinek ezekből eddig csak 1 volt, a következő megnyitáskor kiegészül 2-re. Packban, Season Passban nincsenek, és nem cserélhetők.
   - **Gál Zoli – változat** (c_zoli2), 100 coin.
   - **Fogel – változat** (c_fogel2), 100 coin.
 - A változat-lapok a motorban mindenhol az alaplapként működnek (`bid()`), a pakliban az alaplappal együtt számít a darabszám.

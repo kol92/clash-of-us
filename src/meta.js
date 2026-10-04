@@ -179,6 +179,10 @@ function migrate(p) {
   for (const h of Object.keys(p.heroGold || {})) if (p.heroGold[h] > 1) { const x = p.heroGold[h] - 1; p.heroGold[h] = 1; p.coins += x * ECON.goldDupe; dc.coins += x * ECON.goldDupe; }
   for (const h of Object.keys(p.heroFa || {})) if (p.heroFa[h] > 1) { const x = p.heroFa[h] - 1; p.heroFa[h] = 1; p.coins += x * DUPE_COIN_RARE; dc.coins += x * DUPE_COIN_RARE; }
   if (dc.coins) { p._dirty = true; Store.dupeMsg = `A fölösleges hős-példányaid beváltódtak: +${dc.coins} coin`; }
+  // csak boltban / Season Passban szerezhető változatokból 2 példány jár (régebben 1-et adtunk)
+  for (const c of CARDS) if (c.variantOf && (c.shopOnly || c.passOnly)) { const e = p.coll[c.id]; if (!e) continue;
+    if (c.shopOnly && e.n + e.f > 0 && e.n + e.f < 2) { e.n = 2 - e.f; p._dirty = true; }
+    if (c.passOnly && e.f > 0 && e.f < 2) { e.f = 2; p._dirty = true; } }
   p.gv = GRANT_V;
   // kivett lapok eltávolítása a paklikból
   for (const d of p.decks) for (const id of Object.keys(d.list)) if (!CARD[id] || CARD[id].token) delete d.list[id];
@@ -393,14 +397,14 @@ async function buyShopItem(id) {
   if (owned(id) > 0) return openModal(cardHTML(id, { big: true }), '✓ Ez már megvan neked – a Paklik menüben ugyanúgy beteheted, mint az alaplapot.', cardHelpHTML(id));
   if (p.coins < it.price) return toast(`Nincs elég coinod (${p.coins}/${it.price})`);
   const o = document.createElement('div'); o.className = 'overlay';
-  o.innerHTML = `<div class="modal">${cardHTML(id, { big: true })}<div class="live">✦ ${c.name} – különleges változat. Ugyanúgy játszható, mint a(z) ${CARD[c.variantOf].name}, csak más a képe.</div><div class="row2"><button class="btn" data-x>Mégse</button><button class="btn primary" data-ok><span class="coin sm" aria-hidden="true"></span> ${it.price} · Megveszem</button></div></div>`;
+  o.innerHTML = `<div class="modal">${cardHTML(id, { big: true })}<div class="live">✦ ${c.name} – különleges változat. Ugyanúgy játszható, mint a(z) ${CARD[c.variantOf].name}, csak más a képe. Rögtön 2 példányt kapsz belőle.</div><div class="row2"><button class="btn" data-x>Mégse</button><button class="btn primary" data-ok><span class="coin sm" aria-hidden="true"></span> ${it.price} · Megveszem</button></div></div>`;
   $('#layer').appendChild(o);
   const ok = await new Promise(r => { o.onclick = e => { if (e.target.closest('[data-ok]')) r(true); else if (e.target.closest('[data-x]') || e.target === o) r(false); }; });
   o.remove(); if (!ok) return;
   if (p.coins < it.price || owned(id) > 0) return;
-  p.coins -= it.price; const e = p.coll[id] || (p.coll[id] = { n: 0, f: 0 }); e.n++;
+  p.coins -= it.price; const e = p.coll[id] || (p.coll[id] = { n: 0, f: 0 }); e.n += 2;   // rögtön 2 példány (packból nem szerezhető)
   await save(); renderProfileBar(); renderShop();
-  openModal(cardHTML(id, { big: true }), `🎉 Megvetted: ${c.name}! Bekerült a gyűjteményedbe – a pakliépítőben az alaplap helyett is beteheted.`, '');
+  openModal(cardHTML(id, { big: true }), `🎉 Megvetted: ${c.name}! 2 példány került a gyűjteményedbe – a pakliépítőben az alaplap helyett is beteheted.`, '');
 }
 function renderShop() {
   const p = Store.p; if (!p) return;
@@ -410,7 +414,7 @@ function renderShop() {
     const items = SHOP_ITEMS();
     $('#shopBody').innerHTML = `
     <div class="wallet"><span class="coin" aria-hidden="true"></span><b>${p.coins}</b><small>coin</small></div>${tabs}
-    <p class="shop-note">Különleges változatok, amik csak itt kaphatók: ugyanúgy játszanak, mint az alaplap, csak más a képük. Mindegyikből egyet vehetsz.</p>
+    <p class="shop-note">Különleges változatok, amik csak itt kaphatók: ugyanúgy játszanak, mint az alaplap, csak más a képük. Mindegyiket egyszer veheted meg, és rögtön 2 példányt kapsz belőle.</p>
     <div class="shop-grid">${items.map(shopOfferHTML).join('') || '<p class="live">Most nincs különleges lap a boltban.</p>'}</div>`;
     $('#shopBody').querySelectorAll('[data-buy]').forEach(b => b.onclick = () => buyShopItem(b.dataset.buy));
     $('#shopBody').querySelectorAll('[data-stab]').forEach(b => b.onclick = () => { shopTab = b.dataset.stab; renderShop(); });
@@ -918,7 +922,7 @@ function grantRew(p, r, heroId) {
   else if (r.packs) p.giftPacks = (p.giftPacks || 0) + r.packs;
   else if (r.shiny) p.shinyPacks = (p.shinyPacks || 0) + r.shiny;
   else if (r.fa) p.faPacks = (p.faPacks || 0) + r.fa;
-  else if (r.card) { const e = p.coll[r.card] || (p.coll[r.card] = { n: 0, f: 0 }); e.f++; return { id: r.card, foil: true }; }
+  else if (r.card) { const e = p.coll[r.card] || (p.coll[r.card] = { n: 0, f: 0 }); e.f += CARD[r.card].variantOf ? 2 : 1; return { id: r.card, foil: true }; }   // változatból rögtön 2 (packból nem szerezhető, így kijön egy pakli)
   else if (r.heroPick) {
     const h = heroId || (HEROES.find(x => !(p.heroFa || {})[x.id]) || HEROES[0]).id;
     p.heroFa = p.heroFa || {}; p.heroFa[h] = (p.heroFa[h] || 0) + 1; return { hero: h, foil: true };
@@ -965,7 +969,7 @@ function renderPassBadge() {
 function showPassReveal(got) {
   const o = document.createElement('div'); o.className = 'overlay';
   o.innerHTML = `<div class="modal sp-reveal"><h3>Season Pass jutalom</h3>${pcHTML(got, { big: true, foil: true })}
-    <p class="live">${pcName(got)} – ${!got.hero && CARD[got.id].variantOf ? 'különleges változat, Full Art' : 'Full Art'}. Bekerült a gyűjteményedbe.</p><button class="btn primary" data-x>Szuper!</button></div>`;
+    <p class="live">${pcName(got)} – ${!got.hero && CARD[got.id].variantOf ? 'különleges változat, Full Art – 2 példány' : 'Full Art'}. Bekerült a gyűjteményedbe.</p><button class="btn primary" data-x>Szuper!</button></div>`;
   o.onclick = e => { if (e.target.closest('[data-x]')) o.remove(); };
   $('#layer').appendChild(o);
 }
