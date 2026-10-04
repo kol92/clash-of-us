@@ -215,6 +215,7 @@ h1,h2,h3{font-family:var(--display);font-weight:400;letter-spacing:.01em;text-wr
 .logbox li{padding:4px 8px;border-radius:8px;background:rgba(255,255,255,.05);text-align:left;}
 .logbox .lg-turn h4{text-align:left;}
 .logbox li b{color:#fff;}
+.en.bonus b{color:#8ff6ff;text-shadow:0 0 8px #29c6e6,0 1px 0 #000;}
 .flagbtn{width:24px;height:24px;border-radius:50%;padding:0;border:1px solid rgba(255,255,255,.25);background:rgba(0,0,0,.35);color:#cfe;font-size:12px;cursor:pointer;line-height:1;}
 .round{font-size:10px;font-weight:900;letter-spacing:.12em;text-transform:uppercase;color:var(--mute);font-variant-numeric:tabular-nums;}
 .round.last{color:var(--red);}
@@ -1841,7 +1842,7 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%;}
 <script src="vendor/firebase-auth-compat.js"></script>
 <script src="vendor/firebase-firestore-compat.js"></script>
 <script src="vendor/firebase-database-compat.js"></script>
-<script>window.APP_VERSION = "2026.10.04-0020";</script>
+<script>window.APP_VERSION = "2026.10.04-1027";</script>
 <script>// ===== Best of Us – saját szerver (Firebase) =====
 // A játék eredetileg a Claude-os tárolót használta (window.claude.use('db' | 'user' | 'room')).
 // Ez a fájl ugyanazt a felületet adja Firebase-ből, így a játék kódja szinte változatlan maradhat:
@@ -2925,7 +2926,9 @@ function botChoose(real) {
       let sc = scoreAfterCombat(c, me);
       if (h.id === 'a_kor') {   // egy lépés előre: mit tudnék vele kijátszani?
         sc = -1e9; const P2 = c.players[me];
-        P2.hand.forEach((h2, h2i) => { if (h2.id === 'a_kor' || !canPlay(c, me, h2i) || cardCost(c, me, h2.id) <= p.energy) return;
+        const others = p.hand.filter(x => x.id !== 'a_kor').map(x => cardCost(s, me, x.id)).filter(v => v <= p.energy + 1);
+        const tight = others.reduce((a, b) => a + b, 0) > p.energy;   // több lapot is letenne, mint amire most futja (pl. 6 energiánál 6+1)
+        P2.hand.forEach((h2, h2i) => { if (h2.id === 'a_kor' || !canPlay(c, me, h2i) || (!tight && cardCost(c, me, h2.id) <= p.energy)) return;
           for (const t2 of targetsFor(c, me, h2.id)) { const c2 = clone(c); c2.events = []; playCard(c2, me, h2i, t2); sc = Math.max(sc, scoreAfterCombat(c2, me) + 0.1); } });
       }
       if (sc > bestSc) { bestSc = sc; best = { hi, t }; }
@@ -3737,7 +3740,7 @@ const heroOf = pi => S.players[pi].baszo ? BASZO
   : HERO[S.players[pi].heroId];
 function heroBar(pi) {
   const p = S.players[pi], h = heroOf(pi), bz = !!p.baszo || p.machine === 2;   // átváltozott hős: saját portré, arany/Full Art nélkül
-  const pips = Array.from({ length: 6 }, (_, k) => `<i class="${k < p.energy ? 'on' : k < p.maxEnergy ? 'used' : 'locked'}"></i>`).join('');
+  const pips = Array.from({ length: Math.max(6, p.energy) }, (_, k) => `<i class="${k < p.energy ? 'on' + (k >= 6 ? ' bonus' : '') : k < p.maxEnergy ? 'used' : 'locked'}"></i>`).join('');   // Egy pohár víz: 6 fölött a 7. kristály is kigyullad
   const gold = !bz && heroGoldOf(pi) && !!ART['g_' + h.id], aid = gold ? 'g_' + h.id : h.id;
   const img = ART[aid] ? `background-image:url('${artSrc(aid, true)}');--hp:${ART[aid].port || '50% 7%'}` : '';
   const fa = !bz && (gold || heroFaOf(pi));
@@ -3745,7 +3748,7 @@ function heroBar(pi) {
     <button class="hport-hit" data-hero="${pi}" aria-label="${h.name} képessége"></button>${p.machine === 1 ? '<span class="hmachine" title="Gépüzemmód: egyszer visszatér 10 élettel">⚙️</span>' : ''}${p.locked ? '<span class="hlock" title="Adios Motherfucker!: ebben a körében nem játszhat ki lapot">Bénult</span>' : ''}
     <div class="hinfo"><div class="hname">${h.name}<small>${pi === BOT ? (S.pvp ? escH(S.names?.[pi] || 'barát') : 'bot') : 'te'}</small></div>
       <div class="hpbar" role="img" aria-label="Élet: ${Math.max(0, p.hp)} / ${p.maxHp}"><span class="hps"><i style="width:${Math.max(0, p.hp) / p.maxHp * 100}%"></i></span><b>${Math.max(0, p.hp)} / ${p.maxHp}</b></div></div>
-    <div class="res"><div class="en hudm" role="img" aria-label="Energia: ${p.energy} / ${p.maxEnergy}" title="Energia (most / legfeljebb)"><b>${p.energy}/${p.maxEnergy}</b></div>
+    <div class="res"><div class="en hudm${p.energy > p.maxEnergy ? ' bonus' : ''}" role="img" aria-label="Energia: ${p.energy} / ${p.maxEnergy}" title="Energia (most / legfeljebb)"><b>${p.energy}/${p.maxEnergy}</b></div>
       <div class="counts">Kéz ${p.hand.length} · <button class="gravebtn" data-grave="${pi}" aria-label="Temető: ${p.grave.length} lap"><i class="ic-grave" aria-hidden="true"></i>${p.grave.length}</button></div></div>
     <button class="deckpile${p.deck.length ? p.deck.length <= 3 ? ' low' : '' : ' empty'}" data-deck="${pi}" aria-label="Húzópakli: ${p.deck.length} lap maradt" title="Húzópakli: ennyi lap maradt"><i></i><b>${p.deck.length}</b></button>`;
 }

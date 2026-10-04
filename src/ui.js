@@ -800,7 +800,7 @@ const heroOf = pi => S.players[pi].baszo ? BASZO
   : HERO[S.players[pi].heroId];
 function heroBar(pi) {
   const p = S.players[pi], h = heroOf(pi), bz = !!p.baszo || p.machine === 2;   // átváltozott hős: saját portré, arany/Full Art nélkül
-  const pips = Array.from({ length: 6 }, (_, k) => `<i class="${k < p.energy ? 'on' : k < p.maxEnergy ? 'used' : 'locked'}"></i>`).join('');
+  const pips = Array.from({ length: Math.max(6, p.energy) }, (_, k) => `<i class="${k < p.energy ? 'on' + (k >= 6 ? ' bonus' : '') : k < p.maxEnergy ? 'used' : 'locked'}"></i>`).join('');   // Egy pohár víz: 6 fölött a 7. kristály is kigyullad
   const gold = !bz && heroGoldOf(pi) && !!ART['g_' + h.id], aid = gold ? 'g_' + h.id : h.id;
   const img = ART[aid] ? `background-image:url('${artSrc(aid, true)}');--hp:${ART[aid].port || '50% 7%'}` : '';
   const fa = !bz && (gold || heroFaOf(pi));
@@ -808,7 +808,7 @@ function heroBar(pi) {
     <button class="hport-hit" data-hero="${pi}" aria-label="${h.name} képessége"></button>${p.machine === 1 ? '<span class="hmachine" title="Gépüzemmód: egyszer visszatér 10 élettel">⚙️</span>' : ''}${p.locked ? '<span class="hlock" title="Adios Motherfucker!: ebben a körében nem játszhat ki lapot">Bénult</span>' : ''}
     <div class="hinfo"><div class="hname">${h.name}<small>${pi === BOT ? (S.pvp ? escH(S.names?.[pi] || 'barát') : 'bot') : 'te'}</small></div>
       <div class="hpbar" role="img" aria-label="Élet: ${Math.max(0, p.hp)} / ${p.maxHp}"><span class="hps"><i style="width:${Math.max(0, p.hp) / p.maxHp * 100}%"></i></span><b>${Math.max(0, p.hp)} / ${p.maxHp}</b></div></div>
-    <div class="res"><div class="en hudm" role="img" aria-label="Energia: ${p.energy} / ${p.maxEnergy}" title="Energia (most / legfeljebb)"><b>${p.energy}/${p.maxEnergy}</b></div>
+    <div class="res"><div class="en hudm${p.energy > p.maxEnergy ? ' bonus' : ''}" role="img" aria-label="Energia: ${p.energy} / ${p.maxEnergy}" title="Energia (most / legfeljebb)"><b>${p.energy}/${p.maxEnergy}</b></div>
       <div class="counts">Kéz ${p.hand.length} · <button class="gravebtn" data-grave="${pi}" aria-label="Temető: ${p.grave.length} lap"><i class="ic-grave" aria-hidden="true"></i>${p.grave.length}</button></div></div>
     <button class="deckpile${p.deck.length ? p.deck.length <= 3 ? ' low' : '' : ' empty'}" data-deck="${pi}" aria-label="Húzópakli: ${p.deck.length} lap maradt" title="Húzópakli: ennyi lap maradt"><i></i><b>${p.deck.length}</b></button>`;
 }

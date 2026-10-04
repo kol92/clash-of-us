@@ -838,7 +838,9 @@ function botChoose(real) {
       let sc = scoreAfterCombat(c, me);
       if (h.id === 'a_kor') {   // egy lépés előre: mit tudnék vele kijátszani?
         sc = -1e9; const P2 = c.players[me];
-        P2.hand.forEach((h2, h2i) => { if (h2.id === 'a_kor' || !canPlay(c, me, h2i) || cardCost(c, me, h2.id) <= p.energy) return;
+        const others = p.hand.filter(x => x.id !== 'a_kor').map(x => cardCost(s, me, x.id)).filter(v => v <= p.energy + 1);
+        const tight = others.reduce((a, b) => a + b, 0) > p.energy;   // több lapot is letenne, mint amire most futja (pl. 6 energiánál 6+1)
+        P2.hand.forEach((h2, h2i) => { if (h2.id === 'a_kor' || !canPlay(c, me, h2i) || (!tight && cardCost(c, me, h2.id) <= p.energy)) return;
           for (const t2 of targetsFor(c, me, h2.id)) { const c2 = clone(c); c2.events = []; playCard(c2, me, h2i, t2); sc = Math.max(sc, scoreAfterCombat(c2, me) + 0.1); } });
       }
       if (sc > bestSc) { bestSc = sc; best = { hi, t }; }
