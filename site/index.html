@@ -1607,8 +1607,9 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%;}
 .var-ribbon b{font-weight:900;} .var-ribbon span{display:none;}
 /* 💎 Gyémánt lap: jeges-szivárványos keret, csillogó szikrák */
 .card.diamond{background:linear-gradient(135deg,#f2fdff,#9fe3ff,#ffffff,#cdb8ff,#8fd8ff,#ffffff,#e4fbff);background-size:300% 300%;animation:holo 3.2s linear infinite;box-shadow:0 0 16px rgba(170,235,255,.85),0 0 4px #fff;}
-.card.diamond::before{filter:hue-rotate(150deg) saturate(.55) brightness(1.45) contrast(1.05);}
-.unit.diamond::before{filter:hue-rotate(150deg) saturate(.55) brightness(1.45) contrast(1.05);}
+.card.diamond::before{background-image:url('art/ui/sm/frame-diamond.webp?v=ee40692a')!important;}
+.card.diamond.big::before{background-image:url('art/ui/frame-diamond.webp?v=57f0385e')!important;}
+.unit.diamond::before{background-image:url('art/ui/sm/frame-diamond.webp?v=ee40692a')!important;}
 .unit.diamond{box-shadow:0 0 14px rgba(170,235,255,.9),0 0 3px #fff,0 5px 12px rgba(0,0,0,.45);}
 .dia-spark{position:absolute;inset:0;z-index:6;pointer-events:none;border-radius:inherit;mix-blend-mode:screen;
   background-image:radial-gradient(circle at 18% 22%,#fff 0 1.2px,transparent 2.6px),radial-gradient(circle at 74% 14%,#fff 0 1px,transparent 2.4px),radial-gradient(circle at 86% 46%,#e8fbff 0 1.4px,transparent 3px),radial-gradient(circle at 30% 58%,#fff 0 .9px,transparent 2.2px),radial-gradient(circle at 62% 70%,#f3e8ff 0 1.2px,transparent 2.8px),radial-gradient(circle at 12% 84%,#fff 0 1px,transparent 2.4px),
@@ -1718,10 +1719,10 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%;}
 @media (prefers-reduced-motion:reduce){.card.kholo .art::before,.card.framed.xf-gold .art::before,.card.framed.xf-gold .art::after{animation:none!important;}}
 
 /* ===== Ritkaságjelvények (képek, azonos négyzetes dobozban; a díszítés mind belefér) ===== */
-.rar,.rar.r-k,.rar.r-r,.rar.r-e,.rar.r-l,.rar.r-g{display:inline-block;width:1.15em;height:1.15em;flex:none;border-radius:0;transform:none;box-shadow:none;vertical-align:-.2em;
+.rar,.rar.r-k,.rar.r-r,.rar.r-e,.rar.r-l,.rar.r-g,.rar.r-d{display:inline-block;width:1.15em;height:1.15em;flex:none;border-radius:0;transform:none;box-shadow:none;vertical-align:-.2em;
   background:center/contain no-repeat;filter:drop-shadow(0 1px 1px rgba(0,0,0,.6));}
 .rar.r-k{background-image:url('art/ui/rar-k.webp?v=e4d1a374');} .rar.r-r{background-image:url('art/ui/rar-r.webp?v=4f1172f6');} .rar.r-e{background-image:url('art/ui/rar-e.webp?v=1dfb65da');}
-.rar.r-l{background-image:url('art/ui/rar-l.webp?v=a26d1dc3');} .rar.r-g{background-image:url('art/ui/rar-g.webp?v=3d9c4d55');}
+.rar.r-l{background-image:url('art/ui/rar-l.webp?v=a26d1dc3');} .rar.r-g{background-image:url('art/ui/rar-g.webp?v=3d9c4d55');} .rar.r-d{background-image:url('art/ui/rar-d.webp?v=f627c28d');filter:drop-shadow(0 0 4px rgba(170,230,255,.9));}
 .card .ctype .rar{width:1.6em;height:1.6em;}
 .odd .rar{width:22px;height:22px;}
 .coll-slot .own-n{display:inline-flex;align-items:center;justify-content:center;gap:4px;}
@@ -1887,7 +1888,7 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%;}
 <script src="vendor/firebase-auth-compat.js"></script>
 <script src="vendor/firebase-firestore-compat.js"></script>
 <script src="vendor/firebase-database-compat.js"></script>
-<script>window.APP_VERSION = "2026.10.05-2313";</script>
+<script>window.APP_VERSION = "2026.10.05-2320";</script>
 <script>// ===== Best of Us – saját szerver (Firebase) =====
 // A játék eredetileg a Claude-os tárolót használta (window.claude.use('db' | 'user' | 'room')).
 // Ez a fájl ugyanazt a felületet adja Firebase-ből, így a játék kódja szinte változatlan maradhat:
@@ -3013,7 +3014,8 @@ let S = null, busy = false;
 const ui = { sel: null, pend: null, drag: null, dragEnd: 0, hero: 'barna', deck: 'roham', foil: false, handSeen: null, botHandN: null, flying: new Set() };
 
 const TYPE = { char:['Karakter','t-char'], item:['Eszköz','t-item'], action:['Akció','t-action'], loc:['Helyszín','t-loc'] };
-const RAR = { k:'Gyakori', r:'Ritka', e:'Epikus', l:'Legendás', g:'Arany' };
+const RAR = { k:'Gyakori', r:'Ritka', e:'Epikus', l:'Legendás', g:'Arany', d:'Gyémánt' };
+const rarKey = c => c.diamond ? 'd' : c.rarity;   // a gyémánt lap legendásként számít, de saját jelvénye van
 // Lapfajták és kulcsszavak magyarázata (koppintásra a lap alatt jelenik meg)
 const TYPE_HELP = {
   char:  ['Karakter', 'Lekerül a táblára egy üres helyre, és ott marad. Minden köröd végén megtámadja a vele szemben állót; ha ott nincs senki, az ellenfél hősét.'],
@@ -3080,14 +3082,14 @@ function cardHTML(id, o = {}) {
   const fk = frameKind(c, o);
   const tl = textHTML(c).replace(/<[^>]+>/g, '').length, tlc = tl > 150 ? ' tl-l tl-xl' : tl > 95 ? ' tl-l' : tl > 62 ? ' tl-m' : '';
   const fcls = fk === 'kanon' ? (o.foil ? ' framed xf xf-kanon xf-kanonfa kholo' : ' framed xf xf-kanon') + tlc : fk === 'foil' ? ' foil' : ' framed' + tlc;
-  return `<div class="card ${TYPE[c.type][1]}${c.finisher ? ' kanon' : ''}${c.variantOf ? ' variant' : ''}${c.diamond ? ' diamond' : ''}${o.big ? ' big' : ''}${fcls}${o.cls ? ' ' + o.cls : ''}" style="--h:${hueOf(id)}" ${o.big ? `data-rar="${c.rarity}"` : ''} ${o.attrs || ''}>
+  return `<div class="card ${TYPE[c.type][1]}${c.finisher ? ' kanon' : ''}${c.variantOf ? ' variant' : ''}${c.diamond ? ' diamond' : ''}${o.big ? ' big' : ''}${fcls}${o.cls ? ' ' + o.cls : ''}" style="--h:${hueOf(id)}" ${o.big ? `data-rar="${rarKey(c)}"` : ''} ${o.attrs || ''}>
     <div class="cframe">
       ${ART[id] ? `<div class="art has-art" style="${artStyle(id, o.big)}"></div>`
         : `<div class="art"><span class="mono">${initials(c.name)}</span>${o.big && !o.foil ? '<span class="artnote">Illusztráció helye</span>' : ''}</div>`}
-      <div class="ctype">${c.finisher ? '<i class="ic-kanon" aria-hidden="true"></i>Kánon esemény' : TYPE[c.type][0]}${c.drink ? ' · Ital' : ''}<i class="rar r-${c.rarity}" title="${RAR[c.rarity]}"></i></div>
+      <div class="ctype">${c.finisher ? '<i class="ic-kanon" aria-hidden="true"></i>Kánon esemény' : TYPE[c.type][0]}${c.drink ? ' · Ital' : ''}<i class="rar r-${rarKey(c)}" title="${RAR[rarKey(c)]}"></i></div>
       ${c.finisher ? `<i class="kanon-hero" title="${HERO[c.hero].name}" style="--h:${HERO[c.hero].hue};${ART[c.hero] ? `background-image:url('${artSrc(c.hero, false)}');background-position:${ART[c.hero].av || '50% 15%'}` : ''}">${ART[c.hero] ? '' : initials(HERO[c.hero].name)}</i>` : ''}
       ${c.type !== 'char' && !o.big && !c.finisher ? `<div class="tribbon">${TYPE[c.type][0]}${c.drink ? '<i class="drk">Ital</i>' : ''}</div>` : ''}
-      <div class="name${c.name.length > 16 ? ' long' : ''}${longWord(c.name) > 11 ? ' xl' : ''}">${c.name}</div>${c.diamond ? '<i class="var-ribbon dia"><b>💎 Gyémánt lap</b><span>💎 Gyémánt</span></i>' : c.variantOf ? '<i class="var-ribbon"><b>✦ Ritka változat</b><span>✦ Változat</span></i>' : ''}${c.diamond ? '<i class="dia-spark" aria-hidden="true"></i>' : ''}
+      <div class="name${c.name.length > 16 ? ' long' : ''}${longWord(c.name) > 11 ? ' xl' : ''}">${c.name}</div>${c.diamond ? (o.big ? '<i class="var-ribbon dia"><b>💎 Gyémánt lap</b><span>💎 Gyémánt</span></i>' : '') : c.variantOf ? '<i class="var-ribbon"><b>✦ Ritka változat</b><span>✦ Változat</span></i>' : ''}${c.diamond ? '<i class="dia-spark" aria-hidden="true"></i>' : ''}
       <div class="txt"><span>${textHTML(c)}</span></div>
     </div>
     ${o.big ? `<div class="ctype-below">${c.finisher ? '<i class="ic-kanon" aria-hidden="true"></i>Kánon esemény' : TYPE[c.type][0]}${c.drink ? ' · Ital' : ''}</div>` : ''}
@@ -3298,7 +3300,7 @@ function renderColl() {
     (dup.out.length ? `<button class="btn dupe-btn" id="dupeBtn">♻️ ${dup.out.reduce((s, x) => s + x.n + x.f, 0)} fölösleges lap beváltása · +${dup.coins} coin</button>` : '') + groups.map(([t, type]) => `<div class="lbl">${t}</div><div class="coll-grid">${
     type ? PLAYABLE.filter(c => c.type === type).sort((a, b) => a.cost - b.cost).map(c => {
       const n = ui.foil || c.foilOnly ? (Store.p?.coll[c.id]?.f || 0) : (Store.p?.coll[c.id]?.n || 0);
-      return `<div class="coll-slot${n ? '' : ' missing'}">${cardHTML(c.id, { foil: ui.foil, attrs: `data-card="${c.id}" tabindex="0"` })}<span class="own-n"><i class="rar r-${c.rarity}" title="${RAR[c.rarity]}" aria-label="${RAR[c.rarity]}"></i>${n ? '×' + n : 'Nincs meg'}</span></div>`;
+      return `<div class="coll-slot${n ? '' : ' missing'}">${cardHTML(c.id, { foil: ui.foil, attrs: `data-card="${c.id}" tabindex="0"` })}<span class="own-n"><i class="rar r-${rarKey(c)}" title="${RAR[rarKey(c)]}" aria-label="${RAR[c.rarity]}"></i>${n ? '×' + n : 'Nincs meg'}</span></div>`;
     }).join('')
          : HEROES.map(h => { const miss = ui.foil && !ownsHeroFa(h.id);
              const multi = !ui.foil && Store.p && heroSkins(h.id).length > 1, sk = multi ? heroSkin(h.id) : 'base';

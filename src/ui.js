@@ -21,7 +21,8 @@ let S = null, busy = false;
 const ui = { sel: null, pend: null, drag: null, dragEnd: 0, hero: 'barna', deck: 'roham', foil: false, handSeen: null, botHandN: null, flying: new Set() };
 
 const TYPE = { char:['Karakter','t-char'], item:['Eszköz','t-item'], action:['Akció','t-action'], loc:['Helyszín','t-loc'] };
-const RAR = { k:'Gyakori', r:'Ritka', e:'Epikus', l:'Legendás', g:'Arany' };
+const RAR = { k:'Gyakori', r:'Ritka', e:'Epikus', l:'Legendás', g:'Arany', d:'Gyémánt' };
+const rarKey = c => c.diamond ? 'd' : c.rarity;   // a gyémánt lap legendásként számít, de saját jelvénye van
 // Lapfajták és kulcsszavak magyarázata (koppintásra a lap alatt jelenik meg)
 const TYPE_HELP = {
   char:  ['Karakter', 'Lekerül a táblára egy üres helyre, és ott marad. Minden köröd végén megtámadja a vele szemben állót; ha ott nincs senki, az ellenfél hősét.'],
@@ -88,14 +89,14 @@ function cardHTML(id, o = {}) {
   const fk = frameKind(c, o);
   const tl = textHTML(c).replace(/<[^>]+>/g, '').length, tlc = tl > 150 ? ' tl-l tl-xl' : tl > 95 ? ' tl-l' : tl > 62 ? ' tl-m' : '';
   const fcls = fk === 'kanon' ? (o.foil ? ' framed xf xf-kanon xf-kanonfa kholo' : ' framed xf xf-kanon') + tlc : fk === 'foil' ? ' foil' : ' framed' + tlc;
-  return `<div class="card ${TYPE[c.type][1]}${c.finisher ? ' kanon' : ''}${c.variantOf ? ' variant' : ''}${c.diamond ? ' diamond' : ''}${o.big ? ' big' : ''}${fcls}${o.cls ? ' ' + o.cls : ''}" style="--h:${hueOf(id)}" ${o.big ? `data-rar="${c.rarity}"` : ''} ${o.attrs || ''}>
+  return `<div class="card ${TYPE[c.type][1]}${c.finisher ? ' kanon' : ''}${c.variantOf ? ' variant' : ''}${c.diamond ? ' diamond' : ''}${o.big ? ' big' : ''}${fcls}${o.cls ? ' ' + o.cls : ''}" style="--h:${hueOf(id)}" ${o.big ? `data-rar="${rarKey(c)}"` : ''} ${o.attrs || ''}>
     <div class="cframe">
       ${ART[id] ? `<div class="art has-art" style="${artStyle(id, o.big)}"></div>`
         : `<div class="art"><span class="mono">${initials(c.name)}</span>${o.big && !o.foil ? '<span class="artnote">Illusztráció helye</span>' : ''}</div>`}
-      <div class="ctype">${c.finisher ? '<i class="ic-kanon" aria-hidden="true"></i>Kánon esemény' : TYPE[c.type][0]}${c.drink ? ' · Ital' : ''}<i class="rar r-${c.rarity}" title="${RAR[c.rarity]}"></i></div>
+      <div class="ctype">${c.finisher ? '<i class="ic-kanon" aria-hidden="true"></i>Kánon esemény' : TYPE[c.type][0]}${c.drink ? ' · Ital' : ''}<i class="rar r-${rarKey(c)}" title="${RAR[rarKey(c)]}"></i></div>
       ${c.finisher ? `<i class="kanon-hero" title="${HERO[c.hero].name}" style="--h:${HERO[c.hero].hue};${ART[c.hero] ? `background-image:url('${artSrc(c.hero, false)}');background-position:${ART[c.hero].av || '50% 15%'}` : ''}">${ART[c.hero] ? '' : initials(HERO[c.hero].name)}</i>` : ''}
       ${c.type !== 'char' && !o.big && !c.finisher ? `<div class="tribbon">${TYPE[c.type][0]}${c.drink ? '<i class="drk">Ital</i>' : ''}</div>` : ''}
-      <div class="name${c.name.length > 16 ? ' long' : ''}${longWord(c.name) > 11 ? ' xl' : ''}">${c.name}</div>${c.diamond ? '<i class="var-ribbon dia"><b>💎 Gyémánt lap</b><span>💎 Gyémánt</span></i>' : c.variantOf ? '<i class="var-ribbon"><b>✦ Ritka változat</b><span>✦ Változat</span></i>' : ''}${c.diamond ? '<i class="dia-spark" aria-hidden="true"></i>' : ''}
+      <div class="name${c.name.length > 16 ? ' long' : ''}${longWord(c.name) > 11 ? ' xl' : ''}">${c.name}</div>${c.diamond ? (o.big ? '<i class="var-ribbon dia"><b>💎 Gyémánt lap</b><span>💎 Gyémánt</span></i>' : '') : c.variantOf ? '<i class="var-ribbon"><b>✦ Ritka változat</b><span>✦ Változat</span></i>' : ''}${c.diamond ? '<i class="dia-spark" aria-hidden="true"></i>' : ''}
       <div class="txt"><span>${textHTML(c)}</span></div>
     </div>
     ${o.big ? `<div class="ctype-below">${c.finisher ? '<i class="ic-kanon" aria-hidden="true"></i>Kánon esemény' : TYPE[c.type][0]}${c.drink ? ' · Ital' : ''}</div>` : ''}
@@ -306,7 +307,7 @@ function renderColl() {
     (dup.out.length ? `<button class="btn dupe-btn" id="dupeBtn">♻️ ${dup.out.reduce((s, x) => s + x.n + x.f, 0)} fölösleges lap beváltása · +${dup.coins} coin</button>` : '') + groups.map(([t, type]) => `<div class="lbl">${t}</div><div class="coll-grid">${
     type ? PLAYABLE.filter(c => c.type === type).sort((a, b) => a.cost - b.cost).map(c => {
       const n = ui.foil || c.foilOnly ? (Store.p?.coll[c.id]?.f || 0) : (Store.p?.coll[c.id]?.n || 0);
-      return `<div class="coll-slot${n ? '' : ' missing'}">${cardHTML(c.id, { foil: ui.foil, attrs: `data-card="${c.id}" tabindex="0"` })}<span class="own-n"><i class="rar r-${c.rarity}" title="${RAR[c.rarity]}" aria-label="${RAR[c.rarity]}"></i>${n ? '×' + n : 'Nincs meg'}</span></div>`;
+      return `<div class="coll-slot${n ? '' : ' missing'}">${cardHTML(c.id, { foil: ui.foil, attrs: `data-card="${c.id}" tabindex="0"` })}<span class="own-n"><i class="rar r-${rarKey(c)}" title="${RAR[rarKey(c)]}" aria-label="${RAR[c.rarity]}"></i>${n ? '×' + n : 'Nincs meg'}</span></div>`;
     }).join('')
          : HEROES.map(h => { const miss = ui.foil && !ownsHeroFa(h.id);
              const multi = !ui.foil && Store.p && heroSkins(h.id).length > 1, sk = multi ? heroSkin(h.id) : 'base';
