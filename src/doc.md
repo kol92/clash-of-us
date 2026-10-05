@@ -369,6 +369,7 @@ Hősképesség-ötletek a táblázatban (még nem zöldek, nincsenek beépítve)
 - Adatok: pub/<uid> (név, kód, győzelmek, cserélhető lapok listája), friends/<a_b>, trades/<id>.
 
 ## Saját appá alakítás (terv, 2026-09-30)
+- **App ikon (2026-10-05):** új „BOU” embléma (ChatGPT): app/icon.png (teljes kitöltés, a lekerekített sarkok sötétkékkel kitöltve – az iOS saját maga kerekít), app/icon-maskable.png (Androidos kör/csepp vágáshoz kicsinyítve, középre). Eredeti: art/ui/orig/icon-bou.png. A már telepített appnál az ikon csak újratelepítés (kezdőképernyőről törlés + újra hozzáadás) után cserélődik.
 - Cél: telepíthető webapp (PWA) iPhone-ra és Androidra, 0 Ft-os szerverrel; App Store / Play Store nincs.
 - Kód: privát GitHub-tároló (clash-of-us) → Cloudflare Pages automatikusan kiteszi minden feltöltés után (~1 perc). Külön teszt link az éles előtt.
 - Szerver: Firebase ingyenes csomag – Firestore (profilok, PvP-meccsek), Authentication (Google + e-mail/jelszó), Realtime Database (online jelenlét, élő PvP jelzések). A képek a Cloudflare-en, nem Firebase Storage-ban (az fizetős).

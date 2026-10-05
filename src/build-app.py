@@ -20,12 +20,14 @@ os.makedirs(os.path.join(DIST, 'vendor'))
 for n in ['app', 'auth', 'firestore', 'database']:
     shutil.copy(f'{FB}/firebase-{n}-compat.js', os.path.join(DIST, 'vendor', f'firebase-{n}-compat.js'))
 os.makedirs(os.path.join(DIST, 'icons'))
-# az app ikonja (BU embléma): teljes kitöltésű, így Androidon a kör/csepp alakú vágás is csak a díszek szélét veszi le
+# az app ikonja (BOU embléma, 2026-10-05): teljes kitöltésű, így Androidon a kör/csepp alakú vágás is csak a díszek szélét veszi le
 emb = Image.open(os.path.join(SRC, 'app', 'icon.png')).convert('RGB')
 for sz in (180, 192, 512):
     emb.resize((sz, sz), Image.LANCZOS).save(os.path.join(DIST, 'icons', f'icon-{sz}.png'), optimize=True)
+mpath = os.path.join(SRC, 'app', 'icon-maskable.png')   # Androidos kör/csepp vágáshoz: kisebb, középre tett embléma
+memb = Image.open(mpath).convert('RGB') if os.path.exists(mpath) else emb
 for sz in (192, 512):
-    emb.resize((sz, sz), Image.LANCZOS).save(os.path.join(DIST, 'icons', f'maskable-{sz}.png'), optimize=True)
+    memb.resize((sz, sz), Image.LANCZOS).save(os.path.join(DIST, 'icons', f'maskable-{sz}.png'), optimize=True)
 emb.resize((32, 32), Image.LANCZOS).save(os.path.join(DIST, 'icons', 'favicon-32.png'))
 
 # 2) index.html: a játék héja + scriptek
