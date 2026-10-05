@@ -67,7 +67,7 @@ h1,h2,h3{font-family:var(--display);font-weight:400;letter-spacing:.01em;text-wr
 .deck-opt[aria-pressed="true"]{border-color:var(--gold);background:#1a4550;}
 .deck-opt b{font-family:var(--display);font-weight:400;font-size:18px;display:block;margin-bottom:4px;}
 .deck-opt small{color:var(--mute);font-size:12.5px;line-height:1.35;display:block;}
-.pick-go{position:sticky;bottom:0;padding-block:14px 18px;background:linear-gradient(transparent,var(--bg) 30%);}
+.pick-go{position:sticky;bottom:0;z-index:20;padding-block:14px 18px;background:linear-gradient(transparent,var(--bg) 30%);}
 
 /* ---------- kártya ---------- */
 .card{--cw:84px;--tc:var(--char);position:relative;flex:none;width:var(--cw);aspect-ratio:5/7;border-radius:calc(var(--cw)*.11);
@@ -1373,6 +1373,8 @@ h1,h2,h3{font-family:var(--display);font-weight:400;letter-spacing:.01em;text-wr
 #app>.screen:not(#scr-game){padding-top:env(safe-area-inset-top,0px);}
 #app>.screen:not(#scr-game):not(#scr-edit){padding-bottom:calc(14px + env(safe-area-inset-bottom,0px));}
 #scr-edit{padding-bottom:env(safe-area-inset-bottom,0px);}
+#scr-pick{padding-bottom:0!important;}
+#scr-pick .pick-go{bottom:0;margin-inline:-16px;padding:14px 16px calc(14px + env(safe-area-inset-bottom,0px));background:linear-gradient(transparent,var(--bg) 26%);}
 .safe-probe{position:fixed;left:0;top:0;width:0;height:0;visibility:hidden;padding-top:env(safe-area-inset-top,0px);pointer-events:none;}
 
 /* nagyobb betűméret (iPhone „A A” / szövegméret) mellett se lógjon ki semmi a képernyőből */
@@ -1572,7 +1574,7 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%;}
 .card.ghost.aiming{opacity:.85;transform:translate(-50%,-65%) scale(.8);}
 /* pakliválasztó panelek */
 #deckPick{display:grid;gap:10px;}
-.deck-wrap{position:relative;}
+.deck-wrap{position:relative;z-index:0;isolation:isolate;}
 .deck-opt.dp{position:relative;display:block;width:100%;aspect-ratio:1200/420;padding:0;border:0;border-radius:0;background:none;text-align:left;color:var(--ink);cursor:pointer;}
 .deck-opt.dp::before{content:"";position:absolute;inset:0;z-index:1;background:url('art/ui/deck-panel.webp') center/100% 100% no-repeat;pointer-events:none;filter:drop-shadow(0 6px 10px rgba(0,0,0,.5));}
 .deck-opt.dp.on::before{background-image:url('art/ui/deck-panel-selected.webp');filter:drop-shadow(0 0 12px rgba(255,200,80,.45));}
