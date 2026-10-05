@@ -382,7 +382,6 @@ async function buyPack(setId, free) {
 // ---- bolt képernyő ----
 // a boltban coinért megvehető különleges lapok (változatok); egyszer vehető meg mindegyik
 const SHOP_ITEMS = () => CARDS.filter(c => c.shopOnly && ART[c.id]).map(c => ({ id: c.id, price: c.price || 100 }));
-let shopTab = 'packs';
 function shopOfferHTML(it) {
   const c = CARD[it.id], have = owned(it.id) > 0, p = Store.p, can = p.coins >= it.price;
   return `<button class="shop-card${have ? ' owned' : ''}" data-buy="${it.id}" ${have ? 'aria-disabled="true"' : ''}>
@@ -435,28 +434,20 @@ async function buyShopItem(id) {
 function renderShop() {
   const p = Store.p; if (!p) return;
   const free = freePackReady();
-  const tabs = `<div class="seg shop-tabs" role="group" aria-label="Bolt"><button aria-pressed="${shopTab === 'packs'}" data-stab="packs">Boosterek</button><button aria-pressed="${shopTab === 'vars'}" data-stab="vars">Különleges lapok</button><button aria-pressed="${shopTab === 'ports'}" data-stab="ports">Portrék</button></div>`;
-  if (shopTab === 'ports') {
-    $('#shopBody').innerHTML = `
-    <div class="wallet"><span class="coin" aria-hidden="true"></span><b>${p.coins}</b><small>coin</small></div>${tabs}
-    <p class="shop-note">Hős-portrék saját névvel – mindig Full Artban. Megvétel után a hősöd ezt viseli (a Gyűjteményben a hősre koppintva válthatsz).</p>
-    <div class="shop-grid">${Object.keys(PORTRAITS).filter(k => ART[k]).map(portOfferHTML).join('')}</div>`;
-    $('#shopBody').querySelectorAll('[data-port]').forEach(b => b.onclick = () => buyPortrait(b.dataset.port));
-    $('#shopBody').querySelectorAll('[data-stab]').forEach(b => b.onclick = () => { shopTab = b.dataset.stab; renderShop(); });
-    return;
-  }
-  if (shopTab === 'vars') {
-    const items = SHOP_ITEMS();
-    $('#shopBody').innerHTML = `
-    <div class="wallet"><span class="coin" aria-hidden="true"></span><b>${p.coins}</b><small>coin</small></div>${tabs}
-    <p class="shop-note">Különleges változatok, amik csak itt kaphatók: ugyanúgy játszanak, mint az alaplap, csak más a képük. Mindegyiket egyszer veheted meg, és rögtön 2 példányt kapsz belőle.</p>
-    <div class="shop-grid">${items.map(shopOfferHTML).join('') || '<p class="live">Most nincs különleges lap a boltban.</p>'}</div>`;
-    $('#shopBody').querySelectorAll('[data-buy]').forEach(b => b.onclick = () => buyShopItem(b.dataset.buy));
-    $('#shopBody').querySelectorAll('[data-stab]').forEach(b => b.onclick = () => { shopTab = b.dataset.stab; renderShop(); });
-    return;
-  }
+  const items = SHOP_ITEMS(), ports = Object.keys(PORTRAITS).filter(k => ART[k]);
+  const limited = items.length || ports.length ? `
+    <section class="shop-limited">
+      <div class="lim-head"><h3>⏳ Limitált kínálat</h3><span class="lim-tag">Csak most</span></div>
+      <p class="lim-note">A bolt időnként frissül: az alábbi különleges lapok és hős-portrék <b>csak a következő frissítésig</b> kaphatók – utána mások jönnek a helyükre. Ami megvan, az persze megmarad.</p>
+      ${items.length ? `<div class="lbl shop-lbl">✦ Különleges lapok <small>rögtön 2 példány · ugyanúgy játszanak, mint az alaplap</small></div>
+      <div class="shop-grid">${items.map(shopOfferHTML).join('')}</div>` : ''}
+      ${ports.length ? `<div class="lbl shop-lbl">✦ Hős-portrék <small>saját névvel, mindig Full Artban</small></div>
+      <div class="shop-grid">${ports.map(portOfferHTML).join('')}</div>` : ''}
+    </section>` : '';
   $('#shopBody').innerHTML = `
-    <div class="wallet"><span class="coin" aria-hidden="true"></span><b>${p.coins}</b><small>coin</small></div>${tabs}
+    <div class="wallet"><span class="coin" aria-hidden="true"></span><b>${p.coins}</b><small>coin</small></div>
+    ${limited ? '<button class="lim-jump" data-jump>⏳ Limitált lapok és portrék – lejjebb ↓</button>' : ''}
+    <div class="lbl shop-lbl">Boosterek</div>
     <div class="pack-offer">
       <div class="pack-art">${packHTML('base')}</div>
       <div class="pack-info">
@@ -477,6 +468,7 @@ function renderShop() {
         <button class="btn primary shiny-btn" id="buyShiny" ${p.coins >= ECON.shinyPrice ? '' : 'disabled'}><span class="coin sm" aria-hidden="true"></span> ${ECON.shinyPrice} · Shiny pack</button>
       </div>
     </div>
+    ${limited}
     <div class="odds"><div class="lbl">Esélyek laponként</div>
       ${[['l', 'Legendás'], ['e', 'Epikus'], ['r', 'Ritka'], ['k', 'Gyakori']].map(([k, n]) => `<div class="odd"><i class="rar r-${k}"></i><span>${n}</span><b>${ECON.odds.find(o => o[0] === k)[1]}%</b></div>`).join('')}
       <div class="odd"><i class="rar r-f"></i><span>Full Art változat (bármelyik lapból)</span><b>${ECON.foilChance * 100}%</b></div>
@@ -484,7 +476,9 @@ function renderShop() {
       <div class="odd gold-odd"><i class="rar r-g"></i><span>✦ Arany hős (packonként · Shiny packban)</span><b>${String(ECON.goldPlain * 100).replace('.', ',')}% · ${ECON.goldShiny * 100}%</b></div>
       <small>Ha ${ECON.pityAfter} packon át nem jön epikus vagy legendás lap, a következőben biztosan lesz. Napi coin: győzelem ${ECON.win}, döntetlen ${ECON.draw}, vereség ${ECON.loss}, legfeljebb ${ECON.dailyCap}. Egy lapból legfeljebb ${DUPE_KEEP} példány marad meg, a többit a játék automatikusan beváltja: lapként ${DUPE_COIN} coin, Full Art vagy változat lap esetén ${DUPE_COIN_RARE} coin.</small>
     </div>`;
-  $('#shopBody').querySelectorAll('[data-stab]').forEach(b => b.onclick = () => { shopTab = b.dataset.stab; renderShop(); });
+  $('#shopBody').querySelectorAll('[data-buy]').forEach(b => b.onclick = () => buyShopItem(b.dataset.buy));
+  $('#shopBody').querySelectorAll('[data-port]').forEach(b => b.onclick = () => buyPortrait(b.dataset.port));
+  const jb = $('#shopBody').querySelector('[data-jump]'); if (jb) jb.onclick = () => $('#shopBody .shop-limited')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   $('#freePack').onclick = () => buyPack('base', true);
   if ($('#giftPack')) $('#giftPack').onclick = () => buyPack('base', 'gift');
   if ($('#faPack')) $('#faPack').onclick = () => buyPack('base', 'fa');

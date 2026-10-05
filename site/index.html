@@ -290,8 +290,17 @@ h1,h2,h3{font-family:var(--display);font-weight:400;letter-spacing:.01em;text-wr
 .m-shop-img .chev{display:none;}
 .m-shop-img .badge{position:absolute;top:8%;right:16%;font-weight:900;font-size:11px;letter-spacing:.06em;text-transform:uppercase;padding:4px 10px;border-radius:999px;background:#e8463a;color:#fff;box-shadow:0 2px 6px rgba(0,0,0,.5);}
 .m-shop-img:active img{transform:scale(.98);}
-.shop-tabs{display:grid;grid-template-columns:repeat(3,1fr);width:100%;margin:0 0 12px;}
-.shop-tabs button{padding:8px 6px;font-size:12px;}
+.shop-lbl{margin:14px 2px 8px;font-size:12px;font-weight:900;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);display:flex;flex-wrap:wrap;align-items:baseline;gap:6px;}
+.shop-lbl small{font-size:11px;letter-spacing:0;text-transform:none;font-weight:700;color:var(--mute);}
+.shop-limited{margin:18px 0 6px;padding:14px 12px 16px;border-radius:18px;background:linear-gradient(160deg,rgba(120,60,170,.35),rgba(20,30,60,.55));border:1px solid rgba(255,200,90,.55);box-shadow:0 0 0 1px rgba(0,0,0,.4),0 0 24px rgba(255,180,60,.18) inset;scroll-margin-top:76px;}
+.lim-head{display:flex;align-items:center;justify-content:space-between;gap:8px;}
+.lim-head h3{margin:0;font-family:var(--display);font-weight:400;font-size:22px;color:#ffd36b;text-shadow:0 2px 0 #5a3500;}
+.lim-tag{font-size:11px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;padding:4px 10px;border-radius:999px;background:#e8463a;color:#fff;box-shadow:0 2px 6px rgba(0,0,0,.45);animation:limPulse 1.8s ease-in-out infinite;}
+@keyframes limPulse{50%{transform:scale(1.07);}}
+@media (prefers-reduced-motion: reduce){.lim-tag{animation:none;}}
+.lim-note{margin:8px 0 2px;font-size:13px;line-height:1.45;color:#e6dcff;}
+.lim-note b{color:#ffd36b;}
+.lim-jump{display:block;width:100%;margin:0 0 4px;padding:9px 12px;border-radius:12px;border:1px solid rgba(255,200,90,.55);background:linear-gradient(90deg,rgba(120,60,170,.5),rgba(40,40,90,.5));color:#ffe6a6;font-weight:900;font-size:13px;cursor:pointer;}
 .shop-note{margin:0 0 12px;font-size:13px;color:var(--mute);line-height:1.4;}
 .shop-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;}
 .shop-card{position:relative;display:block;width:100%;aspect-ratio:1064/1430;padding:0;border:0;background:none;cursor:pointer;color:#fff;font-family:var(--body);}
@@ -1845,7 +1854,7 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%;}
 <script src="vendor/firebase-auth-compat.js"></script>
 <script src="vendor/firebase-firestore-compat.js"></script>
 <script src="vendor/firebase-database-compat.js"></script>
-<script>window.APP_VERSION = "2026.10.04-2212";</script>
+<script>window.APP_VERSION = "2026.10.05-1748";</script>
 <script>// ===== Best of Us – saját szerver (Firebase) =====
 // A játék eredetileg a Claude-os tárolót használta (window.claude.use('db' | 'user' | 'room')).
 // Ez a fájl ugyanazt a felületet adja Firebase-ből, így a játék kódja szinte változatlan maradhat:
@@ -4751,7 +4760,6 @@ async function buyPack(setId, free) {
 // ---- bolt képernyő ----
 // a boltban coinért megvehető különleges lapok (változatok); egyszer vehető meg mindegyik
 const SHOP_ITEMS = () => CARDS.filter(c => c.shopOnly && ART[c.id]).map(c => ({ id: c.id, price: c.price || 100 }));
-let shopTab = 'packs';
 function shopOfferHTML(it) {
   const c = CARD[it.id], have = owned(it.id) > 0, p = Store.p, can = p.coins >= it.price;
   return `<button class="shop-card${have ? ' owned' : ''}" data-buy="${it.id}" ${have ? 'aria-disabled="true"' : ''}>
@@ -4804,28 +4812,20 @@ async function buyShopItem(id) {
 function renderShop() {
   const p = Store.p; if (!p) return;
   const free = freePackReady();
-  const tabs = `<div class="seg shop-tabs" role="group" aria-label="Bolt"><button aria-pressed="${shopTab === 'packs'}" data-stab="packs">Boosterek</button><button aria-pressed="${shopTab === 'vars'}" data-stab="vars">Különleges lapok</button><button aria-pressed="${shopTab === 'ports'}" data-stab="ports">Portrék</button></div>`;
-  if (shopTab === 'ports') {
-    $('#shopBody').innerHTML = `
-    <div class="wallet"><span class="coin" aria-hidden="true"></span><b>${p.coins}</b><small>coin</small></div>${tabs}
-    <p class="shop-note">Hős-portrék saját névvel – mindig Full Artban. Megvétel után a hősöd ezt viseli (a Gyűjteményben a hősre koppintva válthatsz).</p>
-    <div class="shop-grid">${Object.keys(PORTRAITS).filter(k => ART[k]).map(portOfferHTML).join('')}</div>`;
-    $('#shopBody').querySelectorAll('[data-port]').forEach(b => b.onclick = () => buyPortrait(b.dataset.port));
-    $('#shopBody').querySelectorAll('[data-stab]').forEach(b => b.onclick = () => { shopTab = b.dataset.stab; renderShop(); });
-    return;
-  }
-  if (shopTab === 'vars') {
-    const items = SHOP_ITEMS();
-    $('#shopBody').innerHTML = `
-    <div class="wallet"><span class="coin" aria-hidden="true"></span><b>${p.coins}</b><small>coin</small></div>${tabs}
-    <p class="shop-note">Különleges változatok, amik csak itt kaphatók: ugyanúgy játszanak, mint az alaplap, csak más a képük. Mindegyiket egyszer veheted meg, és rögtön 2 példányt kapsz belőle.</p>
-    <div class="shop-grid">${items.map(shopOfferHTML).join('') || '<p class="live">Most nincs különleges lap a boltban.</p>'}</div>`;
-    $('#shopBody').querySelectorAll('[data-buy]').forEach(b => b.onclick = () => buyShopItem(b.dataset.buy));
-    $('#shopBody').querySelectorAll('[data-stab]').forEach(b => b.onclick = () => { shopTab = b.dataset.stab; renderShop(); });
-    return;
-  }
+  const items = SHOP_ITEMS(), ports = Object.keys(PORTRAITS).filter(k => ART[k]);
+  const limited = items.length || ports.length ? `
+    <section class="shop-limited">
+      <div class="lim-head"><h3>⏳ Limitált kínálat</h3><span class="lim-tag">Csak most</span></div>
+      <p class="lim-note">A bolt időnként frissül: az alábbi különleges lapok és hős-portrék <b>csak a következő frissítésig</b> kaphatók – utána mások jönnek a helyükre. Ami megvan, az persze megmarad.</p>
+      ${items.length ? `<div class="lbl shop-lbl">✦ Különleges lapok <small>rögtön 2 példány · ugyanúgy játszanak, mint az alaplap</small></div>
+      <div class="shop-grid">${items.map(shopOfferHTML).join('')}</div>` : ''}
+      ${ports.length ? `<div class="lbl shop-lbl">✦ Hős-portrék <small>saját névvel, mindig Full Artban</small></div>
+      <div class="shop-grid">${ports.map(portOfferHTML).join('')}</div>` : ''}
+    </section>` : '';
   $('#shopBody').innerHTML = `
-    <div class="wallet"><span class="coin" aria-hidden="true"></span><b>${p.coins}</b><small>coin</small></div>${tabs}
+    <div class="wallet"><span class="coin" aria-hidden="true"></span><b>${p.coins}</b><small>coin</small></div>
+    ${limited ? '<button class="lim-jump" data-jump>⏳ Limitált lapok és portrék – lejjebb ↓</button>' : ''}
+    <div class="lbl shop-lbl">Boosterek</div>
     <div class="pack-offer">
       <div class="pack-art">${packHTML('base')}</div>
       <div class="pack-info">
@@ -4846,6 +4846,7 @@ function renderShop() {
         <button class="btn primary shiny-btn" id="buyShiny" ${p.coins >= ECON.shinyPrice ? '' : 'disabled'}><span class="coin sm" aria-hidden="true"></span> ${ECON.shinyPrice} · Shiny pack</button>
       </div>
     </div>
+    ${limited}
     <div class="odds"><div class="lbl">Esélyek laponként</div>
       ${[['l', 'Legendás'], ['e', 'Epikus'], ['r', 'Ritka'], ['k', 'Gyakori']].map(([k, n]) => `<div class="odd"><i class="rar r-${k}"></i><span>${n}</span><b>${ECON.odds.find(o => o[0] === k)[1]}%</b></div>`).join('')}
       <div class="odd"><i class="rar r-f"></i><span>Full Art változat (bármelyik lapból)</span><b>${ECON.foilChance * 100}%</b></div>
@@ -4853,7 +4854,9 @@ function renderShop() {
       <div class="odd gold-odd"><i class="rar r-g"></i><span>✦ Arany hős (packonként · Shiny packban)</span><b>${String(ECON.goldPlain * 100).replace('.', ',')}% · ${ECON.goldShiny * 100}%</b></div>
       <small>Ha ${ECON.pityAfter} packon át nem jön epikus vagy legendás lap, a következőben biztosan lesz. Napi coin: győzelem ${ECON.win}, döntetlen ${ECON.draw}, vereség ${ECON.loss}, legfeljebb ${ECON.dailyCap}. Egy lapból legfeljebb ${DUPE_KEEP} példány marad meg, a többit a játék automatikusan beváltja: lapként ${DUPE_COIN} coin, Full Art vagy változat lap esetén ${DUPE_COIN_RARE} coin.</small>
     </div>`;
-  $('#shopBody').querySelectorAll('[data-stab]').forEach(b => b.onclick = () => { shopTab = b.dataset.stab; renderShop(); });
+  $('#shopBody').querySelectorAll('[data-buy]').forEach(b => b.onclick = () => buyShopItem(b.dataset.buy));
+  $('#shopBody').querySelectorAll('[data-port]').forEach(b => b.onclick = () => buyPortrait(b.dataset.port));
+  const jb = $('#shopBody').querySelector('[data-jump]'); if (jb) jb.onclick = () => $('#shopBody .shop-limited')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   $('#freePack').onclick = () => buyPack('base', true);
   if ($('#giftPack')) $('#giftPack').onclick = () => buyPack('base', 'gift');
   if ($('#faPack')) $('#faPack').onclick = () => buyPack('base', 'fa');
