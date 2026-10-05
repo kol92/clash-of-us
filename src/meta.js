@@ -393,6 +393,8 @@ const WHEEL = [   // [kulcs, felirat, súly %, szín]
   { k: 'again', t: '🔄', s: 'újra', w: 2, c: '#3f4a55' },
   { k: 'diamond', t: '💎', s: 'GYÉMÁNT', w: 1, c: '#d8f3ff' },
 ];
+// a kerék képén lévő cikkelyek valódi helye (közép°, szélesség°), felülről óramutató szerint – a képről lemérve (2026-10-06)
+const WHEEL_ANG = [[359.5, 37], [41, 46], [87, 46], [128.5, 37], [168.5, 43], [208.5, 37], [246.5, 39], [283, 34], [320.5, 41]];
 const wheelReady = () => !!Store.p && (Store.p.wheel?.date !== today() || (Store.p.wheel?.extra || 0) > 0);
 const ownsDiamond = () => owned(DIAMOND_CARD) > 0;
 function wheelRoll() { let r = Math.random() * WHEEL.reduce((a, x) => a + x.w, 0); for (let i = 0; i < WHEEL.length; i++) { r -= WHEEL[i].w; if (r < 0) return i; } return 0; }
@@ -437,8 +439,8 @@ function openWheel() {
     const W = p.wheel; if (W.date === today()) W.extra = Math.max(0, (W.extra || 0) - 1); else { W.date = today(); W.extra = 0; }
     const seg = wheelRoll(), res = wheelApply(p, seg);
     await save(); renderProfileBar();
-    const step = 360 / WHEEL.length, jitter = (Math.random() - .5) * step * .5;
-    const from = rot, want = ((360 - seg * step + jitter) % 360 + 360) % 360;
+    const sa = WHEEL_ANG[seg], jitter = (Math.random() - .5) * sa[1] * .6;   // a képen nem egyforma széles cikkelyek: a cikkely közepére (± kicsit) áll meg
+    const from = rot, want = ((360 - sa[0] + jitter) % 360 + 360) % 360;
     rot = from + 360 * 5 + ((want - (from % 360)) % 360 + 360) % 360;   // mindig előre, 5 teljes kör + a célcikkelyig
     const el = o.querySelector('.wh-rot'), hub = o.querySelector('[data-spin]'); hub.disabled = true; hub.classList.add('spinning');
     const red = matchMedia('(prefers-reduced-motion: reduce)').matches;
