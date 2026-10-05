@@ -291,12 +291,15 @@ $('#goRules').onclick = () => show('scr-rules');
 function renderPick() {
   const ds = allDecks();
   if (!ds.some(d => d.id === ui.deck && !deckIssue(d))) ui.deck = 'roham';
-  $('#deckPick').innerHTML = ds.map(d => { const prob = deckIssue(d), h = HERO[d.hero];
-    return `<button class="deck-opt" data-d="${d.id}" aria-pressed="${ui.deck === d.id}" ${prob ? 'disabled' : ''}>${heroPortrait(d.hero, 'do-hero')}
-      <span class="do-txt"><b></b><em>${h ? `${h.name} – ${h.text}` : 'Nincs hős'}</em><small>${prob ? 'Nem játszható: ' + prob : d.starter ? d.desc : 'Saját pakli'}</small></span></button>`; }).join('');
-  $('#deckPick').querySelectorAll('b').forEach((b, i) => b.textContent = ds[i].name);
+  ui.deckOpen = ui.deckOpen || null;
+  $('#deckPick').innerHTML = ds.map(d => { const prob = deckIssue(d), h = HERO[d.hero], sel = ui.deck === d.id, open = ui.deckOpen === d.id;
+    return `<div class="deck-wrap${sel ? ' sel' : ''}"><button class="deck-opt dp${sel ? ' on' : ''}" data-d="${d.id}" aria-pressed="${sel}" ${prob ? 'disabled' : ''}>${heroPortrait(d.hero, 'do-hero')}
+      <span class="do-txt"><b></b><em>${h ? h.name : 'Nincs hős'}</em><small>${prob ? 'Nem játszható: ' + prob : h ? h.text : ''}</small></span></button>
+      <button class="dp-more${open ? ' open' : ''}" data-more="${d.id}" aria-expanded="${open}" aria-label="Részletek: ${escH(d.name)}"></button>
+      ${open ? `<div class="dp-detail"><p><b>${h ? h.name : ''}:</b> ${h ? h.text : ''}</p><p>${d.starter ? d.desc : 'Saját pakli.'}</p></div>` : ''}</div>`; }).join('');
+  $('#deckPick').querySelectorAll('.deck-opt b').forEach((b, i) => b.textContent = ds[i].name);
 }
-$('#deckPick').onclick = e => { const b = e.target.closest('[data-d]'); if (b) { ui.deck = b.dataset.d; renderPick(); } };
+$('#deckPick').onclick = e => { const m = e.target.closest('[data-more]'); if (m) { ui.deckOpen = ui.deckOpen === m.dataset.more ? null : m.dataset.more; renderPick(); return; } const b = e.target.closest('[data-d]'); if (b) { ui.deck = b.dataset.d; renderPick(); } };
 $('#startBtn').onclick = () => { const d = allDecks().find(x => x.id === ui.deck); if (!d || deckIssue(d)) return; startMatch(d.hero, ui.deck); };
 
 function renderColl() {
@@ -1178,8 +1181,18 @@ async function showPlayed(id, tg, foil) {
   back.remove();
 }
 
+// Körváltás: nagy szalag középen („TE KÖVETKEZEL” / „ELLENFÉL KÖRE”)
+function turnBanner(mine) {
+  if (!S || S.winner != null) return;
+  document.querySelectorAll('.turn-banner').forEach(x => x.remove());
+  const b = document.createElement('div'); b.className = 'turn-banner ' + (mine ? 'mine' : 'enemy');
+  b.innerHTML = `<img src="art/ui/turn-${mine ? 'mine' : 'enemy'}.webp" alt="${mine ? 'Te következel' : 'Ellenfél köre'}">`;
+  b.setAttribute('role', 'status');
+  $('#layer').appendChild(b);
+  setTimeout(() => b.remove(), 1500);
+}
 async function botTurn() {
-  busy = true; render(); await sleep(700);
+  busy = true; render(); turnBanner(false); await sleep(1000);
   let ch;
   const plan = S.tut && TUT_BOT[S.players[BOT].turns] ? [...TUT_BOT[S.players[BOT].turns]] : null;   // oktató: fix ellenfél-lépések
   const nextMove = () => { if (!plan) return botChoose(S); const m = plan.shift(); if (!m) return null;
@@ -1192,7 +1205,7 @@ async function botTurn() {
   if (S.winner == null) await resolveEnd();
   busy = false; render();
   if (S.winner != null) return endMatch();
-  toast('Te jössz!');
+  turnBanner(true);
 }
 
 // ---------- húzás-animáció ----------
@@ -1317,7 +1330,7 @@ function showMulligan(first) {
     ui.handSeen = new Set(S.players[ME].hand.map(c => c.uid));   // a csere-ablakban már láttad őket: ne repüljenek be újra
     ui.botHandN = S.players[BOT].hand.length;
     beginGame(S); busy = false; render();
-    if (first === ME) toast('Te kezdesz!');
+    if (first === ME) turnBanner(true);
     else { toast('Az ellenfél kezd'); setTimeout(botTurn, 900); }
   };
 }
@@ -1387,11 +1400,25 @@ function beginDrag(e, hi, el, opt = {}) {
       document.body.appendChild(g); start.ghost = g;
       start.el.classList.add('lifted');
       start.needsTarget = targetsFor(S, ME, S.players[ME].hand[start.hi].id).some(t => t.k !== 'none');
+      if (start.needsTarget && CARD[S.players[ME].hand[start.hi].id].type !== 'char') {   // célzós akció/eszköz: célzónyíl a lapból az ujjadig
+        const r = start.el.getBoundingClientRect(); start.ax = r.left + r.width / 2; start.ay = r.top + r.height * .3;
+        const a = document.createElement('div'); a.className = 'aim-arrow';
+        a.innerHTML = '<svg><path class="aa-glow"/><path class="aa-line"/></svg><img class="aa-head" src="art/ui/aim-arrow-head.webp" alt="">';
+        document.body.appendChild(a); start.arrow = a; g.classList.add('aiming');
+      }
       render();
       if (!start.needsTarget) { $('#eLane').classList.add('playzone'); $('#pLane').classList.add('playzone'); }
     }
     ev.preventDefault();
     start.ghost.style.left = ev.clientX + 'px'; start.ghost.style.top = ev.clientY + 'px';
+    if (start.arrow) {
+      const x0 = start.ax, y0 = start.ay, x1 = ev.clientX, y1 = ev.clientY, mx = (x0 + x1) / 2, my = Math.min(y0, y1) - Math.max(30, Math.abs(x1 - x0) * .25);
+      const d = `M${x0},${y0} Q${mx},${my} ${x1},${y1}`;
+      start.arrow.querySelectorAll('path').forEach(pth => pth.setAttribute('d', d));
+      const ang = Math.atan2(y1 - my, x1 - mx) * 180 / Math.PI + 90;
+      const hd = start.arrow.querySelector('.aa-head'); hd.style.left = x1 + 'px'; hd.style.top = y1 + 'px'; hd.style.transform = `translate(-50%,-30%) rotate(${ang}deg)`;
+      start.ghost.style.left = x0 + 'px'; start.ghost.style.top = (y0 + 10) + 'px';
+    }
     const over = start.needsTarget ? cellUnder(ev.clientX, ev.clientY) : null;
     if (over !== start.over) { start.over && start.over.classList.remove('over'); over && over.classList.add('over'); start.over = over; }
     if (!start.needsTarget) {
@@ -1421,7 +1448,7 @@ function beginDrag(e, hi, el, opt = {}) {
   const stop = () => {
     clearTimeout(start.peekT); start.el.classList.remove('peek');
     window.removeEventListener('pointermove', move); window.removeEventListener('pointerup', up); window.removeEventListener('pointercancel', up);
-    start.ghost && start.ghost.remove(); start.over && start.over.classList.remove('over');
+    start.ghost && start.ghost.remove(); start.arrow && start.arrow.remove(); start.over && start.over.classList.remove('over');
     ['#eLane', '#pLane'].forEach(q => $(q).classList.remove('playzone', 'hot'));
     ui.drag = null;
   };

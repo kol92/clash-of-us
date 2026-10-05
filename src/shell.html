@@ -1546,6 +1546,48 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%;}
 .cell.tgt{border-color:rgba(255,80,80,.55);background:rgba(255,60,60,.08);}
 .cell.picked{outline:0;box-shadow:none;}
 @keyframes ovPulse{50%{opacity:.62;}}
+
+/* ===== UI-csomag 3 (2026-10-06): körváltás, célzás, lerakóhely, pakliválasztó ===== */
+.turn-banner{position:fixed;left:50%;top:40%;z-index:58;width:min(360px,86vw);transform:translate(-50%,-50%);pointer-events:none;animation:tbIn 1.5s ease both;}
+.turn-banner img{display:block;width:100%;height:auto;filter:drop-shadow(0 8px 20px rgba(0,0,0,.7));}
+@keyframes tbIn{0%{opacity:0;transform:translate(-50%,-50%) scale(.6)}14%{opacity:1;transform:translate(-50%,-50%) scale(1.06)}24%{transform:translate(-50%,-50%) scale(1)}78%{opacity:1;transform:translate(-50%,-50%) scale(1)}100%{opacity:0;transform:translate(-50%,-60%) scale(.96)}}
+@media (prefers-reduced-motion:reduce){.turn-banner{animation:tbFade 1.5s ease both}@keyframes tbFade{0%,100%{opacity:0}15%,80%{opacity:1}}}
+.hbar.active .hport-hit::after{content:"";position:absolute;inset:0;z-index:2;pointer-events:none;background:url('art/ui/hero-glow.webp') center/100% 100% no-repeat;animation:hgPulse 1.8s ease-in-out infinite;}
+@keyframes hgPulse{50%{opacity:.6;}}
+@media (prefers-reduced-motion:reduce){.hbar.active .hport-hit::after{animation:none;}}
+/* lerakóhely: aranyfény (üres hely), célpont: célzógyűrű */
+.cell.tgt:not(:has(.unit)){border-color:transparent;background:none;animation:none;}
+.cell.tgt:not(:has(.unit))::after{background-image:url('art/ui/drop-glow.webp')!important;background-size:100% 100%!important;}
+.cell.tgt .unit::after{background-image:url('art/ui/aim-target.webp')!important;background-size:contain!important;left:50%!important;top:50%!important;right:auto!important;bottom:auto!important;width:118%;aspect-ratio:1;transform:translate(-50%,-50%);}
+.cell.tgt.over:not(:has(.unit))::after{filter:brightness(1.5) drop-shadow(0 0 8px #ffc94a);animation:none;}
+.cell.tgt.over .unit::after{filter:brightness(1.4) drop-shadow(0 0 8px #6fd3ff);animation:none;transform:translate(-50%,-50%) scale(.9);}
+/* célzónyíl */
+.aim-arrow{position:fixed;inset:0;z-index:69;pointer-events:none;}
+.aim-arrow svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible;}
+.aim-arrow path{fill:none;stroke-linecap:round;}
+.aim-arrow .aa-glow{stroke:rgba(255,201,74,.35);stroke-width:14;}
+.aim-arrow .aa-line{stroke:#ffd36b;stroke-width:5;stroke-dasharray:10 9;animation:aaDash .6s linear infinite;}
+@keyframes aaDash{to{stroke-dashoffset:-19;}}
+.aim-arrow .aa-head{position:absolute;width:44px;height:44px;filter:drop-shadow(0 2px 4px rgba(0,0,0,.7));}
+.card.ghost.aiming{opacity:.85;transform:translate(-50%,-65%) scale(.8);}
+/* pakliválasztó panelek */
+#deckPick{display:grid;gap:10px;}
+.deck-wrap{position:relative;}
+.deck-opt.dp{position:relative;display:block;width:100%;aspect-ratio:1200/420;padding:0;border:0;border-radius:0;background:none;text-align:left;color:var(--ink);cursor:pointer;}
+.deck-opt.dp::before{content:"";position:absolute;inset:0;z-index:1;background:url('art/ui/deck-panel.webp') center/100% 100% no-repeat;pointer-events:none;filter:drop-shadow(0 6px 10px rgba(0,0,0,.5));}
+.deck-opt.dp.on::before{background-image:url('art/ui/deck-panel-selected.webp');filter:drop-shadow(0 0 12px rgba(255,200,80,.45));}
+.deck-opt.dp .do-hero{position:absolute;z-index:0;left:4.6%;top:12%;width:24.6%;height:70%;border-radius:4px;background-size:cover;background-position:50% 15%;}
+.deck-opt.dp .do-txt{position:absolute;z-index:2;left:33%;right:9%;top:14%;bottom:12%;display:flex;flex-direction:column;justify-content:center;gap:1px;overflow:hidden;}
+.deck-opt.dp b{font-size:clamp(15px,4.6vw,19px);margin:0;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.deck-opt.dp em{font-size:12px;margin:0;}
+.deck-opt.dp small{font-size:11.5px;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.deck-opt.dp.on .do-txt{top:18%;}
+.deck-opt.dp[disabled]{opacity:.45;filter:grayscale(.5);}
+.dp-more{position:absolute;z-index:3;right:3.2%;bottom:12%;width:30px;height:30px;padding:0;border:0;background:url('art/ui/deck-expand.webp') center/contain no-repeat;cursor:pointer;transition:transform .2s;}
+.dp-more.open{transform:rotate(180deg);}
+.dp-detail{margin:-4px 8px 4px;padding:10px 12px;border-radius:0 0 12px 12px;background:rgba(6,20,36,.92);border:1px solid rgba(255,201,74,.35);border-top:0;font-size:13px;line-height:1.45;color:#d7e6ee;}
+.dp-detail p{margin:0 0 6px;} .dp-detail p:last-child{margin:0;}
+.dp-detail b{color:var(--gold);}
 .sr-only{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0;}
 @media (prefers-reduced-motion:reduce){.cell.tgt .unit::after,.cell.tgt:not(:has(.unit))::after{animation:none!important;}}
 /* ===== Állapotjelzők: képes táblák (a feliratot a kép tartalmazza) + borostyán számláló a bénulás köreire ===== */

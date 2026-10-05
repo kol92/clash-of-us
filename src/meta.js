@@ -1459,7 +1459,7 @@ function pvpEnter(id, fresh) {
     else pvpWaitMsg();
     pvpWatchMull(d);
   } else if (d.status === 'done' || S.winner != null) endMatch();
-  else if (S.active === ME) toast('Te jössz!');
+  else if (S.active === ME) turnBanner(true);
 }
 function pvpWaitMsg() {
   if ($('#layer .pv-wait')) return;
@@ -1549,7 +1549,8 @@ async function pvpDrain() {
       if (wasMull) ui.handSeen = null; else ui.handSeen = keepSeen;
       busy = false; render();
       if (S.winner != null) { endMatch(); break; }
-      if (L.by !== ME && S.active === ME) toast(L.kind === 'forfeit' ? 'Az ellenfél feladta' : L.auto ? 'Lejárt az ellenfél ideje – te jössz!' : 'Te jössz!');
+      if (L.by !== ME && S.active === ME) { if (L.kind === 'forfeit') toast('Az ellenfél feladta'); else { if (L.auto) toast('Lejárt az ellenfél ideje'); turnBanner(true); } }
+      if (L.by === ME && S.active !== ME && L.kind === 'end') turnBanner(false);
       if (wasMull) toast(S.active === ME ? 'Te kezdesz!' : 'Az ellenfél kezd');
     }
   } finally { PVP.running = false; }

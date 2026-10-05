@@ -1561,6 +1561,48 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%;}
 .cell.tgt{border-color:rgba(255,80,80,.55);background:rgba(255,60,60,.08);}
 .cell.picked{outline:0;box-shadow:none;}
 @keyframes ovPulse{50%{opacity:.62;}}
+
+/* ===== UI-csomag 3 (2026-10-06): körváltás, célzás, lerakóhely, pakliválasztó ===== */
+.turn-banner{position:fixed;left:50%;top:40%;z-index:58;width:min(360px,86vw);transform:translate(-50%,-50%);pointer-events:none;animation:tbIn 1.5s ease both;}
+.turn-banner img{display:block;width:100%;height:auto;filter:drop-shadow(0 8px 20px rgba(0,0,0,.7));}
+@keyframes tbIn{0%{opacity:0;transform:translate(-50%,-50%) scale(.6)}14%{opacity:1;transform:translate(-50%,-50%) scale(1.06)}24%{transform:translate(-50%,-50%) scale(1)}78%{opacity:1;transform:translate(-50%,-50%) scale(1)}100%{opacity:0;transform:translate(-50%,-60%) scale(.96)}}
+@media (prefers-reduced-motion:reduce){.turn-banner{animation:tbFade 1.5s ease both}@keyframes tbFade{0%,100%{opacity:0}15%,80%{opacity:1}}}
+.hbar.active .hport-hit::after{content:"";position:absolute;inset:0;z-index:2;pointer-events:none;background:url('art/ui/hero-glow.webp?v=57c0194e') center/100% 100% no-repeat;animation:hgPulse 1.8s ease-in-out infinite;}
+@keyframes hgPulse{50%{opacity:.6;}}
+@media (prefers-reduced-motion:reduce){.hbar.active .hport-hit::after{animation:none;}}
+/* lerakóhely: aranyfény (üres hely), célpont: célzógyűrű */
+.cell.tgt:not(:has(.unit)){border-color:transparent;background:none;animation:none;}
+.cell.tgt:not(:has(.unit))::after{background-image:url('art/ui/drop-glow.webp?v=7094ee04')!important;background-size:100% 100%!important;}
+.cell.tgt .unit::after{background-image:url('art/ui/aim-target.webp?v=4bae3c8f')!important;background-size:contain!important;left:50%!important;top:50%!important;right:auto!important;bottom:auto!important;width:118%;aspect-ratio:1;transform:translate(-50%,-50%);}
+.cell.tgt.over:not(:has(.unit))::after{filter:brightness(1.5) drop-shadow(0 0 8px #ffc94a);animation:none;}
+.cell.tgt.over .unit::after{filter:brightness(1.4) drop-shadow(0 0 8px #6fd3ff);animation:none;transform:translate(-50%,-50%) scale(.9);}
+/* célzónyíl */
+.aim-arrow{position:fixed;inset:0;z-index:69;pointer-events:none;}
+.aim-arrow svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible;}
+.aim-arrow path{fill:none;stroke-linecap:round;}
+.aim-arrow .aa-glow{stroke:rgba(255,201,74,.35);stroke-width:14;}
+.aim-arrow .aa-line{stroke:#ffd36b;stroke-width:5;stroke-dasharray:10 9;animation:aaDash .6s linear infinite;}
+@keyframes aaDash{to{stroke-dashoffset:-19;}}
+.aim-arrow .aa-head{position:absolute;width:44px;height:44px;filter:drop-shadow(0 2px 4px rgba(0,0,0,.7));}
+.card.ghost.aiming{opacity:.85;transform:translate(-50%,-65%) scale(.8);}
+/* pakliválasztó panelek */
+#deckPick{display:grid;gap:10px;}
+.deck-wrap{position:relative;}
+.deck-opt.dp{position:relative;display:block;width:100%;aspect-ratio:1200/420;padding:0;border:0;border-radius:0;background:none;text-align:left;color:var(--ink);cursor:pointer;}
+.deck-opt.dp::before{content:"";position:absolute;inset:0;z-index:1;background:url('art/ui/deck-panel.webp?v=92f96721') center/100% 100% no-repeat;pointer-events:none;filter:drop-shadow(0 6px 10px rgba(0,0,0,.5));}
+.deck-opt.dp.on::before{background-image:url('art/ui/deck-panel-selected.webp?v=bde06d0c');filter:drop-shadow(0 0 12px rgba(255,200,80,.45));}
+.deck-opt.dp .do-hero{position:absolute;z-index:0;left:4.6%;top:12%;width:24.6%;height:70%;border-radius:4px;background-size:cover;background-position:50% 15%;}
+.deck-opt.dp .do-txt{position:absolute;z-index:2;left:33%;right:9%;top:14%;bottom:12%;display:flex;flex-direction:column;justify-content:center;gap:1px;overflow:hidden;}
+.deck-opt.dp b{font-size:clamp(15px,4.6vw,19px);margin:0;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.deck-opt.dp em{font-size:12px;margin:0;}
+.deck-opt.dp small{font-size:11.5px;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.deck-opt.dp.on .do-txt{top:18%;}
+.deck-opt.dp[disabled]{opacity:.45;filter:grayscale(.5);}
+.dp-more{position:absolute;z-index:3;right:3.2%;bottom:12%;width:30px;height:30px;padding:0;border:0;background:url('art/ui/deck-expand.webp?v=01d1ab13') center/contain no-repeat;cursor:pointer;transition:transform .2s;}
+.dp-more.open{transform:rotate(180deg);}
+.dp-detail{margin:-4px 8px 4px;padding:10px 12px;border-radius:0 0 12px 12px;background:rgba(6,20,36,.92);border:1px solid rgba(255,201,74,.35);border-top:0;font-size:13px;line-height:1.45;color:#d7e6ee;}
+.dp-detail p{margin:0 0 6px;} .dp-detail p:last-child{margin:0;}
+.dp-detail b{color:var(--gold);}
 .sr-only{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0;}
 @media (prefers-reduced-motion:reduce){.cell.tgt .unit::after,.cell.tgt:not(:has(.unit))::after{animation:none!important;}}
 /* ===== Állapotjelzők: képes táblák (a feliratot a kép tartalmazza) + borostyán számláló a bénulás köreire ===== */
@@ -1889,7 +1931,7 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%;}
 <script src="vendor/firebase-auth-compat.js"></script>
 <script src="vendor/firebase-firestore-compat.js"></script>
 <script src="vendor/firebase-database-compat.js"></script>
-<script>window.APP_VERSION = "2026.10.05-2338";</script>
+<script>window.APP_VERSION = "2026.10.06-0014";</script>
 <script>// ===== Best of Us – saját szerver (Firebase) =====
 // A játék eredetileg a Claude-os tárolót használta (window.claude.use('db' | 'user' | 'room')).
 // Ez a fájl ugyanazt a felületet adja Firebase-ből, így a játék kódja szinte változatlan maradhat:
@@ -3286,12 +3328,15 @@ $('#goRules').onclick = () => show('scr-rules');
 function renderPick() {
   const ds = allDecks();
   if (!ds.some(d => d.id === ui.deck && !deckIssue(d))) ui.deck = 'roham';
-  $('#deckPick').innerHTML = ds.map(d => { const prob = deckIssue(d), h = HERO[d.hero];
-    return `<button class="deck-opt" data-d="${d.id}" aria-pressed="${ui.deck === d.id}" ${prob ? 'disabled' : ''}>${heroPortrait(d.hero, 'do-hero')}
-      <span class="do-txt"><b></b><em>${h ? `${h.name} – ${h.text}` : 'Nincs hős'}</em><small>${prob ? 'Nem játszható: ' + prob : d.starter ? d.desc : 'Saját pakli'}</small></span></button>`; }).join('');
-  $('#deckPick').querySelectorAll('b').forEach((b, i) => b.textContent = ds[i].name);
+  ui.deckOpen = ui.deckOpen || null;
+  $('#deckPick').innerHTML = ds.map(d => { const prob = deckIssue(d), h = HERO[d.hero], sel = ui.deck === d.id, open = ui.deckOpen === d.id;
+    return `<div class="deck-wrap${sel ? ' sel' : ''}"><button class="deck-opt dp${sel ? ' on' : ''}" data-d="${d.id}" aria-pressed="${sel}" ${prob ? 'disabled' : ''}>${heroPortrait(d.hero, 'do-hero')}
+      <span class="do-txt"><b></b><em>${h ? h.name : 'Nincs hős'}</em><small>${prob ? 'Nem játszható: ' + prob : h ? h.text : ''}</small></span></button>
+      <button class="dp-more${open ? ' open' : ''}" data-more="${d.id}" aria-expanded="${open}" aria-label="Részletek: ${escH(d.name)}"></button>
+      ${open ? `<div class="dp-detail"><p><b>${h ? h.name : ''}:</b> ${h ? h.text : ''}</p><p>${d.starter ? d.desc : 'Saját pakli.'}</p></div>` : ''}</div>`; }).join('');
+  $('#deckPick').querySelectorAll('.deck-opt b').forEach((b, i) => b.textContent = ds[i].name);
 }
-$('#deckPick').onclick = e => { const b = e.target.closest('[data-d]'); if (b) { ui.deck = b.dataset.d; renderPick(); } };
+$('#deckPick').onclick = e => { const m = e.target.closest('[data-more]'); if (m) { ui.deckOpen = ui.deckOpen === m.dataset.more ? null : m.dataset.more; renderPick(); return; } const b = e.target.closest('[data-d]'); if (b) { ui.deck = b.dataset.d; renderPick(); } };
 $('#startBtn').onclick = () => { const d = allDecks().find(x => x.id === ui.deck); if (!d || deckIssue(d)) return; startMatch(d.hero, ui.deck); };
 
 function renderColl() {
@@ -4173,8 +4218,18 @@ async function showPlayed(id, tg, foil) {
   back.remove();
 }
 
+// Körváltás: nagy szalag középen („TE KÖVETKEZEL” / „ELLENFÉL KÖRE”)
+function turnBanner(mine) {
+  if (!S || S.winner != null) return;
+  document.querySelectorAll('.turn-banner').forEach(x => x.remove());
+  const b = document.createElement('div'); b.className = 'turn-banner ' + (mine ? 'mine' : 'enemy');
+  b.innerHTML = `<img src="art/ui/turn-${mine ? 'mine' : 'enemy'}.webp" alt="${mine ? 'Te következel' : 'Ellenfél köre'}">`;
+  b.setAttribute('role', 'status');
+  $('#layer').appendChild(b);
+  setTimeout(() => b.remove(), 1500);
+}
 async function botTurn() {
-  busy = true; render(); await sleep(700);
+  busy = true; render(); turnBanner(false); await sleep(1000);
   let ch;
   const plan = S.tut && TUT_BOT[S.players[BOT].turns] ? [...TUT_BOT[S.players[BOT].turns]] : null;   // oktató: fix ellenfél-lépések
   const nextMove = () => { if (!plan) return botChoose(S); const m = plan.shift(); if (!m) return null;
@@ -4187,7 +4242,7 @@ async function botTurn() {
   if (S.winner == null) await resolveEnd();
   busy = false; render();
   if (S.winner != null) return endMatch();
-  toast('Te jössz!');
+  turnBanner(true);
 }
 
 // ---------- húzás-animáció ----------
@@ -4312,7 +4367,7 @@ function showMulligan(first) {
     ui.handSeen = new Set(S.players[ME].hand.map(c => c.uid));   // a csere-ablakban már láttad őket: ne repüljenek be újra
     ui.botHandN = S.players[BOT].hand.length;
     beginGame(S); busy = false; render();
-    if (first === ME) toast('Te kezdesz!');
+    if (first === ME) turnBanner(true);
     else { toast('Az ellenfél kezd'); setTimeout(botTurn, 900); }
   };
 }
@@ -4382,11 +4437,25 @@ function beginDrag(e, hi, el, opt = {}) {
       document.body.appendChild(g); start.ghost = g;
       start.el.classList.add('lifted');
       start.needsTarget = targetsFor(S, ME, S.players[ME].hand[start.hi].id).some(t => t.k !== 'none');
+      if (start.needsTarget && CARD[S.players[ME].hand[start.hi].id].type !== 'char') {   // célzós akció/eszköz: célzónyíl a lapból az ujjadig
+        const r = start.el.getBoundingClientRect(); start.ax = r.left + r.width / 2; start.ay = r.top + r.height * .3;
+        const a = document.createElement('div'); a.className = 'aim-arrow';
+        a.innerHTML = '<svg><path class="aa-glow"/><path class="aa-line"/></svg><img class="aa-head" src="art/ui/aim-arrow-head.webp?v=89057557" alt="">';
+        document.body.appendChild(a); start.arrow = a; g.classList.add('aiming');
+      }
       render();
       if (!start.needsTarget) { $('#eLane').classList.add('playzone'); $('#pLane').classList.add('playzone'); }
     }
     ev.preventDefault();
     start.ghost.style.left = ev.clientX + 'px'; start.ghost.style.top = ev.clientY + 'px';
+    if (start.arrow) {
+      const x0 = start.ax, y0 = start.ay, x1 = ev.clientX, y1 = ev.clientY, mx = (x0 + x1) / 2, my = Math.min(y0, y1) - Math.max(30, Math.abs(x1 - x0) * .25);
+      const d = `M${x0},${y0} Q${mx},${my} ${x1},${y1}`;
+      start.arrow.querySelectorAll('path').forEach(pth => pth.setAttribute('d', d));
+      const ang = Math.atan2(y1 - my, x1 - mx) * 180 / Math.PI + 90;
+      const hd = start.arrow.querySelector('.aa-head'); hd.style.left = x1 + 'px'; hd.style.top = y1 + 'px'; hd.style.transform = `translate(-50%,-30%) rotate(${ang}deg)`;
+      start.ghost.style.left = x0 + 'px'; start.ghost.style.top = (y0 + 10) + 'px';
+    }
     const over = start.needsTarget ? cellUnder(ev.clientX, ev.clientY) : null;
     if (over !== start.over) { start.over && start.over.classList.remove('over'); over && over.classList.add('over'); start.over = over; }
     if (!start.needsTarget) {
@@ -4416,7 +4485,7 @@ function beginDrag(e, hi, el, opt = {}) {
   const stop = () => {
     clearTimeout(start.peekT); start.el.classList.remove('peek');
     window.removeEventListener('pointermove', move); window.removeEventListener('pointerup', up); window.removeEventListener('pointercancel', up);
-    start.ghost && start.ghost.remove(); start.over && start.over.classList.remove('over');
+    start.ghost && start.ghost.remove(); start.arrow && start.arrow.remove(); start.over && start.over.classList.remove('over');
     ['#eLane', '#pLane'].forEach(q => $(q).classList.remove('playzone', 'hot'));
     ui.drag = null;
   };
@@ -5884,7 +5953,7 @@ function pvpEnter(id, fresh) {
     else pvpWaitMsg();
     pvpWatchMull(d);
   } else if (d.status === 'done' || S.winner != null) endMatch();
-  else if (S.active === ME) toast('Te jössz!');
+  else if (S.active === ME) turnBanner(true);
 }
 function pvpWaitMsg() {
   if ($('#layer .pv-wait')) return;
@@ -5974,7 +6043,8 @@ async function pvpDrain() {
       if (wasMull) ui.handSeen = null; else ui.handSeen = keepSeen;
       busy = false; render();
       if (S.winner != null) { endMatch(); break; }
-      if (L.by !== ME && S.active === ME) toast(L.kind === 'forfeit' ? 'Az ellenfél feladta' : L.auto ? 'Lejárt az ellenfél ideje – te jössz!' : 'Te jössz!');
+      if (L.by !== ME && S.active === ME) { if (L.kind === 'forfeit') toast('Az ellenfél feladta'); else { if (L.auto) toast('Lejárt az ellenfél ideje'); turnBanner(true); } }
+      if (L.by === ME && S.active !== ME && L.kind === 'end') turnBanner(false);
       if (wasMull) toast(S.active === ME ? 'Te kezdesz!' : 'Az ellenfél kezd');
     }
   } finally { PVP.running = false; }

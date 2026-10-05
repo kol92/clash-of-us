@@ -343,6 +343,13 @@ Hősképesség-ötletek a táblázatban (még nem zöldek, nincsenek beépítve)
 - Meccs közben a ⚑ melletti 📜 gomb megnyitja a „Mi történt?” ablakot: körönként (legújabb felül, az utolsó 12 kör) ki mit játszott ki és kire, ki támadott, sebzések, gyógyulások, halálok, idézések, bénulás, pajzs, lopás, Cápa, kitiltás stb. Az ellenfél rejtett lapja „egy rejtett lap”, amíg fel nem fordul. PvP-ben is működik (helyben gyűlik, nem kerül a szerverre).
 - Nyertél / Vesztettél: a meccs végén a ChatGPT-s táblakép jelenik meg (art/ui/result-win|lose.webp); a képen lévő „Folytatás” gomb a menübe visz, alatta az ok, a coin-, küldetés- és Season Pass-jutalom, és az „Új meccs” (PvP-ben „PvP”) gomb. Döntetlennél marad a régi szalag.
 
+## UI-csomag 3 (Astra, 2026-10-06)
+- **Körváltás:** középen felúszó szalag – „TE KÖVETKEZEL” (art/ui/turn-mine.webp) a saját köröd elején, „ELLENFÉL KÖRE” (turn-enemy.webp) a bot/ellenfél köre elején (PvP-ben is); a soron lévő hős portréján fénykeret (hero-glow.webp). A régi „Te jössz!” felirat helyett.
+- **Célzás:** célzós akció/eszköz húzásakor ívelt, futó szaggatott aranyvonal a lapból az ujjadig, a végén nyílhegy (aim-arrow-head.webp); a megcélozható karaktereken célzógyűrű (aim-target.webp), amelyik fölött az ujjad van, felragyog.
+- **Lerakóhely:** karakter húzásakor az üres szabad helyeken aranyfény (drop-glow.webp).
+- **Pakliválasztó:** díszes panelek (deck-panel / deck-panel-selected – a kiválasztotton „KIVÁLASZTVA” jelvény): balra hősportré, jobbra pakli neve, hős neve és képessége (2 sorban); a jobb alsó lenyitó gombbal (deck-expand.webp) látszik a teljes hősképesség és a pakli leírása.
+- Eredetik: art/ui/orig/pack3/. Még várunk: 4. gyűjtemény-szűrő elemei, 5. bolti termékpanelek, szilánk ikon.
+
 ## Technikai megjegyzések
 - Minden illusztrációból két méret van: 360 px széles a kis lapokhoz (kéz, tábla, gyűjtemény, temető) és 800 px a nagy nézethez. A keretekből is van kicsi (300 px). Új képnél mindkettőt el kell készíteni.
 - Induláskor a kis képek és keretek előre letöltődnek és dekódolódnak, a nagyok utána, a háttérben.
