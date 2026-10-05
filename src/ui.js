@@ -495,6 +495,7 @@ function logEvents(evs, snap) {
       case 'doom': case 'expire': L(`⌛ ${unitName(e.side, e.i)} eltűnt`); break;
       case 'lock': L(`🔒 ${e.side === ME ? 'Le vagy bénítva' : 'Az ellenfél le van bénítva'}: a következő körben nem játszhat ki lapot`); break;
       case 'locgone': L(`🚫 Kitiltva: ${CARD[e.id].name}`); break;
+      case 'locreplaced': L(`🏚 ${who(e.side)} Munkahelye eltűnt (${e.how === 'banned' ? 'kitiltották' : 'új helyszín váltotta'}) – cserébe 5 életet gyógyul`); break;
       case 'mosh': L('🤘 Mosh Pit: az ellenfél karakterei odébb csúsztak'); break;
       case 'morph': L(`🦹 ${who(e.side)} Baszóvá változott`); break;
       case 'machine': L(`🤖 ${who(e.side)} Gépüzemmódban visszatért`); break;

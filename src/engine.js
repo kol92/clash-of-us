@@ -587,7 +587,7 @@ function dropLocation(s, how) {   // a pályán lévő helyszín eltűnik (lecse
   const L = s.location; if (!L) return;
   if (!CARD[L.id].token) bury(s, L.owner, L.id, how, L.foil);
   s.location = null;
-  if (L.id === 'l_munkahely') healHero(s, L.owner, 5);   // Dávid kánon eseménye: ha elpusztul a munkahely, 5 életet gyógyul
+  if (L.id === 'l_munkahely') { ev(s, { t:'locreplaced', side:L.owner, i:-1, id:L.id, how }); healHero(s, L.owner, 5); }   // Dávid kánon eseménye: ha elpusztul a munkahely, 5 életet gyógyul
 }
 const boost = (s, n, side) => n > 0 && locIs(s, 'l_akacfa') && !(side != null && isReg(s, side)) ? n + 1 : n;
 // Sunyulás: a lap lefordítva marad, amíg nem támad, meg nem támadják, vagy nem éri ellenséges hatás
@@ -839,6 +839,7 @@ function botChoose(real) {
   let best = null, bestSc = scoreAfterCombat(s, me) + 0.05;
   p.hand.forEach((h, hi) => {
     if (!canPlay(s, me, hi)) return;
+    if (CARD[h.id].type === 'loc' && locIs(s, 'l_munkahely') && s.location.owner === me) return;   // a saját Munkahelyét nem cseréli le
     for (const t of targetsFor(s, me, h.id)) {
       const c = clone(s); c.events = [];
       playCard(c, me, hi, t);

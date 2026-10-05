@@ -339,6 +339,7 @@ Hősképesség-ötletek a táblázatban (még nem zöldek, nincsenek beépítve)
   - Adat: p.portraits = [portré-id], p.heroSkin[hős] = portré-id; definíció: PORTRAITS (ui.js), kép: art/p_*.webp.
 
 ## Meccs-előzmények és eredményablak (2026-10-04)
+- Javítás (2026-10-05): a bot nem cseréli le a saját Munkahelyét egy másik helyszínre (korábban megtette, mert a +5 gyógyulás miatt jobbnak ítélte). Az előzményekben külön sor jelzi, ha a Munkahely eltűnik: „Dávid Munkahelye eltűnt (új helyszín váltotta / kitiltották) – cserébe 5 életet gyógyul”.
 - Meccs közben a ⚑ melletti 📜 gomb megnyitja a „Mi történt?” ablakot: körönként (legújabb felül, az utolsó 12 kör) ki mit játszott ki és kire, ki támadott, sebzések, gyógyulások, halálok, idézések, bénulás, pajzs, lopás, Cápa, kitiltás stb. Az ellenfél rejtett lapja „egy rejtett lap”, amíg fel nem fordul. PvP-ben is működik (helyben gyűlik, nem kerül a szerverre).
 - Nyertél / Vesztettél: a meccs végén a ChatGPT-s táblakép jelenik meg (art/ui/result-win|lose.webp); a képen lévő „Folytatás” gomb a menübe visz, alatta az ok, a coin-, küldetés- és Season Pass-jutalom, és az „Új meccs” (PvP-ben „PvP”) gomb. Döntetlennél marad a régi szalag.
 
