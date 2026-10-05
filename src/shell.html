@@ -301,6 +301,25 @@ h1,h2,h3{font-family:var(--display);font-weight:400;letter-spacing:.01em;text-wr
 @media (prefers-reduced-motion: reduce){.shop-card .sc-holo{animation:none;}}
 .shop-card.owned .sc-price{color:#1f5c2a;}
 .shop-card:active{transform:scale(.98);}
+.wheel-box{max-width:360px;gap:10px;}
+.wheel-box h3{margin:0;font-family:var(--display);font-weight:400;font-size:26px;color:var(--gold);}
+.wh-wrap{position:relative;width:min(300px,78vw);aspect-ratio:1;margin:4px auto 0;}
+.wh-rot{position:absolute;inset:0;will-change:transform;}
+.wh-svg{width:100%;height:100%;display:block;filter:drop-shadow(0 8px 18px rgba(0,0,0,.6));}
+.wh-ptr{position:absolute;left:50%;top:-10px;z-index:3;width:0;height:0;transform:translateX(-50%);border-left:14px solid transparent;border-right:14px solid transparent;border-top:28px solid #ffd36b;filter:drop-shadow(0 2px 3px rgba(0,0,0,.7));}
+.wh-hub{position:absolute;left:50%;top:50%;z-index:2;width:30%;aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;border:3px solid #f5d27a;background:radial-gradient(circle at 35% 30%,#ffe9a8,#e0a52a 60%,#8a5a0a);color:#3a2300;font-weight:900;font-size:13px;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,.55);}
+.wh-hub:disabled{filter:grayscale(.6) brightness(.8);cursor:default;}
+.wh-hub:not(:disabled){animation:hubPulse 1.6s ease-in-out infinite;}
+@keyframes hubPulse{50%{transform:translate(-50%,-50%) scale(1.07);}}
+.wh-shards{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:4px;}
+.wh-shards i{width:14px;height:14px;transform:rotate(45deg) scale(.8);border-radius:3px;background:#23384a;border:1px solid #4d6b80;}
+.wh-shards i.on{background:linear-gradient(135deg,#f2fdff,#8fd8ff,#c9b6ff);box-shadow:0 0 6px #9fe3ff;}
+.wh-shards small{flex-basis:100%;text-align:center;font-weight:800;color:#cfe8ff;font-size:12px;}
+.wh-win{font-size:16px;color:#ffd36b;} .wh-win.big{font-size:18px;color:#bff3ff;text-shadow:0 0 10px #6fd3ff;}
+.wh-odds{width:100%;font-size:12px;color:var(--mute);text-align:left;}
+.wh-odds summary{cursor:pointer;font-weight:800;text-align:center;}
+.wh-odds div{display:flex;justify-content:space-between;padding:2px 6px;}
+@media (prefers-reduced-motion: reduce){.wh-hub{animation:none!important;}}
 .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%;}
 .wallet{display:flex;align-items:center;gap:8px;justify-content:flex-end;font-family:var(--display);font-size:26px;color:var(--gold);margin:6px 0 10px;}
 .wallet b{font-weight:400}.wallet small{font-family:var(--body);font-size:12px;font-weight:800;color:var(--mute);}
@@ -1571,6 +1590,19 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%;}
 @media (prefers-reduced-motion:reduce){.var-ribbon,.card.variant{animation:none!important;}}
 
 .var-ribbon b{font-weight:900;} .var-ribbon span{display:none;}
+/* 💎 Gyémánt lap: jeges-szivárványos keret, csillogó szikrák */
+.card.diamond{background:linear-gradient(135deg,#f2fdff,#9fe3ff,#ffffff,#cdb8ff,#8fd8ff,#ffffff,#e4fbff);background-size:300% 300%;animation:holo 3.2s linear infinite;box-shadow:0 0 16px rgba(170,235,255,.85),0 0 4px #fff;}
+.card.diamond::before{filter:hue-rotate(150deg) saturate(.55) brightness(1.45) contrast(1.05);}
+.unit.diamond::before{filter:hue-rotate(150deg) saturate(.55) brightness(1.45) contrast(1.05);}
+.unit.diamond{box-shadow:0 0 14px rgba(170,235,255,.9),0 0 3px #fff,0 5px 12px rgba(0,0,0,.45);}
+.dia-spark{position:absolute;inset:0;z-index:6;pointer-events:none;border-radius:inherit;mix-blend-mode:screen;
+  background-image:radial-gradient(circle at 18% 22%,#fff 0 1.2px,transparent 2.6px),radial-gradient(circle at 74% 14%,#fff 0 1px,transparent 2.4px),radial-gradient(circle at 86% 46%,#e8fbff 0 1.4px,transparent 3px),radial-gradient(circle at 30% 58%,#fff 0 .9px,transparent 2.2px),radial-gradient(circle at 62% 70%,#f3e8ff 0 1.2px,transparent 2.8px),radial-gradient(circle at 12% 84%,#fff 0 1px,transparent 2.4px),
+    linear-gradient(115deg,transparent 35%,rgba(255,255,255,.35) 45%,rgba(180,230,255,.25) 50%,transparent 60%);
+  background-size:100% 100%,100% 100%,100% 100%,100% 100%,100% 100%,100% 100%,260% 260%;animation:diaTw 2.4s ease-in-out infinite,diaSweep 3.6s linear infinite;}
+@keyframes diaTw{50%{opacity:.45}}
+@keyframes diaSweep{from{background-position:0 0,0 0,0 0,0 0,0 0,0 0,120% 0}to{background-position:0 0,0 0,0 0,0 0,0 0,0 0,-120% 0}}
+.var-ribbon.dia{background:linear-gradient(90deg,#d9f6ff,#ffffff,#cbb8ff,#a9e6ff);color:#123;box-shadow:0 0 10px rgba(170,235,255,.9);}
+@media (prefers-reduced-motion:reduce){.card.diamond,.dia-spark{animation:none!important;}}
 .card:not(.big) .var-ribbon{left:58%;font-size:.5em;top:-.45em;} .card:not(.big) .var-ribbon b{display:none;} .card:not(.big) .var-ribbon span{display:inline;}
 
 .card.foil .var-ribbon,.card.foil:not(.big) .var-ribbon{top:.5em;z-index:8;}
@@ -1693,6 +1725,7 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%;}
       <button class="m-tile orn m-friends" id="goFriends" hidden><span class="m-ic ic-img ic-friends" aria-hidden="true"></span><span class="m-txt"><b>Barátok</b><small>Kihívás és lapcsere</small></span><span class="q-badge" id="friendBadge" hidden></span><i class="chev" aria-hidden="true"></i></button>
       <button class="m-shop-img" id="goShop" aria-label="Bolt – boosterek, változatok, portrék"><img src="art/ui/shop-btn.webp" alt="" aria-hidden="true"><span class="badge" id="shopBadge" hidden>Ingyen pack!</span><i class="chev" aria-hidden="true"></i></button>
       <button class="m-tile orn m-pass" id="goPass"><span class="m-ic pass" aria-hidden="true">🏆</span><span class="m-txt"><b>Season Pass</b><small id="passSub">Ingyenes szezonjutalmak</small></span><span class="q-badge sp-badge" id="passBadge">0. szint</span><i class="chev" aria-hidden="true"></i></button>
+      <button class="m-tile orn m-wheel" id="goWheel"><span class="m-ic" aria-hidden="true">🎡</span><span class="m-txt"><b>Szerencsekerék</b><small>Naponta egy ingyen pörgetés · 💎 Gyémánt lap</small></span><span class="q-badge" id="wheelBadge" hidden>Pörgess!</span><i class="chev" aria-hidden="true"></i></button>
       <button class="m-tile orn m-quests" id="goQuests"><span class="m-ic quests" aria-hidden="true">📜</span><span class="m-txt"><b>Küldetések</b><small>3 napi + 1 heti feladat</small></span><span class="q-badge" id="questBadge">0/4</span><i class="chev" aria-hidden="true"></i></button>
       <div class="btn-row">
         <button class="m-tile orn" id="goDecks"><span class="m-ic decks" aria-hidden="true"><i></i><i></i><i></i></span><b>Paklik</b><i class="chev" aria-hidden="true"></i></button>

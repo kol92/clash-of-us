@@ -88,14 +88,14 @@ function cardHTML(id, o = {}) {
   const fk = frameKind(c, o);
   const tl = textHTML(c).replace(/<[^>]+>/g, '').length, tlc = tl > 150 ? ' tl-l tl-xl' : tl > 95 ? ' tl-l' : tl > 62 ? ' tl-m' : '';
   const fcls = fk === 'kanon' ? (o.foil ? ' framed xf xf-kanon xf-kanonfa kholo' : ' framed xf xf-kanon') + tlc : fk === 'foil' ? ' foil' : ' framed' + tlc;
-  return `<div class="card ${TYPE[c.type][1]}${c.finisher ? ' kanon' : ''}${c.variantOf ? ' variant' : ''}${o.big ? ' big' : ''}${fcls}${o.cls ? ' ' + o.cls : ''}" style="--h:${hueOf(id)}" ${o.big ? `data-rar="${c.rarity}"` : ''} ${o.attrs || ''}>
+  return `<div class="card ${TYPE[c.type][1]}${c.finisher ? ' kanon' : ''}${c.variantOf ? ' variant' : ''}${c.diamond ? ' diamond' : ''}${o.big ? ' big' : ''}${fcls}${o.cls ? ' ' + o.cls : ''}" style="--h:${hueOf(id)}" ${o.big ? `data-rar="${c.rarity}"` : ''} ${o.attrs || ''}>
     <div class="cframe">
       ${ART[id] ? `<div class="art has-art" style="${artStyle(id, o.big)}"></div>`
         : `<div class="art"><span class="mono">${initials(c.name)}</span>${o.big && !o.foil ? '<span class="artnote">Illusztráció helye</span>' : ''}</div>`}
       <div class="ctype">${c.finisher ? '<i class="ic-kanon" aria-hidden="true"></i>Kánon esemény' : TYPE[c.type][0]}${c.drink ? ' · Ital' : ''}<i class="rar r-${c.rarity}" title="${RAR[c.rarity]}"></i></div>
       ${c.finisher ? `<i class="kanon-hero" title="${HERO[c.hero].name}" style="--h:${HERO[c.hero].hue};${ART[c.hero] ? `background-image:url('${artSrc(c.hero, false)}');background-position:${ART[c.hero].av || '50% 15%'}` : ''}">${ART[c.hero] ? '' : initials(HERO[c.hero].name)}</i>` : ''}
       ${c.type !== 'char' && !o.big && !c.finisher ? `<div class="tribbon">${TYPE[c.type][0]}${c.drink ? '<i class="drk">Ital</i>' : ''}</div>` : ''}
-      <div class="name${c.name.length > 16 ? ' long' : ''}${longWord(c.name) > 11 ? ' xl' : ''}">${c.name}</div>${c.variantOf ? '<i class="var-ribbon"><b>✦ Ritka változat</b><span>✦ Változat</span></i>' : ''}
+      <div class="name${c.name.length > 16 ? ' long' : ''}${longWord(c.name) > 11 ? ' xl' : ''}">${c.name}</div>${c.diamond ? '<i class="var-ribbon dia"><b>💎 Gyémánt lap</b><span>💎 Gyémánt</span></i>' : c.variantOf ? '<i class="var-ribbon"><b>✦ Ritka változat</b><span>✦ Változat</span></i>' : ''}${c.diamond ? '<i class="dia-spark" aria-hidden="true"></i>' : ''}
       <div class="txt"><span>${textHTML(c)}</span></div>
     </div>
     ${o.big ? `<div class="ctype-below">${c.finisher ? '<i class="ic-kanon" aria-hidden="true"></i>Kánon esemény' : TYPE[c.type][0]}${c.drink ? ' · Ital' : ''}</div>` : ''}
@@ -169,6 +169,8 @@ const ART = {
   c_norbi:  { src:'art/norbi.webp', pos:'42% 18%' },
   a_kor: { src:'art/viz.webp', av:'50% 45%', pos:'50% 40%' },
   a_szulinap: { src:'art/szulinap.webp', av:'50% 40%', pos:'50% 42%' },
+  c_bou: { src:'art/bou.webp', av:'52% 42%', pos:'50% 40%' },
+  c_bou_d: { src:'art/bou_d.webp', av:'52% 42%', pos:'50% 40%' },
   c_davidsofor: { src:'art/davidsofor.webp', av:'35% 20%', pos:'35% 20%' },
   c_lacifinale: { src:'art/lacifinale.webp', av:'48% 16%', pos:'48% 16%' },
   i_ing: { src:'art/ing.webp', av:'50% 40%', pos:'50% 35%' },
@@ -837,7 +839,7 @@ function unitHTML(u, side, i) {
     + (u.hidden ? '<span class="stb hid" role="img" aria-label="Rejtve" title="Rejtve: az ellenfél nem látja"></span>' : '')
     + (c.taunt || u.taunt ? '<span class="stb taunt" role="img" aria-label="Provokál" title="Provokáció: mindenki őt támadja"></span>' : '');
   const fa = CARD[u.id].foilOnly || !!u.foil;
-  return `<button data-uid="${u.uid}" class="unit ${TYPE.char[1]}${fa ? ' fa' : ''}${u.shield ? ' shield' : ''}${sleeping ? ' sleep' : ''}" style="--h:${hueOf(u.id)}">
+  return `<button data-uid="${u.uid}" class="unit ${TYPE.char[1]}${fa ? ' fa' : ''}${CARD[u.id].diamond ? ' diamond' : ''}${u.shield ? ' shield' : ''}${sleeping ? ' sleep' : ''}" style="--h:${hueOf(u.id)}">
     <span class="uin">${ART[u.id] ? `<span class="art has-art" style="${artStyle(u.id)}"></span>` : `<span class="art"><span class="mono">${initials(c.name)}</span></span>`}<span class="uname${c.name.length > 14 ? ' long' : ''}${longWord(c.name) > 10 ? ' xl' : ''}">${c.name}</span></span>
     <span class="st atk${atk > c.atk ? ' up' : ''}">${atk}</span>
     <span class="st hp${u.hp < u.maxHp ? ' hurt' : u.maxHp > c.hp ? ' up' : ''}">${u.hp}</span>

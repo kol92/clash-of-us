@@ -27,6 +27,8 @@ const CARDS = [
   { id:'c_kriszrantott', type:'char', name:'Krisz, a rántott húsok ura', cost:6, atk:4, hp:5, rarity:'e', text:'Kijátszáskor a kezedbe ad egy Rántott hús lapot.' },
   { id:'c_lacifinale', type:'char', name:'Laci, La Grand Finale', cost:6, atk:5, hp:2, rarity:'l', muscle:true, deathGift:'i_ing', text:'Amikor meghal, a kezedbe kerül a Grand Finale ing.' },
   { id:'c_davidsofor', type:'char', name:'Dávid, a sofőr', cost:6, atk:2, hp:8, rarity:'r', sneak:true, taunt:true, text:'Amíg rejtve van, nem provokál – csak miután felfordult.' },
+  { id:'c_bou', type:'char', name:'Best of Us', cost:6, atk:3, hp:3, rarity:'l', text:'Kijátszáskor a többi saját karaktered +1/+1-et kap, ő maga pedig +1/+1-et mindegyikükért.' },
+  { id:'c_bou_d', type:'char', name:'Best of Us', cost:6, atk:3, hp:3, rarity:'l', variantOf:'c_bou', diamond:true, foilOnly:true, wheelOnly:true, text:'Kijátszáskor a többi saját karaktered +1/+1-et kap, ő maga pedig +1/+1-et mindegyikükért.' },
   { id:'c_alekosz', type:'char', name:'Alekosz Tibi', cost:5, maxCost:3, atk:2, hp:2, rarity:'e', text:'Kijátszáskor ellop egy véletlen, legfeljebb 3 költségű ellenséges karaktert, és maga mellé teszi (ha van mellette üres hely).' },
   { id:'c_norbi', type:'char', name:'Lukács Norbi', cost:3, atk:2, hp:3, rarity:'r', text:'Ha mellette áll egy másik karaktered, +2 támadást kap.' },
   { id:'c_udvarhelyi', type:'char', name:'Udvarhelyi Zoli', cost:6, atk:5, hp:5, rarity:'k', text:'' },
@@ -371,6 +373,11 @@ function playCard(s, pi, hi, t) {
       addToHand(s, pi, d);
     }
     if (bid(c.id) === 'c_sasimeselo') draw(s, pi);
+    if (bid(c.id) === 'c_bou') {   // Best of Us: együtt erősebbek
+      let n = 0;
+      p.board.forEach((x, j) => { if (x && j !== t.i && !isFixed(x)) { x.atk += 1; x.hp += 1; x.maxHp += 1; n++; ev(s, { t:'buff', side:pi, i:j, n:1 }); } });
+      if (n) { u.atk += n; u.hp += n; u.maxHp += n; ev(s, { t:'buff', side:pi, i:t.i, n }); }
+    }
     if (bid(c.id) === 'c_kriszrantott') { ev(s, { t:'gift', side:pi, i:t.i, id:'a_rantott' }); addToHand(s, pi, 'a_rantott'); }
     if (bid(c.id) === 'c_tomiparti') partyDrink(s, pi, t.i);
     if (bid(c.id) === 'c_alekosz') {   // véletlen ellenséges karaktert ellop, és maga mellé teszi (előbb jobbra, aztán balra, aztán bárhova)

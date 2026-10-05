@@ -305,6 +305,7 @@ function renderProfileBar() {
   const ss = $('#saveState'); if (ss) ss.textContent = window.APP_MODE ? '👤 Fiók' : Store.mode === 'cloud' ? '☁️ Felhőben mentve' : '📱 Ezen az eszközön mentve';
   el.querySelector('.pb-name').textContent = p.name;
   renderQuestBadge(); renderPassBadge();
+  const wb = $('#wheelBadge'); if (wb) wb.hidden = !wheelReady();
   const badge = $('#shopBadge'); if (badge) badge.hidden = !freePackReady() && !(p.giftPacks > 0) && !(p.faPacks > 0) && !(p.shinyPacks > 0);
 }
 
@@ -338,7 +339,7 @@ function openPackRoll(setId, forceFoil = false, shiny = false) {
   slots.sort((a, b) => order[a] - order[b]);
   const faSlot = forceFoil || shiny ? 2 : -1;   // garantált Full Art: a pack legjobb lapja lesz az
   // Shiny pack: a különleges hely 25% eséllyel változat-lap (pl. a zöld Rehab), különben Full Art
-  const allVars = CARDS.filter(v => v.variantOf && !v.passOnly && !v.shopOnly);
+  const allVars = CARDS.filter(v => v.variantOf && !v.passOnly && !v.shopOnly && !v.wheelOnly);
   const sr = Math.random();
   const varSlot = shiny && allVars.length && sr < ECON.shinyVariant ? 2 : -1;
   // Full Art hős: sima packban kis eséllyel a leggyengébb lap helyén, Shiny packban a különleges helyen
@@ -349,7 +350,7 @@ function openPackRoll(setId, forceFoil = false, shiny = false) {
     if (si === heroSlot) return rollHeroFa(p);
     const ids = pool.filter(id => CARD[id].rarity === rar);
     let id = ids[Math.floor(Math.random() * ids.length)];
-    const vars = CARDS.filter(v => v.variantOf === id && !v.passOnly && !v.shopOnly);
+    const vars = CARDS.filter(v => v.variantOf === id && !v.passOnly && !v.shopOnly && !v.wheelOnly);
     if (vars.length && Math.random() < VARIANT_CHANCE) id = vars[Math.floor(Math.random() * vars.length)].id;
     if (si === varSlot) id = allVars[Math.floor(Math.random() * allVars.length)].id;
     const foil = (si === faSlot && si !== varSlot) || Math.random() < ECON.foilChance;
@@ -377,6 +378,90 @@ async function buyPack(setId, free) {
   await save(); renderProfileBar(); renderShop();
   await packOpening(setId, cards, { shiny: shinyMode });
   if (conv.coins) toast(`Fölösleges hős-példány beváltva: +${conv.coins} coin`);
+}
+
+// ---- Szerencsekerék: naponta egy ingyen pörgetés; főnyeremény a 💎 Gyémánt Best of Us ----
+const DIAMOND_CARD = 'c_bou_d', SHARDS_NEED = 10, DIAMOND_DUPE = 300;
+const WHEEL = [   // [kulcs, felirat, súly %, szín]
+  { k: 'c10', t: '10', s: 'coin', w: 26, c: '#2b5d8a' },
+  { k: 'c25', t: '25', s: 'coin', w: 22, c: '#1f7a6b' },
+  { k: 'shard', t: '💎', s: 'szilánk', w: 12, c: '#6a4fb3' },
+  { k: 'c50', t: '50', s: 'coin', w: 14, c: '#2b5d8a' },
+  { k: 'pack', t: '🎁', s: 'pack', w: 11, c: '#a0661c' },
+  { k: 'c100', t: '100', s: 'coin', w: 8, c: '#1f7a6b' },
+  { k: 'shiny', t: '✨', s: 'Shiny', w: 4, c: '#8a2f8f' },
+  { k: 'again', t: '🔄', s: 'újra', w: 2, c: '#3f4a55' },
+  { k: 'diamond', t: '💎', s: 'GYÉMÁNT', w: 1, c: '#d8f3ff' },
+];
+const wheelReady = () => !!Store.p && (Store.p.wheel?.date !== today() || (Store.p.wheel?.extra || 0) > 0);
+const ownsDiamond = () => owned(DIAMOND_CARD) > 0;
+function wheelRoll() { let r = Math.random() * WHEEL.reduce((a, x) => a + x.w, 0); for (let i = 0; i < WHEEL.length; i++) { r -= WHEEL[i].w; if (r < 0) return i; } return 0; }
+function giveDiamond(p) { const e = p.coll[DIAMOND_CARD] || (p.coll[DIAMOND_CARD] = { n: 0, f: 0 }); e.f++; }
+function wheelApply(p, seg) {   // a nyeremény jóváírása; visszaadja a szöveget
+  const k = WHEEL[seg].k;
+  if (k[0] === 'c') { const n = +k.slice(1); p.coins += n; return { txt: `+${n} coin`, ic: 'coin' }; }
+  if (k === 'pack') { p.giftPacks = (p.giftPacks || 0) + 1; return { txt: '1 booster pack – a Boltban bonthatod ki', ic: 'pack' }; }
+  if (k === 'shiny') { p.shinyPacks = (p.shinyPacks || 0) + 1; return { txt: '1 Shiny pack – a Boltban bonthatod ki', ic: 'shiny' }; }
+  if (k === 'again') { p.wheel.extra = (p.wheel.extra || 0) + 1; return { txt: 'Még egy pörgetés!', ic: 'again' }; }
+  if (k === 'shard') {
+    p.wheel.shards = (p.wheel.shards || 0) + 1;
+    if (p.wheel.shards >= SHARDS_NEED) { p.wheel.shards -= SHARDS_NEED;
+      if (ownsDiamond()) { p.coins += DIAMOND_DUPE; return { txt: `${SHARDS_NEED} szilánk összegyűlt – a Gyémánt lapod már megvan, ezért +${DIAMOND_DUPE} coin`, ic: 'coin' }; }
+      giveDiamond(p); return { txt: `${SHARDS_NEED} szilánk összegyűlt: tiéd a 💎 Gyémánt Best of Us!`, ic: 'diamond', big: true }; }
+    return { txt: `+1 Gyémántszilánk (${p.wheel.shards}/${SHARDS_NEED})`, ic: 'shard' };
+  }
+  if (k === 'diamond') {
+    if (ownsDiamond()) { p.coins += DIAMOND_DUPE; return { txt: `FŐNYEREMÉNY! A Gyémánt lapod már megvan, ezért +${DIAMOND_DUPE} coin`, ic: 'coin', big: true }; }
+    giveDiamond(p); return { txt: 'FŐNYEREMÉNY! Tiéd a 💎 Gyémánt Best of Us!', ic: 'diamond', big: true };
+  }
+}
+function wheelSVG() {
+  const tot = WHEEL.reduce((a, x) => a + x.w, 0), R = 150, cx = 160, cy = 160;
+  // a cikkelyek egyenlő méretűek (a súly csak az esélyt adja, nem a méretet) – így minden nyeremény jól olvasható
+  const n = WHEEL.length, step = 360 / n; let out = '';
+  WHEEL.forEach((x, i) => {
+    const a0 = (i * step - 90 - step / 2) * Math.PI / 180, a1 = ((i + 1) * step - 90 - step / 2) * Math.PI / 180;
+    const p0 = [cx + R * Math.cos(a0), cy + R * Math.sin(a0)], p1 = [cx + R * Math.cos(a1), cy + R * Math.sin(a1)];
+    out += `<path d="M${cx},${cy} L${p0[0].toFixed(1)},${p0[1].toFixed(1)} A${R},${R} 0 0 1 ${p1[0].toFixed(1)},${p1[1].toFixed(1)} Z" fill="${x.c}" stroke="#f5d27a" stroke-width="2"/>`;
+    const am = i * step, dark = x.k === 'diamond';
+    out += `<g transform="rotate(${am} ${cx} ${cy})"><text x="${cx}" y="${cy - R * .66}" text-anchor="middle" font-size="${x.t.length > 2 ? 22 : 26}" font-weight="900" fill="${dark ? '#123' : '#fff'}" style="paint-order:stroke" stroke="${dark ? '#fff' : 'rgba(0,0,0,.45)'}" stroke-width="2">${x.t}</text><text x="${cx}" y="${cy - R * .66 + 20}" text-anchor="middle" font-size="12" font-weight="800" fill="${dark ? '#123' : '#ffe9b0'}">${x.s}</text></g>`;
+  });
+  return `<svg viewBox="0 0 320 320" class="wh-svg" aria-hidden="true"><circle cx="160" cy="160" r="156" fill="#0b1c2a" stroke="#f5d27a" stroke-width="6"/>${out}<circle cx="160" cy="160" r="30" fill="#14324a" stroke="#f5d27a" stroke-width="4"/></svg>`;
+}
+function openWheel() {
+  const p = Store.p; p.wheel = p.wheel || { date: '', shards: 0, extra: 0 };
+  const o = document.createElement('div'); o.className = 'overlay wheel-ov';
+  const ready = wheelReady();
+  o.innerHTML = `<div class="modal wheel-box">
+    <h3>🎡 Szerencsekerék</h3>
+    <p class="live">Naponta egy ingyen pörgetés. Főnyeremény: a <b>💎 Gyémánt Best of Us</b> – csak itt szerezhető meg!</p>
+    <div class="wh-wrap"><i class="wh-ptr" aria-hidden="true"></i><div class="wh-rot">${wheelSVG()}</div><button class="wh-hub" data-spin ${ready ? '' : 'disabled'} aria-label="Pörgetés">${ready ? 'PÖRGESS!' : '✓'}</button></div>
+    <div class="wh-shards" aria-label="Gyémántszilánkok: ${p.wheel.shards || 0} / ${SHARDS_NEED}">${Array.from({ length: SHARDS_NEED }, (_, i) => `<i class="${i < (p.wheel.shards || 0) ? 'on' : ''}"></i>`).join('')}<small>💎 ${p.wheel.shards || 0}/${SHARDS_NEED} szilánk → Gyémánt lap</small></div>
+    <p class="wh-msg live">${ready ? 'Koppints a közepére!' : 'Mára már pörgettél – holnap újra!'}</p>
+    <details class="wh-odds"><summary>Esélyek</summary>${WHEEL.map(x => `<div><span>${x.t} ${x.s}</span><b>${x.w}%</b></div>`).join('')}<small>Ha a Gyémánt lap már megvan, a főnyeremény és a 10 szilánk ${DIAMOND_DUPE} coint ér.</small></details>
+    <button class="btn" data-x>Bezárás</button></div>`;
+  $('#layer').appendChild(o);
+  let busy = false, rot = 0;
+  o.onclick = async e => {
+    if (busy) return;
+    if (e.target === o || e.target.closest('[data-x]')) { o.remove(); renderProfileBar(); return; }
+    if (!e.target.closest('[data-spin]') || !wheelReady()) return;
+    busy = true;
+    const W = p.wheel; if (W.date === today()) W.extra = Math.max(0, (W.extra || 0) - 1); else { W.date = today(); W.extra = 0; }
+    const seg = wheelRoll(), res = wheelApply(p, seg);
+    await save(); renderProfileBar();
+    const step = 360 / WHEEL.length, jitter = (Math.random() - .5) * step * .6;
+    const from = rot, want = ((360 - seg * step + jitter) % 360 + 360) % 360;
+    rot = from + 360 * 5 + ((want - (from % 360)) % 360 + 360) % 360;   // mindig előre, 5 teljes kör + a célcikkelyig
+    const el = o.querySelector('.wh-rot'), hub = o.querySelector('[data-spin]'); hub.disabled = true; hub.textContent = '…';
+    const red = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    await el.animate([{ transform: `rotate(${from}deg)` }, { transform: `rotate(${rot}deg)` }], { duration: red ? 600 : 4300, easing: 'cubic-bezier(.12,.75,.15,1)', fill: 'forwards' }).finished;
+    const msg = o.querySelector('.wh-msg'); msg.innerHTML = `<b class="wh-win${res.big ? ' big' : ''}">${res.txt}</b>`;
+    o.querySelector('.wh-shards').outerHTML = `<div class="wh-shards">${Array.from({ length: SHARDS_NEED }, (_, i) => `<i class="${i < (p.wheel.shards || 0) ? 'on' : ''}"></i>`).join('')}<small>💎 ${p.wheel.shards || 0}/${SHARDS_NEED} szilánk → Gyémánt lap</small></div>`;
+    if (res.ic === 'diamond') openModal(cardHTML(DIAMOND_CARD, { big: true }), '💎 GYÉMÁNT LAP! A Best of Us gyémánt változata a tiéd – a pakliépítőben az alaplap helyett beteheted.', '');
+    const again = wheelReady(); hub.disabled = !again; hub.textContent = again ? 'PÖRGESS!' : '✓';
+    busy = false;
+  };
 }
 
 // ---- bolt képernyő ----
@@ -1660,6 +1745,7 @@ $('#goPvp').onclick = () => { if (!Store.p) return showCreate(); pvpStart(); ren
 // ---- menü gombok ----
 $('#goShop').onclick = () => { if (!Store.p) return showCreate(); renderShop(); show('scr-shop'); };
 $('#goDecks').onclick = () => { if (!Store.p) return showCreate(); renderDecks(); show('scr-decks'); };
+$('#goWheel').onclick = () => { if (!Store.p) return showCreate(); openWheel(); };
 $('#goQuests').onclick = () => { if (!Store.p) return showCreate(); renderQuests(); show('scr-quests'); };
 
 bootProfile();

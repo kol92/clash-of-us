@@ -316,6 +316,25 @@ h1,h2,h3{font-family:var(--display);font-weight:400;letter-spacing:.01em;text-wr
 @media (prefers-reduced-motion: reduce){.shop-card .sc-holo{animation:none;}}
 .shop-card.owned .sc-price{color:#1f5c2a;}
 .shop-card:active{transform:scale(.98);}
+.wheel-box{max-width:360px;gap:10px;}
+.wheel-box h3{margin:0;font-family:var(--display);font-weight:400;font-size:26px;color:var(--gold);}
+.wh-wrap{position:relative;width:min(300px,78vw);aspect-ratio:1;margin:4px auto 0;}
+.wh-rot{position:absolute;inset:0;will-change:transform;}
+.wh-svg{width:100%;height:100%;display:block;filter:drop-shadow(0 8px 18px rgba(0,0,0,.6));}
+.wh-ptr{position:absolute;left:50%;top:-10px;z-index:3;width:0;height:0;transform:translateX(-50%);border-left:14px solid transparent;border-right:14px solid transparent;border-top:28px solid #ffd36b;filter:drop-shadow(0 2px 3px rgba(0,0,0,.7));}
+.wh-hub{position:absolute;left:50%;top:50%;z-index:2;width:30%;aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;border:3px solid #f5d27a;background:radial-gradient(circle at 35% 30%,#ffe9a8,#e0a52a 60%,#8a5a0a);color:#3a2300;font-weight:900;font-size:13px;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,.55);}
+.wh-hub:disabled{filter:grayscale(.6) brightness(.8);cursor:default;}
+.wh-hub:not(:disabled){animation:hubPulse 1.6s ease-in-out infinite;}
+@keyframes hubPulse{50%{transform:translate(-50%,-50%) scale(1.07);}}
+.wh-shards{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:4px;}
+.wh-shards i{width:14px;height:14px;transform:rotate(45deg) scale(.8);border-radius:3px;background:#23384a;border:1px solid #4d6b80;}
+.wh-shards i.on{background:linear-gradient(135deg,#f2fdff,#8fd8ff,#c9b6ff);box-shadow:0 0 6px #9fe3ff;}
+.wh-shards small{flex-basis:100%;text-align:center;font-weight:800;color:#cfe8ff;font-size:12px;}
+.wh-win{font-size:16px;color:#ffd36b;} .wh-win.big{font-size:18px;color:#bff3ff;text-shadow:0 0 10px #6fd3ff;}
+.wh-odds{width:100%;font-size:12px;color:var(--mute);text-align:left;}
+.wh-odds summary{cursor:pointer;font-weight:800;text-align:center;}
+.wh-odds div{display:flex;justify-content:space-between;padding:2px 6px;}
+@media (prefers-reduced-motion: reduce){.wh-hub{animation:none!important;}}
 .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%;}
 .wallet{display:flex;align-items:center;gap:8px;justify-content:flex-end;font-family:var(--display);font-size:26px;color:var(--gold);margin:6px 0 10px;}
 .wallet b{font-weight:400}.wallet small{font-family:var(--body);font-size:12px;font-weight:800;color:var(--mute);}
@@ -1586,6 +1605,19 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%;}
 @media (prefers-reduced-motion:reduce){.var-ribbon,.card.variant{animation:none!important;}}
 
 .var-ribbon b{font-weight:900;} .var-ribbon span{display:none;}
+/* 💎 Gyémánt lap: jeges-szivárványos keret, csillogó szikrák */
+.card.diamond{background:linear-gradient(135deg,#f2fdff,#9fe3ff,#ffffff,#cdb8ff,#8fd8ff,#ffffff,#e4fbff);background-size:300% 300%;animation:holo 3.2s linear infinite;box-shadow:0 0 16px rgba(170,235,255,.85),0 0 4px #fff;}
+.card.diamond::before{filter:hue-rotate(150deg) saturate(.55) brightness(1.45) contrast(1.05);}
+.unit.diamond::before{filter:hue-rotate(150deg) saturate(.55) brightness(1.45) contrast(1.05);}
+.unit.diamond{box-shadow:0 0 14px rgba(170,235,255,.9),0 0 3px #fff,0 5px 12px rgba(0,0,0,.45);}
+.dia-spark{position:absolute;inset:0;z-index:6;pointer-events:none;border-radius:inherit;mix-blend-mode:screen;
+  background-image:radial-gradient(circle at 18% 22%,#fff 0 1.2px,transparent 2.6px),radial-gradient(circle at 74% 14%,#fff 0 1px,transparent 2.4px),radial-gradient(circle at 86% 46%,#e8fbff 0 1.4px,transparent 3px),radial-gradient(circle at 30% 58%,#fff 0 .9px,transparent 2.2px),radial-gradient(circle at 62% 70%,#f3e8ff 0 1.2px,transparent 2.8px),radial-gradient(circle at 12% 84%,#fff 0 1px,transparent 2.4px),
+    linear-gradient(115deg,transparent 35%,rgba(255,255,255,.35) 45%,rgba(180,230,255,.25) 50%,transparent 60%);
+  background-size:100% 100%,100% 100%,100% 100%,100% 100%,100% 100%,100% 100%,260% 260%;animation:diaTw 2.4s ease-in-out infinite,diaSweep 3.6s linear infinite;}
+@keyframes diaTw{50%{opacity:.45}}
+@keyframes diaSweep{from{background-position:0 0,0 0,0 0,0 0,0 0,0 0,120% 0}to{background-position:0 0,0 0,0 0,0 0,0 0,0 0,-120% 0}}
+.var-ribbon.dia{background:linear-gradient(90deg,#d9f6ff,#ffffff,#cbb8ff,#a9e6ff);color:#123;box-shadow:0 0 10px rgba(170,235,255,.9);}
+@media (prefers-reduced-motion:reduce){.card.diamond,.dia-spark{animation:none!important;}}
 .card:not(.big) .var-ribbon{left:58%;font-size:.5em;top:-.45em;} .card:not(.big) .var-ribbon b{display:none;} .card:not(.big) .var-ribbon span{display:inline;}
 
 .card.foil .var-ribbon,.card.foil:not(.big) .var-ribbon{top:.5em;z-index:8;}
@@ -1711,6 +1743,7 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%;}
       <button class="m-tile orn m-friends" id="goFriends" hidden><span class="m-ic ic-img ic-friends" aria-hidden="true"></span><span class="m-txt"><b>Barátok</b><small>Kihívás és lapcsere</small></span><span class="q-badge" id="friendBadge" hidden></span><i class="chev" aria-hidden="true"></i></button>
       <button class="m-shop-img" id="goShop" aria-label="Bolt – boosterek, változatok, portrék"><img src="art/ui/shop-btn.webp?v=5703300c" alt="" aria-hidden="true"><span class="badge" id="shopBadge" hidden>Ingyen pack!</span><i class="chev" aria-hidden="true"></i></button>
       <button class="m-tile orn m-pass" id="goPass"><span class="m-ic pass" aria-hidden="true">🏆</span><span class="m-txt"><b>Season Pass</b><small id="passSub">Ingyenes szezonjutalmak</small></span><span class="q-badge sp-badge" id="passBadge">0. szint</span><i class="chev" aria-hidden="true"></i></button>
+      <button class="m-tile orn m-wheel" id="goWheel"><span class="m-ic" aria-hidden="true">🎡</span><span class="m-txt"><b>Szerencsekerék</b><small>Naponta egy ingyen pörgetés · 💎 Gyémánt lap</small></span><span class="q-badge" id="wheelBadge" hidden>Pörgess!</span><i class="chev" aria-hidden="true"></i></button>
       <button class="m-tile orn m-quests" id="goQuests"><span class="m-ic quests" aria-hidden="true">📜</span><span class="m-txt"><b>Küldetések</b><small>3 napi + 1 heti feladat</small></span><span class="q-badge" id="questBadge">0/4</span><i class="chev" aria-hidden="true"></i></button>
       <div class="btn-row">
         <button class="m-tile orn" id="goDecks"><span class="m-ic decks" aria-hidden="true"><i></i><i></i><i></i></span><b>Paklik</b><i class="chev" aria-hidden="true"></i></button>
@@ -1854,7 +1887,7 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%;}
 <script src="vendor/firebase-auth-compat.js"></script>
 <script src="vendor/firebase-firestore-compat.js"></script>
 <script src="vendor/firebase-database-compat.js"></script>
-<script>window.APP_VERSION = "2026.10.05-2211";</script>
+<script>window.APP_VERSION = "2026.10.05-2313";</script>
 <script>// ===== Best of Us – saját szerver (Firebase) =====
 // A játék eredetileg a Claude-os tárolót használta (window.claude.use('db' | 'user' | 'room')).
 // Ez a fájl ugyanazt a felületet adja Firebase-ből, így a játék kódja szinte változatlan maradhat:
@@ -2127,6 +2160,8 @@ const CARDS = [
   { id:'c_kriszrantott', type:'char', name:'Krisz, a rántott húsok ura', cost:6, atk:4, hp:5, rarity:'e', text:'Kijátszáskor a kezedbe ad egy Rántott hús lapot.' },
   { id:'c_lacifinale', type:'char', name:'Laci, La Grand Finale', cost:6, atk:5, hp:2, rarity:'l', muscle:true, deathGift:'i_ing', text:'Amikor meghal, a kezedbe kerül a Grand Finale ing.' },
   { id:'c_davidsofor', type:'char', name:'Dávid, a sofőr', cost:6, atk:2, hp:8, rarity:'r', sneak:true, taunt:true, text:'Amíg rejtve van, nem provokál – csak miután felfordult.' },
+  { id:'c_bou', type:'char', name:'Best of Us', cost:6, atk:3, hp:3, rarity:'l', text:'Kijátszáskor a többi saját karaktered +1/+1-et kap, ő maga pedig +1/+1-et mindegyikükért.' },
+  { id:'c_bou_d', type:'char', name:'Best of Us', cost:6, atk:3, hp:3, rarity:'l', variantOf:'c_bou', diamond:true, foilOnly:true, wheelOnly:true, text:'Kijátszáskor a többi saját karaktered +1/+1-et kap, ő maga pedig +1/+1-et mindegyikükért.' },
   { id:'c_alekosz', type:'char', name:'Alekosz Tibi', cost:5, maxCost:3, atk:2, hp:2, rarity:'e', text:'Kijátszáskor ellop egy véletlen, legfeljebb 3 költségű ellenséges karaktert, és maga mellé teszi (ha van mellette üres hely).' },
   { id:'c_norbi', type:'char', name:'Lukács Norbi', cost:3, atk:2, hp:3, rarity:'r', text:'Ha mellette áll egy másik karaktered, +2 támadást kap.' },
   { id:'c_udvarhelyi', type:'char', name:'Udvarhelyi Zoli', cost:6, atk:5, hp:5, rarity:'k', text:'' },
@@ -2471,6 +2506,11 @@ function playCard(s, pi, hi, t) {
       addToHand(s, pi, d);
     }
     if (bid(c.id) === 'c_sasimeselo') draw(s, pi);
+    if (bid(c.id) === 'c_bou') {   // Best of Us: együtt erősebbek
+      let n = 0;
+      p.board.forEach((x, j) => { if (x && j !== t.i && !isFixed(x)) { x.atk += 1; x.hp += 1; x.maxHp += 1; n++; ev(s, { t:'buff', side:pi, i:j, n:1 }); } });
+      if (n) { u.atk += n; u.hp += n; u.maxHp += n; ev(s, { t:'buff', side:pi, i:t.i, n }); }
+    }
     if (bid(c.id) === 'c_kriszrantott') { ev(s, { t:'gift', side:pi, i:t.i, id:'a_rantott' }); addToHand(s, pi, 'a_rantott'); }
     if (bid(c.id) === 'c_tomiparti') partyDrink(s, pi, t.i);
     if (bid(c.id) === 'c_alekosz') {   // véletlen ellenséges karaktert ellop, és maga mellé teszi (előbb jobbra, aztán balra, aztán bárhova)
@@ -3040,14 +3080,14 @@ function cardHTML(id, o = {}) {
   const fk = frameKind(c, o);
   const tl = textHTML(c).replace(/<[^>]+>/g, '').length, tlc = tl > 150 ? ' tl-l tl-xl' : tl > 95 ? ' tl-l' : tl > 62 ? ' tl-m' : '';
   const fcls = fk === 'kanon' ? (o.foil ? ' framed xf xf-kanon xf-kanonfa kholo' : ' framed xf xf-kanon') + tlc : fk === 'foil' ? ' foil' : ' framed' + tlc;
-  return `<div class="card ${TYPE[c.type][1]}${c.finisher ? ' kanon' : ''}${c.variantOf ? ' variant' : ''}${o.big ? ' big' : ''}${fcls}${o.cls ? ' ' + o.cls : ''}" style="--h:${hueOf(id)}" ${o.big ? `data-rar="${c.rarity}"` : ''} ${o.attrs || ''}>
+  return `<div class="card ${TYPE[c.type][1]}${c.finisher ? ' kanon' : ''}${c.variantOf ? ' variant' : ''}${c.diamond ? ' diamond' : ''}${o.big ? ' big' : ''}${fcls}${o.cls ? ' ' + o.cls : ''}" style="--h:${hueOf(id)}" ${o.big ? `data-rar="${c.rarity}"` : ''} ${o.attrs || ''}>
     <div class="cframe">
       ${ART[id] ? `<div class="art has-art" style="${artStyle(id, o.big)}"></div>`
         : `<div class="art"><span class="mono">${initials(c.name)}</span>${o.big && !o.foil ? '<span class="artnote">Illusztráció helye</span>' : ''}</div>`}
       <div class="ctype">${c.finisher ? '<i class="ic-kanon" aria-hidden="true"></i>Kánon esemény' : TYPE[c.type][0]}${c.drink ? ' · Ital' : ''}<i class="rar r-${c.rarity}" title="${RAR[c.rarity]}"></i></div>
       ${c.finisher ? `<i class="kanon-hero" title="${HERO[c.hero].name}" style="--h:${HERO[c.hero].hue};${ART[c.hero] ? `background-image:url('${artSrc(c.hero, false)}');background-position:${ART[c.hero].av || '50% 15%'}` : ''}">${ART[c.hero] ? '' : initials(HERO[c.hero].name)}</i>` : ''}
       ${c.type !== 'char' && !o.big && !c.finisher ? `<div class="tribbon">${TYPE[c.type][0]}${c.drink ? '<i class="drk">Ital</i>' : ''}</div>` : ''}
-      <div class="name${c.name.length > 16 ? ' long' : ''}${longWord(c.name) > 11 ? ' xl' : ''}">${c.name}</div>${c.variantOf ? '<i class="var-ribbon"><b>✦ Ritka változat</b><span>✦ Változat</span></i>' : ''}
+      <div class="name${c.name.length > 16 ? ' long' : ''}${longWord(c.name) > 11 ? ' xl' : ''}">${c.name}</div>${c.diamond ? '<i class="var-ribbon dia"><b>💎 Gyémánt lap</b><span>💎 Gyémánt</span></i>' : c.variantOf ? '<i class="var-ribbon"><b>✦ Ritka változat</b><span>✦ Változat</span></i>' : ''}${c.diamond ? '<i class="dia-spark" aria-hidden="true"></i>' : ''}
       <div class="txt"><span>${textHTML(c)}</span></div>
     </div>
     ${o.big ? `<div class="ctype-below">${c.finisher ? '<i class="ic-kanon" aria-hidden="true"></i>Kánon esemény' : TYPE[c.type][0]}${c.drink ? ' · Ital' : ''}</div>` : ''}
@@ -3121,6 +3161,8 @@ const ART = {
   c_norbi:  { src:'art/norbi.webp?v=740db1e1acf15673', pos:'42% 18%' },
   a_kor: { src:'art/viz.webp?v=a17ce0b241a73985', av:'50% 45%', pos:'50% 40%' },
   a_szulinap: { src:'art/szulinap.webp?v=63830bc272447d6b', av:'50% 40%', pos:'50% 42%' },
+  c_bou: { src:'art/bou.webp?v=0d88173a1f2ebc00', av:'52% 42%', pos:'50% 40%' },
+  c_bou_d: { src:'art/bou_d.webp?v=f9b5aa7cf5da8331', av:'52% 42%', pos:'50% 40%' },
   c_davidsofor: { src:'art/davidsofor.webp?v=02dc86dba9551b19', av:'35% 20%', pos:'35% 20%' },
   c_lacifinale: { src:'art/lacifinale.webp?v=e418a56b8cf48724', av:'48% 16%', pos:'48% 16%' },
   i_ing: { src:'art/ing.webp?v=102023358e87523a', av:'50% 40%', pos:'50% 35%' },
@@ -3789,7 +3831,7 @@ function unitHTML(u, side, i) {
     + (u.hidden ? '<span class="stb hid" role="img" aria-label="Rejtve" title="Rejtve: az ellenfél nem látja"></span>' : '')
     + (c.taunt || u.taunt ? '<span class="stb taunt" role="img" aria-label="Provokál" title="Provokáció: mindenki őt támadja"></span>' : '');
   const fa = CARD[u.id].foilOnly || !!u.foil;
-  return `<button data-uid="${u.uid}" class="unit ${TYPE.char[1]}${fa ? ' fa' : ''}${u.shield ? ' shield' : ''}${sleeping ? ' sleep' : ''}" style="--h:${hueOf(u.id)}">
+  return `<button data-uid="${u.uid}" class="unit ${TYPE.char[1]}${fa ? ' fa' : ''}${CARD[u.id].diamond ? ' diamond' : ''}${u.shield ? ' shield' : ''}${sleeping ? ' sleep' : ''}" style="--h:${hueOf(u.id)}">
     <span class="uin">${ART[u.id] ? `<span class="art has-art" style="${artStyle(u.id)}"></span>` : `<span class="art"><span class="mono">${initials(c.name)}</span></span>`}<span class="uname${c.name.length > 14 ? ' long' : ''}${longWord(c.name) > 10 ? ' xl' : ''}">${c.name}</span></span>
     <span class="st atk${atk > c.atk ? ' up' : ''}">${atk}</span>
     <span class="st hp${u.hp < u.maxHp ? ' hurt' : u.maxHp > c.hp ? ' up' : ''}">${u.hp}</span>
@@ -4683,6 +4725,7 @@ function renderProfileBar() {
   const ss = $('#saveState'); if (ss) ss.textContent = window.APP_MODE ? '👤 Fiók' : Store.mode === 'cloud' ? '☁️ Felhőben mentve' : '📱 Ezen az eszközön mentve';
   el.querySelector('.pb-name').textContent = p.name;
   renderQuestBadge(); renderPassBadge();
+  const wb = $('#wheelBadge'); if (wb) wb.hidden = !wheelReady();
   const badge = $('#shopBadge'); if (badge) badge.hidden = !freePackReady() && !(p.giftPacks > 0) && !(p.faPacks > 0) && !(p.shinyPacks > 0);
 }
 
@@ -4716,7 +4759,7 @@ function openPackRoll(setId, forceFoil = false, shiny = false) {
   slots.sort((a, b) => order[a] - order[b]);
   const faSlot = forceFoil || shiny ? 2 : -1;   // garantált Full Art: a pack legjobb lapja lesz az
   // Shiny pack: a különleges hely 25% eséllyel változat-lap (pl. a zöld Rehab), különben Full Art
-  const allVars = CARDS.filter(v => v.variantOf && !v.passOnly && !v.shopOnly);
+  const allVars = CARDS.filter(v => v.variantOf && !v.passOnly && !v.shopOnly && !v.wheelOnly);
   const sr = Math.random();
   const varSlot = shiny && allVars.length && sr < ECON.shinyVariant ? 2 : -1;
   // Full Art hős: sima packban kis eséllyel a leggyengébb lap helyén, Shiny packban a különleges helyen
@@ -4727,7 +4770,7 @@ function openPackRoll(setId, forceFoil = false, shiny = false) {
     if (si === heroSlot) return rollHeroFa(p);
     const ids = pool.filter(id => CARD[id].rarity === rar);
     let id = ids[Math.floor(Math.random() * ids.length)];
-    const vars = CARDS.filter(v => v.variantOf === id && !v.passOnly && !v.shopOnly);
+    const vars = CARDS.filter(v => v.variantOf === id && !v.passOnly && !v.shopOnly && !v.wheelOnly);
     if (vars.length && Math.random() < VARIANT_CHANCE) id = vars[Math.floor(Math.random() * vars.length)].id;
     if (si === varSlot) id = allVars[Math.floor(Math.random() * allVars.length)].id;
     const foil = (si === faSlot && si !== varSlot) || Math.random() < ECON.foilChance;
@@ -4755,6 +4798,90 @@ async function buyPack(setId, free) {
   await save(); renderProfileBar(); renderShop();
   await packOpening(setId, cards, { shiny: shinyMode });
   if (conv.coins) toast(`Fölösleges hős-példány beváltva: +${conv.coins} coin`);
+}
+
+// ---- Szerencsekerék: naponta egy ingyen pörgetés; főnyeremény a 💎 Gyémánt Best of Us ----
+const DIAMOND_CARD = 'c_bou_d', SHARDS_NEED = 10, DIAMOND_DUPE = 300;
+const WHEEL = [   // [kulcs, felirat, súly %, szín]
+  { k: 'c10', t: '10', s: 'coin', w: 26, c: '#2b5d8a' },
+  { k: 'c25', t: '25', s: 'coin', w: 22, c: '#1f7a6b' },
+  { k: 'shard', t: '💎', s: 'szilánk', w: 12, c: '#6a4fb3' },
+  { k: 'c50', t: '50', s: 'coin', w: 14, c: '#2b5d8a' },
+  { k: 'pack', t: '🎁', s: 'pack', w: 11, c: '#a0661c' },
+  { k: 'c100', t: '100', s: 'coin', w: 8, c: '#1f7a6b' },
+  { k: 'shiny', t: '✨', s: 'Shiny', w: 4, c: '#8a2f8f' },
+  { k: 'again', t: '🔄', s: 'újra', w: 2, c: '#3f4a55' },
+  { k: 'diamond', t: '💎', s: 'GYÉMÁNT', w: 1, c: '#d8f3ff' },
+];
+const wheelReady = () => !!Store.p && (Store.p.wheel?.date !== today() || (Store.p.wheel?.extra || 0) > 0);
+const ownsDiamond = () => owned(DIAMOND_CARD) > 0;
+function wheelRoll() { let r = Math.random() * WHEEL.reduce((a, x) => a + x.w, 0); for (let i = 0; i < WHEEL.length; i++) { r -= WHEEL[i].w; if (r < 0) return i; } return 0; }
+function giveDiamond(p) { const e = p.coll[DIAMOND_CARD] || (p.coll[DIAMOND_CARD] = { n: 0, f: 0 }); e.f++; }
+function wheelApply(p, seg) {   // a nyeremény jóváírása; visszaadja a szöveget
+  const k = WHEEL[seg].k;
+  if (k[0] === 'c') { const n = +k.slice(1); p.coins += n; return { txt: `+${n} coin`, ic: 'coin' }; }
+  if (k === 'pack') { p.giftPacks = (p.giftPacks || 0) + 1; return { txt: '1 booster pack – a Boltban bonthatod ki', ic: 'pack' }; }
+  if (k === 'shiny') { p.shinyPacks = (p.shinyPacks || 0) + 1; return { txt: '1 Shiny pack – a Boltban bonthatod ki', ic: 'shiny' }; }
+  if (k === 'again') { p.wheel.extra = (p.wheel.extra || 0) + 1; return { txt: 'Még egy pörgetés!', ic: 'again' }; }
+  if (k === 'shard') {
+    p.wheel.shards = (p.wheel.shards || 0) + 1;
+    if (p.wheel.shards >= SHARDS_NEED) { p.wheel.shards -= SHARDS_NEED;
+      if (ownsDiamond()) { p.coins += DIAMOND_DUPE; return { txt: `${SHARDS_NEED} szilánk összegyűlt – a Gyémánt lapod már megvan, ezért +${DIAMOND_DUPE} coin`, ic: 'coin' }; }
+      giveDiamond(p); return { txt: `${SHARDS_NEED} szilánk összegyűlt: tiéd a 💎 Gyémánt Best of Us!`, ic: 'diamond', big: true }; }
+    return { txt: `+1 Gyémántszilánk (${p.wheel.shards}/${SHARDS_NEED})`, ic: 'shard' };
+  }
+  if (k === 'diamond') {
+    if (ownsDiamond()) { p.coins += DIAMOND_DUPE; return { txt: `FŐNYEREMÉNY! A Gyémánt lapod már megvan, ezért +${DIAMOND_DUPE} coin`, ic: 'coin', big: true }; }
+    giveDiamond(p); return { txt: 'FŐNYEREMÉNY! Tiéd a 💎 Gyémánt Best of Us!', ic: 'diamond', big: true };
+  }
+}
+function wheelSVG() {
+  const tot = WHEEL.reduce((a, x) => a + x.w, 0), R = 150, cx = 160, cy = 160;
+  // a cikkelyek egyenlő méretűek (a súly csak az esélyt adja, nem a méretet) – így minden nyeremény jól olvasható
+  const n = WHEEL.length, step = 360 / n; let out = '';
+  WHEEL.forEach((x, i) => {
+    const a0 = (i * step - 90 - step / 2) * Math.PI / 180, a1 = ((i + 1) * step - 90 - step / 2) * Math.PI / 180;
+    const p0 = [cx + R * Math.cos(a0), cy + R * Math.sin(a0)], p1 = [cx + R * Math.cos(a1), cy + R * Math.sin(a1)];
+    out += `<path d="M${cx},${cy} L${p0[0].toFixed(1)},${p0[1].toFixed(1)} A${R},${R} 0 0 1 ${p1[0].toFixed(1)},${p1[1].toFixed(1)} Z" fill="${x.c}" stroke="#f5d27a" stroke-width="2"/>`;
+    const am = i * step, dark = x.k === 'diamond';
+    out += `<g transform="rotate(${am} ${cx} ${cy})"><text x="${cx}" y="${cy - R * .66}" text-anchor="middle" font-size="${x.t.length > 2 ? 22 : 26}" font-weight="900" fill="${dark ? '#123' : '#fff'}" style="paint-order:stroke" stroke="${dark ? '#fff' : 'rgba(0,0,0,.45)'}" stroke-width="2">${x.t}</text><text x="${cx}" y="${cy - R * .66 + 20}" text-anchor="middle" font-size="12" font-weight="800" fill="${dark ? '#123' : '#ffe9b0'}">${x.s}</text></g>`;
+  });
+  return `<svg viewBox="0 0 320 320" class="wh-svg" aria-hidden="true"><circle cx="160" cy="160" r="156" fill="#0b1c2a" stroke="#f5d27a" stroke-width="6"/>${out}<circle cx="160" cy="160" r="30" fill="#14324a" stroke="#f5d27a" stroke-width="4"/></svg>`;
+}
+function openWheel() {
+  const p = Store.p; p.wheel = p.wheel || { date: '', shards: 0, extra: 0 };
+  const o = document.createElement('div'); o.className = 'overlay wheel-ov';
+  const ready = wheelReady();
+  o.innerHTML = `<div class="modal wheel-box">
+    <h3>🎡 Szerencsekerék</h3>
+    <p class="live">Naponta egy ingyen pörgetés. Főnyeremény: a <b>💎 Gyémánt Best of Us</b> – csak itt szerezhető meg!</p>
+    <div class="wh-wrap"><i class="wh-ptr" aria-hidden="true"></i><div class="wh-rot">${wheelSVG()}</div><button class="wh-hub" data-spin ${ready ? '' : 'disabled'} aria-label="Pörgetés">${ready ? 'PÖRGESS!' : '✓'}</button></div>
+    <div class="wh-shards" aria-label="Gyémántszilánkok: ${p.wheel.shards || 0} / ${SHARDS_NEED}">${Array.from({ length: SHARDS_NEED }, (_, i) => `<i class="${i < (p.wheel.shards || 0) ? 'on' : ''}"></i>`).join('')}<small>💎 ${p.wheel.shards || 0}/${SHARDS_NEED} szilánk → Gyémánt lap</small></div>
+    <p class="wh-msg live">${ready ? 'Koppints a közepére!' : 'Mára már pörgettél – holnap újra!'}</p>
+    <details class="wh-odds"><summary>Esélyek</summary>${WHEEL.map(x => `<div><span>${x.t} ${x.s}</span><b>${x.w}%</b></div>`).join('')}<small>Ha a Gyémánt lap már megvan, a főnyeremény és a 10 szilánk ${DIAMOND_DUPE} coint ér.</small></details>
+    <button class="btn" data-x>Bezárás</button></div>`;
+  $('#layer').appendChild(o);
+  let busy = false, rot = 0;
+  o.onclick = async e => {
+    if (busy) return;
+    if (e.target === o || e.target.closest('[data-x]')) { o.remove(); renderProfileBar(); return; }
+    if (!e.target.closest('[data-spin]') || !wheelReady()) return;
+    busy = true;
+    const W = p.wheel; if (W.date === today()) W.extra = Math.max(0, (W.extra || 0) - 1); else { W.date = today(); W.extra = 0; }
+    const seg = wheelRoll(), res = wheelApply(p, seg);
+    await save(); renderProfileBar();
+    const step = 360 / WHEEL.length, jitter = (Math.random() - .5) * step * .6;
+    const from = rot, want = ((360 - seg * step + jitter) % 360 + 360) % 360;
+    rot = from + 360 * 5 + ((want - (from % 360)) % 360 + 360) % 360;   // mindig előre, 5 teljes kör + a célcikkelyig
+    const el = o.querySelector('.wh-rot'), hub = o.querySelector('[data-spin]'); hub.disabled = true; hub.textContent = '…';
+    const red = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    await el.animate([{ transform: `rotate(${from}deg)` }, { transform: `rotate(${rot}deg)` }], { duration: red ? 600 : 4300, easing: 'cubic-bezier(.12,.75,.15,1)', fill: 'forwards' }).finished;
+    const msg = o.querySelector('.wh-msg'); msg.innerHTML = `<b class="wh-win${res.big ? ' big' : ''}">${res.txt}</b>`;
+    o.querySelector('.wh-shards').outerHTML = `<div class="wh-shards">${Array.from({ length: SHARDS_NEED }, (_, i) => `<i class="${i < (p.wheel.shards || 0) ? 'on' : ''}"></i>`).join('')}<small>💎 ${p.wheel.shards || 0}/${SHARDS_NEED} szilánk → Gyémánt lap</small></div>`;
+    if (res.ic === 'diamond') openModal(cardHTML(DIAMOND_CARD, { big: true }), '💎 GYÉMÁNT LAP! A Best of Us gyémánt változata a tiéd – a pakliépítőben az alaplap helyett beteheted.', '');
+    const again = wheelReady(); hub.disabled = !again; hub.textContent = again ? 'PÖRGESS!' : '✓';
+    busy = false;
+  };
 }
 
 // ---- bolt képernyő ----
@@ -6038,6 +6165,7 @@ $('#goPvp').onclick = () => { if (!Store.p) return showCreate(); pvpStart(); ren
 // ---- menü gombok ----
 $('#goShop').onclick = () => { if (!Store.p) return showCreate(); renderShop(); show('scr-shop'); };
 $('#goDecks').onclick = () => { if (!Store.p) return showCreate(); renderDecks(); show('scr-decks'); };
+$('#goWheel').onclick = () => { if (!Store.p) return showCreate(); openWheel(); };
 $('#goQuests').onclick = () => { if (!Store.p) return showCreate(); renderQuests(); show('scr-quests'); };
 
 bootProfile();
