@@ -415,19 +415,6 @@ function wheelApply(p, seg) {   // a nyeremény jóváírása; visszaadja a szö
     giveDiamond(p); return { txt: 'FŐNYEREMÉNY! Tiéd a 💎 Gyémánt Best of Us!', ic: 'diamond', big: true };
   }
 }
-function wheelSVG() {
-  const tot = WHEEL.reduce((a, x) => a + x.w, 0), R = 150, cx = 160, cy = 160;
-  // a cikkelyek egyenlő méretűek (a súly csak az esélyt adja, nem a méretet) – így minden nyeremény jól olvasható
-  const n = WHEEL.length, step = 360 / n; let out = '';
-  WHEEL.forEach((x, i) => {
-    const a0 = (i * step - 90 - step / 2) * Math.PI / 180, a1 = ((i + 1) * step - 90 - step / 2) * Math.PI / 180;
-    const p0 = [cx + R * Math.cos(a0), cy + R * Math.sin(a0)], p1 = [cx + R * Math.cos(a1), cy + R * Math.sin(a1)];
-    out += `<path d="M${cx},${cy} L${p0[0].toFixed(1)},${p0[1].toFixed(1)} A${R},${R} 0 0 1 ${p1[0].toFixed(1)},${p1[1].toFixed(1)} Z" fill="${x.c}" stroke="#f5d27a" stroke-width="2"/>`;
-    const am = i * step, dark = x.k === 'diamond';
-    out += `<g transform="rotate(${am} ${cx} ${cy})"><text x="${cx}" y="${cy - R * .66}" text-anchor="middle" font-size="${x.t.length > 2 ? 22 : 26}" font-weight="900" fill="${dark ? '#123' : '#fff'}" style="paint-order:stroke" stroke="${dark ? '#fff' : 'rgba(0,0,0,.45)'}" stroke-width="2">${x.t}</text><text x="${cx}" y="${cy - R * .66 + 20}" text-anchor="middle" font-size="12" font-weight="800" fill="${dark ? '#123' : '#ffe9b0'}">${x.s}</text></g>`;
-  });
-  return `<svg viewBox="0 0 320 320" class="wh-svg" aria-hidden="true"><circle cx="160" cy="160" r="156" fill="#0b1c2a" stroke="#f5d27a" stroke-width="6"/>${out}<circle cx="160" cy="160" r="30" fill="#14324a" stroke="#f5d27a" stroke-width="4"/></svg>`;
-}
 function openWheel() {
   const p = Store.p; p.wheel = p.wheel || { date: '', shards: 0, extra: 0 };
   const o = document.createElement('div'); o.className = 'overlay wheel-ov';
@@ -435,7 +422,7 @@ function openWheel() {
   o.innerHTML = `<div class="modal wheel-box">
     <h3>🎡 Szerencsekerék</h3>
     <p class="live">Naponta egy ingyen pörgetés. Főnyeremény: a <b>💎 Gyémánt Best of Us</b> – csak itt szerezhető meg!</p>
-    <div class="wh-wrap"><i class="wh-ptr" aria-hidden="true"></i><div class="wh-rot">${wheelSVG()}</div><button class="wh-hub" data-spin ${ready ? '' : 'disabled'} aria-label="Pörgetés">${ready ? 'PÖRGESS!' : '✓'}</button></div>
+    <div class="wh-wrap"><div class="wh-rot"><img src="art/ui/wheel-disc.webp" alt="" draggable="false"></div><img class="wh-ptr" src="art/ui/wheel-ptr.webp" alt="" aria-hidden="true"><button class="wh-hub" data-spin ${ready ? '' : 'disabled'} aria-label="Pörgetés"></button></div>
     <div class="wh-shards" aria-label="Gyémántszilánkok: ${p.wheel.shards || 0} / ${SHARDS_NEED}">${Array.from({ length: SHARDS_NEED }, (_, i) => `<i class="${i < (p.wheel.shards || 0) ? 'on' : ''}"></i>`).join('')}<small>💎 ${p.wheel.shards || 0}/${SHARDS_NEED} szilánk → Gyémánt lap</small></div>
     <p class="wh-msg live">${ready ? 'Koppints a közepére!' : 'Mára már pörgettél – holnap újra!'}</p>
     <details class="wh-odds"><summary>Esélyek</summary>${WHEEL.map(x => `<div><span>${x.t} ${x.s}</span><b>${x.w}%</b></div>`).join('')}<small>Ha a Gyémánt lap már megvan, a főnyeremény és a 10 szilánk ${DIAMOND_DUPE} coint ér.</small></details>
@@ -450,16 +437,16 @@ function openWheel() {
     const W = p.wheel; if (W.date === today()) W.extra = Math.max(0, (W.extra || 0) - 1); else { W.date = today(); W.extra = 0; }
     const seg = wheelRoll(), res = wheelApply(p, seg);
     await save(); renderProfileBar();
-    const step = 360 / WHEEL.length, jitter = (Math.random() - .5) * step * .6;
+    const step = 360 / WHEEL.length, jitter = (Math.random() - .5) * step * .5;
     const from = rot, want = ((360 - seg * step + jitter) % 360 + 360) % 360;
     rot = from + 360 * 5 + ((want - (from % 360)) % 360 + 360) % 360;   // mindig előre, 5 teljes kör + a célcikkelyig
-    const el = o.querySelector('.wh-rot'), hub = o.querySelector('[data-spin]'); hub.disabled = true; hub.textContent = '…';
+    const el = o.querySelector('.wh-rot'), hub = o.querySelector('[data-spin]'); hub.disabled = true; hub.classList.add('spinning');
     const red = matchMedia('(prefers-reduced-motion: reduce)').matches;
     await el.animate([{ transform: `rotate(${from}deg)` }, { transform: `rotate(${rot}deg)` }], { duration: red ? 600 : 4300, easing: 'cubic-bezier(.12,.75,.15,1)', fill: 'forwards' }).finished;
     const msg = o.querySelector('.wh-msg'); msg.innerHTML = `<b class="wh-win${res.big ? ' big' : ''}">${res.txt}</b>`;
     o.querySelector('.wh-shards').outerHTML = `<div class="wh-shards">${Array.from({ length: SHARDS_NEED }, (_, i) => `<i class="${i < (p.wheel.shards || 0) ? 'on' : ''}"></i>`).join('')}<small>💎 ${p.wheel.shards || 0}/${SHARDS_NEED} szilánk → Gyémánt lap</small></div>`;
     if (res.ic === 'diamond') openModal(cardHTML(DIAMOND_CARD, { big: true }), '💎 GYÉMÁNT LAP! A Best of Us gyémánt változata a tiéd – a pakliépítőben az alaplap helyett beteheted.', '');
-    const again = wheelReady(); hub.disabled = !again; hub.textContent = again ? 'PÖRGESS!' : '✓';
+    const again = wheelReady(); hub.disabled = !again; hub.classList.remove('spinning');
     busy = false;
   };
 }

@@ -318,14 +318,15 @@ h1,h2,h3{font-family:var(--display);font-weight:400;letter-spacing:.01em;text-wr
 .shop-card:active{transform:scale(.98);}
 .wheel-box{max-width:360px;gap:10px;}
 .wheel-box h3{margin:0;font-family:var(--display);font-weight:400;font-size:26px;color:var(--gold);}
-.wh-wrap{position:relative;width:min(300px,78vw);aspect-ratio:1;margin:4px auto 0;}
+.wh-wrap{position:relative;width:min(320px,82vw);aspect-ratio:1;margin:4px auto 0;}
 .wh-rot{position:absolute;inset:0;will-change:transform;}
-.wh-svg{width:100%;height:100%;display:block;filter:drop-shadow(0 8px 18px rgba(0,0,0,.6));}
-.wh-ptr{position:absolute;left:50%;top:-10px;z-index:3;width:0;height:0;transform:translateX(-50%);border-left:14px solid transparent;border-right:14px solid transparent;border-top:28px solid #ffd36b;filter:drop-shadow(0 2px 3px rgba(0,0,0,.7));}
-.wh-hub{position:absolute;left:50%;top:50%;z-index:2;width:30%;aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;border:3px solid #f5d27a;background:radial-gradient(circle at 35% 30%,#ffe9a8,#e0a52a 60%,#8a5a0a);color:#3a2300;font-weight:900;font-size:13px;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,.55);}
-.wh-hub:disabled{filter:grayscale(.6) brightness(.8);cursor:default;}
-.wh-hub:not(:disabled){animation:hubPulse 1.6s ease-in-out infinite;}
-@keyframes hubPulse{50%{transform:translate(-50%,-50%) scale(1.07);}}
+.wh-rot img{display:block;width:100%;height:100%;filter:drop-shadow(0 10px 22px rgba(0,0,0,.65));user-select:none;-webkit-user-drag:none;}
+.wh-ptr{position:absolute;left:41.47%;top:0;width:17.07%;height:auto;z-index:3;pointer-events:none;filter:drop-shadow(0 3px 4px rgba(0,0,0,.6));}
+.wh-hub{position:absolute;left:50%;top:50%;z-index:2;width:36.4%;aspect-ratio:1;transform:translate(-50%,-50%);border:0;padding:0;border-radius:50%;background:url('art/ui/wheel-hub.webp?v=702a5eee') center/100% 100% no-repeat;cursor:pointer;}
+.wh-hub:disabled{filter:grayscale(.75) brightness(.7);cursor:default;}
+.wh-hub.spinning{filter:none;}
+.wh-hub:not(:disabled):not(.spinning){animation:hubPulse 1.6s ease-in-out infinite;}
+@keyframes hubPulse{50%{transform:translate(-50%,-50%) scale(1.06);filter:brightness(1.12);}}
 .wh-shards{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:4px;}
 .wh-shards i{width:14px;height:14px;transform:rotate(45deg) scale(.8);border-radius:3px;background:#23384a;border:1px solid #4d6b80;}
 .wh-shards i.on{background:linear-gradient(135deg,#f2fdff,#8fd8ff,#c9b6ff);box-shadow:0 0 6px #9fe3ff;}
@@ -1744,7 +1745,7 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%;}
       <button class="m-tile orn m-friends" id="goFriends" hidden><span class="m-ic ic-img ic-friends" aria-hidden="true"></span><span class="m-txt"><b>Barátok</b><small>Kihívás és lapcsere</small></span><span class="q-badge" id="friendBadge" hidden></span><i class="chev" aria-hidden="true"></i></button>
       <button class="m-shop-img" id="goShop" aria-label="Bolt – boosterek, változatok, portrék"><img src="art/ui/shop-btn.webp?v=5703300c" alt="" aria-hidden="true"><span class="badge" id="shopBadge" hidden>Ingyen pack!</span><i class="chev" aria-hidden="true"></i></button>
       <button class="m-tile orn m-pass" id="goPass"><span class="m-ic pass" aria-hidden="true">🏆</span><span class="m-txt"><b>Season Pass</b><small id="passSub">Ingyenes szezonjutalmak</small></span><span class="q-badge sp-badge" id="passBadge">0. szint</span><i class="chev" aria-hidden="true"></i></button>
-      <button class="m-tile orn m-wheel" id="goWheel"><span class="m-ic" aria-hidden="true">🎡</span><span class="m-txt"><b>Szerencsekerék</b><small>Naponta egy ingyen pörgetés · 💎 Gyémánt lap</small></span><span class="q-badge" id="wheelBadge" hidden>Pörgess!</span><i class="chev" aria-hidden="true"></i></button>
+      <button class="m-shop-img m-wheel-img" id="goWheel" aria-label="Szerencsekerék – naponta egy ingyen pörgetés"><img src="art/ui/wheel-btn.webp?v=08ad701b" alt="" aria-hidden="true"><span class="badge" id="wheelBadge" hidden>Pörgess!</span></button>
       <button class="m-tile orn m-quests" id="goQuests"><span class="m-ic quests" aria-hidden="true">📜</span><span class="m-txt"><b>Küldetések</b><small>3 napi + 1 heti feladat</small></span><span class="q-badge" id="questBadge">0/4</span><i class="chev" aria-hidden="true"></i></button>
       <div class="btn-row">
         <button class="m-tile orn" id="goDecks"><span class="m-ic decks" aria-hidden="true"><i></i><i></i><i></i></span><b>Paklik</b><i class="chev" aria-hidden="true"></i></button>
@@ -1888,7 +1889,7 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%;}
 <script src="vendor/firebase-auth-compat.js"></script>
 <script src="vendor/firebase-firestore-compat.js"></script>
 <script src="vendor/firebase-database-compat.js"></script>
-<script>window.APP_VERSION = "2026.10.05-2320";</script>
+<script>window.APP_VERSION = "2026.10.05-2329";</script>
 <script>// ===== Best of Us – saját szerver (Firebase) =====
 // A játék eredetileg a Claude-os tárolót használta (window.claude.use('db' | 'user' | 'room')).
 // Ez a fájl ugyanazt a felületet adja Firebase-ből, így a játék kódja szinte változatlan maradhat:
@@ -4837,19 +4838,6 @@ function wheelApply(p, seg) {   // a nyeremény jóváírása; visszaadja a szö
     giveDiamond(p); return { txt: 'FŐNYEREMÉNY! Tiéd a 💎 Gyémánt Best of Us!', ic: 'diamond', big: true };
   }
 }
-function wheelSVG() {
-  const tot = WHEEL.reduce((a, x) => a + x.w, 0), R = 150, cx = 160, cy = 160;
-  // a cikkelyek egyenlő méretűek (a súly csak az esélyt adja, nem a méretet) – így minden nyeremény jól olvasható
-  const n = WHEEL.length, step = 360 / n; let out = '';
-  WHEEL.forEach((x, i) => {
-    const a0 = (i * step - 90 - step / 2) * Math.PI / 180, a1 = ((i + 1) * step - 90 - step / 2) * Math.PI / 180;
-    const p0 = [cx + R * Math.cos(a0), cy + R * Math.sin(a0)], p1 = [cx + R * Math.cos(a1), cy + R * Math.sin(a1)];
-    out += `<path d="M${cx},${cy} L${p0[0].toFixed(1)},${p0[1].toFixed(1)} A${R},${R} 0 0 1 ${p1[0].toFixed(1)},${p1[1].toFixed(1)} Z" fill="${x.c}" stroke="#f5d27a" stroke-width="2"/>`;
-    const am = i * step, dark = x.k === 'diamond';
-    out += `<g transform="rotate(${am} ${cx} ${cy})"><text x="${cx}" y="${cy - R * .66}" text-anchor="middle" font-size="${x.t.length > 2 ? 22 : 26}" font-weight="900" fill="${dark ? '#123' : '#fff'}" style="paint-order:stroke" stroke="${dark ? '#fff' : 'rgba(0,0,0,.45)'}" stroke-width="2">${x.t}</text><text x="${cx}" y="${cy - R * .66 + 20}" text-anchor="middle" font-size="12" font-weight="800" fill="${dark ? '#123' : '#ffe9b0'}">${x.s}</text></g>`;
-  });
-  return `<svg viewBox="0 0 320 320" class="wh-svg" aria-hidden="true"><circle cx="160" cy="160" r="156" fill="#0b1c2a" stroke="#f5d27a" stroke-width="6"/>${out}<circle cx="160" cy="160" r="30" fill="#14324a" stroke="#f5d27a" stroke-width="4"/></svg>`;
-}
 function openWheel() {
   const p = Store.p; p.wheel = p.wheel || { date: '', shards: 0, extra: 0 };
   const o = document.createElement('div'); o.className = 'overlay wheel-ov';
@@ -4857,7 +4845,7 @@ function openWheel() {
   o.innerHTML = `<div class="modal wheel-box">
     <h3>🎡 Szerencsekerék</h3>
     <p class="live">Naponta egy ingyen pörgetés. Főnyeremény: a <b>💎 Gyémánt Best of Us</b> – csak itt szerezhető meg!</p>
-    <div class="wh-wrap"><i class="wh-ptr" aria-hidden="true"></i><div class="wh-rot">${wheelSVG()}</div><button class="wh-hub" data-spin ${ready ? '' : 'disabled'} aria-label="Pörgetés">${ready ? 'PÖRGESS!' : '✓'}</button></div>
+    <div class="wh-wrap"><div class="wh-rot"><img src="art/ui/wheel-disc.webp?v=f3118ecd" alt="" draggable="false"></div><img class="wh-ptr" src="art/ui/wheel-ptr.webp?v=4eaccb54" alt="" aria-hidden="true"><button class="wh-hub" data-spin ${ready ? '' : 'disabled'} aria-label="Pörgetés"></button></div>
     <div class="wh-shards" aria-label="Gyémántszilánkok: ${p.wheel.shards || 0} / ${SHARDS_NEED}">${Array.from({ length: SHARDS_NEED }, (_, i) => `<i class="${i < (p.wheel.shards || 0) ? 'on' : ''}"></i>`).join('')}<small>💎 ${p.wheel.shards || 0}/${SHARDS_NEED} szilánk → Gyémánt lap</small></div>
     <p class="wh-msg live">${ready ? 'Koppints a közepére!' : 'Mára már pörgettél – holnap újra!'}</p>
     <details class="wh-odds"><summary>Esélyek</summary>${WHEEL.map(x => `<div><span>${x.t} ${x.s}</span><b>${x.w}%</b></div>`).join('')}<small>Ha a Gyémánt lap már megvan, a főnyeremény és a 10 szilánk ${DIAMOND_DUPE} coint ér.</small></details>
@@ -4872,16 +4860,16 @@ function openWheel() {
     const W = p.wheel; if (W.date === today()) W.extra = Math.max(0, (W.extra || 0) - 1); else { W.date = today(); W.extra = 0; }
     const seg = wheelRoll(), res = wheelApply(p, seg);
     await save(); renderProfileBar();
-    const step = 360 / WHEEL.length, jitter = (Math.random() - .5) * step * .6;
+    const step = 360 / WHEEL.length, jitter = (Math.random() - .5) * step * .5;
     const from = rot, want = ((360 - seg * step + jitter) % 360 + 360) % 360;
     rot = from + 360 * 5 + ((want - (from % 360)) % 360 + 360) % 360;   // mindig előre, 5 teljes kör + a célcikkelyig
-    const el = o.querySelector('.wh-rot'), hub = o.querySelector('[data-spin]'); hub.disabled = true; hub.textContent = '…';
+    const el = o.querySelector('.wh-rot'), hub = o.querySelector('[data-spin]'); hub.disabled = true; hub.classList.add('spinning');
     const red = matchMedia('(prefers-reduced-motion: reduce)').matches;
     await el.animate([{ transform: `rotate(${from}deg)` }, { transform: `rotate(${rot}deg)` }], { duration: red ? 600 : 4300, easing: 'cubic-bezier(.12,.75,.15,1)', fill: 'forwards' }).finished;
     const msg = o.querySelector('.wh-msg'); msg.innerHTML = `<b class="wh-win${res.big ? ' big' : ''}">${res.txt}</b>`;
     o.querySelector('.wh-shards').outerHTML = `<div class="wh-shards">${Array.from({ length: SHARDS_NEED }, (_, i) => `<i class="${i < (p.wheel.shards || 0) ? 'on' : ''}"></i>`).join('')}<small>💎 ${p.wheel.shards || 0}/${SHARDS_NEED} szilánk → Gyémánt lap</small></div>`;
     if (res.ic === 'diamond') openModal(cardHTML(DIAMOND_CARD, { big: true }), '💎 GYÉMÁNT LAP! A Best of Us gyémánt változata a tiéd – a pakliépítőben az alaplap helyett beteheted.', '');
-    const again = wheelReady(); hub.disabled = !again; hub.textContent = again ? 'PÖRGESS!' : '✓';
+    const again = wheelReady(); hub.disabled = !again; hub.classList.remove('spinning');
     busy = false;
   };
 }
