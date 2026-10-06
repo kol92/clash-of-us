@@ -503,13 +503,14 @@ async function buyShopItem(id) {
   await save(); renderProfileBar(); renderShop();
   openModal(cardHTML(id, { big: true }), `🎉 Megvetted: ${c.name}! 2 példány került a gyűjteményedbe – a pakliépítőben az alaplap helyett is beteheted.`, '');
 }
-const SHOP_REFRESH = null;   // a limitált kínálat következő frissítése, pl. '2026-10-20' – ha megadod, visszaszámlál
+const SHOP_REFRESH = '2026-10-16';   // a limitált kínálat következő frissítése, pl. '2026-10-20' – ha megadod, visszaszámlál
 function renderShop() {
   const p = Store.p; if (!p) return;
   const free = freePackReady();
   const items = SHOP_ITEMS(), ports = Object.keys(PORTRAITS).filter(k => ART[k]);
   let refresh = 'A kínálat időnként frissül – ami most itt van, csak a következő frissítésig kapható.';
-  if (SHOP_REFRESH) { const d = Math.ceil((new Date(SHOP_REFRESH + 'T00:00') - new Date()) / 864e5); if (d > 0) refresh = `Frissül: <b>${d} nap múlva</b> – addig kapható, ami most itt van.`; }
+  if (SHOP_REFRESH) { const end = new Date(SHOP_REFRESH + 'T00:00'), d = Math.ceil((end - new Date()) / 864e5), md = `${end.getMonth() + 1}. ${end.getDate()}.`;
+    refresh = d > 1 ? `Frissül: <b>${d} nap múlva</b> (${md}) – addig kapható, ami most itt van.` : d === 1 ? `Frissül: <b>holnap</b> (${md}) – ez az utolsó nap!` : 'Hamarosan új kínálat érkezik – addig még kapható, ami most itt van.'; }
   const limited = items.length || ports.length ? `
     <section class="shop-limited">
       <div class="lim-head"><img class="lim-badge" src="art/ui/badge-limited.webp" alt="Limitált"><h3>Limitált kínálat</h3></div>
