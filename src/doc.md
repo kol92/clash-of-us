@@ -348,7 +348,14 @@ Hősképesség-ötletek a táblázatban (még nem zöldek, nincsenek beépítve)
 - **Célzás:** célzós akció/eszköz húzásakor ívelt, futó szaggatott aranyvonal a lapból az ujjadig, a végén nyílhegy (aim-arrow-head.webp); a megcélozható karaktereken célzógyűrű (aim-target.webp), amelyik fölött az ujjad van, felragyog.
 - **Lerakóhely:** karakter húzásakor az üres szabad helyeken aranyfény (drop-glow.webp).
 - **Pakliválasztó:** díszes panelek (deck-panel / deck-panel-selected – a kiválasztotton „KIVÁLASZTVA” jelvény): balra hősportré, jobbra pakli neve, hős neve és képessége (2 sorban); a jobb alsó lenyitó gombbal (deck-expand.webp) látszik a teljes hősképesség és a pakli leírása.
-- Eredetik: art/ui/orig/pack3/. Még várunk: 4. gyűjtemény-szűrő elemei, 5. bolti termékpanelek, szilánk ikon.
+- Eredetik: art/ui/orig/pack3/.
+
+## UI-csomag 4 (Astra, 2026-10-06): bolt és gyűjtemény
+- **Bolti termékpanelek:** minden termék egységes panelen (shop-panel.webp – a kép-ablak kilyukasztva, a kép alatta): nagy termékkép, kis címke (pl. „✦ Változat · 2 db”, „✦ Full Art portré”, „3 lap”), névsáv, ársáv érmével. Állapotok: vehető (arany ársáv), **nincs elég coin** (vörös ársáv – shop-panel-poor), **megszerezted** (zöld „MEGSZEREZTED” sáv – shop-panel-owned, a kép tompítva). A boosterek is így jelennek meg (Base set 50, Shiny pack 250 – koppintásra vásárol); az ingyenes/ajándék packok gombjai felül; a pack-leírás egy lenyitható „Mi van a packokban?” alatt.
+- **Limitált kínálat:** „LIMITÁLT” jelvény (badge-limited.webp), homokóra ikon (ic-timer.webp) a frissülési szöveg mellett. A `SHOP_REFRESH` konstans (meta.js) ha dátumra van állítva (pl. '2026-10-20'), „Frissül: N nap múlva” látszik; most null → „A kínálat időnként frissül…”.
+- **Gyűjtemény-szűrő:** keresőmező (search-bar.webp; név és lapszöveg szerint, ékezet nélkül is), szűrőgombok (filter-chip / filter-chip-on): típus (ikonokkal: ic-type-char/action/item/loc), ritkaság (ritkaságjelvényekkel, köztük 💎 Gyémánt), megvan / hiányzik (ic-owned, ic-missing), energiaköltség (0-1, 2, 3, 4, 5, 6+). Csoporton belül VAGY, csoportok között ÉS. „✕ Szűrők törlése”. Szűréskor az üres csoportok és az arany hősök eltűnnek; a hősök csak névkeresésre szűrődnek. A gyémánt lapokon a gyűjteményben kis gyémántjel (ic-diamond-small.webp).
+- **Szerencsekerék:** a szilánkok saját ikonnal (ic-shard.webp; a még meg nem szerzettek szürkék).
+- Eredetik: art/ui/orig/pack4/.
 
 ## Technikai megjegyzések
 - Minden illusztrációból két méret van: 360 px széles a kis lapokhoz (kéz, tábla, gyűjtemény, temető) és 800 px a nagy nézethez. A keretekből is van kicsi (300 px). Új képnél mindkettőt el kell készíteni.

@@ -328,8 +328,9 @@ h1,h2,h3{font-family:var(--display);font-weight:400;letter-spacing:.01em;text-wr
 .wh-hub:not(:disabled):not(.spinning){animation:hubPulse 1.6s ease-in-out infinite;}
 @keyframes hubPulse{50%{transform:translate(-50%,-50%) scale(1.06);filter:brightness(1.12);}}
 .wh-shards{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:4px;}
-.wh-shards i{width:14px;height:14px;transform:rotate(45deg) scale(.8);border-radius:3px;background:#23384a;border:1px solid #4d6b80;}
-.wh-shards i.on{background:linear-gradient(135deg,#f2fdff,#8fd8ff,#c9b6ff);box-shadow:0 0 6px #9fe3ff;}
+.wh-shards i{width:20px;height:20px;background:url('art/ui/ic-shard.webp?v=c894b132') center/contain no-repeat;filter:grayscale(1) brightness(.35);}
+.wh-shards i.on{filter:drop-shadow(0 0 4px #9fe3ff);}
+.wh-shards small img,.wh-odds img{width:16px;height:16px;vertical-align:-3px;}
 .wh-shards small{flex-basis:100%;text-align:center;font-weight:800;color:#cfe8ff;font-size:12px;}
 .wh-win{font-size:16px;color:#ffd36b;} .wh-win.big{font-size:18px;color:#bff3ff;text-shadow:0 0 10px #6fd3ff;}
 .wh-odds{width:100%;font-size:12px;color:var(--mute);text-align:left;}
@@ -1605,6 +1606,48 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%;}
 .dp-detail{margin:-4px 8px 4px;padding:10px 12px;border-radius:0 0 12px 12px;background:rgba(6,20,36,.92);border:1px solid rgba(255,201,74,.35);border-top:0;font-size:13px;line-height:1.45;color:#d7e6ee;}
 .dp-detail p{margin:0 0 6px;} .dp-detail p:last-child{margin:0;}
 .dp-detail b{color:var(--gold);}
+
+/* ===== UI-csomag 4 (Astra, 2026-10-06): bolti termékpanelek, gyűjtemény-szűrő ===== */
+.sp-card{position:relative;display:block;width:100%;aspect-ratio:3/4;padding:0;border:0;background:none;cursor:pointer;color:#fff;font-family:var(--body);}
+.sp-card .sp-img{position:absolute;left:11.2%;right:11.2%;top:7.4%;bottom:30.3%;border-radius:5%/4%;background-size:cover;background-color:#0b1c30;}
+.sp-card.contain .sp-img{background:radial-gradient(circle at 50% 45%,rgba(90,140,220,.35),rgba(8,20,40,.95) 70%);}
+.sp-card.contain .sp-img::after{content:"";position:absolute;inset:8% 18%;background:var(--packimg) center/contain no-repeat;filter:drop-shadow(0 6px 10px rgba(0,0,0,.6));}
+.sp-card .sp-holo{left:11.2%;right:11.2%;top:7.4%;bottom:30.3%;}
+.sp-card .sp-frame{position:absolute;inset:0;background:url('art/ui/shop-panel.webp?v=e89a2ce0') center/100% 100% no-repeat;filter:drop-shadow(0 6px 12px rgba(0,0,0,.55));pointer-events:none;}
+.sp-card.owned .sp-frame{background-image:url('art/ui/shop-panel-owned.webp?v=c940f1b2');}
+.sp-card.poor .sp-frame{background-image:url('art/ui/shop-panel-poor.webp?v=073f1267');}
+.sp-card.owned .sp-img{filter:saturate(.55) brightness(.75);}
+.sp-card .sp-name{position:absolute;left:13%;right:13%;top:71.2%;height:6.2%;display:grid;place-items:center;font-family:var(--display);font-size:clamp(11px,3.5vw,15px);line-height:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.sp-card .sp-sub{position:absolute;left:50%;bottom:32%;transform:translateX(-50%);padding:2px 8px;border-radius:999px;background:rgba(5,15,30,.85);border:1px solid rgba(255,201,74,.45);white-space:nowrap;font-size:clamp(9px,2.6vw,11px);font-weight:900;letter-spacing:.03em;color:#fff;}
+.sp-card .sp-price{position:absolute;left:28%;right:13%;top:79.7%;height:9.9%;display:grid;place-items:center;font-weight:900;font-size:clamp(16px,5vw,22px);color:#3a2600;text-shadow:0 1px 0 rgba(255,240,180,.6);}
+.sp-card.poor .sp-price{color:#ffd9cf;text-shadow:0 1px 2px rgba(0,0,0,.7);}
+.sp-card:active{transform:scale(.98);}
+.shop-gifts{display:grid;gap:8px;margin:0 0 12px;}
+.shop-gifts .btn{width:100%;}
+.pack-info-more{margin:10px 2px 4px;font-size:13px;color:var(--mute);}
+.pack-info-more summary{cursor:pointer;font-weight:800;color:#cfe8ff;}
+.pack-info-more p{margin:6px 0;line-height:1.4;} .pack-info-more b{color:var(--gold);}
+.lim-head{justify-content:flex-start!important;gap:10px!important;}
+.lim-badge{height:34px;width:auto;filter:drop-shadow(0 2px 4px rgba(0,0,0,.5));}
+.lim-note{display:flex;align-items:center;gap:8px;}
+.lim-timer{width:26px;height:26px;flex:none;}
+.lim-jump{display:flex!important;align-items:center;justify-content:center;gap:6px;}
+.lim-jump img{width:20px;height:20px;}
+/* gyűjtemény-szűrő */
+.coll-filters{display:grid;grid-template-columns:minmax(0,1fr);gap:8px;margin:4px 0 10px;}
+.coll-filters>*{min-width:0;}
+.cf-search{position:relative;width:100%;aspect-ratio:700/111;max-height:58px;background:url('art/ui/search-bar.webp?v=36698bc1') center/100% 100% no-repeat;}
+.cf-search input{position:absolute;left:11%;right:5%;top:21%;bottom:15%;width:auto;border:0;background:none;color:#fff;font:700 15px var(--body);outline:none;padding:0;}
+.cf-search input::placeholder{color:#8fa7c0;}
+.cf-row{display:flex;gap:4px;}
+.cf-chip{flex:1 1 0;display:inline-flex;align-items:center;justify-content:center;gap:3px;height:30px;min-width:0;padding:0 2px;border:0;border-style:solid;border-color:transparent;border-width:5px 10px;border-image:url('art/ui/filter-chip.webp?v=c6d50ef8') 30 60 fill / 5px 10px / 0 stretch;background:none;color:#cfe0ee;font:800 11px var(--body);cursor:pointer;white-space:nowrap;}
+.cf-chip.on{border-image-source:url('art/ui/filter-chip-on.webp?v=f11d475b');color:#fff;}
+.cf-chip img,.cf-chip .rar{width:20px;height:20px;margin:-6px -1px;flex:none;}
+.cf-chip .lbl-t{white-space:nowrap;}
+.cf-clear{border:0;background:none;color:var(--gold);font:800 12px var(--body);text-decoration:underline;cursor:pointer;justify-self:end;padding:0;}
+.coll-slot{position:relative;}
+.coll-slot .dia-mark{position:absolute;top:-6px;right:-2px;width:26px;height:26px;z-index:8;filter:drop-shadow(0 0 4px rgba(170,230,255,.9));}
+.cf-empty{color:var(--mute);font-weight:700;text-align:center;margin:20px 0;}
 .sr-only{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0;}
 @media (prefers-reduced-motion:reduce){.cell.tgt .unit::after,.cell.tgt:not(:has(.unit))::after{animation:none!important;}}
 /* ===== Állapotjelzők: képes táblák (a feliratot a kép tartalmazza) + borostyán számláló a bénulás köreire ===== */
@@ -1810,6 +1853,7 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%;}
   <section class="screen" id="scr-coll" hidden>
     <div class="top"><button class="back" data-back aria-label="Vissza">‹</button><h2>Gyűjtemény</h2>
       <div class="seg" role="group" aria-label="Változat"><button id="vBase" aria-pressed="true">Alap</button><button id="vFoil" aria-pressed="false">Full Art</button></div></div>
+    <div id="collFilters" class="coll-filters"></div>
     <div id="collBody"></div>
   </section>
 
@@ -1933,7 +1977,7 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%;}
 <script src="vendor/firebase-auth-compat.js"></script>
 <script src="vendor/firebase-firestore-compat.js"></script>
 <script src="vendor/firebase-database-compat.js"></script>
-<script>window.APP_VERSION = "2026.10.06-0030";</script>
+<script>window.APP_VERSION = "2026.10.06-1134";</script>
 <script>// ===== Best of Us – saját szerver (Firebase) =====
 // A játék eredetileg a Claude-os tárolót használta (window.claude.use('db' | 'user' | 'room')).
 // Ez a fájl ugyanazt a felületet adja Firebase-ből, így a játék kódja szinte változatlan maradhat:
@@ -3341,19 +3385,57 @@ function renderPick() {
 $('#deckPick').onclick = e => { const m = e.target.closest('[data-more]'); if (m) { ui.deckOpen = ui.deckOpen === m.dataset.more ? null : m.dataset.more; renderPick(); return; } const b = e.target.closest('[data-d]'); if (b) { ui.deck = b.dataset.d; renderPick(); } };
 $('#startBtn').onclick = () => { const d = allDecks().find(x => x.id === ui.deck); if (!d || deckIssue(d)) return; startMatch(d.hero, ui.deck); };
 
-function renderColl() {
-  const groups = [['Hősök', null], ['Karakterek', 'char'], ['Eszközök', 'item'], ['Akciók', 'action'], ['Helyszínek', 'loc']];
+// ---- gyűjtemény-szűrő (Astra UI): név, típus, ritkaság, költség, megvan/hiányzik ----
+const CF = { q: '', type: new Set(), rar: new Set(), cost: new Set(), own: '' };
+const CF_TYPES = [['char', 'Karakter'], ['action', 'Akció'], ['item', 'Eszköz'], ['loc', 'Helyszín']];
+const CF_RARS = [['k', 'Gyakori'], ['r', 'Ritka'], ['e', 'Epikus'], ['l', 'Legendás'], ['d', 'Gyémánt']];
+const CF_COSTS = ['0-1', '2', '3', '4', '5', '6+'];
+const cfActive = () => CF.q || CF.type.size || CF.rar.size || CF.cost.size || CF.own;
+const costKey = c => c.cost <= 1 ? '0-1' : c.cost >= 6 ? '6+' : String(c.cost);
+const cfNorm = t => String(t).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+function cfMatch(c) {
+  if (CF.q && !cfNorm(c.name + ' ' + (c.text || '')).includes(cfNorm(CF.q))) return false;
+  if (CF.type.size && !CF.type.has(c.type)) return false;
+  if (CF.rar.size && !CF.rar.has(rarKey(c))) return false;
+  if (CF.cost.size && !CF.cost.has(costKey(c))) return false;
+  if (CF.own) { const n = Store.p ? owned(c.id) : 0; if (CF.own === 'have' ? !n : n) return false; }
+  return true;
+}
+function renderCollFilters() {
+  const el = $('#collFilters'); if (!el) return;
+  const chip = (grp, val, inner, on, label) => `<button class="cf-chip${on ? ' on' : ''}" data-cf="${grp}" data-v="${val}" aria-pressed="${on}" aria-label="${label}">${inner}</button>`;
+  el.innerHTML = `<label class="cf-search"><span class="sr-only">Keresés</span><input id="cfQ" type="search" placeholder="Keresés…" value="${escH(CF.q)}" autocomplete="off"></label>
+    <div class="cf-row">${CF_TYPES.map(([k, n]) => chip('type', k, `<img src="art/ui/ic-type-${k}.webp" alt=""><span class="lbl-t">${n}</span>`, CF.type.has(k), n)).join('')}</div>
+    <div class="cf-row">${CF_RARS.map(([k, n]) => chip('rar', k, `<i class="rar r-${k}"></i>`, CF.rar.has(k), n)).join('')}
+      ${chip('own', 'have', '<img src="art/ui/ic-owned.webp?v=db13b2f4" alt="">', CF.own === 'have', 'Megvan')}${chip('own', 'miss', '<img src="art/ui/ic-missing.webp?v=a815545d" alt="">', CF.own === 'miss', 'Hiányzik')}</div>
+    <div class="cf-row">${CF_COSTS.map(k => chip('cost', k, `<span class="lbl-t">⚡${k}</span>`, CF.cost.has(k), k + ' energia')).join('')}</div>
+    ${cfActive() ? '<button class="cf-clear" data-cfclear>✕ Szűrők törlése</button>' : ''}`;
+  const q = $('#cfQ'); q.oninput = () => { CF.q = q.value.trim(); renderColl(true); const cl = el.querySelector('[data-cfclear]'); if (!!cl !== !!cfActive()) { renderCollFilters(); $('#cfQ').focus(); } };
+  el.onclick = e => {
+    if (e.target.closest('[data-cfclear]')) { CF.q = ''; CF.type.clear(); CF.rar.clear(); CF.cost.clear(); CF.own = ''; renderCollFilters(); renderColl(true); return; }
+    const b = e.target.closest('[data-cf]'); if (!b) return;
+    const g = b.dataset.cf, v = b.dataset.v;
+    if (g === 'own') CF.own = CF.own === v ? '' : v; else { const S2 = CF[g]; S2.has(v) ? S2.delete(v) : S2.add(v); }
+    renderCollFilters(); renderColl(true);
+  };
+}
+function renderColl(bodyOnly) {
+  if (!bodyOnly) renderCollFilters();
+  const heroQ = h => !CF.q || cfNorm(h.name + ' ' + h.text).includes(cfNorm(CF.q));
+  const heroOk = !(CF.type.size || CF.rar.size || CF.cost.size || CF.own) && HEROES.some(heroQ);
+  const groups = [['Hősök', null], ['Karakterek', 'char'], ['Eszközök', 'item'], ['Akciók', 'action'], ['Helyszínek', 'loc']]
+    .filter(([, type]) => type ? PLAYABLE.some(c => c.type === type && cfMatch(c)) : heroOk);
   const have = PLAYABLE.filter(c => owned(c.id) > 0).length, foils = PLAYABLE.filter(c => ownsFoil(c.id)).length;
   const dup = typeof dupeList === 'function' && Store.p ? dupeList(Store.p) : { out: [] };
-  $('#collBody').innerHTML = `<p class="coll-sum">${have}/${PLAYABLE.length} különböző lap · ${foils} Full Art változat</p>` +
+  $('#collBody').innerHTML = `<p class="coll-sum">${have}/${PLAYABLE.length} különböző lap · ${foils} Full Art változat</p>` + (groups.length ? '' : '<p class="cf-empty">Nincs a szűrésnek megfelelő lap.</p>') +
     (dup.out.length ? `<button class="btn dupe-btn" id="dupeBtn">♻️ ${dup.out.reduce((s, x) => s + x.n + x.f, 0)} fölösleges lap beváltása · +${dup.coins} coin</button>` : '') + groups.map(([t, type]) => `<div class="lbl">${t}</div><div class="coll-grid">${
-    type ? PLAYABLE.filter(c => c.type === type).sort((a, b) => a.cost - b.cost).map(c => {
+    type ? PLAYABLE.filter(c => c.type === type && cfMatch(c)).sort((a, b) => a.cost - b.cost).map(c => {
       const n = ui.foil || c.foilOnly ? (Store.p?.coll[c.id]?.f || 0) : (Store.p?.coll[c.id]?.n || 0);
-      return `<div class="coll-slot${n ? '' : ' missing'}">${cardHTML(c.id, { foil: ui.foil, attrs: `data-card="${c.id}" tabindex="0"` })}<span class="own-n"><i class="rar r-${rarKey(c)}" title="${RAR[rarKey(c)]}" aria-label="${RAR[c.rarity]}"></i>${n ? '×' + n : 'Nincs meg'}</span></div>`;
+      return `<div class="coll-slot${n ? '' : ' missing'}">${c.diamond ? '<img class="dia-mark" src="art/ui/ic-diamond-small.webp?v=cca24576" alt="Gyémánt">' : ''}${cardHTML(c.id, { foil: ui.foil, attrs: `data-card="${c.id}" tabindex="0"` })}<span class="own-n"><i class="rar r-${rarKey(c)}" title="${RAR[rarKey(c)]}" aria-label="${RAR[c.rarity]}"></i>${n ? '×' + n : 'Nincs meg'}</span></div>`;
     }).join('')
-         : HEROES.map(h => { const miss = ui.foil && !ownsHeroFa(h.id);
+         : HEROES.filter(heroQ).map(h => { const miss = ui.foil && !ownsHeroFa(h.id);
              const multi = !ui.foil && Store.p && heroSkins(h.id).length > 1, sk = multi ? heroSkin(h.id) : 'base';
-             return `<div class="coll-slot${miss ? ' missing' : ''}">${heroCardHTML(h, { foil: ui.foil || sk === 'fa', gold: !ui.foil && sk === 'gold', port: !ui.foil && isPort(sk) ? sk : null, attrs: `data-hcard="${h.id}" tabindex="0"` })}${ui.foil ? `<span class="own-n">${miss ? 'Nincs meg' : '×' + Store.p.heroFa[h.id]}</span>` : multi ? `<span class="own-n skin-n">🎨 ${skinName(sk)}</span>` : ''}</div>`; }).join('')}</div>${type ? '' : `<div class="lbl gold-lbl">✦ Arany hősök – a legritkább lapok</div><div class="coll-grid">${GOLD_HEROES.map(hid => { const has = ownsHeroGold(hid);
+             return `<div class="coll-slot${miss ? ' missing' : ''}">${heroCardHTML(h, { foil: ui.foil || sk === 'fa', gold: !ui.foil && sk === 'gold', port: !ui.foil && isPort(sk) ? sk : null, attrs: `data-hcard="${h.id}" tabindex="0"` })}${ui.foil ? `<span class="own-n">${miss ? 'Nincs meg' : '×' + Store.p.heroFa[h.id]}</span>` : multi ? `<span class="own-n skin-n">🎨 ${skinName(sk)}</span>` : ''}</div>`; }).join('')}</div>${type || cfActive() ? '' : `<div class="lbl gold-lbl">✦ Arany hősök – a legritkább lapok</div><div class="coll-grid">${GOLD_HEROES.map(hid => { const has = ownsHeroGold(hid);
              return `<div class="coll-slot${has ? '' : ' missing gold-miss'}">${heroCardHTML(HERO[hid], { gold: true, attrs: `data-hgold="${hid}" tabindex="0"` })}<span class="own-n">${has ? '✦ Megvan' : 'Nincs meg'}</span></div>`; }).join('')}</div>`}`).join('');
 }
 $('#vBase').onclick = () => { ui.foil = false; $('#vBase').setAttribute('aria-pressed', 'true'); $('#vFoil').setAttribute('aria-pressed', 'false'); renderColl(); };
@@ -4921,9 +5003,9 @@ function openWheel() {
     <h3>🎡 Szerencsekerék</h3>
     <p class="live">Naponta egy ingyen pörgetés. Főnyeremény: a <b>💎 Gyémánt Best of Us</b> – csak itt szerezhető meg!</p>
     <div class="wh-wrap"><div class="wh-rot"><img src="art/ui/wheel-disc.webp?v=f3118ecd" alt="" draggable="false"></div><img class="wh-ptr" src="art/ui/wheel-ptr.webp?v=4eaccb54" alt="" aria-hidden="true"><button class="wh-hub" data-spin ${ready ? '' : 'disabled'} aria-label="Pörgetés"></button></div>
-    <div class="wh-shards" aria-label="Gyémántszilánkok: ${p.wheel.shards || 0} / ${SHARDS_NEED}">${Array.from({ length: SHARDS_NEED }, (_, i) => `<i class="${i < (p.wheel.shards || 0) ? 'on' : ''}"></i>`).join('')}<small>💎 ${p.wheel.shards || 0}/${SHARDS_NEED} szilánk → Gyémánt lap</small></div>
+    <div class="wh-shards" aria-label="Gyémántszilánkok: ${p.wheel.shards || 0} / ${SHARDS_NEED}">${Array.from({ length: SHARDS_NEED }, (_, i) => `<i class="${i < (p.wheel.shards || 0) ? 'on' : ''}"></i>`).join('')}<small><img src="art/ui/ic-shard.webp?v=c894b132" alt=""> ${p.wheel.shards || 0}/${SHARDS_NEED} szilánk → 💎 Gyémánt lap</small></div>
     <p class="wh-msg live">${ready ? 'Koppints a közepére!' : 'Mára már pörgettél – holnap újra!'}</p>
-    <details class="wh-odds"><summary>Esélyek</summary>${WHEEL.map(x => `<div><span>${x.t} ${x.s}</span><b>${x.w}%</b></div>`).join('')}<small>Ha a Gyémánt lap már megvan, a főnyeremény és a 10 szilánk ${DIAMOND_DUPE} coint ér.</small></details>
+    <details class="wh-odds"><summary>Esélyek</summary>${WHEEL.map(x => `<div><span>${x.k === 'shard' ? '<img src="art/ui/ic-shard.webp?v=c894b132" alt="">' : x.t} ${x.s}</span><b>${x.w}%</b></div>`).join('')}<small>Ha a Gyémánt lap már megvan, a főnyeremény és a 10 szilánk ${DIAMOND_DUPE} coint ér.</small></details>
     <button class="btn" data-x>Bezárás</button></div>`;
   $('#layer').appendChild(o);
   let busy = false, rot = 0;
@@ -4942,7 +5024,7 @@ function openWheel() {
     const red = matchMedia('(prefers-reduced-motion: reduce)').matches;
     await el.animate([{ transform: `rotate(${from}deg)` }, { transform: `rotate(${rot}deg)` }], { duration: red ? 600 : 4300, easing: 'cubic-bezier(.12,.75,.15,1)', fill: 'forwards' }).finished;
     const msg = o.querySelector('.wh-msg'); msg.innerHTML = `<b class="wh-win${res.big ? ' big' : ''}">${res.txt}</b>`;
-    o.querySelector('.wh-shards').outerHTML = `<div class="wh-shards">${Array.from({ length: SHARDS_NEED }, (_, i) => `<i class="${i < (p.wheel.shards || 0) ? 'on' : ''}"></i>`).join('')}<small>💎 ${p.wheel.shards || 0}/${SHARDS_NEED} szilánk → Gyémánt lap</small></div>`;
+    o.querySelector('.wh-shards').outerHTML = `<div class="wh-shards">${Array.from({ length: SHARDS_NEED }, (_, i) => `<i class="${i < (p.wheel.shards || 0) ? 'on' : ''}"></i>`).join('')}<small><img src="art/ui/ic-shard.webp?v=c894b132" alt=""> ${p.wheel.shards || 0}/${SHARDS_NEED} szilánk → 💎 Gyémánt lap</small></div>`;
     if (res.ic === 'diamond') openModal(cardHTML(DIAMOND_CARD, { big: true }), '💎 GYÉMÁNT LAP! A Best of Us gyémánt változata a tiéd – a pakliépítőben az alaplap helyett beteheted.', '');
     const again = wheelReady(); hub.disabled = !again; hub.classList.remove('spinning');
     busy = false;
@@ -4952,25 +5034,23 @@ function openWheel() {
 // ---- bolt képernyő ----
 // a boltban coinért megvehető különleges lapok (változatok); egyszer vehető meg mindegyik
 const SHOP_ITEMS = () => CARDS.filter(c => c.shopOnly && ART[c.id]).map(c => ({ id: c.id, price: c.price || 100 }));
-function shopOfferHTML(it) {
-  const c = CARD[it.id], have = owned(it.id) > 0, p = Store.p, can = p.coins >= it.price;
-  return `<button class="shop-card${have ? ' owned' : ''}" data-buy="${it.id}" ${have ? 'aria-disabled="true"' : ''}>
-    <span class="sc-art" style="background-image:url('${ART[it.id].src}');background-position:${ART[it.id].pos || '50% 20%'}"></span>
-    <span class="sc-frame" aria-hidden="true"></span>
-    <span class="sc-name">${c.name}</span>
-    <span class="sc-sub">✦ Különleges változat</span>
-    <span class="sc-price${!have && !can ? ' poor' : ''}">${have ? '✓ Megvan' : `<b>${it.price}</b> coin`}</span>
+// egységes bolti termékpanel (Astra UI): kép + név + ársáv; állapotok: vehető / megszerezted / nincs elég coin
+function shopPanelHTML({ attr, img, pos, contain, name, sub, price, have, holo, extra = '' }) {
+  const poor = !have && Store.p.coins < price, st = have ? 'owned' : poor ? 'poor' : 'ok';
+  return `<button class="sp-card ${st}${contain ? ' contain' : ''}" ${attr} aria-label="${escH(name)} – ${have ? 'megszerezted' : price + ' coin'}${poor ? ', nincs elég coin' : ''}">
+    <span class="sp-img" style="${contain ? `--packimg:url('${img}')` : `background-image:url('${img}');${pos ? `background-position:${pos};` : ''}`}"></span>${holo ? '<span class="sc-holo sp-holo" aria-hidden="true"></span>' : ''}
+    <span class="sp-frame" aria-hidden="true"></span>${extra}
+    <span class="sp-name">${name}</span>${sub ? `<span class="sp-sub">${sub}</span>` : ''}
+    ${have ? '' : `<span class="sp-price">${price}</span>`}
   </button>`;
 }
+function shopOfferHTML(it) {
+  const c = CARD[it.id];
+  return shopPanelHTML({ attr: `data-buy="${it.id}"`, img: ART[it.id].src, pos: ART[it.id].pos || '50% 20%', name: c.name, sub: '✦ Változat · 2 db', price: it.price, have: owned(it.id) > 0 });
+}
 function portOfferHTML(k) {
-  const P = PORTRAITS[k], have = ownsPort(k), can = Store.p.coins >= P.price;
-  return `<button class="shop-card port${have ? ' owned' : ''}" data-port="${k}">
-    <span class="sc-art" style="background-image:url('${ART[k].src}');background-position:${ART[k].pos || '50% 20%'}"></span><span class="sc-holo" aria-hidden="true"></span>
-    <span class="sc-frame" aria-hidden="true"></span>
-    <span class="sc-name">${P.name}</span>
-    <span class="sc-sub">✦ Full Art portré</span>
-    <span class="sc-price${!have && !can ? ' poor' : ''}">${have ? '✓ Megvan' : `<b>${P.price}</b> coin`}</span>
-  </button>`;
+  const P = PORTRAITS[k];
+  return shopPanelHTML({ attr: `data-port="${k}"`, img: ART[k].src, pos: ART[k].pos || '50% 20%', name: P.name, sub: '✦ Full Art portré', price: P.price, have: ownsPort(k), holo: true });
 }
 async function buyPortrait(k) {
   const P = PORTRAITS[k], p = Store.p, h = HERO[P.hero]; if (!P || !p) return;
@@ -5001,59 +5081,54 @@ async function buyShopItem(id) {
   await save(); renderProfileBar(); renderShop();
   openModal(cardHTML(id, { big: true }), `🎉 Megvetted: ${c.name}! 2 példány került a gyűjteményedbe – a pakliépítőben az alaplap helyett is beteheted.`, '');
 }
+const SHOP_REFRESH = null;   // a limitált kínálat következő frissítése, pl. '2026-10-20' – ha megadod, visszaszámlál
 function renderShop() {
   const p = Store.p; if (!p) return;
   const free = freePackReady();
   const items = SHOP_ITEMS(), ports = Object.keys(PORTRAITS).filter(k => ART[k]);
+  let refresh = 'A kínálat időnként frissül – ami most itt van, csak a következő frissítésig kapható.';
+  if (SHOP_REFRESH) { const d = Math.ceil((new Date(SHOP_REFRESH + 'T00:00') - new Date()) / 864e5); if (d > 0) refresh = `Frissül: <b>${d} nap múlva</b> – addig kapható, ami most itt van.`; }
   const limited = items.length || ports.length ? `
     <section class="shop-limited">
-      <div class="lim-head"><h3>⏳ Limitált kínálat</h3><span class="lim-tag">Csak most</span></div>
-      <p class="lim-note">A bolt időnként frissül: az alábbi különleges lapok és hős-portrék <b>csak a következő frissítésig</b> kaphatók – utána mások jönnek a helyükre. Ami megvan, az persze megmarad.</p>
-      ${items.length ? `<div class="lbl shop-lbl">✦ Különleges lapok <small>rögtön 2 példány · ugyanúgy játszanak, mint az alaplap</small></div>
-      <div class="shop-grid">${items.map(shopOfferHTML).join('')}</div>` : ''}
-      ${ports.length ? `<div class="lbl shop-lbl">✦ Hős-portrék <small>saját névvel, mindig Full Artban</small></div>
-      <div class="shop-grid">${ports.map(portOfferHTML).join('')}</div>` : ''}
+      <div class="lim-head"><img class="lim-badge" src="art/ui/badge-limited.webp?v=79702068" alt="Limitált"><h3>Limitált kínálat</h3></div>
+      <p class="lim-note"><img class="lim-timer" src="art/ui/ic-timer.webp?v=df03901e" alt="" aria-hidden="true">${refresh}</p>
+      <div class="shop-grid">${items.map(shopOfferHTML).join('')}${ports.map(portOfferHTML).join('')}</div>
     </section>` : '';
+  const gifts = [
+    p.faPacks > 0 ? `<button class="btn primary gift fa" id="faPack">✨ Full Art ajándék pack${p.faPacks > 1 ? ` (${p.faPacks})` : ''}</button>` : '',
+    p.giftPacks > 0 ? `<button class="btn primary gift" id="giftPack">🎁 Ajándék pack bontása${p.giftPacks > 1 ? ` (${p.giftPacks})` : ''}</button>` : '',
+    p.shinyPacks > 0 ? `<button class="btn primary shiny-btn" id="giftShiny">🎁 Ajándék Shiny pack${p.shinyPacks > 1 ? ` (${p.shinyPacks})` : ''}</button>` : '',
+    `<button class="btn primary" id="freePack" ${free ? '' : 'disabled'}>${free ? '🎁 Napi ingyen pack' : 'Mai ingyen pack elhasználva'}</button>`].join('');
   $('#shopBody').innerHTML = `
     <div class="wallet"><span class="coin" aria-hidden="true"></span><b>${p.coins}</b><small>coin</small></div>
-    ${limited ? '<button class="lim-jump" data-jump>⏳ Limitált lapok és portrék – lejjebb ↓</button>' : ''}
+    ${limited ? '<button class="lim-jump" data-jump><img src="art/ui/ic-timer.webp?v=df03901e" alt="" aria-hidden="true"> Limitált lapok és portrék – lejjebb ↓</button>' : ''}
     <div class="lbl shop-lbl">Boosterek</div>
-    <div class="pack-offer">
-      <div class="pack-art">${packHTML('base')}</div>
-      <div class="pack-info">
-        <h3>${SETS.base.name}</h3>
-        <p>3 véletlen lap a teljes alapkészletből. Minden packban van legalább egy ritka vagy jobb lap.</p>
-        ${p.faPacks > 0 ? `<button class="btn primary gift fa" id="faPack">✨ Full Art ajándék pack${p.faPacks > 1 ? ` (${p.faPacks})` : ''}</button>` : ''}
-        ${p.giftPacks > 0 ? `<button class="btn primary gift" id="giftPack">🎁 Ajándék pack bontása${p.giftPacks > 1 ? ` (${p.giftPacks})` : ''}</button>` : ''}
-        <button class="btn primary" id="freePack" ${free ? '' : 'disabled'}>${free ? 'Napi ingyen pack bontása' : 'Mai ingyen pack elhasználva'}</button>
-        <button class="btn" id="buyPack" ${p.coins >= ECON.packPrice ? '' : 'disabled'}><span class="coin sm" aria-hidden="true"></span> ${ECON.packPrice} · Pack vásárlása</button>
-      </div>
+    <div class="shop-gifts">${gifts}</div>
+    <div class="shop-grid">
+      ${shopPanelHTML({ attr: 'data-pack="base"', img: 'art/ui/pack-base.webp?v=d38f1f0c', contain: true, name: SETS.base.name, sub: '3 lap', price: ECON.packPrice, have: false })}
+      ${shopPanelHTML({ attr: 'data-pack="shiny"', img: 'art/ui/pack-shiny.webp?v=ca07ac74', contain: true, name: 'Shiny pack', sub: '1 biztos különleges', price: ECON.shinyPrice, have: false, holo: true })}
     </div>
-    <div class="pack-offer shiny-offer">
-      <div class="pack-art">${packHTML('base', { shiny: true })}</div>
-      <div class="pack-info">
-        <h3>Shiny ${SETS.base.name}</h3>
-        <p>3 lap, amiből egy <b>biztosan különleges</b>: Full Art lap, Full Art hős, vagy ritka változat-lap (pl. a zöld Rehab). Ráadásul <b class="gold-t">${ECON.goldShiny * 100}% eséllyel ✦ Arany hős</b> is lehet benne!</p>
-        ${p.shinyPacks > 0 ? `<button class="btn primary shiny-btn" id="giftShiny">🎁 Ajándék Shiny pack bontása${p.shinyPacks > 1 ? ` (${p.shinyPacks})` : ''}</button>` : ''}
-        <button class="btn primary shiny-btn" id="buyShiny" ${p.coins >= ECON.shinyPrice ? '' : 'disabled'}><span class="coin sm" aria-hidden="true"></span> ${ECON.shinyPrice} · Shiny pack</button>
-      </div>
-    </div>
+    <details class="pack-info-more"><summary>Mi van a packokban?</summary>
+      <p><b>${SETS.base.name}:</b> 3 véletlen lap a teljes alapkészletből, legalább egy ritka vagy jobb.</p>
+      <p><b>Shiny pack:</b> 3 lap, amiből egy biztosan különleges: Full Art lap, Full Art hős vagy ritka változat-lap. ${ECON.goldShiny * 100}% eséllyel ✦ Arany hős is lehet benne.</p></details>
     ${limited}
     <div class="odds"><div class="lbl">Esélyek laponként</div>
       ${[['l', 'Legendás'], ['e', 'Epikus'], ['r', 'Ritka'], ['k', 'Gyakori']].map(([k, n]) => `<div class="odd"><i class="rar r-${k}"></i><span>${n}</span><b>${ECON.odds.find(o => o[0] === k)[1]}%</b></div>`).join('')}
       <div class="odd"><i class="rar r-f"></i><span>Full Art változat (bármelyik lapból)</span><b>${ECON.foilChance * 100}%</b></div>
       <div class="odd"><i class="rar r-f"></i><span>Full Art hős (packonként)</span><b>${ECON.heroFaChance * 100}%</b></div>
       <div class="odd gold-odd"><i class="rar r-g"></i><span>✦ Arany hős (packonként · Shiny packban)</span><b>${String(ECON.goldPlain * 100).replace('.', ',')}% · ${ECON.goldShiny * 100}%</b></div>
-      <small>Ha ${ECON.pityAfter} packon át nem jön epikus vagy legendás lap, a következőben biztosan lesz. Napi coin: győzelem ${ECON.win}, döntetlen ${ECON.draw}, vereség ${ECON.loss}, legfeljebb ${ECON.dailyCap}. Egy lapból legfeljebb ${DUPE_KEEP} példány marad meg, a többit a játék automatikusan beváltja: lapként ${DUPE_COIN} coin, Full Art vagy változat lap esetén ${DUPE_COIN_RARE} coin.</small>
+      <small>Ha ${ECON.pityAfter} packon át nem jön epikus vagy legendás lap, a következőben biztosan lesz. Napi coin: győzelem ${ECON.win}, döntetlen ${ECON.draw}, vereség ${ECON.loss}, legfeljebb ${ECON.dailyCap}.</small>
     </div>`;
   $('#shopBody').querySelectorAll('[data-buy]').forEach(b => b.onclick = () => buyShopItem(b.dataset.buy));
   $('#shopBody').querySelectorAll('[data-port]').forEach(b => b.onclick = () => buyPortrait(b.dataset.port));
+  $('#shopBody').querySelectorAll('[data-pack]').forEach(b => b.onclick = () => {
+    const sh = b.dataset.pack === 'shiny', pr = sh ? ECON.shinyPrice : ECON.packPrice;
+    if (Store.p.coins < pr) return toast(`Nincs elég coinod (${Store.p.coins}/${pr})`);
+    buyPack('base', sh ? 'shiny' : false); });
   const jb = $('#shopBody').querySelector('[data-jump]'); if (jb) jb.onclick = () => $('#shopBody .shop-limited')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   $('#freePack').onclick = () => buyPack('base', true);
   if ($('#giftPack')) $('#giftPack').onclick = () => buyPack('base', 'gift');
   if ($('#faPack')) $('#faPack').onclick = () => buyPack('base', 'fa');
-  $('#buyPack').onclick = () => buyPack('base', false);
-  $('#buyShiny').onclick = () => buyPack('base', 'shiny');
   if ($('#giftShiny')) $('#giftShiny').onclick = () => buyPack('base', 'shinyGift');
 }
 function packHTML(setId, o = {}) {

@@ -425,9 +425,9 @@ function openWheel() {
     <h3>🎡 Szerencsekerék</h3>
     <p class="live">Naponta egy ingyen pörgetés. Főnyeremény: a <b>💎 Gyémánt Best of Us</b> – csak itt szerezhető meg!</p>
     <div class="wh-wrap"><div class="wh-rot"><img src="art/ui/wheel-disc.webp" alt="" draggable="false"></div><img class="wh-ptr" src="art/ui/wheel-ptr.webp" alt="" aria-hidden="true"><button class="wh-hub" data-spin ${ready ? '' : 'disabled'} aria-label="Pörgetés"></button></div>
-    <div class="wh-shards" aria-label="Gyémántszilánkok: ${p.wheel.shards || 0} / ${SHARDS_NEED}">${Array.from({ length: SHARDS_NEED }, (_, i) => `<i class="${i < (p.wheel.shards || 0) ? 'on' : ''}"></i>`).join('')}<small>💎 ${p.wheel.shards || 0}/${SHARDS_NEED} szilánk → Gyémánt lap</small></div>
+    <div class="wh-shards" aria-label="Gyémántszilánkok: ${p.wheel.shards || 0} / ${SHARDS_NEED}">${Array.from({ length: SHARDS_NEED }, (_, i) => `<i class="${i < (p.wheel.shards || 0) ? 'on' : ''}"></i>`).join('')}<small><img src="art/ui/ic-shard.webp" alt=""> ${p.wheel.shards || 0}/${SHARDS_NEED} szilánk → 💎 Gyémánt lap</small></div>
     <p class="wh-msg live">${ready ? 'Koppints a közepére!' : 'Mára már pörgettél – holnap újra!'}</p>
-    <details class="wh-odds"><summary>Esélyek</summary>${WHEEL.map(x => `<div><span>${x.t} ${x.s}</span><b>${x.w}%</b></div>`).join('')}<small>Ha a Gyémánt lap már megvan, a főnyeremény és a 10 szilánk ${DIAMOND_DUPE} coint ér.</small></details>
+    <details class="wh-odds"><summary>Esélyek</summary>${WHEEL.map(x => `<div><span>${x.k === 'shard' ? '<img src="art/ui/ic-shard.webp" alt="">' : x.t} ${x.s}</span><b>${x.w}%</b></div>`).join('')}<small>Ha a Gyémánt lap már megvan, a főnyeremény és a 10 szilánk ${DIAMOND_DUPE} coint ér.</small></details>
     <button class="btn" data-x>Bezárás</button></div>`;
   $('#layer').appendChild(o);
   let busy = false, rot = 0;
@@ -446,7 +446,7 @@ function openWheel() {
     const red = matchMedia('(prefers-reduced-motion: reduce)').matches;
     await el.animate([{ transform: `rotate(${from}deg)` }, { transform: `rotate(${rot}deg)` }], { duration: red ? 600 : 4300, easing: 'cubic-bezier(.12,.75,.15,1)', fill: 'forwards' }).finished;
     const msg = o.querySelector('.wh-msg'); msg.innerHTML = `<b class="wh-win${res.big ? ' big' : ''}">${res.txt}</b>`;
-    o.querySelector('.wh-shards').outerHTML = `<div class="wh-shards">${Array.from({ length: SHARDS_NEED }, (_, i) => `<i class="${i < (p.wheel.shards || 0) ? 'on' : ''}"></i>`).join('')}<small>💎 ${p.wheel.shards || 0}/${SHARDS_NEED} szilánk → Gyémánt lap</small></div>`;
+    o.querySelector('.wh-shards').outerHTML = `<div class="wh-shards">${Array.from({ length: SHARDS_NEED }, (_, i) => `<i class="${i < (p.wheel.shards || 0) ? 'on' : ''}"></i>`).join('')}<small><img src="art/ui/ic-shard.webp" alt=""> ${p.wheel.shards || 0}/${SHARDS_NEED} szilánk → 💎 Gyémánt lap</small></div>`;
     if (res.ic === 'diamond') openModal(cardHTML(DIAMOND_CARD, { big: true }), '💎 GYÉMÁNT LAP! A Best of Us gyémánt változata a tiéd – a pakliépítőben az alaplap helyett beteheted.', '');
     const again = wheelReady(); hub.disabled = !again; hub.classList.remove('spinning');
     busy = false;
@@ -456,25 +456,23 @@ function openWheel() {
 // ---- bolt képernyő ----
 // a boltban coinért megvehető különleges lapok (változatok); egyszer vehető meg mindegyik
 const SHOP_ITEMS = () => CARDS.filter(c => c.shopOnly && ART[c.id]).map(c => ({ id: c.id, price: c.price || 100 }));
-function shopOfferHTML(it) {
-  const c = CARD[it.id], have = owned(it.id) > 0, p = Store.p, can = p.coins >= it.price;
-  return `<button class="shop-card${have ? ' owned' : ''}" data-buy="${it.id}" ${have ? 'aria-disabled="true"' : ''}>
-    <span class="sc-art" style="background-image:url('${ART[it.id].src}');background-position:${ART[it.id].pos || '50% 20%'}"></span>
-    <span class="sc-frame" aria-hidden="true"></span>
-    <span class="sc-name">${c.name}</span>
-    <span class="sc-sub">✦ Különleges változat</span>
-    <span class="sc-price${!have && !can ? ' poor' : ''}">${have ? '✓ Megvan' : `<b>${it.price}</b> coin`}</span>
+// egységes bolti termékpanel (Astra UI): kép + név + ársáv; állapotok: vehető / megszerezted / nincs elég coin
+function shopPanelHTML({ attr, img, pos, contain, name, sub, price, have, holo, extra = '' }) {
+  const poor = !have && Store.p.coins < price, st = have ? 'owned' : poor ? 'poor' : 'ok';
+  return `<button class="sp-card ${st}${contain ? ' contain' : ''}" ${attr} aria-label="${escH(name)} – ${have ? 'megszerezted' : price + ' coin'}${poor ? ', nincs elég coin' : ''}">
+    <span class="sp-img" style="${contain ? `--packimg:url('${img}')` : `background-image:url('${img}');${pos ? `background-position:${pos};` : ''}`}"></span>${holo ? '<span class="sc-holo sp-holo" aria-hidden="true"></span>' : ''}
+    <span class="sp-frame" aria-hidden="true"></span>${extra}
+    <span class="sp-name">${name}</span>${sub ? `<span class="sp-sub">${sub}</span>` : ''}
+    ${have ? '' : `<span class="sp-price">${price}</span>`}
   </button>`;
 }
+function shopOfferHTML(it) {
+  const c = CARD[it.id];
+  return shopPanelHTML({ attr: `data-buy="${it.id}"`, img: ART[it.id].src, pos: ART[it.id].pos || '50% 20%', name: c.name, sub: '✦ Változat · 2 db', price: it.price, have: owned(it.id) > 0 });
+}
 function portOfferHTML(k) {
-  const P = PORTRAITS[k], have = ownsPort(k), can = Store.p.coins >= P.price;
-  return `<button class="shop-card port${have ? ' owned' : ''}" data-port="${k}">
-    <span class="sc-art" style="background-image:url('${ART[k].src}');background-position:${ART[k].pos || '50% 20%'}"></span><span class="sc-holo" aria-hidden="true"></span>
-    <span class="sc-frame" aria-hidden="true"></span>
-    <span class="sc-name">${P.name}</span>
-    <span class="sc-sub">✦ Full Art portré</span>
-    <span class="sc-price${!have && !can ? ' poor' : ''}">${have ? '✓ Megvan' : `<b>${P.price}</b> coin`}</span>
-  </button>`;
+  const P = PORTRAITS[k];
+  return shopPanelHTML({ attr: `data-port="${k}"`, img: ART[k].src, pos: ART[k].pos || '50% 20%', name: P.name, sub: '✦ Full Art portré', price: P.price, have: ownsPort(k), holo: true });
 }
 async function buyPortrait(k) {
   const P = PORTRAITS[k], p = Store.p, h = HERO[P.hero]; if (!P || !p) return;
@@ -505,59 +503,54 @@ async function buyShopItem(id) {
   await save(); renderProfileBar(); renderShop();
   openModal(cardHTML(id, { big: true }), `🎉 Megvetted: ${c.name}! 2 példány került a gyűjteményedbe – a pakliépítőben az alaplap helyett is beteheted.`, '');
 }
+const SHOP_REFRESH = null;   // a limitált kínálat következő frissítése, pl. '2026-10-20' – ha megadod, visszaszámlál
 function renderShop() {
   const p = Store.p; if (!p) return;
   const free = freePackReady();
   const items = SHOP_ITEMS(), ports = Object.keys(PORTRAITS).filter(k => ART[k]);
+  let refresh = 'A kínálat időnként frissül – ami most itt van, csak a következő frissítésig kapható.';
+  if (SHOP_REFRESH) { const d = Math.ceil((new Date(SHOP_REFRESH + 'T00:00') - new Date()) / 864e5); if (d > 0) refresh = `Frissül: <b>${d} nap múlva</b> – addig kapható, ami most itt van.`; }
   const limited = items.length || ports.length ? `
     <section class="shop-limited">
-      <div class="lim-head"><h3>⏳ Limitált kínálat</h3><span class="lim-tag">Csak most</span></div>
-      <p class="lim-note">A bolt időnként frissül: az alábbi különleges lapok és hős-portrék <b>csak a következő frissítésig</b> kaphatók – utána mások jönnek a helyükre. Ami megvan, az persze megmarad.</p>
-      ${items.length ? `<div class="lbl shop-lbl">✦ Különleges lapok <small>rögtön 2 példány · ugyanúgy játszanak, mint az alaplap</small></div>
-      <div class="shop-grid">${items.map(shopOfferHTML).join('')}</div>` : ''}
-      ${ports.length ? `<div class="lbl shop-lbl">✦ Hős-portrék <small>saját névvel, mindig Full Artban</small></div>
-      <div class="shop-grid">${ports.map(portOfferHTML).join('')}</div>` : ''}
+      <div class="lim-head"><img class="lim-badge" src="art/ui/badge-limited.webp" alt="Limitált"><h3>Limitált kínálat</h3></div>
+      <p class="lim-note"><img class="lim-timer" src="art/ui/ic-timer.webp" alt="" aria-hidden="true">${refresh}</p>
+      <div class="shop-grid">${items.map(shopOfferHTML).join('')}${ports.map(portOfferHTML).join('')}</div>
     </section>` : '';
+  const gifts = [
+    p.faPacks > 0 ? `<button class="btn primary gift fa" id="faPack">✨ Full Art ajándék pack${p.faPacks > 1 ? ` (${p.faPacks})` : ''}</button>` : '',
+    p.giftPacks > 0 ? `<button class="btn primary gift" id="giftPack">🎁 Ajándék pack bontása${p.giftPacks > 1 ? ` (${p.giftPacks})` : ''}</button>` : '',
+    p.shinyPacks > 0 ? `<button class="btn primary shiny-btn" id="giftShiny">🎁 Ajándék Shiny pack${p.shinyPacks > 1 ? ` (${p.shinyPacks})` : ''}</button>` : '',
+    `<button class="btn primary" id="freePack" ${free ? '' : 'disabled'}>${free ? '🎁 Napi ingyen pack' : 'Mai ingyen pack elhasználva'}</button>`].join('');
   $('#shopBody').innerHTML = `
     <div class="wallet"><span class="coin" aria-hidden="true"></span><b>${p.coins}</b><small>coin</small></div>
-    ${limited ? '<button class="lim-jump" data-jump>⏳ Limitált lapok és portrék – lejjebb ↓</button>' : ''}
+    ${limited ? '<button class="lim-jump" data-jump><img src="art/ui/ic-timer.webp" alt="" aria-hidden="true"> Limitált lapok és portrék – lejjebb ↓</button>' : ''}
     <div class="lbl shop-lbl">Boosterek</div>
-    <div class="pack-offer">
-      <div class="pack-art">${packHTML('base')}</div>
-      <div class="pack-info">
-        <h3>${SETS.base.name}</h3>
-        <p>3 véletlen lap a teljes alapkészletből. Minden packban van legalább egy ritka vagy jobb lap.</p>
-        ${p.faPacks > 0 ? `<button class="btn primary gift fa" id="faPack">✨ Full Art ajándék pack${p.faPacks > 1 ? ` (${p.faPacks})` : ''}</button>` : ''}
-        ${p.giftPacks > 0 ? `<button class="btn primary gift" id="giftPack">🎁 Ajándék pack bontása${p.giftPacks > 1 ? ` (${p.giftPacks})` : ''}</button>` : ''}
-        <button class="btn primary" id="freePack" ${free ? '' : 'disabled'}>${free ? 'Napi ingyen pack bontása' : 'Mai ingyen pack elhasználva'}</button>
-        <button class="btn" id="buyPack" ${p.coins >= ECON.packPrice ? '' : 'disabled'}><span class="coin sm" aria-hidden="true"></span> ${ECON.packPrice} · Pack vásárlása</button>
-      </div>
+    <div class="shop-gifts">${gifts}</div>
+    <div class="shop-grid">
+      ${shopPanelHTML({ attr: 'data-pack="base"', img: 'art/ui/pack-base.webp', contain: true, name: SETS.base.name, sub: '3 lap', price: ECON.packPrice, have: false })}
+      ${shopPanelHTML({ attr: 'data-pack="shiny"', img: 'art/ui/pack-shiny.webp', contain: true, name: 'Shiny pack', sub: '1 biztos különleges', price: ECON.shinyPrice, have: false, holo: true })}
     </div>
-    <div class="pack-offer shiny-offer">
-      <div class="pack-art">${packHTML('base', { shiny: true })}</div>
-      <div class="pack-info">
-        <h3>Shiny ${SETS.base.name}</h3>
-        <p>3 lap, amiből egy <b>biztosan különleges</b>: Full Art lap, Full Art hős, vagy ritka változat-lap (pl. a zöld Rehab). Ráadásul <b class="gold-t">${ECON.goldShiny * 100}% eséllyel ✦ Arany hős</b> is lehet benne!</p>
-        ${p.shinyPacks > 0 ? `<button class="btn primary shiny-btn" id="giftShiny">🎁 Ajándék Shiny pack bontása${p.shinyPacks > 1 ? ` (${p.shinyPacks})` : ''}</button>` : ''}
-        <button class="btn primary shiny-btn" id="buyShiny" ${p.coins >= ECON.shinyPrice ? '' : 'disabled'}><span class="coin sm" aria-hidden="true"></span> ${ECON.shinyPrice} · Shiny pack</button>
-      </div>
-    </div>
+    <details class="pack-info-more"><summary>Mi van a packokban?</summary>
+      <p><b>${SETS.base.name}:</b> 3 véletlen lap a teljes alapkészletből, legalább egy ritka vagy jobb.</p>
+      <p><b>Shiny pack:</b> 3 lap, amiből egy biztosan különleges: Full Art lap, Full Art hős vagy ritka változat-lap. ${ECON.goldShiny * 100}% eséllyel ✦ Arany hős is lehet benne.</p></details>
     ${limited}
     <div class="odds"><div class="lbl">Esélyek laponként</div>
       ${[['l', 'Legendás'], ['e', 'Epikus'], ['r', 'Ritka'], ['k', 'Gyakori']].map(([k, n]) => `<div class="odd"><i class="rar r-${k}"></i><span>${n}</span><b>${ECON.odds.find(o => o[0] === k)[1]}%</b></div>`).join('')}
       <div class="odd"><i class="rar r-f"></i><span>Full Art változat (bármelyik lapból)</span><b>${ECON.foilChance * 100}%</b></div>
       <div class="odd"><i class="rar r-f"></i><span>Full Art hős (packonként)</span><b>${ECON.heroFaChance * 100}%</b></div>
       <div class="odd gold-odd"><i class="rar r-g"></i><span>✦ Arany hős (packonként · Shiny packban)</span><b>${String(ECON.goldPlain * 100).replace('.', ',')}% · ${ECON.goldShiny * 100}%</b></div>
-      <small>Ha ${ECON.pityAfter} packon át nem jön epikus vagy legendás lap, a következőben biztosan lesz. Napi coin: győzelem ${ECON.win}, döntetlen ${ECON.draw}, vereség ${ECON.loss}, legfeljebb ${ECON.dailyCap}. Egy lapból legfeljebb ${DUPE_KEEP} példány marad meg, a többit a játék automatikusan beváltja: lapként ${DUPE_COIN} coin, Full Art vagy változat lap esetén ${DUPE_COIN_RARE} coin.</small>
+      <small>Ha ${ECON.pityAfter} packon át nem jön epikus vagy legendás lap, a következőben biztosan lesz. Napi coin: győzelem ${ECON.win}, döntetlen ${ECON.draw}, vereség ${ECON.loss}, legfeljebb ${ECON.dailyCap}.</small>
     </div>`;
   $('#shopBody').querySelectorAll('[data-buy]').forEach(b => b.onclick = () => buyShopItem(b.dataset.buy));
   $('#shopBody').querySelectorAll('[data-port]').forEach(b => b.onclick = () => buyPortrait(b.dataset.port));
+  $('#shopBody').querySelectorAll('[data-pack]').forEach(b => b.onclick = () => {
+    const sh = b.dataset.pack === 'shiny', pr = sh ? ECON.shinyPrice : ECON.packPrice;
+    if (Store.p.coins < pr) return toast(`Nincs elég coinod (${Store.p.coins}/${pr})`);
+    buyPack('base', sh ? 'shiny' : false); });
   const jb = $('#shopBody').querySelector('[data-jump]'); if (jb) jb.onclick = () => $('#shopBody .shop-limited')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   $('#freePack').onclick = () => buyPack('base', true);
   if ($('#giftPack')) $('#giftPack').onclick = () => buyPack('base', 'gift');
   if ($('#faPack')) $('#faPack').onclick = () => buyPack('base', 'fa');
-  $('#buyPack').onclick = () => buyPack('base', false);
-  $('#buyShiny').onclick = () => buyPack('base', 'shiny');
   if ($('#giftShiny')) $('#giftShiny').onclick = () => buyPack('base', 'shinyGift');
 }
 function packHTML(setId, o = {}) {

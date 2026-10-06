@@ -302,19 +302,57 @@ function renderPick() {
 $('#deckPick').onclick = e => { const m = e.target.closest('[data-more]'); if (m) { ui.deckOpen = ui.deckOpen === m.dataset.more ? null : m.dataset.more; renderPick(); return; } const b = e.target.closest('[data-d]'); if (b) { ui.deck = b.dataset.d; renderPick(); } };
 $('#startBtn').onclick = () => { const d = allDecks().find(x => x.id === ui.deck); if (!d || deckIssue(d)) return; startMatch(d.hero, ui.deck); };
 
-function renderColl() {
-  const groups = [['Hősök', null], ['Karakterek', 'char'], ['Eszközök', 'item'], ['Akciók', 'action'], ['Helyszínek', 'loc']];
+// ---- gyűjtemény-szűrő (Astra UI): név, típus, ritkaság, költség, megvan/hiányzik ----
+const CF = { q: '', type: new Set(), rar: new Set(), cost: new Set(), own: '' };
+const CF_TYPES = [['char', 'Karakter'], ['action', 'Akció'], ['item', 'Eszköz'], ['loc', 'Helyszín']];
+const CF_RARS = [['k', 'Gyakori'], ['r', 'Ritka'], ['e', 'Epikus'], ['l', 'Legendás'], ['d', 'Gyémánt']];
+const CF_COSTS = ['0-1', '2', '3', '4', '5', '6+'];
+const cfActive = () => CF.q || CF.type.size || CF.rar.size || CF.cost.size || CF.own;
+const costKey = c => c.cost <= 1 ? '0-1' : c.cost >= 6 ? '6+' : String(c.cost);
+const cfNorm = t => String(t).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+function cfMatch(c) {
+  if (CF.q && !cfNorm(c.name + ' ' + (c.text || '')).includes(cfNorm(CF.q))) return false;
+  if (CF.type.size && !CF.type.has(c.type)) return false;
+  if (CF.rar.size && !CF.rar.has(rarKey(c))) return false;
+  if (CF.cost.size && !CF.cost.has(costKey(c))) return false;
+  if (CF.own) { const n = Store.p ? owned(c.id) : 0; if (CF.own === 'have' ? !n : n) return false; }
+  return true;
+}
+function renderCollFilters() {
+  const el = $('#collFilters'); if (!el) return;
+  const chip = (grp, val, inner, on, label) => `<button class="cf-chip${on ? ' on' : ''}" data-cf="${grp}" data-v="${val}" aria-pressed="${on}" aria-label="${label}">${inner}</button>`;
+  el.innerHTML = `<label class="cf-search"><span class="sr-only">Keresés</span><input id="cfQ" type="search" placeholder="Keresés…" value="${escH(CF.q)}" autocomplete="off"></label>
+    <div class="cf-row">${CF_TYPES.map(([k, n]) => chip('type', k, `<img src="art/ui/ic-type-${k}.webp" alt=""><span class="lbl-t">${n}</span>`, CF.type.has(k), n)).join('')}</div>
+    <div class="cf-row">${CF_RARS.map(([k, n]) => chip('rar', k, `<i class="rar r-${k}"></i>`, CF.rar.has(k), n)).join('')}
+      ${chip('own', 'have', '<img src="art/ui/ic-owned.webp" alt="">', CF.own === 'have', 'Megvan')}${chip('own', 'miss', '<img src="art/ui/ic-missing.webp" alt="">', CF.own === 'miss', 'Hiányzik')}</div>
+    <div class="cf-row">${CF_COSTS.map(k => chip('cost', k, `<span class="lbl-t">⚡${k}</span>`, CF.cost.has(k), k + ' energia')).join('')}</div>
+    ${cfActive() ? '<button class="cf-clear" data-cfclear>✕ Szűrők törlése</button>' : ''}`;
+  const q = $('#cfQ'); q.oninput = () => { CF.q = q.value.trim(); renderColl(true); const cl = el.querySelector('[data-cfclear]'); if (!!cl !== !!cfActive()) { renderCollFilters(); $('#cfQ').focus(); } };
+  el.onclick = e => {
+    if (e.target.closest('[data-cfclear]')) { CF.q = ''; CF.type.clear(); CF.rar.clear(); CF.cost.clear(); CF.own = ''; renderCollFilters(); renderColl(true); return; }
+    const b = e.target.closest('[data-cf]'); if (!b) return;
+    const g = b.dataset.cf, v = b.dataset.v;
+    if (g === 'own') CF.own = CF.own === v ? '' : v; else { const S2 = CF[g]; S2.has(v) ? S2.delete(v) : S2.add(v); }
+    renderCollFilters(); renderColl(true);
+  };
+}
+function renderColl(bodyOnly) {
+  if (!bodyOnly) renderCollFilters();
+  const heroQ = h => !CF.q || cfNorm(h.name + ' ' + h.text).includes(cfNorm(CF.q));
+  const heroOk = !(CF.type.size || CF.rar.size || CF.cost.size || CF.own) && HEROES.some(heroQ);
+  const groups = [['Hősök', null], ['Karakterek', 'char'], ['Eszközök', 'item'], ['Akciók', 'action'], ['Helyszínek', 'loc']]
+    .filter(([, type]) => type ? PLAYABLE.some(c => c.type === type && cfMatch(c)) : heroOk);
   const have = PLAYABLE.filter(c => owned(c.id) > 0).length, foils = PLAYABLE.filter(c => ownsFoil(c.id)).length;
   const dup = typeof dupeList === 'function' && Store.p ? dupeList(Store.p) : { out: [] };
-  $('#collBody').innerHTML = `<p class="coll-sum">${have}/${PLAYABLE.length} különböző lap · ${foils} Full Art változat</p>` +
+  $('#collBody').innerHTML = `<p class="coll-sum">${have}/${PLAYABLE.length} különböző lap · ${foils} Full Art változat</p>` + (groups.length ? '' : '<p class="cf-empty">Nincs a szűrésnek megfelelő lap.</p>') +
     (dup.out.length ? `<button class="btn dupe-btn" id="dupeBtn">♻️ ${dup.out.reduce((s, x) => s + x.n + x.f, 0)} fölösleges lap beváltása · +${dup.coins} coin</button>` : '') + groups.map(([t, type]) => `<div class="lbl">${t}</div><div class="coll-grid">${
-    type ? PLAYABLE.filter(c => c.type === type).sort((a, b) => a.cost - b.cost).map(c => {
+    type ? PLAYABLE.filter(c => c.type === type && cfMatch(c)).sort((a, b) => a.cost - b.cost).map(c => {
       const n = ui.foil || c.foilOnly ? (Store.p?.coll[c.id]?.f || 0) : (Store.p?.coll[c.id]?.n || 0);
-      return `<div class="coll-slot${n ? '' : ' missing'}">${cardHTML(c.id, { foil: ui.foil, attrs: `data-card="${c.id}" tabindex="0"` })}<span class="own-n"><i class="rar r-${rarKey(c)}" title="${RAR[rarKey(c)]}" aria-label="${RAR[c.rarity]}"></i>${n ? '×' + n : 'Nincs meg'}</span></div>`;
+      return `<div class="coll-slot${n ? '' : ' missing'}">${c.diamond ? '<img class="dia-mark" src="art/ui/ic-diamond-small.webp" alt="Gyémánt">' : ''}${cardHTML(c.id, { foil: ui.foil, attrs: `data-card="${c.id}" tabindex="0"` })}<span class="own-n"><i class="rar r-${rarKey(c)}" title="${RAR[rarKey(c)]}" aria-label="${RAR[c.rarity]}"></i>${n ? '×' + n : 'Nincs meg'}</span></div>`;
     }).join('')
-         : HEROES.map(h => { const miss = ui.foil && !ownsHeroFa(h.id);
+         : HEROES.filter(heroQ).map(h => { const miss = ui.foil && !ownsHeroFa(h.id);
              const multi = !ui.foil && Store.p && heroSkins(h.id).length > 1, sk = multi ? heroSkin(h.id) : 'base';
-             return `<div class="coll-slot${miss ? ' missing' : ''}">${heroCardHTML(h, { foil: ui.foil || sk === 'fa', gold: !ui.foil && sk === 'gold', port: !ui.foil && isPort(sk) ? sk : null, attrs: `data-hcard="${h.id}" tabindex="0"` })}${ui.foil ? `<span class="own-n">${miss ? 'Nincs meg' : '×' + Store.p.heroFa[h.id]}</span>` : multi ? `<span class="own-n skin-n">🎨 ${skinName(sk)}</span>` : ''}</div>`; }).join('')}</div>${type ? '' : `<div class="lbl gold-lbl">✦ Arany hősök – a legritkább lapok</div><div class="coll-grid">${GOLD_HEROES.map(hid => { const has = ownsHeroGold(hid);
+             return `<div class="coll-slot${miss ? ' missing' : ''}">${heroCardHTML(h, { foil: ui.foil || sk === 'fa', gold: !ui.foil && sk === 'gold', port: !ui.foil && isPort(sk) ? sk : null, attrs: `data-hcard="${h.id}" tabindex="0"` })}${ui.foil ? `<span class="own-n">${miss ? 'Nincs meg' : '×' + Store.p.heroFa[h.id]}</span>` : multi ? `<span class="own-n skin-n">🎨 ${skinName(sk)}</span>` : ''}</div>`; }).join('')}</div>${type || cfActive() ? '' : `<div class="lbl gold-lbl">✦ Arany hősök – a legritkább lapok</div><div class="coll-grid">${GOLD_HEROES.map(hid => { const has = ownsHeroGold(hid);
              return `<div class="coll-slot${has ? '' : ' missing gold-miss'}">${heroCardHTML(HERO[hid], { gold: true, attrs: `data-hgold="${hid}" tabindex="0"` })}<span class="own-n">${has ? '✦ Megvan' : 'Nincs meg'}</span></div>`; }).join('')}</div>`}`).join('');
 }
 $('#vBase').onclick = () => { ui.foil = false; $('#vBase').setAttribute('aria-pressed', 'true'); $('#vFoil').setAttribute('aria-pressed', 'false'); renderColl(); };
