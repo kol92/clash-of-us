@@ -33,6 +33,7 @@ const CARDS = [
   { id:'c_norbi', type:'char', name:'Lukács Norbi', cost:3, atk:2, hp:3, rarity:'r', text:'Ha mellette áll egy másik karaktered, +2 támadást kap.' },
   { id:'c_udvarhelyi', type:'char', name:'Udvarhelyi Zoli', cost:6, atk:5, hp:5, rarity:'k', text:'' },
   { id:'c_molnar', type:'char', name:'Molnár Zsolti', cost:5, atk:2, hp:4, rarity:'r', deathKill:true, text:'Amikor meghal, elpusztít egy véletlen ellenséges karaktert.' },
+  { id:'c_atiuldozott', type:'char', name:'Ati, az üldözött', cost:3, atk:3, hp:2, rarity:'r', sneak:true, text:'A köröd elején, ha szemben áll vele valaki, átmenekül egy szabad helyre, ahol nincs vele szemben senki.' },
   { id:'c_amszterdam', type:'char', name:'Bence, Amszterdam hőse', cost:2, atk:2, hp:1, rarity:'r', sneak:true, deathHeal:3, text:'Amikor meghal, a hősöd 3 életet gyógyul.' },
   { id:'c_barnaelet', type:'char', name:'Barna, az életunt', cost:2, atk:1, hp:2, rarity:'r', sneak:true, deathDraw:true, text:'Amikor meghal, húzol egy lapot.' },
   { id:'c_zana', type:'char', name:'Zana', cost:4, atk:3, hp:3, rarity:'e', text:'Körönként kétszer támad.' },
@@ -248,6 +249,7 @@ function startTurn(s) {
   ev(s, { t:'turn', side:pi });
   if (s.half > 1) draw(s, pi);
   if (s.half === 2 && !s.noCoin) { addToHand(s, pi, 'a_kor'); ev(s, { t:'coin', side:pi, i:-1 }); }   // a második játékos kiegyenlítése
+  atiFlee(s, pi);
   sharkSwim(s, pi);
   if (has(p, 'extraDraw') && p.turns % 3 === 0) draw(s, pi);
   checkWin(s);
@@ -735,6 +737,23 @@ function baszoStrike(s) {
   checkWin(s);
 }
 // Cápa (Barna kánon eseménye): a gazdája körének elején egy hellyel balra úszik, és megeszi, aki ott áll; a bal szélen elpusztul
+function atiFlee(s, pi) {
+  // Ati, az üldözött: a gazdája körének elején, ha szemben áll vele valaki, átmenekül a legközelebbi szabad helyre,
+  // ahol nincs vele szemben senki (a saját Cápánk nem számít „valakinek”)
+  const b = s.players[pi].board, e = s.players[other(pi)].board;
+  const foe = j => !!(e[j] && e[j].owner !== pi);
+  b.map((u, i) => u && bid(u.id) === 'c_atiuldozott' ? u : null).filter(Boolean).forEach(u => {
+    const i = b.indexOf(u); if (i < 0 || !foe(i)) return;
+    let best = -1, bd = 99;
+    for (let j = 0; j < LANES; j++) {
+      if (b[j] || foe(j) || closedLane(s, pi, j)) continue;
+      const d = Math.abs(j - i); if (d < bd || (d === bd && rnd() < .5)) { bd = d; best = j; }
+    }
+    if (best < 0) return;
+    b[best] = u; b[i] = null; ev(s, { t:'flee', side:pi, i:best, from:i });
+  });
+}
+
 function sharkSwim(s, pi) {
   // Cápa (Barna Kánon eseménye): a gazdája körének elején EGY helyet úszik afelé a karakter felé, akit az ellenfél utoljára
   // lerakott (ha az már nincs lent: a legközelebbi karakter felé), és megeszi, aki azon a helyen áll. 4 úszás után eltűnik.
@@ -857,4 +876,4 @@ function botChoose(real) {
   return best;
 }
 
-if (typeof module !== 'undefined') module.exports = { baszoStrike, sharkSwim, openSlots, closedLane, CARDS_ALL: CARDS, DECK_OF, LANES, MAX_HALF, mulligan, botMulligan, beginGame, CARDS, CARD, HEROES, HERO, DECKS, newGame, playCard, canPlay, targetsFor, cardCost, attackLane, finishTurn, runEndTurn, botChoose, canAttack, effAtk };
+if (typeof module !== 'undefined') module.exports = { baszoStrike, sharkSwim, atiFlee, openSlots, closedLane, CARDS_ALL: CARDS, DECK_OF, LANES, MAX_HALF, mulligan, botMulligan, beginGame, CARDS, CARD, HEROES, HERO, DECKS, newGame, playCard, canPlay, targetsFor, cardCost, attackLane, finishTurn, runEndTurn, botChoose, canAttack, effAtk };

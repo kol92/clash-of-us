@@ -178,6 +178,7 @@ const ART = {
   c_kriszrantott: { src:'art/kriszrantott.webp', av:'58% 22%', pos:'56% 22%' },
   a_rantott: { src:'art/rantott.webp', av:'45% 40%', pos:'50% 38%' },
   c_tomiparti: { src:'art/tomiparti.webp', av:'47% 26%', pos:'47% 24%' },
+  c_atiuldozott: { src:'art/atiuldozott.webp', av:'50% 24%', pos:'50% 26%' },
   c_amszterdam: { src:'art/amszterdam.webp', av:'60% 22%', pos:'58% 24%' },
   c_barnaelet: { src:'art/barnaelet.webp', av:'54% 26%', pos:'54% 26%' },
   f_bender: { src:'art/f_bender.webp', av:'55% 40%', pos:'55% 34%' },   // Kánon esemény lapok
@@ -533,6 +534,7 @@ function logEvents(evs, snap) {
       case 'coin': L(`💧 ${e.side === ME ? 'Kaptál' : 'Az ellenfél kapott'} egy pohár vizet`); break;
       case 'chomp': L(`🦈 A Cápa megette: ${unitName(e.side, e.i)}`); break;
       case 'sharkgone': L('🦈 A Cápa eltűnt'); break;
+      case 'flee': L(`🏃 ${unitName(e.side, e.i)} átmenekült egy másik helyre`); break;
       case 'doom': case 'expire': L(`⌛ ${unitName(e.side, e.i)} eltűnt`); break;
       case 'lock': L(`🔒 ${e.side === ME ? 'Le vagy bénítva' : 'Az ellenfél le van bénítva'}: a következő körben nem játszhat ki lapot`); break;
       case 'locgone': L(`🚫 Kitiltva: ${CARD[e.id].name}`); break;
@@ -683,6 +685,7 @@ async function animateEvents(evs) {
       case 'nocounter': floatAt(anchor, 'Baszót nem lehet visszaütni!', 'info'); hold = Math.max(hold, 500); break;
       case 'jblwave': await jblWaveFx(e); break;
       case 'sharkgone': floatAt(anchor, '🦈 Elúszott…', 'info'); hold = Math.max(hold, 600); break;
+      case 'flee': floatAt(anchor, '🏃 Menekül!', 'info'); hold = Math.max(hold, 600); break;
       case 'gift': floatAt(anchor, `${e.id === 'i_ing' ? '👔' : '🍗'} ${CARD[e.id].name} a ${e.side === ME ? 'kezedbe' : 'kezébe'}!`, 'info'); hold = Math.max(hold, 700); break;
       case 'drinkgift': floatAt(anchor, e.side === ME ? `🍸 ${CARD[e.id].name} a kezedbe!` : '🍸 Ital a kezébe!', 'info'); hold = Math.max(hold, 700); break;
       case 'deathblast': floatAt(anchor, '💥 Utolsó ütés!', 'dmg'); hold = Math.max(hold, 450); break;

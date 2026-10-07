@@ -1977,7 +1977,7 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%;}
 <script src="vendor/firebase-auth-compat.js"></script>
 <script src="vendor/firebase-firestore-compat.js"></script>
 <script src="vendor/firebase-database-compat.js"></script>
-<script>window.APP_VERSION = "2026.10.06-1925";</script>
+<script>window.APP_VERSION = "2026.10.07-2324";</script>
 <script>// ===== Best of Us – saját szerver (Firebase) =====
 // A játék eredetileg a Claude-os tárolót használta (window.claude.use('db' | 'user' | 'room')).
 // Ez a fájl ugyanazt a felületet adja Firebase-ből, így a játék kódja szinte változatlan maradhat:
@@ -2256,6 +2256,7 @@ const CARDS = [
   { id:'c_norbi', type:'char', name:'Lukács Norbi', cost:3, atk:2, hp:3, rarity:'r', text:'Ha mellette áll egy másik karaktered, +2 támadást kap.' },
   { id:'c_udvarhelyi', type:'char', name:'Udvarhelyi Zoli', cost:6, atk:5, hp:5, rarity:'k', text:'' },
   { id:'c_molnar', type:'char', name:'Molnár Zsolti', cost:5, atk:2, hp:4, rarity:'r', deathKill:true, text:'Amikor meghal, elpusztít egy véletlen ellenséges karaktert.' },
+  { id:'c_atiuldozott', type:'char', name:'Ati, az üldözött', cost:3, atk:3, hp:2, rarity:'r', sneak:true, text:'A köröd elején, ha szemben áll vele valaki, átmenekül egy szabad helyre, ahol nincs vele szemben senki.' },
   { id:'c_amszterdam', type:'char', name:'Bence, Amszterdam hőse', cost:2, atk:2, hp:1, rarity:'r', sneak:true, deathHeal:3, text:'Amikor meghal, a hősöd 3 életet gyógyul.' },
   { id:'c_barnaelet', type:'char', name:'Barna, az életunt', cost:2, atk:1, hp:2, rarity:'r', sneak:true, deathDraw:true, text:'Amikor meghal, húzol egy lapot.' },
   { id:'c_zana', type:'char', name:'Zana', cost:4, atk:3, hp:3, rarity:'e', text:'Körönként kétszer támad.' },
@@ -2471,6 +2472,7 @@ function startTurn(s) {
   ev(s, { t:'turn', side:pi });
   if (s.half > 1) draw(s, pi);
   if (s.half === 2 && !s.noCoin) { addToHand(s, pi, 'a_kor'); ev(s, { t:'coin', side:pi, i:-1 }); }   // a második játékos kiegyenlítése
+  atiFlee(s, pi);
   sharkSwim(s, pi);
   if (has(p, 'extraDraw') && p.turns % 3 === 0) draw(s, pi);
   checkWin(s);
@@ -2958,6 +2960,23 @@ function baszoStrike(s) {
   checkWin(s);
 }
 // Cápa (Barna kánon eseménye): a gazdája körének elején egy hellyel balra úszik, és megeszi, aki ott áll; a bal szélen elpusztul
+function atiFlee(s, pi) {
+  // Ati, az üldözött: a gazdája körének elején, ha szemben áll vele valaki, átmenekül a legközelebbi szabad helyre,
+  // ahol nincs vele szemben senki (a saját Cápánk nem számít „valakinek”)
+  const b = s.players[pi].board, e = s.players[other(pi)].board;
+  const foe = j => !!(e[j] && e[j].owner !== pi);
+  b.map((u, i) => u && bid(u.id) === 'c_atiuldozott' ? u : null).filter(Boolean).forEach(u => {
+    const i = b.indexOf(u); if (i < 0 || !foe(i)) return;
+    let best = -1, bd = 99;
+    for (let j = 0; j < LANES; j++) {
+      if (b[j] || foe(j) || closedLane(s, pi, j)) continue;
+      const d = Math.abs(j - i); if (d < bd || (d === bd && rnd() < .5)) { bd = d; best = j; }
+    }
+    if (best < 0) return;
+    b[best] = u; b[i] = null; ev(s, { t:'flee', side:pi, i:best, from:i });
+  });
+}
+
 function sharkSwim(s, pi) {
   // Cápa (Barna Kánon eseménye): a gazdája körének elején EGY helyet úszik afelé a karakter felé, akit az ellenfél utoljára
   // lerakott (ha az már nincs lent: a legközelebbi karakter felé), és megeszi, aki azon a helyen áll. 4 úszás után eltűnik.
@@ -3080,7 +3099,7 @@ function botChoose(real) {
   return best;
 }
 
-if (typeof module !== 'undefined') module.exports = { baszoStrike, sharkSwim, openSlots, closedLane, CARDS_ALL: CARDS, DECK_OF, LANES, MAX_HALF, mulligan, botMulligan, beginGame, CARDS, CARD, HEROES, HERO, DECKS, newGame, playCard, canPlay, targetsFor, cardCost, attackLane, finishTurn, runEndTurn, botChoose, canAttack, effAtk };
+if (typeof module !== 'undefined') module.exports = { baszoStrike, sharkSwim, atiFlee, openSlots, closedLane, CARDS_ALL: CARDS, DECK_OF, LANES, MAX_HALF, mulligan, botMulligan, beginGame, CARDS, CARD, HEROES, HERO, DECKS, newGame, playCard, canPlay, targetsFor, cardCost, attackLane, finishTurn, runEndTurn, botChoose, canAttack, effAtk };
 // ===== Clash of Us – felület =====
 let ME = 0, BOT = 1;   // PvP-ben a vendégnél felcserélődik: mindig te vagy lent
 const $ = q => document.querySelector(q);
@@ -3261,6 +3280,7 @@ const ART = {
   c_kriszrantott: { src:'art/kriszrantott.webp?v=1b89215302acb952', av:'58% 22%', pos:'56% 22%' },
   a_rantott: { src:'art/rantott.webp?v=ce888fe848453ef6', av:'45% 40%', pos:'50% 38%' },
   c_tomiparti: { src:'art/tomiparti.webp?v=b7bb907f03a864ac', av:'47% 26%', pos:'47% 24%' },
+  c_atiuldozott: { src:'art/atiuldozott.webp?v=d9d0a615d185f637', av:'50% 24%', pos:'50% 26%' },
   c_amszterdam: { src:'art/amszterdam.webp?v=98c8109d815f01c2', av:'60% 22%', pos:'58% 24%' },
   c_barnaelet: { src:'art/barnaelet.webp?v=3a8e3fa5ae680a86', av:'54% 26%', pos:'54% 26%' },
   f_bender: { src:'art/f_bender.webp?v=a0c0508cdfb14425', av:'55% 40%', pos:'55% 34%' },   // Kánon esemény lapok
@@ -3616,6 +3636,7 @@ function logEvents(evs, snap) {
       case 'coin': L(`💧 ${e.side === ME ? 'Kaptál' : 'Az ellenfél kapott'} egy pohár vizet`); break;
       case 'chomp': L(`🦈 A Cápa megette: ${unitName(e.side, e.i)}`); break;
       case 'sharkgone': L('🦈 A Cápa eltűnt'); break;
+      case 'flee': L(`🏃 ${unitName(e.side, e.i)} átmenekült egy másik helyre`); break;
       case 'doom': case 'expire': L(`⌛ ${unitName(e.side, e.i)} eltűnt`); break;
       case 'lock': L(`🔒 ${e.side === ME ? 'Le vagy bénítva' : 'Az ellenfél le van bénítva'}: a következő körben nem játszhat ki lapot`); break;
       case 'locgone': L(`🚫 Kitiltva: ${CARD[e.id].name}`); break;
@@ -3766,6 +3787,7 @@ async function animateEvents(evs) {
       case 'nocounter': floatAt(anchor, 'Baszót nem lehet visszaütni!', 'info'); hold = Math.max(hold, 500); break;
       case 'jblwave': await jblWaveFx(e); break;
       case 'sharkgone': floatAt(anchor, '🦈 Elúszott…', 'info'); hold = Math.max(hold, 600); break;
+      case 'flee': floatAt(anchor, '🏃 Menekül!', 'info'); hold = Math.max(hold, 600); break;
       case 'gift': floatAt(anchor, `${e.id === 'i_ing' ? '👔' : '🍗'} ${CARD[e.id].name} a ${e.side === ME ? 'kezedbe' : 'kezébe'}!`, 'info'); hold = Math.max(hold, 700); break;
       case 'drinkgift': floatAt(anchor, e.side === ME ? `🍸 ${CARD[e.id].name} a kezedbe!` : '🍸 Ital a kezébe!', 'info'); hold = Math.max(hold, 700); break;
       case 'deathblast': floatAt(anchor, '💥 Utolsó ütés!', 'dmg'); hold = Math.max(hold, 450); break;
@@ -4598,7 +4620,7 @@ function starterCollection() {
   return coll;
 }
 // Később bekerült gyakori lapok: a meglévő profilok is megkapják (gv = kiosztási verzió)
-const STARTER_ADDS = { 2: ['a_delfin', 'i_varazsho', 'i_lepke'], 3: ['a_rehab'], 4: ['c_pp'], 5: ['c_nfc'], 6: ['a_cheddar'], 7: ['c_vajda', 'c_veghtomi'], 8: ['c_kovacs'], 9: ['a_kitiltva'], 10: ['a_haver'], 11: PLAYABLE.filter(c => c.rarity === 'r' && !c.variantOf).map(c => c.id), 12: ['c_sasimeselo'], 13: ['c_norbi'], 14: ['c_udvarhelyi'], 15: ['c_molnar'], 16: CARDS.filter(c => c.finisher).map(c => c.id), 17: ['c_barnaelet'], 18: ['c_amszterdam'], 19: ['c_davidsofor'], 20: ['a_szulinap'] };   // 16: mindenki megkapja mind a 9 Kánon esemény lapot   // 12: Laci új kezdőpaklijához   // 11: minden ritka lapból 1 (a kezdőpaklikhoz)
+const STARTER_ADDS = { 2: ['a_delfin', 'i_varazsho', 'i_lepke'], 3: ['a_rehab'], 4: ['c_pp'], 5: ['c_nfc'], 6: ['a_cheddar'], 7: ['c_vajda', 'c_veghtomi'], 8: ['c_kovacs'], 9: ['a_kitiltva'], 10: ['a_haver'], 11: PLAYABLE.filter(c => c.rarity === 'r' && !c.variantOf).map(c => c.id), 12: ['c_sasimeselo'], 13: ['c_norbi'], 14: ['c_udvarhelyi'], 15: ['c_molnar'], 16: CARDS.filter(c => c.finisher).map(c => c.id), 17: ['c_barnaelet'], 18: ['c_amszterdam'], 19: ['c_davidsofor'], 20: ['a_szulinap'], 21: ['c_atiuldozott'] };   // 16: mindenki megkapja mind a 9 Kánon esemény lapot   // 12: Laci új kezdőpaklijához   // 11: minden ritka lapból 1 (a kezdőpaklikhoz)
 const GRANT_V = Math.max(1, ...Object.keys(STARTER_ADDS).map(Number));
 // Ajándékok: minden profil egyszer kapja meg (a meglévők a következő megnyitáskor, az újak létrehozáskor)
 const GIFTS = [{ id: 'g-2026-09-28', packs: 1 }, { id: 'g-2026-09-28b', packs: 5 },
