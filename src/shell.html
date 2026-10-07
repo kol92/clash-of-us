@@ -1380,6 +1380,8 @@ h1,h2,h3{font-family:var(--display);font-weight:400;letter-spacing:.01em;text-wr
 
 /* nagyobb betűméret (iPhone „A A” / szövegméret) mellett se lógjon ki semmi a képernyőből */
 html{-webkit-text-size-adjust:100%;text-size-adjust:100%;}
+/* ne zoomoljon bele dupla koppintásra / csippentésre */
+*{touch-action:manipulation;}
 .menu-btns{grid-template-columns:minmax(0,1fr);}
 .menu-btns>*,.m-play>*,.m-tile>*,.btn-row>*{min-width:0;}
 .m-play b{font-size:min(27px,6.8vw);overflow-wrap:anywhere;}

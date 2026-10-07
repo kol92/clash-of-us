@@ -2,7 +2,7 @@
 <html lang="hu">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#0b1c21">
 <meta name="description" content="Best of Us – a banda saját kártyajátéka">
 <link rel="manifest" href="manifest.webmanifest">
@@ -1395,6 +1395,8 @@ h1,h2,h3{font-family:var(--display);font-weight:400;letter-spacing:.01em;text-wr
 
 /* nagyobb betűméret (iPhone „A A” / szövegméret) mellett se lógjon ki semmi a képernyőből */
 html{-webkit-text-size-adjust:100%;text-size-adjust:100%;}
+/* ne zoomoljon bele dupla koppintásra / csippentésre */
+*{touch-action:manipulation;}
 .menu-btns{grid-template-columns:minmax(0,1fr);}
 .menu-btns>*,.m-play>*,.m-tile>*,.btn-row>*{min-width:0;}
 .m-play b{font-size:min(27px,6.8vw);overflow-wrap:anywhere;}
@@ -1977,7 +1979,7 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%;}
 <script src="vendor/firebase-auth-compat.js"></script>
 <script src="vendor/firebase-firestore-compat.js"></script>
 <script src="vendor/firebase-database-compat.js"></script>
-<script>window.APP_VERSION = "2026.10.07-2324";</script>
+<script>window.APP_VERSION = "2026.10.07-2337";</script>
 <script>// ===== Best of Us – saját szerver (Firebase) =====
 // A játék eredetileg a Claude-os tárolót használta (window.claude.use('db' | 'user' | 'room')).
 // Ez a fájl ugyanazt a felületet adja Firebase-ből, így a játék kódja szinte változatlan maradhat:
@@ -3376,11 +3378,17 @@ function heroCardHTML(h, o = {}) {
 // ---------- képernyők ----------
 function show(id) { document.querySelectorAll('.screen').forEach(x => x.hidden = x.id !== id); }
 document.querySelectorAll('[data-back]').forEach(b => b.onclick = () => { renderMenuFan(); renderProfileBar(); show('scr-menu'); });
+// iOS: csippentéses zoom tiltása (a dupla koppintást a touch-action kezeli)
+['gesturestart', 'gesturechange'].forEach(t => document.addEventListener(t, e => e.preventDefault(), { passive: false }));
 function renderMenuFan() {
   const pool = HEROES.filter(h => ART[h.id]).slice();
   for (let i = pool.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [pool[i], pool[j]] = [pool[j], pool[i]]; }
   let gold = []; try { if (Store.p) gold = GOLD_HEROES.filter(h => heroSkin(h) === 'gold'); } catch {}   // induláskor még nincs betöltve a profil   // ha van arany hősöd, az is a menüben díszeleg
-  const pick = pool.slice(0, 3); if (gold.length) pick[1] = HERO[gold[Math.floor(Math.random() * gold.length)]];
+  let pick = pool.slice(0, 3);
+  if (gold.length) {   // az arany hős középre – de ne szerepeljen kétszer
+    const g = HERO[gold[Math.floor(Math.random() * gold.length)]], rest = pool.filter(h => h.id !== g.id);
+    pick = [rest[0], g, rest[1]];
+  }
   const pt = h => { try { const v = Store.p && heroSkin(h.id); return isPort(v) ? v : null; } catch { return null; } };
   $('#menuFan').innerHTML = pick.map(h => heroCardHTML(h, { foil: true, gold: gold.includes(h.id), port: pt(h) })).join('');
 }

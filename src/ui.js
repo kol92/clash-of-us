@@ -274,11 +274,17 @@ function heroCardHTML(h, o = {}) {
 // ---------- képernyők ----------
 function show(id) { document.querySelectorAll('.screen').forEach(x => x.hidden = x.id !== id); }
 document.querySelectorAll('[data-back]').forEach(b => b.onclick = () => { renderMenuFan(); renderProfileBar(); show('scr-menu'); });
+// iOS: csippentéses zoom tiltása (a dupla koppintást a touch-action kezeli)
+['gesturestart', 'gesturechange'].forEach(t => document.addEventListener(t, e => e.preventDefault(), { passive: false }));
 function renderMenuFan() {
   const pool = HEROES.filter(h => ART[h.id]).slice();
   for (let i = pool.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [pool[i], pool[j]] = [pool[j], pool[i]]; }
   let gold = []; try { if (Store.p) gold = GOLD_HEROES.filter(h => heroSkin(h) === 'gold'); } catch {}   // induláskor még nincs betöltve a profil   // ha van arany hősöd, az is a menüben díszeleg
-  const pick = pool.slice(0, 3); if (gold.length) pick[1] = HERO[gold[Math.floor(Math.random() * gold.length)]];
+  let pick = pool.slice(0, 3);
+  if (gold.length) {   // az arany hős középre – de ne szerepeljen kétszer
+    const g = HERO[gold[Math.floor(Math.random() * gold.length)]], rest = pool.filter(h => h.id !== g.id);
+    pick = [rest[0], g, rest[1]];
+  }
   const pt = h => { try { const v = Store.p && heroSkin(h.id); return isPort(v) ? v : null; } catch { return null; } };
   $('#menuFan').innerHTML = pick.map(h => heroCardHTML(h, { foil: true, gold: gold.includes(h.id), port: pt(h) })).join('');
 }

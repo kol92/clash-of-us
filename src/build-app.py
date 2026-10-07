@@ -43,7 +43,7 @@ html = f'''<!doctype html>
 <html lang="hu">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#0b1c21">
 <meta name="description" content="Best of Us – a banda saját kártyajátéka">
 <link rel="manifest" href="manifest.webmanifest">
