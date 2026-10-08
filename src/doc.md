@@ -5,7 +5,7 @@
 - Megosztás barátoknak: e-mailes meghívással, szerkesztői (Editor) joggal, Claude-fiókkal. Nyilvános link nem működik ebben a változatban.
 - Kezdőgyűjtemény: mind a 9 hős, minden gyakori lap 2×, minden ritka lap 1×. Epikus és legendás lap, extra példányok és különleges (csillogó) változatok csak boosterből.
 - Később bekerülő gyakori lapokat a meglévő profilok is automatikusan megkapják 2×-es példányban (a profil „kiosztási verziója” alapján).
-- Coin meccsenként: győzelem 25, döntetlen 15, vereség 10; naponta legfeljebb 100 (helyi idő szerinti nap).
+- Coin meccsenként: győzelem 25, döntetlen 15, vereség 10; naponta legfeljebb 200 (helyi idő szerinti nap; 2026-10-08-ig 100 volt).
 - Booster: **Base set** (első és egyelőre egyetlen készlet), 50 coin, 3 lap. Napi 1 ingyen pack.
 - **Shiny Base set pack:** 250 coin, 3 lap; a legjobb lap biztosan különleges: 25% változat-lap (jelenleg a zöld Rehab), 15% Full Art hős, 60% Full Art lap. Szivárványos, csillogó pack-kinézet „Shiny” szalaggal.
 - **Full Art hősök:** packból szerezhetők – sima packban 2% eséllyel (a leggyengébb lap helyén), Shiny packban 15%. Nagy „Full Art hős!” bemutatóval jönnek. A gyűjtemény Full Art fülén csak a megszerzett Full Art hősök színesek; a meccsen a saját hősödre koppintva a Full Art változat látszik, ha megvan. 2 feletti példány 2 coint ér.
@@ -322,7 +322,7 @@ Hősképesség-ötletek a táblázatban (még nem zöldek, nincsenek beépítve)
 
 ## Szerencsekerék (2026-10-05)
 - Menü → 🎡 Szerencsekerék (a „Pörgess!” jelzés mutatja, ha aznap még van pörgetés). Naponta egy ingyen pörgetés (helyi idő szerint, éjfélkor nullázódik).
-- Nyeremények (egyforma cikkelyek, az esély a súly): 10 coin 26% · 25 coin 22% · 50 coin 14% · 💎 Gyémántszilánk 12% · booster pack 11% · 100 coin 8% · Shiny pack 4% · 🔄 Pörgess újra 2% · **💎 Gyémánt Best of Us 1%**. A packok ajándék packként a Boltba kerülnek. A coin nem számít a napi 100-as plafonba.
+- Nyeremények (egyforma cikkelyek, az esély a súly): 10 coin 26% · 25 coin 22% · 50 coin 14% · 💎 Gyémántszilánk 12% · booster pack 11% · 100 coin 8% · Shiny pack 4% · 🔄 Pörgess újra 2% · **💎 Gyémánt Best of Us 1%**. A packok ajándék packként a Boltba kerülnek. A coin nem számít a napi 200-as plafonba.
 - 10 Gyémántszilánk = a Gyémánt Best of Us. Ha már megvan, a főnyeremény és a 10 szilánk 300 coint ér.
 - Adat: p.wheel = { date, shards, extra }. Átlagos érték kb. 40 coin/nap.
 - Grafika (2026-10-05, ChatGPT UI): menügomb art/ui/wheel-btn.webp (a Bolt gomb stílusában, „Pörgess!” jelzéssel); a kerék képe szétszedve: forgó korong (wheel-disc.webp – a beleégett mutatót a perem folytatásával kitöröltem), álló mutató (wheel-ptr.webp) és álló középső „PÖRGESS!” gomb (wheel-hub.webp; ha mára nincs pörgetés, elszürkül). A cikkelyek sorrendje a képen (felülről, óramutató szerint): 10, 25, Szilánk, 50, Pack, 100, Shiny, Újra, Gyémánt – ez egyezik a WHEEL tömbbel, ne változtasd az egyiket a másik nélkül. A képen a cikkelyek NEM egyforma szélesek: a valódi középpontjuk és szélességük a WHEEL_ANG tömbben van (lemérve, 2026-10-06 – előtte egyforma 40°-kal számolt, és a mutató néha a szomszéd cikkelyre esett, pl. Pack látszott, 100 coin járt). Új kerékképnél újra le kell mérni. Eredetik: art/ui/orig/wheel*.png. Még hiányzik: szilánk ikon (most 💎 emoji).
