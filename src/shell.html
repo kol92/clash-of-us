@@ -1394,11 +1394,16 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%;}
 
 /* ===== Barátok ===== */
 .m-friends{grid-template-columns:48px 1fr auto auto;min-height:70px;border-color:rgba(120,200,255,.55)!important;}
-#frBody{display:grid;gap:8px;padding-bottom:24px;}
+#frBody{display:grid;grid-template-columns:minmax(0,1fr);gap:8px;padding-bottom:24px;}
 .fr-code{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 14px;border-radius:14px;background:linear-gradient(160deg,#1d3550,#0f1d2e);border:1px solid var(--gold);}
 .fr-code small{display:block;font-size:11px;font-weight:900;letter-spacing:.12em;text-transform:uppercase;color:var(--mute);}
 .fr-code b{font-family:var(--display);font-weight:400;font-size:30px;letter-spacing:.14em;color:var(--gold);}
 .fr-code .btn{min-height:40px;padding:0 14px;font-size:14px;}
+.fr-share{width:100%;margin-top:2px;min-height:48px;font-size:16px;}
+.fr-share-note{margin:6px 0 2px;text-align:center;}
+.inv-fld span i{font-style:normal;font-weight:600;opacity:.6;text-transform:none;letter-spacing:0;}
+.inv-fld input{text-transform:uppercase;letter-spacing:.14em;}
+.inv-who{display:block;margin:-4px 0 8px;font-size:13px;font-weight:700;color:var(--gold);}
 .fr-add{display:grid;grid-template-columns:1fr auto;gap:8px;}
 .fr-add input{min-width:0;font:inherit;font-size:18px;font-weight:900;letter-spacing:.12em;text-transform:uppercase;color:var(--ink);background:#081a20;border:1px solid var(--line);border-radius:12px;padding:10px 12px;}
 .fr-add .btn{min-height:46px;padding:0 16px;}

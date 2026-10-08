@@ -201,6 +201,7 @@ function showCreate() {
       <p>Válassz játékosnevet. Ezzel a névvel látnak majd a barátaid.</p>
       <label class="fld"><span>Játékosnév</span><input id="pname" maxlength="18" autocomplete="nickname" required></label>
       <div class="gift"><b>Kezdőcsomag</b><span>Mind a ${HEROES.length} hős · minden gyakori lap 2× · minden ritka lap 1× · ${Object.keys(DECKS).length} kész pakli (minden hősnek egy)</span></div>
+      ${window.APP_MODE ? `<label class="fld inv-fld"><span>Meghívó kód <i>(nem kötelező)</i></span><input id="pinv" maxlength="7" autocapitalize="characters" spellcheck="false" placeholder="pl. AB12CD"></label><small class="inv-who" id="pinvWho" hidden></small>` : ''}
       <p class="err" id="perr" hidden></p>
       <button class="btn primary" type="submit">Játékos létrehozása</button>
       <small class="where">${window.APP_MODE ? 'A profilod a fiókodhoz kötve, a felhőben mentődik.' : Store.mode === 'cloud' ? 'A profilod a Claude-fiókodhoz kötve mentődik.' : 'A profilod ezen az eszközön mentődik.'}</small>
@@ -209,14 +210,25 @@ function showCreate() {
   $('#layer').appendChild(o);
   const inp = o.querySelector('#pname'); inp.value = Store.suggestName.split(' ')[0] || '';
   o.querySelector('#cImport')?.addEventListener('click', () => importModal(() => o.remove()));
+  const invIn = o.querySelector('#pinv');
+  if (invIn) {   // meghívó linkről jött: kitöltjük, és megmutatjuk, ki hívta meg
+    invIn.value = frInvGet();
+    const who = async () => { const c = invIn.value.toUpperCase().replace(/[^A-Z0-9]/g, ''), el = o.querySelector('#pinvWho');
+      if (c.length !== 6) { el.hidden = true; return; }
+      const n = await frInvName(c); if (invIn.value.toUpperCase().replace(/[^A-Z0-9]/g, '') !== c) return;
+      el.hidden = false; el.textContent = n ? `🤝 ${n} hívott meg – automatikusan barátok lesztek` : 'Nincs ilyen kódú játékos'; };
+    invIn.addEventListener('input', who); who();
+  }
   setTimeout(() => inp.focus(), 50);
   o.querySelector('#createForm').onsubmit = async e => {
     e.preventDefault();
     const name = inp.value.trim().replace(/\s+/g, ' ');
     const err = o.querySelector('#perr');
     if (name.length < 2) { err.hidden = false; err.textContent = 'A név legalább 2 karakter legyen.'; return; }
+    if (invIn) { const c = invIn.value.toUpperCase().replace(/[^A-Z0-9]/g, ''); try { c.length === 6 ? localStorage.setItem('bou_inv', c) : localStorage.removeItem('bou_inv'); } catch {} }
     Store.p = newProfile(name); Store.p.onboard = true; await save(); o.remove();
     renderProfileBar(); startOnboarding();
+    if (window.APP_MODE) frApplyInvite();
   };
 }
 
@@ -1754,11 +1766,41 @@ function frPubSync(now) {
     Store.db.doc('pub/' + Store.uid).set({ name: p.name, code: frCode(Store.uid), w: p.stats?.w || 0, coll, ver: window.APP_VERSION || '', updated: Date.now() }).catch(() => {});
   }, now ? 50 : 2500);
 }
+// ---- meghívó link: …/?inv=<barátkód> – aki ezzel regisztrál (vagy belép), automatikusan barátja lesz a meghívónak ----
+const INV_URL = 'https://bestofus.pages.dev/';
+const frInvGet = () => { try { return localStorage.getItem('bou_inv') || ''; } catch { return ''; } };
+async function frInvName(code) {
+  try { const q = await Store.db.collection('pub').where('code', '==', code).limit(1).get(); return q.empty ? '' : (q.docs[0].data().name || 'Valaki'); } catch { return ''; }
+}
+async function frApplyInvite() {
+  const code = frInvGet(); if (!code || !frOn() || FR.invBusy) return;
+  FR.invBusy = true;
+  try {
+    if (code === frCode(Store.uid)) return localStorage.removeItem('bou_inv');
+    const q = await Store.db.collection('pub').where('code', '==', code).limit(1).get();
+    if (q.empty) return localStorage.removeItem('bou_inv');
+    const doc = q.docs[0], uid = doc.id, other = doc.data(), id = frPair(Store.uid, uid);
+    const ex = await Store.db.doc('friends/' + id).get().catch(() => null);
+    if (ex?.exists && ex.data().status === 'accepted') { localStorage.removeItem('bou_inv'); return; }
+    // a meghívó a linkkel már beleegyezett → rögtön elfogadott barátság
+    await Store.db.doc('friends/' + id).set({ parts: [Store.uid, uid], from: uid, names: { [Store.uid]: Store.p.name, [uid]: other.name || '' }, status: 'accepted', via: 'invite', created: Date.now(), since: Date.now() });
+    localStorage.removeItem('bou_inv');
+    toast(`🤝 ${other.name || 'A meghívód'} mostantól a barátod!`);
+  } catch (e) { /* majd a következő indításkor újra */ }
+  finally { FR.invBusy = false; }
+}
+async function frShareInvite() {
+  const code = frCode(Store.uid), url = INV_URL + '?inv=' + code;
+  const text = `Gyere játszani velem a Best of Us-ban – a banda saját kártyajátéka! A linkkel regisztrálva automatikusan barátok leszünk (meghívó kódom: ${code}).`;
+  try { if (navigator.share) { await navigator.share({ title: 'Best of Us', text, url }); return; } } catch (e) { if (e && e.name === 'AbortError') return; }
+  try { await navigator.clipboard.writeText(text + ' ' + url); toast('Meghívó link kimásolva ✔'); } catch { toast(url); }
+}
 function frStart() {
   if (!frOn() || FR.unsubF) return;
   frPubSync(true);
   FR.unsubF = Store.db.collection('friends').where('parts', 'array-contains', Store.uid).onSnapshot(s => {
     FR.list = s.docs.map(d => ({ id: d.id, ...d.data() }));
+    if (frInvGet()) frApplyInvite();
     FR.list.filter(d => d.status === 'accepted').forEach(d => frFetchPub(frOther(d)));
     frRefresh();
   }, () => { FR.unsubF = null; });
@@ -1946,6 +1988,8 @@ function renderFriends() {
   const mini = c => `<span class="fr-mini">${cardHTML(c.id, { foil: c.foil })}</span>`;
   body.innerHTML = `
     <div class="fr-code"><div><small>A te barátkódod</small><b>${frCode(me)}</b></div><button class="btn" data-copy>Másolás</button></div>
+    <button class="btn primary fr-share" data-share>📤 Meghívó küldése</button>
+    <p class="q-note fr-share-note">Aki a linkeddel regisztrál, automatikusan a barátod lesz.</p>
     <form class="fr-add" autocomplete="off"><input id="frIn" maxlength="7" placeholder="Barát kódja" autocapitalize="characters" spellcheck="false"><button class="btn primary">Jelölés</button></form>
     ${chIn.length ? `<div class="lbl">⚔️ Kihívtak</div>${chIn.map(d => `<div class="pv-row hot">${av(d.host?.name)}<div class="pv-txt"><b>${escH(d.host?.name || '')}</b><small>Élő meccsre vár · ${escH(HERO[d.host?.hero]?.name || '')}</small></div><button class="btn primary" data-chacc="${d.id}">Elfogadom</button></div>`).join('')}` : ''}
     ${trIn.length ? `<div class="lbl">🔄 Cserejavaslatok</div>${trIn.map(t => `<div class="tr-row"><div class="tr-who"><b>${escH(t.names?.[t.from] || 'Barát')}</b> cserélne veled</div>
@@ -1967,6 +2011,7 @@ function renderFriends() {
   body.onclick = async e => {
     const b = e.target.closest('button'); if (!b || b.closest('form')) return;
     const ds = b.dataset;
+    if (b.hasAttribute('data-share')) return frShareInvite();
     if (b.hasAttribute('data-copy')) { try { await navigator.clipboard.writeText(frCode(me)); toast('Kód kimásolva ✔'); } catch { toast(frCode(me)); } return; }
     if (ds.acc) return frAccept(ds.acc);
     if (ds.rm) return frRemove(ds.rm);

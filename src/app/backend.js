@@ -15,6 +15,12 @@
     appId: '1:833868657941:web:856018a89e4c8de214e51c',
   };
   window.APP_MODE = true;
+  // Meghívó link (…/?inv=KÓD): eltesszük, és a profil létrehozásakor / belépéskor automatikusan barátok lesztek
+  try {
+    const q = new URLSearchParams(location.search), inv = (q.get('inv') || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+    if (inv.length === 6) localStorage.setItem('bou_inv', inv);
+    if (q.has('inv')) history.replaceState(null, '', location.pathname + location.hash);
+  } catch (e) {}
   firebase.initializeApp(CFG);
   const auth = firebase.auth(), fs = firebase.firestore(), rtdb = firebase.database();
   fs.settings({ ignoreUndefinedProperties: true, experimentalAutoDetectLongPolling: true });
