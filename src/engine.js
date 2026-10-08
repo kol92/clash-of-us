@@ -33,6 +33,7 @@ const CARDS = [
   { id:'c_norbi', type:'char', name:'Lukács Norbi', cost:3, atk:2, hp:3, rarity:'r', text:'Ha mellette áll egy másik karaktered, +2 támadást kap.' },
   { id:'c_udvarhelyi', type:'char', name:'Udvarhelyi Zoli', cost:6, atk:5, hp:5, rarity:'k', text:'' },
   { id:'c_molnar', type:'char', name:'Molnár Zsolti', cost:5, atk:2, hp:4, rarity:'r', deathKill:true, text:'Amikor meghal, elpusztít egy véletlen ellenséges karaktert.' },
+  { id:'c_piftikiraly', type:'char', name:'Pifti, a király', cost:4, atk:4, hp:2, rarity:'e', text:'Kijátszáskor 5 Pifti haverja lapot kever a paklidba.' },
   { id:'c_atiuldozott', type:'char', name:'Ati, az üldözött', cost:3, atk:3, hp:2, rarity:'r', sneak:true, text:'A köröd elején, ha szemben áll vele valaki, átmenekül egy szabad helyre, ahol nincs vele szemben senki.' },
   { id:'c_amszterdam', type:'char', name:'Bence, Amszterdam hőse', cost:2, atk:2, hp:1, rarity:'r', sneak:true, deathHeal:3, text:'Amikor meghal, a hősöd 3 életet gyógyul.' },
   { id:'c_barnaelet', type:'char', name:'Barna, az életunt', cost:2, atk:1, hp:2, rarity:'r', sneak:true, deathDraw:true, text:'Amikor meghal, húzol egy lapot.' },
@@ -100,6 +101,11 @@ const CARDS = [
   // a kánon események által hozott, nem gyűjthető lapok
   // a második játékos kiegyenlítő lapja (nem gyűjthető): az első körében kapja
   { id:'i_ing', type:'item', name:'Grand Finale ing', cost:2, atk:3, hp:3, rarity:'l', token:true, muscle:true, text:'' },
+  { id:'c_piftihaver1', type:'char', name:'Pifti haverja', cost:1, atk:2, hp:2, rarity:'k', token:true, text:'Pifti, a király hozta magával.' },
+  { id:'c_piftihaver2', type:'char', name:'Pifti haverja', cost:1, atk:2, hp:2, rarity:'k', token:true, text:'Pifti, a király hozta magával.' },
+  { id:'c_piftihaver3', type:'char', name:'Pifti haverja', cost:1, atk:2, hp:2, rarity:'k', token:true, text:'Pifti, a király hozta magával.' },
+  { id:'c_piftihaver4', type:'char', name:'Pifti haverja', cost:1, atk:2, hp:2, rarity:'k', token:true, text:'Pifti, a király hozta magával.' },
+  { id:'c_piftihaver5', type:'char', name:'Pifti haverja', cost:1, atk:2, hp:2, rarity:'k', token:true, text:'Pifti, a király hozta magával.' },
   { id:'a_rantott', type:'action', name:'Rántott hús', cost:0, tgt:'ownOrHero', rarity:'k', token:true, text:'Egy saját karaktered vagy a hősöd 3 életet gyógyul.' },
   { id:'a_szulinap', type:'action', name:'Boldog szülinapot Pifti!', cost:6, tgt:'summon', rarity:'r', text:'Három Piftit idéz a szabad helyeidre (ha kevesebb a hely, annyit).' },
   { id:'a_kor', type:'action', name:'Egy pohár víz', cost:0, rarity:'k', token:true, text:'Ebben a körben +1 energiád van. A 3. körödtől játszható ki. Aki másodikként jön, megkapja, mert a kezdés előny.' },
@@ -382,6 +388,10 @@ function playCard(s, pi, hi, t) {
     }
     if (bid(c.id) === 'c_kriszrantott') { ev(s, { t:'gift', side:pi, i:t.i, id:'a_rantott' }); addToHand(s, pi, 'a_rantott'); }
     if (bid(c.id) === 'c_tomiparti') partyDrink(s, pi, t.i);
+    if (bid(c.id) === 'c_piftikiraly') {   // 5 Pifti haverja a pakliba (az 5 különböző kinézet, véletlen helyre keverve)
+      for (let k = 1; k <= 5; k++) p.deck.push('c_piftihaver' + k);
+      shuffle(p.deck); ev(s, { t:'shuffled', side:pi, i:t.i, n:5, id:'c_piftihaver1' });
+    }
     if (bid(c.id) === 'c_alekosz') {   // véletlen ellenséges karaktert ellop, és maga mellé teszi (előbb jobbra, aztán balra, aztán bárhova)
       const os = openSlots(s, pi), spots = [t.i + 1, t.i - 1].filter(j => os.includes(j));
       const j = spots.length ? spots[0] : (CARD.c_alekosz.anywhere && os.length) ? os[0] : -1;   // csak közvetlenül mellé (ahogy a lap írja)

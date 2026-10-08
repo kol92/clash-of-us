@@ -1,0 +1,12 @@
+const E = require(require('path').join(__dirname, '..', 'engine.js'));
+let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('HIBA:', m); } else console.log('ok  ', m); };
+const s = E.newGame('bence', E.DECK_OF('bence'), 'gabi', E.DECK_OF('gabi'), 0); s.players.forEach(p => { p.energy = 6; p.maxEnergy = 6; p.board = [null, null, null, null]; }); s.events = [];
+const p = s.players[0], n0 = p.deck.length; p.hand.unshift({ uid: 9999, id: 'c_piftikiraly' });
+ok(E.canPlay(s, 0, 0), 'Pifti, a király kijátszható');
+E.playCard(s, 0, 0, { k: 'slot', side: 0, i: 1 });
+ok(p.board[1]?.id === 'c_piftikiraly', 'lent van');
+ok(p.deck.length === n0 + 5, 'pakli +5 lap (' + n0 + ' → ' + p.deck.length + ')');
+ok([1, 2, 3, 4, 5].every(k => p.deck.includes('c_piftihaver' + k)), 'mind az 5 különböző haver a pakliban');
+ok(s.events.some(e => e.t === 'shuffled' && e.n === 5), 'shuffled esemény');
+ok(E.CARDS.filter(c => c.id.startsWith('c_piftihaver')).every(c => c.token && c.cost === 1 && c.atk === 2 && c.hp === 2), 'haverok: token, 1 energia, 2/2');
+console.log(fails ? 'HIBÁK: ' + fails : 'PIFTI OK');
