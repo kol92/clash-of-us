@@ -1,8 +1,9 @@
 # Best of Us
 
-A banda saját kártyajátéka – telepíthető webapp (iPhone, Android).
+A banda saját kártyajátéka – telepíthető webapp (iPhone, Android): https://bestofus.pages.dev
 
-- `site/` – a kész, kitehető játék. **Ezt teszi ki a Cloudflare Pages** (Build output directory: `site`).
-- `src/` – a játék forrása (motor, felület, gyűjtés/PvP, Firebase-réteg, build-szkript). A képek a `site/art` mappában vannak.
+- `site/` – a kész, kitett játék. **Ezt teszi ki a Cloudflare Pages** (Build output directory: `site`).
+- `src/` – a teljes forrás: motor, felület, gyűjtés/PvP, Firebase-réteg, képek, build- és kitevő szkript, tesztek.
+- `CLAUDE.md` – fejlesztői átadó: hogyan kell lapot felvenni, buildelni, tesztelni, kitenni.
 
-Frissítés: a forrás módosítása után `python3 src/build-app.py "újdonság szövege"` (a képeket `src/art`-ként várja – másold vissza a `site/art`-ból), majd a `dist/` tartalma kerül a `site/` mappába.
+Kitétel egy lépésben: `bash src/deploy.sh "Újdonság szövege"`

@@ -8,6 +8,7 @@ from PIL import Image
 SRC = os.path.dirname(os.path.abspath(__file__))
 DIST = os.path.join(SRC, 'dist')
 FB = '/home/claude/app/node_modules/firebase'
+if not os.path.isdir(FB): FB = os.path.join(SRC, 'vendor')   # a repóban: src/vendor (a Firebase compat fájlok bemásolva)
 VERSION = time.strftime('%Y.%m.%d-%H%M')
 NOTE = ' '.join(sys.argv[1:]).strip()
 
