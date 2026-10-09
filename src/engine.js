@@ -127,7 +127,7 @@ const HEROES = [
   { id:'gabi', name:'Gabi', hue:165, text:'A köröd végén a legsérültebb karaktered 1 életet gyógyul. Ha nincs sérült karaktered, a hősöd gyógyul.' },
   { id:'krisz', name:'Krisz', hue:210, text:'A meccsen az első két kijátszott lapod 1-gyel olcsóbb.' },
   { id:'tomi', name:'Tomi', hue:45, text:'Az eszközeid +1 életet is adnak, és a körödben az első eszközöd 1-gyel olcsóbb.' },
-  { id:'david', name:'Dávid', hue:305, text:'Törzsvendég: minden helyszín neki kedvez, bárki rakta le. Kórház: 2-t gyógyít. Barhole: 2-vel olcsóbb. Budapest Park: nem drágít. Morrison’s 2: nem sebzi. Akácfa: őt nem sebzi jobban. Laciverse: neki is +1 támadás.' },
+  { id:'david', name:'Dávid', hue:305, text:'Törzsvendég: minden helyszín neki kedvez, bárki rakta le. Ha lecserél egy helyszínt, húz egy lapot. Kórház: 2-t gyógyít. Barhole: 2-vel olcsóbb. Budapest Park: nem drágít. Morrison’s 2: nem sebzi. Akácfa: őt nem sebzi jobban. Laciverse: neki is +1 támadás.' },
   { id:'bence', name:'Bence', hue:0, text:'24 élettel kezd 20 helyett.' },
   { id:'milo', name:'Milo', hue:95, text:'Ha egy karaktered meghal, 1 sebzést okoz az ellenfél hősének.' },
   { id:'laci', name:'Laci', hue:255, text:'Minden harmadik körödben húzol egy extra lapot.' },
@@ -446,8 +446,10 @@ function playCard(s, pi, hi, t) {
     ev(s, { t:'buff', side:pi, i:t.i });
     if (c.selfDmg) damageHero(s, pi, c.selfDmg);
   } else if (c.type === 'loc') {
+    const had = !!s.location;
     dropLocation(s, 'loc');
     s.location = { id:c.id, owner:pi, foil:!!h.foil };
+    if (had && isReg(s, pi)) { ev(s, { t:'regdraw', side:pi, i:-1 }); draw(s, pi); }   // Dávid (2026-10-09): ha helyszínt cserél, húz egy lapot
   } else {
     switch (c.id) {
       case 'a_dinnyes': if (t.k === 'hero') damageHero(s, ei, 3); else damageUnit(s, ei, t.i, 3); break;

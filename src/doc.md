@@ -96,7 +96,7 @@
 | Gabi | A köröd végén a legsérültebb karaktered 1 életet gyógyul; ha nincs ilyen, a hősöd. |
 | Krisz | A meccsen az első két kijátszott lapod 1-gyel olcsóbb (gyors kezdés); a 0 költségű lapok nem számítanak bele. |
 | Tomi | Az eszközeid +1 életet is adnak, és a körödben az első eszközöd 1-gyel olcsóbb. |
-| Dávid | Törzsvendég: minden helyszín neki kedvez, bárki rakta le. Kórház: 2-t gyógyít; Barhole: 2-vel olcsóbb; Budapest Park: nem drágít; Morrison’s 2: nem sebzi; Akácfa: őt nem sebzi jobban; Laciverse: neki is +1 támadás. |
+| Dávid | Törzsvendég: minden helyszín neki kedvez, bárki rakta le. **Ha lecserél egy helyszínt, húz egy lapot** (2026-10-09). Kórház: 2-t gyógyít; Barhole: 2-vel olcsóbb; Budapest Park: nem drágít; Morrison’s 2: nem sebzi; Akácfa: őt nem sebzi jobban; Laciverse: neki is +1 támadás. |
 | Bence | 24 élettel kezd. |
 | Milo | Ha egy karaktered meghal, 1 sebzést okoz az ellenfél hősének. |
 | Laci | Minden harmadik körödben húzol egy extra lapot. |
@@ -108,6 +108,7 @@
 - Kipróbált, de elvetett: Tomi eszközei +1 támadást is adnak – a saját paklijával 63–67%-ra ugrott, túl erős.
 - Utána: csak képesség 40–59% (Milo, Gabi, Laci a teteje; Krisz, Dávid az alja), saját pakli 44–56%.
 - **2. kör (2026-10-01):** Krisz és Dávid új képességet kapott (a csapat ötlete). Krisz: a meccs első két lapja 1-gyel olcsóbb (csak képesség 41→45%, saját pakli 53→56%). Dávid „törzsvendég”: minden helyszín ad neki valami extrát (38→45%, saját pakli 54%); a Kocsmatúrába 1 Ki vagy tiltva! helyett Budapest Park került (neki nem drágít). Végeredmény: csak képesség 42–59%, saját pakli 43–56%.
+- **3. kör (2026-10-09):** Dávid saját paklival ~45,5–47,3% (utolsó). Tesztelt erősítések (6400 meccs/változat): helyszín cseréjekor húz → 48,2% (**ezt választottuk**); helyszín lerakásakor 1 életet gyógyul → 52,5%; lerakáskor húz → 58%; lerakáskor 3 gyógyulás → 58%. Megfigyelés: a bot alulhasználja Dávid helyszíneit, élő játékos kezében erősebb lehet.
 - Kipróbált, de elvetett: Krisz minden körben az első két lapja olcsóbb – 67% / 81%, túl erős; Dávid törzsvendég + laphúzás helyszínnél – saját paklival 66%; Krisz minden 4. körben véletlen Ital a kézbe – 59% / 52% (jó lett volna, de a csapat a gyors kezdést választotta).
 
 Hősképesség-ötletek a táblázatban (még nem zöldek, nincsenek beépítve): Krisz – Vad Képmások lapok +1/+1; Tomi – ha hatással megnézel egy lapot, húzol; Bence – Fehér varázshó szinergia; Milo – visszavesz egy Fehér varázshót; Laci – ha hatás miatt dobsz lapot, húzol; Barna – női karakterek 1-gyel olcsóbbak; Gabi – Zanafar szinergia.

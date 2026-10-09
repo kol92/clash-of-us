@@ -533,6 +533,7 @@ function logEvents(evs, snap) {
       case 'heal': L(`💚 ${nm(e.side, e.i)}: +${e.n}`); break;
       case 'overflow': L(`💪 Izom: ${e.n} átüt a hősre`); break;
       case 'death': L(`💀 ${CARD[e.id].name} meghalt (${e.side === ME ? 'tiéd' : 'ellenfélé'})`); break;
+      case 'regdraw': L(`🍺 ${e.side === ME ? 'Helyszínt cseréltél – Törzsvendégként húztál egy lapot' : 'Dávid helyszínt cserélt, és húzott egy lapot'}`); break;
       case 'boon': L(`✨ ${unitName(e.side, e.i)} új erőt kapott: ${BOON_NAME[e.b]}`); break;
       case 'summon': case 'rise': L(`✨ ${CARD[e.id]?.name || 'Egy lap'} a pályára került (${e.side === ME ? 'nálad' : 'az ellenfélnél'})`); break;
       case 'revive': L(`✨ ${unitName(e.side, e.i)} feltámadt`); break;
@@ -693,6 +694,7 @@ async function animateEvents(evs) {
         else floatAt(anchor, `${CARD[e.id]?.name || 'Query'}!`, 'info');
         hold = Math.max(hold, e.id === 'c_query' ? 300 : 520); break;
       case 'rise': floatAt(anchor, `✝️ ${CARD[e.id].name} visszatért! +1/+1`, 'buff'); hold = Math.max(hold, 750); break;
+      case 'regdraw': floatAt(anchor, '🍺 Törzsvendég: +1 lap', 'buff'); hold = Math.max(hold, 650); break;
       case 'boon': floatAt(anchor, `✨ ${BOON_NAME[e.b]}!`, 'buff'); hold = Math.max(hold, 750); break;
       case 'morph': fx(el, 'fx-heroheal'); fx($('#app'), 'fx-quake'); floatAt(anchor, '🦋 Metamorfózis! Itt van Baszó', 'buff'); hold = Math.max(hold, 1000); break;
       case 'machineon': floatAt(anchor, '⚙️ Gépüzemmód bekapcsolva', 'info'); hold = Math.max(hold, 700); break;
