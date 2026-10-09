@@ -1115,10 +1115,10 @@ $('#flagBtn').onclick = () => {
   if (S.tut?.onboard) return toast('Előbb játszd végig a gyakorló meccset – utána jön a főmenü 🙂');
   if (busy) return toast('Várd meg, amíg lezajlik a lépés');
   const o = document.createElement('div'); o.className = 'overlay';
-  o.innerHTML = `<div class="modal"><h3>Meccs</h3><p class="live">${S.pvp ? 'Ha kilépsz, a meccs megmarad: a PvP menüben bármikor folytathatod.' : S.tut ? 'Kilépsz az oktatóból?' : 'Ha kilépsz, a bot elleni meccs elvész.'}</p>
+  o.innerHTML = `<div class="modal"><h3>Meccs</h3><p class="live">${S.pvp ? 'Ha kilépsz, a meccs megmarad: a PvP menüben bármikor folytathatod.' : S.tut ? 'Kilépsz az oktatóból?' : S.ranked ? 'Ha kilépsz, a ranked meccs <b>vereségnek</b> számít.' : 'Ha kilépsz, a bot elleni meccs elvész.'}</p>
     <button class="btn primary" data-f="stay">Folytatom</button><button class="btn" data-f="leave">${S.pvp ? 'Kilépés (a meccs megmarad)' : 'Kilépés a menübe'}</button>${S.pvp ? '<button class="btn ghost" data-f="give">Feladom</button>' : ''}</div>`;
   o.onclick = e => { const b = e.target.closest('[data-f]'); if (!b && e.target !== o) return; o.remove(); if (!b) return;
-    if (b.dataset.f === 'leave') { if (S.pvp) return pvpLeave(); if (S.tut) tutHide(); busy = false; S = null; renderMenuFan(); renderProfileBar(); show('scr-menu'); }
+    if (b.dataset.f === 'leave') { if (S.pvp) return pvpLeave(); if (S.tut) tutHide(); if (S.ranked && !S.rkDone && S.winner == null) { S.rkDone = true; rankOnMatch('loss'); toast('Feladtad – a ranked meccs vereségnek számít'); } busy = false; S = null; renderMenuFan(); renderProfileBar(); show('scr-menu'); }
     if (b.dataset.f === 'give') pvpForfeit(); };
   $('#layer').appendChild(o);
 };
@@ -1369,13 +1369,14 @@ function vsIntro() {
     $('#layer').appendChild(o);
   });
 }
-function startMatch(heroId, deckId) {
+function startMatch(heroId, deckId, opt = {}) {
   const others = HEROES.filter(h => h.id !== heroId);
   const bh = others[Math.floor(Math.random() * others.length)].id;
   const bd = DECK_OF(bh) || Object.keys(DECKS)[0];   // a bot a saját hősének kezdőpaklijával játszik
   const first = Math.random() < .5 ? ME : BOT;
   const mine = (allDecks().find(d => d.id === deckId) || allDecks()[0]).list;
   S = newGame(heroId, { ...mine }, bh, bd, first, { mulligan: true, foils: [0, 1].map(k => k === ME ? myFoils(mine) : {}) }); S.events = [];
+  if (opt.ranked) { S.ranked = true; const r = ensureRank(Store.p); if (r) { r.pend = Date.now(); save(); } }   // ha bezárja az appot, vereségnek számít
   ui.sel = null; busy = true; ui.handSeen = null; ui.botHandN = null; ui.flying = new Set(); show('scr-game');
   $('#layer').innerHTML = '';
   vsIntro().then(() => { render(); setTimeout(() => showMulligan(first), 250 + S.players[ME].hand.length * 150 + 450); });
@@ -1454,16 +1455,19 @@ function endMatch() {
     ? `Letelt a ${MAX_HALF / 2} kör. Életek: te ${S.players[ME].hp}, ellenfél ${S.players[BOT].hp}.`
     : draw ? 'Mindkét hős egyszerre dőlt ki.' : win ? 'Az ellenfél hőse kiütve.' : 'A hősöd kiütve.';
   const aw = awardMatch(draw ? 'draw' : win ? 'win' : 'loss');
+  if (S.ranked && !S.rkDone) { S.rkDone = true; S.rkRes = rankOnMatch(draw ? 'draw' : win ? 'win' : 'loss'); }
   const qd = S.qDone ? [] : questsOnMatch({ win, hero: S.players[ME].heroId, ...(S.qs || { actions: 0, items: 0, chars: 0, locs: 0, big: 0, heroDmg: 0, kills: 0 }) });
   const px = S.qDone ? null : passOnMatch(draw ? 'draw' : win ? 'win' : 'loss', qd);
   S.qDone = true;
   const reward = (aw ? `<div class="reward"><span class="coin" aria-hidden="true"></span><b>+${aw.gain}</b><small>${aw.capped ? 'Elérted a mai coin-plafont' : 'coin'} · ma ${aw.today}/${ECON.dailyCap}</small></div>` : '')
     + qd.map(q => `<div class="q-done-pop">✓ Küldetés teljesítve: <b>${q.txt}</b><em>+${q.rew}</em></div>`).join('')
-    + (px ? `<div class="sp-pop${px.up ? ' up' : ''}"><b>+${px.gain} XP</b> Season Pass${px.up ? ` · <em>Szintlépés! ${px.lv}. szint – vedd át a jutalmat</em>` : ` · ${px.lv}. szint (${px.inLv}/${PASS_XP.perLevel})`}</div>` : '');
+    + (px ? `<div class="sp-pop${px.up ? ' up' : ''}"><b>+${px.gain} XP</b> Season Pass${px.up ? ` · <em>Szintlépés! ${px.lv}. szint – vedd át a jutalmat</em>` : ` · ${px.lv}. szint (${px.inLv}/${PASS_XP.perLevel})`}</div>` : '') + (S.ranked ? rkResultHTML(S.rkRes) : '');
   const o = document.createElement('div'); o.className = 'overlay';
   o.innerHTML = `<div class="modal result${win ? '' : ' lose'}${draw ? '' : ' resart'}">${draw ? '<h2 class="banner-h"><img src="art/ui/banner-draw.webp" alt="Döntetlen"></h2>' : resultArt(win)}<p>${why}</p>${reward}
-    <div class="row"><button class="btn" data-r="menu">Menü</button><button class="btn primary" data-r="again">Új meccs</button></div></div>`;
+    <div class="row"><button class="btn" data-r="menu">Menü</button><button class="btn primary" data-r="again">${S.ranked ? 'Újabb ranked' : 'Új meccs'}</button></div></div>`;
+  const wasRanked = !!S.ranked;
   o.onclick = e => { const b = e.target.closest('[data-r]'); if (!b) return; o.remove();
+    if (b.dataset.r === 'again' && wasRanked) { const d = allDecks().find(x => x.id === ui.deck); if (d && !deckIssue(d)) rankedSearch(d); else { renderRanked(); show('scr-ranked'); } return; }
     if (b.dataset.r === 'again') { const d = allDecks().find(x => x.id === ui.deck); if (d && !deckIssue(d)) startMatch(d.hero, ui.deck); else { renderPick(); show('scr-pick'); } } else { renderMenuFan(); renderProfileBar(); show('scr-menu'); } };
   setTimeout(() => $('#layer').appendChild(o), 700);
 }

@@ -316,7 +316,7 @@ function renderProfileBar() {
     <div class="pb-day"><small>Mai coin</small><div class="meter"><i style="width:${e / ECON.dailyCap * 100}%"></i></div><small class="num">${e}/${ECON.dailyCap}</small></div>`;
   const ss = $('#saveState'); if (ss) ss.textContent = window.APP_MODE ? '👤 Fiók' : Store.mode === 'cloud' ? '☁️ Felhőben mentve' : '📱 Ezen az eszközön mentve';
   el.querySelector('.pb-name').textContent = p.name;
-  renderQuestBadge(); renderPassBadge();
+  renderQuestBadge(); renderPassBadge(); try { renderRankTile(); } catch (e) {}
   const wb = $('#wheelBadge'); if (wb) wb.hidden = !wheelReady();
   const badge = $('#shopBadge'); if (badge) badge.hidden = !freePackReady() && !(p.giftPacks > 0) && !(p.faPacks > 0) && !(p.shinyPacks > 0);
 }
@@ -1478,7 +1478,7 @@ const pvpVerOk = d => !window.APP_MODE || ((d.host?.ver || '') === (window.APP_V
 function renderPvpBadge() {
   const b = $('#pvpBadge'), sub = $('#pvpSub'); if (!b) return;
   if (!Store.db || !Store.uid) { b.hidden = true; if (sub) sub.textContent = 'Felhőmentés kell hozzá'; return; }
-  const turn = PVP.list.filter(pvpMyTurn).length, open = PVP.list.filter(d => d.status === 'open' && !pvpMine(d) && (!d.to || d.to === Store.uid) && (!d.live || Date.now() - (d.seen || 0) < 20000)).length;
+  const turn = PVP.list.filter(pvpMyTurn).length, open = PVP.list.filter(d => d.status === 'open' && !d.ranked && !pvpMine(d) && (!d.to || d.to === Store.uid) && (!d.live || Date.now() - (d.seen || 0) < 20000)).length;
   b.hidden = !(turn || open); b.textContent = turn ? `${turn} – te jössz!` : `${open} kihívás`;
   b.classList.toggle('hot', !!turn);
   if (sub) sub.textContent = turn ? 'Valaki vár a lépésedre' : open ? 'Nyitott kihívás vár rád' : 'Játssz a barátaid ellen';
@@ -1490,7 +1490,7 @@ function renderPvp() {
   const now = Date.now(), L = PVP.list;
   const mine = L.filter(d => pvpMine(d) && (d.status === 'mull' || d.status === 'play')).sort((a, b) => pvpMyTurn(b) - pvpMyTurn(a) || (b.updated || 0) - (a.updated || 0));
   const myOpen = L.filter(d => d.status === 'open' && d.host?.uid === Store.uid);
-  const others = L.filter(d => d.status === 'open' && d.host?.uid !== Store.uid && (!d.to || d.to === Store.uid) && (d.live ? now - (d.seen || 0) < 20000 : now - (d.created || 0) < 3 * 864e5));
+  const others = L.filter(d => d.status === 'open' && !d.ranked && d.host?.uid !== Store.uid && (!d.to || d.to === Store.uid) && (d.live ? now - (d.seen || 0) < 20000 : now - (d.created || 0) < 3 * 864e5));
   const done = L.filter(d => pvpMine(d) && d.status === 'done').sort((a, b) => (b.updated || 0) - (a.updated || 0)).slice(0, 5);
   const ago = t => { const m = Math.round((now - (t || now)) / 60000); return m < 1 ? 'most' : m < 60 ? `${m} perce` : m < 1440 ? `${Math.round(m / 60)} órája` : `${Math.round(m / 1440)} napja`; };
   const heroOf = p => p ? heroPortrait(p.hero, 'pv-hero') : '';
@@ -1563,7 +1563,7 @@ function pvpEnter(id, fresh) {
   const side = pvpSideOf(d);
   ME = side; BOT = 1 - side;
   PVP.id = id; PVP.v = d.v; PVP.queue = []; PVP.running = false;
-  S = { ...JSON.parse(JSON.stringify(d.state)), events: [], pvp: { id, side, live: !!d.live } };
+  S = { ...JSON.parse(JSON.stringify(d.state)), events: [], pvp: { id, side, live: !!d.live, ranked: !!d.ranked } };
   PVP.turnAt = d.turnAt || Date.now(); PVP.afk = d.afk || [0, 0];
   pvpJoinRoom(id, side); pvpPresence();
   ui.sel = null; ui.pend = null; busy = false; ui.handSeen = null; ui.botHandN = null; ui.flying = new Set();
@@ -1694,9 +1694,10 @@ function pvpEndMatch() {
     const qd = questsOnMatch({ win, hero: S.players[ME].heroId, ...(S.qs || { actions: 0, items: 0, chars: 0, locs: 0, big: 0, heroDmg: 0, kills: 0 }) });
     const px = passOnMatch(draw ? 'draw' : win ? 'win' : 'loss', qd);
     p.pvp = p.pvp || { w: 0, l: 0, d: 0 }; p.pvp[win ? 'w' : draw ? 'd' : 'l']++; save();
+    if (S.pvp.ranked) S.rkRes = rankOnMatch(draw ? 'draw' : win ? 'win' : 'loss');
     reward = (aw ? `<div class="reward"><span class="coin" aria-hidden="true"></span><b>+${aw.gain}</b><small>coin · ma ${aw.today}/${ECON.dailyCap}</small></div>` : '')
       + qd.map(q => `<div class="q-done-pop">✓ Küldetés teljesítve: <b>${q.txt}</b><em>+${q.rew}</em></div>`).join('')
-      + (px ? `<div class="sp-pop${px.up ? ' up' : ''}"><b>+${px.gain} XP</b> Season Pass</div>` : '');
+      + (px ? `<div class="sp-pop${px.up ? ' up' : ''}"><b>+${px.gain} XP</b> Season Pass</div>` : '') + rkResultHTML(S.rkRes);
   }
   const opp = escH(S.names?.[BOT] || 'Az ellenfél');
   const why = S.reason === 'forfeit' ? (win ? `${opp} feladta a meccset.` : 'Feladtad a meccset.')
@@ -1784,7 +1785,7 @@ function pvpEmoteMenu() {
 function pvpQuick(dk) {
   PVP.searchDeck = dk; PVP.searchT0 = Date.now();
   const o = document.createElement('div'); o.className = 'overlay pv-search';
-  o.innerHTML = `<div class="modal"><div class="pv-spin">⚔️</div><h3>${PVP.friendTo ? `Várjuk: ${escH(PVP.friendTo.name)}` : 'Ellenfél keresése…'}</h3><p class="live" id="pvSearchT">0:00</p><p class="live">${PVP.friendTo ? 'Elküldtük neki a kihívást – amint elfogadja, indul a meccs.' : 'Amint valaki más is élő meccset keres, indul a játék. Szólj a haveroknak, hogy nyomják meg ők is az „Élő meccs keresése” gombot!'}</p><button class="btn" data-x>Mégse</button></div>`;
+  o.innerHTML = `<div class="modal"><div class="pv-spin">⚔️</div><h3>${PVP.friendTo ? `Várjuk: ${escH(PVP.friendTo.name)}` : PVP.ranked ? '🏆 Ranked ellenfél keresése…' : 'Ellenfél keresése…'}</h3><p class="live" id="pvSearchT">0:00</p><p class="live">${PVP.ranked ? '20 másodpercig élő ellenfelet keresünk – ha nincs senki, egy bot ellen játszol, a rangod úgy is számít.' : PVP.friendTo ? 'Elküldtük neki a kihívást – amint elfogadja, indul a meccs.' : 'Amint valaki más is élő meccset keres, indul a játék. Szólj a haveroknak, hogy nyomják meg ők is az „Élő meccs keresése” gombot!'}</p><button class="btn" data-x>Mégse</button></div>`;
   o.onclick = e => { if (e.target.closest('[data-x]')) pvpStopSearch(true); };
   $('#layer').appendChild(o);
   pvpSearchTick(); PVP.hb = setInterval(pvpSearchTick, 4000);
@@ -1795,7 +1796,7 @@ async function pvpSearchTick() {
   if (!PVP.searchDeck) return;
   const now = Date.now(), mine = PVP.searching && PVP.list.find(d => d.id === PVP.searching);
   if (mine && mine.status !== 'open') return;
-  const cands = PVP.friendTo ? [] : PVP.list.filter(d => d.live && d.status === 'open' && !d.guest && !d.to && pvpVerOk(d) && d.host?.uid !== Store.uid && now - (d.seen || 0) < 20000).sort((a, b) => (a.created || 0) - (b.created || 0));
+  const cands = PVP.friendTo ? [] : PVP.list.filter(d => d.live && d.status === 'open' && !d.guest && !d.to && !!d.ranked === !!PVP.ranked && pvpVerOk(d) && d.host?.uid !== Store.uid && now - (d.seen || 0) < 20000).sort((a, b) => (a.created || 0) - (b.created || 0));
   const target = cands.find(d => !mine || (d.created || 0) < (mine.created || 0));   // a később indult keresés csatlakozik a korábbihoz
   if (target) {
     const dk = PVP.searchDeck;
@@ -1806,10 +1807,13 @@ async function pvpSearchTick() {
     if (PVP.searchDeck) PVP.hb = setInterval(pvpSearchTick, 4000);
     return;
   }
+  if (PVP.ranked && now - PVP.searchT0 > 20000 && !PVP.friendTo) {   // ranked: 20 mp után bot
+    const dk = PVP.searchDeck; pvpStopSearch(true); rankedBot(dk); return;
+  }
   if (!mine && !PVP.creating && !PVP.searching) {
     PVP.creating = true;
     const ft = PVP.friendTo, extra = ft ? { to: ft.uid, toName: ft.name } : {};
-    try { const ref = await Store.db.collection('pvp').add({ parts: ft ? [Store.uid, ft.uid] : [Store.uid], status: 'open', live: true, created: now, seen: now, updated: now, host: pvpMe(PVP.searchDeck), guest: null, v: 0, ...extra }); PVP.searching = ref.id; }
+    try { const ref = await Store.db.collection('pvp').add({ parts: ft ? [Store.uid, ft.uid] : [Store.uid], status: 'open', live: true, created: now, seen: now, updated: now, host: pvpMe(PVP.searchDeck), guest: null, v: 0, ...(PVP.ranked && !ft ? { ranked: true } : {}), ...extra }); PVP.searching = ref.id; }
     catch { toast('Nem sikerült keresést indítani (lehet, hogy nincs írási jogod)'); pvpStopSearch(); }
     finally { PVP.creating = false; }
   } else if (mine) { PVP.friendSeen = true; pvpDoc(mine.id).update({ seen: now }).catch(() => {}); }
@@ -1818,7 +1822,7 @@ async function pvpSearchTick() {
 function pvpStopSearch(cancel) {
   clearInterval(PVP.hb); clearInterval(PVP.searchClock); PVP.hb = null;
   if (cancel && PVP.searching) { const d = PVP.list.find(x => x.id === PVP.searching); if (!d || d.status === 'open') pvpDoc(PVP.searching).delete().catch(() => {}); }
-  PVP.searching = null; PVP.searchDeck = null; PVP.friendTo = null; PVP.friendSeen = false;
+  PVP.searching = null; PVP.searchDeck = null; PVP.friendTo = null; PVP.friendSeen = false; PVP.ranked = false;
   $('#layer .pv-search')?.remove(); pvpPresence();
 }
 // körszámláló élő meccsben; ha a soros játékos nincs ott, a másik gép zárja le helyette a kört
@@ -1874,7 +1878,7 @@ function frPubSync(now) {
   FR.pubT = setTimeout(() => {
     const p = Store.p, coll = {};
     for (const [id, e] of Object.entries(p.coll || {})) if (tradable(id) && (e.n || e.f)) coll[id] = [e.n || 0, e.f || 0];
-    Store.db.doc('pub/' + Store.uid).set({ name: p.name, code: frCode(Store.uid), w: p.stats?.w || 0, coll, ver: window.APP_VERSION || '', updated: Date.now() }).catch(() => {});
+    const rk = ensureRank(p); Store.db.doc('pub/' + Store.uid).set({ name: p.name, code: frCode(Store.uid), w: p.stats?.w || 0, rank: { season: rk.season, t: rk.t, st: rk.st, lp: rk.lp }, coll, ver: window.APP_VERSION || '', updated: Date.now() }).catch(() => {});
   }, now ? 50 : 2500);
 }
 // ---- meghívó link: …/?inv=<barátkód> – aki ezzel regisztrál (vagy belép), automatikusan barátja lesz a meghívónak ----
@@ -2161,3 +2165,149 @@ function dupeModal() {
     if (b.hasAttribute('data-go')) { b.disabled = true; const r = convertDupes(Store.p); await save(); frPubSync(); o.remove(); renderProfileBar(); renderColl(); toast(`♻️ Beváltva: +${r.coins} coin`); } };
   $('#layer').appendChild(o);
 }
+
+// ======================= Ranked (2026-10-09) =======================
+// Bronz 5–1 → Ezüst 5–1 → Arany 5–1 → Legenda. Győzelem +1 csillag (3. győzelemtől sorozatban +1 bónusz).
+// Bronz és Ezüst 5: vereség nem visz el csillagot. Ezüst 5 alá nem lehet visszaesni.
+// Ezüst 4–1: csak minden második vereség vesz el csillagot („Kitartás”); győzelem után az első vereség ingyenes.
+// Arany: minden vereség −1 csillag, 0 csillagnál visszaesés. Legenda: Legenda-pont (+1/−1), onnan nem esel vissza.
+// Szezon = a Season Pass szezonja (ha nincs, naptári hónap). Szezonváltáskor a szezon legjobb rangja szerinti jutalom, majd újrakezdés Bronz 5-ről.
+const RK_NAMES = ['Bronz', 'Ezüst', 'Arany'];
+const RK_LEG = 15;
+const rkNeed = t => t < 5 ? 2 : t < 10 ? 3 : 4;
+const rkTierCls = t => t >= RK_LEG ? 'legend' : ['bronze', 'silver', 'gold'][Math.floor(t / 5)];
+const rkName = t => t >= RK_LEG ? 'Legenda' : `${RK_NAMES[Math.floor(t / 5)]} ${5 - (t % 5)}`;
+const RK_REWARDS = [
+  { min: 0,  name: 'Bronz',   rew: { packs: 1 } },
+  { min: 5,  name: 'Ezüst',   rew: { packs: 3 } },
+  { min: 10, name: 'Arany',   rew: { shiny: 1, packs: 3, coins: 150 } },
+  { min: 15, name: 'Legenda', rew: { shiny: 2, packs: 5, coins: 500 } },
+];
+const rkRewardFor = t => [...RK_REWARDS].reverse().find(r => t >= r.min);
+const rkRewText = r => [r.shiny ? `${r.shiny} Shiny pack` : '', r.packs ? `${r.packs} booster pack` : '', r.coins ? `${r.coins} coin` : ''].filter(Boolean).join(' + ');
+function rkSeason() { const s = curSeason(); if (s) return { id: s.id, end: s.end, name: s.name }; const d = new Date(); return { id: `m${d.getFullYear()}-${d.getMonth() + 1}`, end: new Date(d.getFullYear(), d.getMonth() + 1, 1), name: `${d.getFullYear()}. ${d.getMonth() + 1}. havi szezon` }; }
+function rkFresh(season) { return { season, t: 0, st: 0, streak: 0, shield: false, lp: 0, best: 0, w: 0, l: 0, games: 0 }; }
+// a profil rangja; szezonváltáskor jutalom + újrakezdés
+function ensureRank(p) {
+  if (!p) return null;
+  const se = rkSeason();
+  if (!p.rank) { p.rank = rkFresh(se.id); return p.rank; }
+  if (p.rank.season !== se.id) {
+    const old = p.rank;
+    if (old.games > 0) {
+      const rw = rkRewardFor(old.best).rew;
+      if (rw.packs) p.giftPacks = (p.giftPacks || 0) + rw.packs;
+      if (rw.shiny) p.shinyPacks = (p.shinyPacks || 0) + rw.shiny;
+      if (rw.coins) p.coins += rw.coins;
+      p.rankReward = { season: old.season, best: old.best, lp: old.lp, w: old.w, l: old.l, rew: rw, seen: false };
+    }
+    p.rank = rkFresh(se.id); p._dirty = true; save();
+  }
+  return p.rank;
+}
+// egy ranked meccs eredménye → új rang; visszaadja, mi történt (a kijelzéshez)
+function rankOnMatch(res) {
+  const p = Store.p, r = ensureRank(p); if (!r) return null;
+  const before = { t: r.t, st: r.st, lp: r.lp };
+  let note = '';
+  r.games++; delete r.pend;
+  if (res === 'win') {
+    r.w++;
+    const bonus = r.streak >= 2 && r.t < RK_LEG ? 1 : 0;
+    r.streak++; r.shield = false;
+    if (r.t >= RK_LEG) { r.lp++; note = '+1 Legenda-pont'; }
+    else {
+      r.st += 1 + bonus; if (bonus) note = `🔥 Győzelmi sorozat: +1 bónusz csillag`;
+      while (r.t < RK_LEG && r.st >= rkNeed(r.t)) { r.st -= rkNeed(r.t); r.t++; }
+      if (r.t >= RK_LEG) r.st = 0;
+    }
+  } else if (res === 'loss') {
+    r.l++; r.streak = 0;
+    if (r.t >= RK_LEG) { r.lp = Math.max(0, r.lp - 1); note = r.lp || before.lp ? '−1 Legenda-pont' : 'A Legenda rangot nem veszítheted el'; }
+    else if (r.t <= 5) note = r.t < 5 ? 'Bronzban a vereség nem visz el csillagot' : 'Ezüst 5 alá nem eshetsz vissza';
+    else {
+      let lose = true;
+      if (r.t < 10) { if (!r.shield) { r.shield = true; lose = false; note = '🛡 Kitartás: ezt a vereséget nem számoltuk'; } else r.shield = false; }
+      if (lose) {
+        if (r.st > 0) r.st--;
+        else if (r.t > 5) { r.t--; r.st = rkNeed(r.t) - 1; note = 'Visszaestél egy fokozatot'; }
+      }
+    }
+  } else note = 'Döntetlen: a rangod nem változott';
+  r.best = Math.max(r.best, r.t);
+  save(); frPubSync();
+  return { before, after: { t: r.t, st: r.st, lp: r.lp }, res, note, up: r.t > before.t, down: r.t < before.t };
+}
+function rkEmblem(t, cls = '') {
+  return `<span class="rk-emb ${rkTierCls(t)} ${cls}" aria-hidden="true"><i>${t >= RK_LEG ? '★' : 5 - (t % 5)}</i></span>`;
+}
+function rkStars(t, st, anim) {
+  if (t >= RK_LEG) return '';
+  return `<span class="rk-stars">${Array.from({ length: rkNeed(t) }, (_, k) => `<i class="${k < st ? 'on' : ''}${anim != null && k === anim ? ' pop' : ''}"></i>`).join('')}</span>`;
+}
+// a meccs végi ablakba: rangváltozás
+function rkResultHTML(x) {
+  if (!x) return '';
+  const a = x.after, gained = x.res === 'win' && !x.up && a.t < RK_LEG ? a.st - 1 : null;
+  return `<div class="rk-res${x.up ? ' up' : x.down ? ' down' : ''}">${rkEmblem(a.t, 'sm')}<div class="rk-res-t"><b>${x.up ? `Szintlépés! ${rkName(a.t)}` : x.down ? `${rkName(a.t)}` : rkName(a.t)}</b>
+    ${a.t >= RK_LEG ? `<small>${a.lp} Legenda-pont</small>` : rkStars(a.t, a.st, gained)}${x.note ? `<small class="rk-note">${x.note}</small>` : ''}</div></div>`;
+}
+// menü csempe
+function renderRankTile() {
+  const el = $('#rankSub'), em = $('#rankEmb'); if (!el || !Store.p) return;
+  const r = ensureRank(Store.p);
+  if (r.pend && !(S && S.ranked)) { rankOnMatch('loss'); toast('Félbehagyott ranked meccs: vereségnek számított'); }
+  el.textContent = r.t >= RK_LEG ? `Legenda · ${r.lp} pont` : `${rkName(r.t)} · ${r.st}/${rkNeed(r.t)} csillag`;
+  if (em) em.innerHTML = rkEmblem(r.t, 'xs');
+  const rw = Store.p.rankReward; if (rw && !rw.seen) rkRewardPopup();
+}
+function rkRewardPopup() {
+  const p = Store.p, rw = p.rankReward; if (!rw || rw.seen || $('#layer .rk-season')) return;
+  const o = document.createElement('div'); o.className = 'overlay rk-season';
+  o.innerHTML = `<div class="modal acct-box"><h3>🏆 Véget ért a ranked szezon</h3>${rkEmblem(rw.best, 'lg')}
+    <p class="live">A szezon legjobb rangod: <b>${rkName(rw.best)}</b>${rw.best >= RK_LEG ? ` (${rw.lp} Legenda-pont)` : ''} · ${rw.w} győzelem, ${rw.l} vereség.</p>
+    <p class="tut-gift">🎁 Jutalom: <b>${rkRewText(rw.rew)}</b> – a Boosterek menüben vár.</p>
+    <p class="live">Az új szezon Bronz 5-ről indul. Hajrá!</p><button class="btn primary" data-x>Szuper!</button></div>`;
+  o.onclick = e => { if (e.target.closest('[data-x]')) { o.remove(); rw.seen = true; save(); } };
+  $('#layer').appendChild(o);
+}
+function renderRanked() {
+  const body = $('#rankBody'); if (!body || !Store.p) return;
+  const r = ensureRank(Store.p), se = rkSeason();
+  const days = Math.max(0, Math.ceil((se.end - new Date()) / 864e5));
+  const me = { name: Store.p.name, t: r.t, st: r.st, lp: r.lp, me: true };
+  const fr = (typeof frOn === 'function' && frOn()) ? FR.list.filter(d => d.status === 'accepted').map(d => { const u = frOther(d), pb = FR.pub[u]; return pb && pb.rank && pb.rank.season === se.id ? { name: pb.name, ...pb.rank } : null; }).filter(Boolean) : [];
+  const board = [me, ...fr].sort((a, b) => b.t - a.t || (b.t >= RK_LEG ? b.lp - a.lp : b.st - a.st));
+  const nextRw = rkRewardFor(r.best);
+  body.innerHTML = `
+    <div class="rk-hero">${rkEmblem(r.t, 'xl')}<div class="rk-name">${rkName(r.t)}</div>
+      ${r.t >= RK_LEG ? `<div class="rk-lp">${r.lp} Legenda-pont</div>` : rkStars(r.t, r.st)}
+      <small class="rk-sea">${escH(se.name)} · még ${days} nap · ${r.w} győzelem, ${r.l} vereség${r.streak >= 2 ? ` · 🔥 ${r.streak} győzelem sorozat` : ''}</small></div>
+    <button class="btn primary rk-play" id="rkPlay">⚔️ Ranked meccs</button>
+    <p class="q-note rk-how">Élő ellenfelet keresünk; ha 20 mp alatt nincs senki, egy bot ellen játszol – a rangod mindkét esetben számít.</p>
+    <div class="lbl">Szezon végi jutalom (a szezon legjobb rangja szerint)</div>
+    <div class="rk-rews">${RK_REWARDS.map(x => `<div class="rk-rew${r.best >= x.min ? ' got' : ''}">${rkEmblem(x.min, 'xs')}<span><b>${x.name}</b><small>${rkRewText(x.rew)}</small></span>${r.best >= x.min && x === nextRw ? '<em>elérve</em>' : ''}</div>`).join('')}</div>
+    <div class="lbl">Barátok ranglistája</div>
+    <div class="rk-board">${board.map((x, i) => `<div class="rk-row${x.me ? ' me' : ''}"><span class="rk-pos">${i + 1}.</span>${rkEmblem(x.t, 'xs')}<b>${escH(x.name || 'Barát')}</b><small>${x.t >= RK_LEG ? `Legenda · ${x.lp || 0} pont` : `${rkName(x.t)} · ${x.st}★`}</small></div>`).join('')}
+      ${fr.length ? '' : '<p class="q-note">Még egy barátod sem játszott ranked meccset ebben a szezonban.</p>'}</div>
+    <details class="rk-rules"><summary>Hogyan működik?</summary><ul>
+      <li>Győzelem: +1 csillag. Sorozatban a 3. győzelemtől minden győzelem +1 bónusz csillagot ad.</li>
+      <li>Bronzban 2, Ezüstben 3, Aranyban 4 csillag kell egy fokozathoz. Arany 1 után jön a Legenda.</li>
+      <li>Bronzban és Ezüst 5-ön a vereség nem visz el csillagot, és Ezüst 5 alá már nem eshetsz vissza.</li>
+      <li>Ezüst 4–1: csak minden második vereség vesz el csillagot (🛡 Kitartás), és egy győzelem után az első vereség mindig ingyenes.</li>
+      <li>Aranyban minden vereség −1 csillag, és 0 csillagnál visszaesel egy fokozatot.</li>
+      <li>Legendában Legenda-pontokat gyűjtesz, onnan már nem esel vissza.</li>
+      <li>A szezon a Season Passsal együtt ér véget: akkor jár a jutalom, és mindenki Bronz 5-ről kezd.</li></ul></details>`;
+  $('#rkPlay').onclick = () => pvpPickDeck('Melyik paklival mész rankedbe?', dk => rankedSearch(dk));
+}
+// ranked keresés: élő ellenfél (20 mp), különben bot
+function rankedSearch(dk) {
+  if (window.APP_MODE && Store.db && Store.uid) { PVP.ranked = true; PVP.friendTo = null; pvpQuick(dk); }
+  else rankedBot(dk);
+}
+function rankedBot(dk) {
+  ui.deck = dk.id;
+  startMatch(dk.hero, dk.id, { ranked: true });
+  toast('Nincs most élő ellenfél – bot ellen játszol (a rangod számít)');
+}
+$('#goRanked').onclick = () => { if (!Store.p) return showCreate(); if (typeof frStart === 'function' && frOn()) { frStart(); FR.list.filter(d => d.status === 'accepted').forEach(d => frFetchPub(frOther(d), true)); } renderRanked(); show('scr-ranked'); };

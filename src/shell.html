@@ -1443,6 +1443,44 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%;}
 @keyframes vsPlateR{from{opacity:0;transform:translateX(30px)}to{opacity:1;transform:none}}
 @keyframes vsOut{to{opacity:0;transform:scale(1.04)}}
 @media (prefers-reduced-motion:reduce){.vs-screen *{animation-duration:.01s!important;animation-delay:0s!important}}
+/* Ranked */
+.m-ranked{grid-template-columns:48px 1fr auto;min-height:70px;border-color:rgba(255,200,90,.65)!important;}
+.m-ranked .m-ic{display:grid;place-items:center;}
+.rk-emb{--a:#c98a4b;--b:#6b3d17;--c:#ffd8a8;position:relative;display:inline-grid;place-items:center;width:64px;height:72px;clip-path:polygon(50% 0,100% 18%,100% 62%,50% 100%,0 62%,0 18%);background:linear-gradient(160deg,var(--c),var(--a) 40%,var(--b));filter:drop-shadow(0 4px 10px rgba(0,0,0,.5));flex:none;}
+.rk-emb::before{content:'';position:absolute;inset:5px;clip-path:inherit;background:radial-gradient(circle at 50% 30%,rgba(255,255,255,.25),transparent 60%),linear-gradient(170deg,var(--b),var(--a));}
+.rk-emb i{position:relative;font-style:normal;font-family:var(--display);font-size:30px;color:#fff;text-shadow:0 2px 0 rgba(0,0,0,.45),0 0 10px var(--c);}
+.rk-emb.silver{--a:#aeb8c6;--b:#4c5666;--c:#f2f6ff;}
+.rk-emb.gold{--a:#f2c14e;--b:#7a5410;--c:#fff1b8;}
+.rk-emb.legend{--a:#b46cff;--b:#3d1470;--c:#ffd36b;}
+.rk-emb.legend i{color:#ffd36b;}
+.rk-emb.xs{width:34px;height:38px;}.rk-emb.xs i{font-size:16px;}
+.rk-emb.sm{width:46px;height:52px;}.rk-emb.sm i{font-size:22px;}
+.rk-emb.lg{width:90px;height:100px;margin:0 auto;}.rk-emb.lg i{font-size:42px;}
+.rk-emb.xl{width:120px;height:134px;}.rk-emb.xl i{font-size:56px;}
+.rk-hero{display:grid;justify-items:center;gap:6px;padding:14px 0 6px;}
+.rk-name{font-family:var(--display);font-size:34px;color:var(--gold);text-shadow:0 2px 10px rgba(0,0,0,.6);}
+.rk-lp{font-weight:900;color:#d9b3ff;}
+.rk-sea{color:var(--mute);font-size:12px;text-align:center;}
+.rk-stars{display:inline-flex;gap:6px;}
+.rk-stars i{width:22px;height:22px;clip-path:polygon(50% 0,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%);background:rgba(255,255,255,.15);}
+.rk-stars i.on{background:linear-gradient(160deg,#fff3b0,#f2b62e);filter:drop-shadow(0 0 4px rgba(255,200,60,.8));}
+.rk-stars i.pop{animation:rkPop .6s cubic-bezier(.2,1.6,.4,1) .6s both;}
+@keyframes rkPop{from{transform:scale(2.4);opacity:0}to{transform:none;opacity:1}}
+.rk-play{width:100%;min-height:52px;font-size:18px;margin-top:6px;}
+.rk-how{text-align:center;margin:4px 0 8px;}
+.rk-rews,.rk-board{display:grid;gap:6px;}
+.rk-rew,.rk-row{display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:12px;background:linear-gradient(160deg,#1d3550,#0f1d2e);border:1px solid rgba(255,255,255,.1);}
+.rk-rew > span:not(.rk-emb){display:grid;flex:1;min-width:0;}.rk-rew small,.rk-row small{color:var(--mute);font-size:12px;}
+.rk-rew.got{border-color:rgba(255,200,90,.55);}
+.rk-rew em{font-style:normal;font-size:11px;font-weight:900;color:var(--gold);text-transform:uppercase;letter-spacing:.08em;}
+.rk-row b{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.rk-row.me{border-color:var(--gold);}
+.rk-pos{width:22px;font-weight:900;color:var(--mute);}
+.rk-rules{margin:12px 0 24px;color:var(--mute);font-size:13px;}.rk-rules summary{cursor:pointer;font-weight:800;color:var(--ink);}.rk-rules li{margin:4px 0;}
+.rk-res{display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:14px;background:rgba(0,0,0,.35);border:1px solid rgba(255,200,90,.45);text-align:left;width:100%;box-sizing:border-box;}
+.rk-res.up{border-color:var(--gold);box-shadow:0 0 18px rgba(255,200,80,.45);}
+.rk-res.down{border-color:rgba(255,110,110,.6);}
+.rk-res-t{display:grid;gap:4px;}.rk-res-t b{font-size:16px;}.rk-note{color:var(--mute);font-size:12px;}
 .lesson-box{display:grid;gap:10px;}
 .lesson-row{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:12px;border-radius:14px;border:1px solid rgba(255,255,255,.12);background:linear-gradient(160deg,#1d3550,#0f1d2e);color:var(--ink);font:inherit;cursor:pointer;}
 .lesson-row.done{border-color:rgba(120,220,160,.45);}
@@ -1870,6 +1908,7 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%;}
     <div class="profile-bar orn" id="profileBar"></div>
     <div class="menu-btns">
       <button class="m-play" id="goPlay"><i class="m-ic swords" aria-hidden="true"></i><span><b>Játék indítása</b><small>Bot elleni csata</small></span></button>
+      <button class="m-tile orn m-ranked" id="goRanked"><span class="m-ic" id="rankEmb" aria-hidden="true"></span><span class="m-txt"><b>Ranked</b><small id="rankSub">Bronz 5</small></span><i class="chev" aria-hidden="true"></i></button>
       <button class="m-tile orn m-pvp" id="goPvp"><span class="m-ic ic-img ic-pvp" aria-hidden="true"></span><span class="m-txt"><b>PvP</b><small id="pvpSub">Játssz a barátaid ellen</small></span><span class="q-badge sp-badge" id="pvpBadge" hidden></span><i class="chev" aria-hidden="true"></i></button>
       <button class="m-tile orn m-friends" id="goFriends" hidden><span class="m-ic ic-img ic-friends" aria-hidden="true"></span><span class="m-txt"><b>Barátok</b><small>Kihívás és lapcsere</small></span><span class="q-badge" id="friendBadge" hidden></span><i class="chev" aria-hidden="true"></i></button>
       <button class="m-shop-img" id="goShop" aria-label="Bolt – boosterek, változatok, portrék"><img src="art/ui/shop-btn.webp" alt="" aria-hidden="true"><span class="badge" id="shopBadge" hidden>Ingyen pack!</span><i class="chev" aria-hidden="true"></i></button>
@@ -1912,6 +1951,11 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%;}
   <section class="screen" id="scr-friends" hidden>
     <div class="top"><button class="back" data-back aria-label="Vissza">‹</button><h2>Barátok</h2></div>
     <div id="frBody"></div>
+  </section>
+
+  <section class="screen" id="scr-ranked" hidden>
+    <div class="top"><button class="back" data-back aria-label="Vissza">‹</button><h2>Ranked</h2></div>
+    <div id="rankBody"></div>
   </section>
 
   <section class="screen" id="scr-pass" hidden>

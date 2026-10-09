@@ -392,6 +392,15 @@ Hősképesség-ötletek a táblázatban (még nem zöldek, nincsenek beépítve)
 ## Ritka változat-lapok kiemelése (2026-10-01)
 - A változat-lapokon (zöld Rehab, TZS és Pifti pass-változat) zöld-arany „✦ Ritka változat” szalag (kicsiben „✦ Változat”) és zöldes ragyogó keret. Bontáskor saját bemutató: „✦ Ritka változat!” + „A(z) X különleges, ritka kinézete – ugyanúgy játszható”. A Gyűjteményben a nagy nézet felirata is ezt magyarázza.
 
+## Ranked (2026-10-09)
+- Menü → 🏆 **Ranked** csempe (jelvény + rang + csillagok) → Ranked képernyő: nagy jelvény, rang, csillagok, szezon és hátralévő napok, győzelmek/vereségek, győzelmi sorozat; „⚔️ Ranked meccs” gomb; szezon végi jutalmak; barátok ranglistája (a `pub/<uid>.rank` mezőből, csak az aktuális szezon); „Hogyan működik?” szabályok.
+- **Ellenfél:** 20 mp-ig élő ranked ellenfelet keres (csak ranked keresővel párosít, a sima PvP-listában nem látszik – `ranked:true` a pvp dokumentumon); ha nincs senki, bot ellen indul. A rang mindkét esetben számít. Bot elleni ranked meccsből kilépni (vagy az appot bezárni) vereségnek számít (`rank.pend`).
+- **Rangok:** Bronz 5–1 (2 csillag/fokozat) → Ezüst 5–1 (3) → Arany 5–1 (4) → Legenda. Győzelem +1 csillag; sorozatban a 3. győzelemtől +1 bónusz csillag (Legenda alatt).
+- **Vereség:** Bronzban és Ezüst 5-ön nem visz el csillagot, Ezüst 5 alá nem lehet visszaesni. Ezüst 4–1: csak minden második vereség vesz el csillagot (🛡 Kitartás; győzelem után az első vereség mindig ingyenes); 0 csillagnál a számító vereség visszavisz egy fokozatot. Arany: minden vereség −1 csillag, 0 csillagnál visszaesés (Arany 5-ről Ezüst 1-be). Legenda: Legenda-pont +1/−1 (min. 0), onnan nem esel vissza. Döntetlen: nincs változás.
+- **Tempó (szimuláció, medián meccsszám):** 55%-os nyerésnél Ezüst 5 ~15, Arany 5 ~39, Legenda ~100 meccs; 60%-nál 13 / 34 / 77.
+- **Szezon:** a Season Pass szezonja (ha épp nincs, a naptári hónap). Szezonváltáskor a szezon **legjobb** rangja szerinti jutalom jár (felugró ablak), majd mindenki Bronz 5-ről kezd: Bronz 1 pack · Ezüst 3 pack · Arany 1 Shiny + 3 pack + 150 coin · Legenda 2 Shiny + 5 pack + 500 coin. (Csak aki játszott legalább 1 ranked meccset.)
+- Meccs végén a ranked eredmény-dobozban: jelvény, új rang, csillagok (az új csillag „bepattan”), megjegyzés (pl. „🔥 Győzelmi sorozat: +1 bónusz csillag”, „🛡 Kitartás…”, „Szintlépés! Ezüst 2”). A coin/küldetés/Season Pass ugyanúgy jár, mint a sima meccsen.
+
 ## Meccs eleji VS képernyő (2026-10-09)
 - Bot elleni és PvP meccs indulásakor (a kezdő kéz előtt) teljes képernyős „X vs Y” jelenet: felül az ellenfél hőse, alul a tiéd, átlósan elválasztva, a hős színével izzó kerettel; a nagy portrék a választott kinézettel (arany / portré skin). Felül „Bot” vagy „Ellenfél · név”, alul „Te · név”, középen becsapódó arany VS villanással, alatta ki kezd. ~3 mp után magától eltűnik, koppintásra azonnal továbblép. PvP-ben csak új meccsnél jelenik meg (folytatásnál nem); az oktató leckéknél nincs.
 
