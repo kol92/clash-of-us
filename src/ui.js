@@ -40,7 +40,7 @@ const KW_HELP = {
   stun:  ['Bénult', 'Nem támad, és ha megütik, nem üt vissza. A gazdája minden körének végén 1-gyel csökken.'],
   fresh: ['Pihen', 'Ebben a körben került le, ezért még nem támad. A következő körödtől harcol.'],
   doom:  ['Eltűnik', 'A köröd végén magától elpusztul (előtte még támad).'],
-  invis: ['Láthatatlan', 'A támadások átmennek rajta: aki vele szemben áll, mintha üres lenne a hely, az ellenfél hősét üti. Támadással nem lehet sebezni vagy megölni (akciókkal igen).'],
+  invis: ['Láthatatlan', 'A támadások átmennek rajta: aki vele szemben áll, mintha üres lenne a hely, az ellenfél hősét üti. Támadással nem lehet sebezni vagy megölni (akciókkal igen); ha ő támad, nem lehet visszaütni.'],
   legend:['Legendás', 'Egy pakliban legfeljebb 1 lehet belőle.'],
 };
 function cardHelpHTML(id, u) {
@@ -178,6 +178,7 @@ const ART = {
   c_kriszrantott: { src:'art/kriszrantott.webp', av:'58% 22%', pos:'56% 22%' },
   a_rantott: { src:'art/rantott.webp', av:'45% 40%', pos:'50% 38%' },
   c_tomiparti: { src:'art/tomiparti.webp', av:'47% 26%', pos:'47% 24%' },
+  c_alvari: { src:'art/alvari.webp', av:'50% 30%', pos:'50% 30%' },
   c_piftikiraly: { src:'art/piftikiraly.webp', av:'50% 24%', pos:'50% 24%' },
   c_piftihaver1: { src:'art/piftihaver1.webp', av:'48% 32%', pos:'48% 32%' },
   c_piftihaver2: { src:'art/piftihaver2.webp', av:'50% 28%', pos:'50% 28%' },

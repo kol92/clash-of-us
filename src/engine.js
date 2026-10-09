@@ -34,6 +34,7 @@ const CARDS = [
   { id:'c_udvarhelyi', type:'char', name:'Udvarhelyi Zoli', cost:6, atk:5, hp:5, rarity:'k', text:'' },
   { id:'c_molnar', type:'char', name:'Molnár Zsolti', cost:5, atk:2, hp:4, rarity:'r', deathKill:true, text:'Amikor meghal, elpusztít egy véletlen ellenséges karaktert.' },
   { id:'c_piftikiraly', type:'char', name:'Pifti, a király', cost:4, atk:4, hp:2, rarity:'e', text:'Kijátszáskor 5 Pifti haverja lapot kever a paklidba.' },
+  { id:'c_alvari', type:'char', name:'Alvári Roli', cost:1, atk:1, hp:1, rarity:'r', invis:true, text:'' },
   { id:'c_atiuldozott', type:'char', name:'Ati, az üldözött', cost:3, atk:3, hp:2, rarity:'r', sneak:true, text:'A köröd elején, ha szemben áll vele valaki, átmenekül egy szabad helyre, ahol nincs vele szemben senki.' },
   { id:'c_amszterdam', type:'char', name:'Bence, Amszterdam hőse', cost:2, atk:2, hp:1, rarity:'r', sneak:true, deathHeal:3, text:'Amikor meghal, a hősöd 3 életet gyógyul.' },
   { id:'c_barnaelet', type:'char', name:'Barna, az életunt', cost:2, atk:1, hp:2, rarity:'r', sneak:true, deathDraw:true, text:'Amikor meghal, húzol egy lapot.' },
@@ -708,7 +709,7 @@ function strike(s, i) {
   const x = s.players[ei].board[j];
   if (tj < 0 && (u.id === 'c_nyiti' || !x || CARD[x.id].invis)) { damageHero(s, ei, a); return; }
   reveal(s, ei, j);
-  const r = x.stun ? 0 : effAtk(s, ei, j);
+  const r = x.stun || CARD[u.id].invis ? 0 : effAtk(s, ei, j);   // Láthatatlan támadót nem lehet visszaütni
   const sh = x.shield;
   damageUnit(s, ei, j, a);
   // Izom: ami sebzés a karakter halála után megmarad, az ellenfél hősét éri (a Pajzs elnyeli az egészet)
@@ -841,7 +842,7 @@ function evalState(s, me) {
     const u = P.board[i], x0 = E.board[i], x = x0 && !CARD[x0.id].invis ? x0 : null;   // a Láthatatlan lap nem áll útban
     if (u) { v += val(me, i); if ((!x || u.id === 'c_nyiti') && !u.stun && !CARD[u.id].noAttack) v += effAtk(s, me, i) * 0.6; }
     if (x0) v -= val(other(me), i);
-    if (x && (!u || x.id === 'c_nyiti') && !x.stun && !CARD[x.id].noAttack) v -= effAtk(s, other(me), i) * 0.8;
+    if (x && (!u || CARD[u.id].invis || x.id === 'c_nyiti') && !x.stun && !CARD[x.id].noAttack) v -= effAtk(s, other(me), i) * 0.8;
   }
   v += P.hand.length * 0.6 - E.hand.length * 0.3;
   if (s.location && s.location.owner === me) v += 1.0;
