@@ -178,6 +178,7 @@ const ART = {
   c_kriszrantott: { src:'art/kriszrantott.webp', av:'58% 22%', pos:'56% 22%' },
   a_rantott: { src:'art/rantott.webp', av:'45% 40%', pos:'50% 38%' },
   c_tomiparti: { src:'art/tomiparti.webp', av:'47% 26%', pos:'47% 24%' },
+  a_espresso: { src:'art/espresso.webp', av:'52% 40%', pos:'52% 40%' },
   a_amongus: { src:'art/amongus.webp', av:'50% 62%', pos:'50% 58%' },
   c_alvari: { src:'art/alvari.webp', av:'50% 30%', pos:'50% 30%' },
   c_piftikiraly: { src:'art/piftikiraly.webp', av:'50% 24%', pos:'50% 24%' },
@@ -549,6 +550,8 @@ function logEvents(evs, snap) {
       case 'chomp': L(`🦈 A Cápa megette: ${unitName(e.side, e.i)}`); break;
       case 'sharkgone': L('🦈 A Cápa eltűnt'); break;
       case 'shuffled': L(`🃏 ${e.side === ME ? 'A paklidba' : 'Az ellenfél paklijába'} került ${e.n} ${CARD[e.id].name}`); break;
+      case 'espresso': L(`☕ ${e.side === ME ? 'Espresso Martini: a következő körödben húzol még 2 lapot' : 'Az ellenfél Espresso Martinit ivott: a következő körében húz még 2 lapot'}`); break;
+      case 'espressodraw': L(`☕ ${e.side === ME ? 'Felpörögtél: +' + e.n + ' lap' : 'Az ellenfél felpörgött: +' + e.n + ' lap'}`); break;
       case 'amongus': L(`🌶️ Among Us! A paprikás shotot ${e.i === -1 ? (e.side === ME ? 'a hősöd' : 'az ellenfél hőse') : unitName(e.side, e.i)} itta meg`); break;
       case 'flee': L(`🏃 ${unitName(e.side, e.i)} átmenekült egy másik helyre`); break;
       case 'doom': case 'expire': L(`⌛ ${unitName(e.side, e.i)} eltűnt`); break;
@@ -703,6 +706,8 @@ async function animateEvents(evs) {
       case 'sharkgone': floatAt(anchor, '🦈 Elúszott…', 'info'); hold = Math.max(hold, 600); break;
       case 'shuffled': floatAt(anchor, `👑 +${e.n} Pifti haverja a ${e.side === ME ? 'paklidba' : 'paklijába'}!`, 'info'); hold = Math.max(hold, 900); break;
       case 'amongus': await amongUsFx(el, anchor); break;
+      case 'espresso': floatAt(anchor, '☕ Jövő körben +2 lap', 'info'); hold = Math.max(hold, 700); break;
+      case 'espressodraw': floatAt(anchor, `☕ Felpörögve: +${e.n} lap`, 'buff'); hold = Math.max(hold, 700); break;
       case 'flee': floatAt(anchor, '🏃 Menekül!', 'info'); hold = Math.max(hold, 600); break;
       case 'gift': floatAt(anchor, `${e.id === 'i_ing' ? '👔' : '🍗'} ${CARD[e.id].name} a ${e.side === ME ? 'kezedbe' : 'kezébe'}!`, 'info'); hold = Math.max(hold, 700); break;
       case 'drinkgift': floatAt(anchor, e.side === ME ? `🍸 ${CARD[e.id].name} a kezedbe!` : '🍸 Ital a kezébe!', 'info'); hold = Math.max(hold, 700); break;

@@ -78,7 +78,8 @@ const CARDS = [
   { id:'a_mangos', drink:true, type:'action', name:'Mangós Ciroc Vodka', cost:4, tgt:'none', rarity:'r', text:'A hősöd 4 életet gyógyul.' },
   { id:'a_koktel', drink:true, type:'action', name:'Koktélarmageddon', cost:5, tgt:'none', rarity:'e', text:'Egy véletlen karakter +5 támadást kap, egy másik 5 sebzést. Bármelyik oldalon lehetnek.' },
   { id:'a_kancso', drink:true, type:'action', name:'Kancsó Long Island', cost:6, tgt:'two', rarity:'e', text:'3 sebzés két általad választott célpontnak: bármelyik karakternek vagy az ellenfél hősének.' },
-  { id:'a_amongus', drink:true, type:'action', name:'Among Us', cost:3, tgt:'none', rarity:'r', rand:true, text:'Te fizeted a kört: húzol egy lapot, a karaktereid +1/+1-et kapnak, mindkét hős 2 életet gyógyul. Egy véletlen résztvevő – bármelyik karakter vagy hős, mindkét oldalon – a paprikásat issza: 6 sebzés.' },
+  { id:'a_espresso', drink:true, type:'action', name:'Espresso Martini', cost:1, tgt:'none', rarity:'r', noParty:true, text:'A következő köröd elején húzol még 2 lapot.' },
+  { id:'a_amongus', drink:true, type:'action', name:'Among Us', cost:3, tgt:'none', rarity:'r', rand:true, text:'Húzol 1 lapot, a karaktereid +1/+1-et kapnak, mindkét hős 2 életet gyógyul. Egy véletlen karakter vagy hős (bármelyik oldalon) a paprikásat issza: 6 sebzés.' },
   { id:'a_talca', drink:true, type:'action', name:'Tálca shot', cost:6, tgt:'none', rarity:'e', text:'Mindenki 2 sebzést kap: az összes karakter és mindkét hős.' },
   { id:'a_stop', type:'action', name:'STOP', cost:4, tgt:'none', rarity:'e', text:'Leszedsz minden eszközt az ellenfél karaktereiről (amit ő tett rájuk). A hatásuk is megszűnik.' },
   { id:'a_adios', drink:true, type:'action', name:'Adios Motherfucker!', cost:5, tgt:'none', rarity:'l', text:'Megbénítod az ellenfél hősét: a következő körében nem játszhat ki lapot (a karakterei attól még támadnak).' },
@@ -256,6 +257,7 @@ function startTurn(s) {
   p.board.forEach(u => { if (u) u.fresh = false; });
   ev(s, { t:'turn', side:pi });
   if (s.half > 1) draw(s, pi);
+  if (p.espresso) { const n = p.espresso; p.espresso = 0; ev(s, { t:'espressodraw', side:pi, i:-1, n }); for (let k = 0; k < n; k++) draw(s, pi); }   // Espresso Martini: a következő köre elején +2 húzás (a szokásos mellé)
   if (s.half === 2 && !s.noCoin) { addToHand(s, pi, 'a_kor'); ev(s, { t:'coin', side:pi, i:-1 }); }   // a második játékos kiegyenlítése
   atiFlee(s, pi);
   sharkSwim(s, pi);
@@ -506,6 +508,7 @@ function playCard(s, pi, hi, t) {
         });
         break;
       case 'a_adios': e.locked = true; ev(s, { t:'lock', side:ei, i:-1 }); break;
+      case 'a_espresso': p.espresso = (p.espresso || 0) + 2; ev(s, { t:'espresso', side:pi, i:-1 }); break;
       case 'a_amongus': {   // 10 shot, az egyikben durva paprika: mindenki iszik (mindkét oldal karakterei és hősei), egy valaki megszívja
         const part = [];
         for (const sd of [pi, ei]) s.players[sd].board.forEach((u, i) => { if (u && !isFixed(u)) { part.push({ sd, i }); if (sd === pi) { u.atk += 1; u.hp += 1; u.maxHp += 1; ev(s, { t:'buff', side:sd, i, n:1 }); } } });
@@ -574,7 +577,7 @@ function playCard(s, pi, hi, t) {
 }
 
 // Tomi, a parti lelke: véletlen Ital véletlen ellenséges karakterre – minden ital a célpontra hat
-const PARTY_POOL = () => CARDS.filter(x => x.drink && !x.variantOf && !x.token).map(x => x.id);
+const PARTY_POOL = () => CARDS.filter(x => x.drink && !x.variantOf && !x.token && !x.noParty).map(x => x.id);   // noParty: nincs értelme ellenséges karakterre (pl. Espresso Martini)
 function partyDrink(s, pi, si) {
   const ei = other(pi), e = s.players[ei];
   const cand = e.board.map((x, k) => x && !isFixed(x) ? k : -1).filter(k => k >= 0);
@@ -605,7 +608,7 @@ function partyDrink(s, pi, si) {
 }
 const PARTY_FX = { i_energiaital:'+2 támadás', i_akuma:'+5 támadás, de a köre végén meghal', i_vodkakancso:'+4 támadás, utána bénult',
   a_dinnyes:'3 sebzés', a_abszint:'7 sebzés', a_tubi:'6 sebzés (és 3 a te hősödnek)', a_kancso:'3 sebzés neki és 3 a hősének', a_talca:'2 sebzés',
-  a_koktel:'+5 támadás vagy 5 sebzés', a_mangos:'4 életet gyógyul', a_rehab:'3 életet gyógyul, és magához tér', a_adios:'a következő körében bénult' };
+  a_koktel:'+5 támadás vagy 5 sebzés', a_mangos:'4 életet gyógyul', a_rehab:'3 életet gyógyul, és magához tér', a_adios:'a következő körében bénult', a_amongus:'6 sebzés – a paprikás jutott neki' };
 
 function dropLocation(s, how) {   // a pályán lévő helyszín eltűnik (lecserélik vagy kitiltják)
   const L = s.location; if (!L) return;
@@ -855,7 +858,7 @@ function evalState(s, me) {
     if (x0) v -= val(other(me), i);
     if (x && (!u || CARD[u.id].invis || x.id === 'c_nyiti') && !x.stun && !CARD[x.id].noAttack) v -= effAtk(s, other(me), i) * 0.8;
   }
-  v += P.hand.length * 0.6 - E.hand.length * 0.3;
+  v += P.hand.length * 0.6 - E.hand.length * 0.3 + (P.espresso || 0) * 0.55;   // Espresso Martini: a jövő körben érkező lapok
   if (s.location && s.location.owner === me) v += 1.0;
   if (locIs(s, 'l_munkahely')) v += s.location.owner === me ? 4 : -4;   // Munkahely: tartós energiaelőny
   if (E.locked) v += 3; if (P.locked) v -= 3;
