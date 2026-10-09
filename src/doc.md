@@ -389,6 +389,9 @@ Hősképesség-ötletek a táblázatban (még nem zöldek, nincsenek beépítve)
 ## Ritka változat-lapok kiemelése (2026-10-01)
 - A változat-lapokon (zöld Rehab, TZS és Pifti pass-változat) zöld-arany „✦ Ritka változat” szalag (kicsiben „✦ Változat”) és zöldes ragyogó keret. Bontáskor saját bemutató: „✦ Ritka változat!” + „A(z) X különleges, ritka kinézete – ugyanúgy játszható”. A Gyűjteményben a nagy nézet felirata is ezt magyarázza.
 
+## Meccs eleji VS képernyő (2026-10-09)
+- Bot elleni és PvP meccs indulásakor (a kezdő kéz előtt) teljes képernyős „X vs Y” jelenet: felül az ellenfél hőse, alul a tiéd, átlósan elválasztva, a hős színével izzó kerettel; a nagy portrék a választott kinézettel (arany / portré skin). Felül „Bot” vagy „Ellenfél · név”, alul „Te · név”, középen becsapódó arany VS villanással, alatta ki kezd. ~3 mp után magától eltűnik, koppintásra azonnal továbblép. PvP-ben csak új meccsnél jelenik meg (folytatásnál nem); az oktató leckéknél nincs.
+
 ## Barátok (2026-09-30, csak a saját appban)
 - Menü → 👥 Barátok. Mindenkinek van egy 6 jegyű barátkódja; a barát kódjával jelölsz, ő elfogadja. Látszik, ki van online és hány győzelme van.
 - ⚔️ Kihívás: élő meccsre hívod a barátot (csak ő csatlakozhat, idegen nem); nála felugrik „X kihívott!” – Elfogadom / Most nem. Ha nemet mond, nálad jelzi.

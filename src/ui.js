@@ -1317,6 +1317,26 @@ async function flyBotDraw(k) {
   g.remove();
 }
 
+// ---------- meccs eleji „X vs Y” képernyő (2026-10-09): ~3 mp, koppintásra átugorható ----------
+function vsIntro() {
+  return new Promise(done => {
+    const side = pi => {
+      const h = HERO[S.players[pi].heroId], port = heroPortOf(pi), gold = !port && heroGoldOf(pi) && !!ART['g_' + h.id], aid = port || (gold ? 'g_' + h.id : h.id);
+      const who = pi === ME ? (Store.p?.name || 'Te') : S.pvp ? (S.names?.[pi] || 'Ellenfél') : 'Bot';
+      const pos = ART[aid]?.port || ART[aid]?.pos || ART[aid]?.av || '50% 15%';
+      return `<div class="vs-side ${pi === ME ? 'me' : 'foe'}${gold ? ' gold' : ''}${port || gold || heroFaOf(pi) ? ' fa' : ''}" style="--h:${h.hue}">
+        <div class="vs-art" style="${ART[aid] ? `background-image:url('${artSrc(aid, false)}');` : ''}background-position:${pos}"></div>
+        <div class="vs-plate"><small>${pi === ME ? `Te · ${escH(who)}` : S.pvp ? `Ellenfél · ${escH(who)}` : 'Bot'}</small><b>${escH(h.name)}</b></div></div>`;
+    };
+    const firstTxt = S.active === ME ? 'Te kezdesz' : `${S.pvp ? escH(S.names?.[BOT] || 'Az ellenfél') : 'Az ellenfél'} kezd`;
+    const o = document.createElement('div'); o.className = 'overlay vs-screen';
+    o.innerHTML = `${side(BOT)}${side(ME)}<div class="vs-mid"><i class="vs-flash"></i><span>VS</span><em>${firstTxt}</em></div><small class="vs-skip">Koppints a folytatáshoz</small>`;
+    let end = false;
+    const finish = () => { if (end) return; end = true; o.classList.add('out'); setTimeout(() => { o.remove(); done(); }, 320); };
+    o.onclick = finish; setTimeout(finish, 3000);
+    $('#layer').appendChild(o);
+  });
+}
 function startMatch(heroId, deckId) {
   const others = HEROES.filter(h => h.id !== heroId);
   const bh = others[Math.floor(Math.random() * others.length)].id;
@@ -1325,8 +1345,8 @@ function startMatch(heroId, deckId) {
   const mine = (allDecks().find(d => d.id === deckId) || allDecks()[0]).list;
   S = newGame(heroId, { ...mine }, bh, bd, first, { mulligan: true, foils: [0, 1].map(k => k === ME ? myFoils(mine) : {}) }); S.events = [];
   ui.sel = null; busy = true; ui.handSeen = null; ui.botHandN = null; ui.flying = new Set(); show('scr-game');
-  $('#layer').innerHTML = ''; render();
-  setTimeout(() => showMulligan(first), 250 + S.players[ME].hand.length * 150 + 450);
+  $('#layer').innerHTML = '';
+  vsIntro().then(() => { render(); setTimeout(() => showMulligan(first), 250 + S.players[ME].hand.length * 150 + 450); });
 }
 
 // ---------- kezdő kéz cseréje (mint a Hearthstone-ban) ----------

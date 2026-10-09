@@ -1399,6 +1399,39 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%;}
 .fr-code small{display:block;font-size:11px;font-weight:900;letter-spacing:.12em;text-transform:uppercase;color:var(--mute);}
 .fr-code b{font-family:var(--display);font-weight:400;font-size:30px;letter-spacing:.14em;color:var(--gold);}
 .fr-code .btn{min-height:40px;padding:0 14px;font-size:14px;}
+/* meccs eleji VS képernyő */
+.overlay.vs-screen{position:fixed;inset:0;z-index:80;place-items:stretch;padding:0;backdrop-filter:none;overflow:hidden;background:radial-gradient(120% 60% at 50% 50%,#13263a,#04070c 70%);display:grid;grid-template-rows:1fr 1fr;overflow:hidden;cursor:pointer;-webkit-tap-highlight-color:transparent;}
+.vs-screen.out{animation:vsOut .32s ease-in forwards;}
+.vs-side{position:relative;overflow:hidden;}
+.vs-side.foe{clip-path:polygon(0 0,100% 0,100% 84%,0 100%);animation:vsInTop .6s cubic-bezier(.2,.9,.25,1) both;}
+.vs-side.me{clip-path:polygon(0 16%,100% 0,100% 100%,0 100%);margin-top:-8vh;animation:vsInBot .6s cubic-bezier(.2,.9,.25,1) .08s both;}
+.vs-art{position:absolute;inset:0;background-size:cover;background-repeat:no-repeat;animation:vsZoom 3.4s linear both;}
+.vs-side::before{content:'';position:absolute;inset:0;z-index:1;pointer-events:none;box-shadow:inset 0 0 70px hsl(var(--h) 85% 55% / .55);}
+.vs-side.foe::after{content:'';position:absolute;inset:0;z-index:1;background:linear-gradient(180deg,rgba(0,0,0,.15) 0%,transparent 35%,rgba(0,0,0,.78) 100%);}
+.vs-side.me::after{content:'';position:absolute;inset:0;z-index:1;background:linear-gradient(0deg,rgba(0,0,0,.85) 0%,transparent 45%,rgba(0,0,0,.25) 100%);}
+.vs-side.gold::before{box-shadow:inset 0 0 80px rgba(255,200,80,.7);}
+.vs-plate{position:absolute;z-index:2;display:grid;gap:2px;}
+.vs-side.foe .vs-plate{left:20px;bottom:20%;}
+.vs-side.me .vs-plate{right:20px;bottom:calc(26px + env(safe-area-inset-bottom));text-align:right;}
+.vs-plate b{font-family:var(--display);font-weight:400;font-size:clamp(38px,11vw,58px);line-height:1;color:#fff;text-shadow:0 3px 14px #000,0 0 26px hsl(var(--h) 90% 55% / .75);}
+.vs-plate small{font-size:12px;font-weight:900;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);text-shadow:0 2px 6px #000;}
+.vs-side.foe .vs-plate{animation:vsPlateL .5s ease-out .35s both;}
+.vs-side.me .vs-plate{animation:vsPlateR .5s ease-out .45s both;}
+.vs-mid{position:absolute;left:50%;top:46%;transform:translate(-50%,-50%);z-index:3;display:grid;justify-items:center;pointer-events:none;}
+.vs-mid span{font-family:var(--display);font-weight:400;font-size:104px;line-height:1;color:var(--gold);text-shadow:0 0 28px rgba(255,200,80,.85),0 5px 0 #6b4a10,0 8px 22px #000;animation:vsPop .55s cubic-bezier(.2,1.6,.4,1) .5s both;}
+.vs-mid em{font-style:normal;white-space:nowrap;font-size:13px;font-weight:900;letter-spacing:.18em;text-transform:uppercase;color:#fff;background:rgba(0,0,0,.55);border:1px solid var(--gold);border-radius:999px;padding:5px 14px;margin-top:6px;animation:vsFade .4s ease-out 1.05s both;}
+.vs-flash{position:absolute;left:50%;top:50%;width:380px;height:380px;margin:-190px 0 0 -190px;border-radius:50%;background:radial-gradient(circle,rgba(255,240,200,.95),rgba(255,190,80,.35) 35%,transparent 65%);animation:vsFlash .7s ease-out .48s both;}
+.vs-skip{position:absolute;left:0;right:0;top:calc(10px + env(safe-area-inset-top));z-index:3;text-align:center;font-size:11px;color:rgba(255,255,255,.45);letter-spacing:.08em;animation:vsFade .4s 1.4s both;}
+@keyframes vsInTop{from{transform:translateY(-105%)}to{transform:none}}
+@keyframes vsInBot{from{transform:translateY(105%)}to{transform:none}}
+@keyframes vsZoom{from{transform:scale(1.16)}to{transform:scale(1.02)}}
+@keyframes vsPop{from{transform:scale(3);opacity:0}to{transform:none;opacity:1}}
+@keyframes vsFlash{0%{transform:scale(.2);opacity:0}30%{opacity:1}100%{transform:scale(1.6);opacity:0}}
+@keyframes vsFade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+@keyframes vsPlateL{from{opacity:0;transform:translateX(-30px)}to{opacity:1;transform:none}}
+@keyframes vsPlateR{from{opacity:0;transform:translateX(30px)}to{opacity:1;transform:none}}
+@keyframes vsOut{to{opacity:0;transform:scale(1.04)}}
+@media (prefers-reduced-motion:reduce){.vs-screen *{animation-duration:.01s!important;animation-delay:0s!important}}
 .lesson-box{display:grid;gap:10px;}
 .lesson-row{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:12px;border-radius:14px;border:1px solid rgba(255,255,255,.12);background:linear-gradient(160deg,#1d3550,#0f1d2e);color:var(--ink);font:inherit;cursor:pointer;}
 .lesson-row.done{border-color:rgba(120,220,160,.45);}

@@ -1567,7 +1567,12 @@ function pvpEnter(id, fresh) {
   PVP.turnAt = d.turnAt || Date.now(); PVP.afk = d.afk || [0, 0];
   pvpJoinRoom(id, side); pvpPresence();
   ui.sel = null; ui.pend = null; busy = false; ui.handSeen = null; ui.botHandN = null; ui.flying = new Set();
-  show('scr-game'); $('#layer').innerHTML = ''; render();
+  show('scr-game'); $('#layer').innerHTML = '';
+  if (d.status === 'mull' && !(d.mulled || [])[side]) {   // új meccs: előbb a „X vs Y” képernyő, utána a kezdő kéz
+    vsIntro().then(() => { if (!S || S.pvp?.id !== id) return; render(); setTimeout(() => showMulligan(d.first), 500); });
+    pvpWatchMull(d); return;
+  }
+  render();
   if (d.status === 'mull') {
     if (!(d.mulled || [])[side]) setTimeout(() => showMulligan(d.first), 500);
     else pvpWaitMsg();
