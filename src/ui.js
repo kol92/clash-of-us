@@ -1250,7 +1250,7 @@ function turnBanner(mine) {
 async function botTurn() {
   busy = true; render(); turnBanner(false); await sleep(1000);
   let ch;
-  const plan = S.tut && TUT_BOT[S.players[BOT].turns] ? [...TUT_BOT[S.players[BOT].turns]] : null;   // oktató: fix ellenfél-lépések
+  const plan = S.tut ? tutBotPlan() : null;   // oktató: fix ellenfél-lépések
   const nextMove = () => { if (!plan) return botChoose(S); const m = plan.shift(); if (!m) return null;
     const hi = S.players[BOT].hand.findIndex(c => c.id === m[0]); return hi < 0 ? null : { hi, t: { ...m[1], side: BOT } }; };
   while (S.winner == null && (ch = nextMove())) {
