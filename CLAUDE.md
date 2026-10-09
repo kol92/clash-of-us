@@ -75,7 +75,7 @@ Csak build (kitétel nélkül): `cd src && python3 build-app.py ""` → `src/dis
 - Napi coin-plafon: `ECON.dailyCap` (most 200). A szerencsekerék coinja nem számít bele.
 - Bolt: limitált kínálat, `SHOP_REFRESH` (meta.js) a következő frissítés dátuma (most `2026-10-16`). Rotációkor a felhasználó küldi az új kínálatot, és új dátumot kell beállítani.
 - A bot sosem cseréli le a saját Munkahelyét helyszínre.
-- Ranked (meta.js vége): rang a `p.rank`-ban, szezon = `curSeason()` (Season Pass) vagy naptári hónap. A `SEASONS` listában most csak az 1. szezon van (2026-11-02-ig) – a következő Season Pass szezont fel kell venni.
+- Ranked (meta.js vége): **jelenleg kikapcsolva (`RANKED_ON = false`)** – Tomi szól, mikor induljon, és megadja a jutalmakat (`RK_REWARDS`). Rang a `p.rank`-ban, szezon = `curSeason()` (Season Pass) vagy naptári hónap. A `SEASONS` listában most csak az 1. szezon van (2026-11-02-ig) – a következő Season Pass szezont fel kell venni.
 - A szabálydokumentum (`src/doc.md`) a felhasználó claude.ai Projectjében is megvan („claude/clash-of-us-szabalyok.md”). Ha van Project-hozzáférésed, minden változás után töltsd fel oda is.
 
 ## Nyitott ötletek / teendők

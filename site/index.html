@@ -1459,8 +1459,15 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%;}
 @keyframes vsOut{to{opacity:0;transform:scale(1.04)}}
 @media (prefers-reduced-motion:reduce){.vs-screen *{animation-duration:.01s!important;animation-delay:0s!important}}
 /* Ranked */
-.m-ranked{grid-template-columns:48px 1fr auto;min-height:70px;border-color:rgba(255,200,90,.65)!important;}
-.m-ranked .m-ic{display:grid;place-items:center;}
+.m-play.m-rank{margin-top:12px;color:#fff;border-color:#e6d2ff;
+  background:radial-gradient(ellipse at 50% 0%,rgba(255,255,255,.35),transparent 60%),linear-gradient(180deg,#a77bff,#6a3fd6 45%,#3a1d86 100%);
+  box-shadow:0 0 0 3px #2a1460,0 0 0 5px rgba(190,160,255,.55),0 0 26px rgba(160,110,255,.35),0 10px 22px rgba(0,0,0,.55),inset 0 -4px 0 rgba(20,0,60,.4);}
+.m-play.m-rank b{text-shadow:0 2px 6px rgba(0,0,0,.5);}
+.m-play.m-rank small{color:#efe4ff;}
+.m-play.m-rank .rk-ic{display:grid;place-items:center;width:56px;}
+.m-play.m-rank .rk-lock{display:none;}
+.m-play.m-rank.off{filter:grayscale(1) brightness(.8);opacity:.75;}
+.m-play.m-rank.off .rk-lock{display:block;position:absolute;top:-10px;right:14px;padding:3px 10px;border-radius:999px;background:#2a2f36;color:#fff;font-size:12px;font-weight:900;letter-spacing:.04em;border:1px solid rgba(255,255,255,.35);}
 .rk-emb{--a:#c98a4b;--b:#6b3d17;--c:#ffd8a8;position:relative;display:inline-grid;place-items:center;width:64px;height:72px;clip-path:polygon(50% 0,100% 18%,100% 62%,50% 100%,0 62%,0 18%);background:linear-gradient(160deg,var(--c),var(--a) 40%,var(--b));filter:drop-shadow(0 4px 10px rgba(0,0,0,.5));flex:none;}
 .rk-emb::before{content:'';position:absolute;inset:5px;clip-path:inherit;background:radial-gradient(circle at 50% 30%,rgba(255,255,255,.25),transparent 60%),linear-gradient(170deg,var(--b),var(--a));}
 .rk-emb i{position:relative;font-style:normal;font-family:var(--display);font-size:30px;color:#fff;text-shadow:0 2px 0 rgba(0,0,0,.45),0 0 10px var(--c);}
@@ -1926,7 +1933,7 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%;}
     <div class="profile-bar orn" id="profileBar"></div>
     <div class="menu-btns">
       <button class="m-play" id="goPlay"><i class="m-ic swords" aria-hidden="true"></i><span><b>Játék indítása</b><small>Bot elleni csata</small></span></button>
-      <button class="m-tile orn m-ranked" id="goRanked"><span class="m-ic" id="rankEmb" aria-hidden="true"></span><span class="m-txt"><b>Ranked</b><small id="rankSub">Bronz 5</small></span><i class="chev" aria-hidden="true"></i></button>
+      <button class="m-play m-rank" id="goRanked"><span class="m-ic rk-ic" id="rankEmb" aria-hidden="true"></span><span><b>Ranked</b><small id="rankSub">Bronz 5</small></span><span class="rk-lock" aria-hidden="true">🔒 Hamarosan</span></button>
       <button class="m-tile orn m-pvp" id="goPvp"><span class="m-ic ic-img ic-pvp" aria-hidden="true"></span><span class="m-txt"><b>PvP</b><small id="pvpSub">Játssz a barátaid ellen</small></span><span class="q-badge sp-badge" id="pvpBadge" hidden></span><i class="chev" aria-hidden="true"></i></button>
       <button class="m-tile orn m-friends" id="goFriends" hidden><span class="m-ic ic-img ic-friends" aria-hidden="true"></span><span class="m-txt"><b>Barátok</b><small>Kihívás és lapcsere</small></span><span class="q-badge" id="friendBadge" hidden></span><i class="chev" aria-hidden="true"></i></button>
       <button class="m-shop-img" id="goShop" aria-label="Bolt – boosterek, változatok, portrék"><img src="art/ui/shop-btn.webp?v=5703300c" alt="" aria-hidden="true"><span class="badge" id="shopBadge" hidden>Ingyen pack!</span><i class="chev" aria-hidden="true"></i></button>
@@ -2081,7 +2088,7 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%;}
 <script src="vendor/firebase-auth-compat.js"></script>
 <script src="vendor/firebase-firestore-compat.js"></script>
 <script src="vendor/firebase-database-compat.js"></script>
-<script>window.APP_VERSION = "2026.10.09-2341";</script>
+<script>window.APP_VERSION = "2026.10.09-2353";</script>
 <script>// ===== Best of Us – saját szerver (Firebase) =====
 // A játék eredetileg a Claude-os tárolót használta (window.claude.use('db' | 'user' | 'room')).
 // Ez a fájl ugyanazt a felületet adja Firebase-ből, így a játék kódja szinte változatlan maradhat:
@@ -6994,6 +7001,7 @@ function dupeModal() {
 // Ezüst 4–1: csak minden második vereség vesz el csillagot („Kitartás”); győzelem után az első vereség ingyenes.
 // Arany: minden vereség −1 csillag, 0 csillagnál visszaesés. Legenda: Legenda-pont (+1/−1), onnan nem esel vissza.
 // Szezon = a Season Pass szezonja (ha nincs, naptári hónap). Szezonváltáskor a szezon legjobb rangja szerinti jutalom, majd újrakezdés Bronz 5-ről.
+const RANKED_ON = false;   // 2026-10-09: kész, de még kikapcsolva – a szezon indulásakor true (és a jutalmak véglegesítése)
 const RK_NAMES = ['Bronz', 'Ezüst', 'Arany'];
 const RK_LEG = 15;
 const rkNeed = t => t < 5 ? 2 : t < 10 ? 3 : 4;
@@ -7016,7 +7024,7 @@ function ensureRank(p) {
   if (!p.rank) { p.rank = rkFresh(se.id); return p.rank; }
   if (p.rank.season !== se.id) {
     const old = p.rank;
-    if (old.games > 0) {
+    if (old.games > 0 && RANKED_ON) {
       const rw = rkRewardFor(old.best).rew;
       if (rw.packs) p.giftPacks = (p.giftPacks || 0) + rw.packs;
       if (rw.shiny) p.shinyPacks = (p.shinyPacks || 0) + rw.shiny;
@@ -7078,9 +7086,11 @@ function rkResultHTML(x) {
 function renderRankTile() {
   const el = $('#rankSub'), em = $('#rankEmb'); if (!el || !Store.p) return;
   const r = ensureRank(Store.p);
+  $('#goRanked')?.classList.toggle('off', !RANKED_ON);
+  if (!RANKED_ON) { el.textContent = 'A szezon hamarosan indul'; if (em) em.innerHTML = rkEmblem(0, 'sm'); return; }
   if (r.pend && !(S && S.ranked)) { rankOnMatch('loss'); toast('Félbehagyott ranked meccs: vereségnek számított'); }
   el.textContent = r.t >= RK_LEG ? `Legenda · ${r.lp} pont` : `${rkName(r.t)} · ${r.st}/${rkNeed(r.t)} csillag`;
-  if (em) em.innerHTML = rkEmblem(r.t, 'xs');
+  if (em) em.innerHTML = rkEmblem(r.t, 'sm');
   const rw = Store.p.rankReward; if (rw && !rw.seen) rkRewardPopup();
 }
 function rkRewardPopup() {
@@ -7124,6 +7134,7 @@ function renderRanked() {
 }
 // ranked keresés: élő ellenfél (20 mp), különben bot
 function rankedSearch(dk) {
+  if (!RANKED_ON) return toast('A ranked szezon még nem indult el');
   if (window.APP_MODE && Store.db && Store.uid) { PVP.ranked = true; PVP.friendTo = null; pvpQuick(dk); }
   else rankedBot(dk);
 }
@@ -7132,7 +7143,7 @@ function rankedBot(dk) {
   startMatch(dk.hero, dk.id, { ranked: true });
   toast('Nincs most élő ellenfél – bot ellen játszol (a rangod számít)');
 }
-$('#goRanked').onclick = () => { if (!Store.p) return showCreate(); if (typeof frStart === 'function' && frOn()) { frStart(); FR.list.filter(d => d.status === 'accepted').forEach(d => frFetchPub(frOther(d), true)); } renderRanked(); show('scr-ranked'); };
+$('#goRanked').onclick = () => { if (!Store.p) return showCreate(); if (!RANKED_ON) return toast('🏆 A ranked szezon hamarosan indul!'); if (typeof frStart === 'function' && frOn()) { frStart(); FR.list.filter(d => d.status === 'accepted').forEach(d => frFetchPub(frOther(d), true)); } renderRanked(); show('scr-ranked'); };
 
 </script>
 </body>

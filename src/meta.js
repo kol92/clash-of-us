@@ -2172,6 +2172,7 @@ function dupeModal() {
 // Ezüst 4–1: csak minden második vereség vesz el csillagot („Kitartás”); győzelem után az első vereség ingyenes.
 // Arany: minden vereség −1 csillag, 0 csillagnál visszaesés. Legenda: Legenda-pont (+1/−1), onnan nem esel vissza.
 // Szezon = a Season Pass szezonja (ha nincs, naptári hónap). Szezonváltáskor a szezon legjobb rangja szerinti jutalom, majd újrakezdés Bronz 5-ről.
+const RANKED_ON = false;   // 2026-10-09: kész, de még kikapcsolva – a szezon indulásakor true (és a jutalmak véglegesítése)
 const RK_NAMES = ['Bronz', 'Ezüst', 'Arany'];
 const RK_LEG = 15;
 const rkNeed = t => t < 5 ? 2 : t < 10 ? 3 : 4;
@@ -2194,7 +2195,7 @@ function ensureRank(p) {
   if (!p.rank) { p.rank = rkFresh(se.id); return p.rank; }
   if (p.rank.season !== se.id) {
     const old = p.rank;
-    if (old.games > 0) {
+    if (old.games > 0 && RANKED_ON) {
       const rw = rkRewardFor(old.best).rew;
       if (rw.packs) p.giftPacks = (p.giftPacks || 0) + rw.packs;
       if (rw.shiny) p.shinyPacks = (p.shinyPacks || 0) + rw.shiny;
@@ -2256,9 +2257,11 @@ function rkResultHTML(x) {
 function renderRankTile() {
   const el = $('#rankSub'), em = $('#rankEmb'); if (!el || !Store.p) return;
   const r = ensureRank(Store.p);
+  $('#goRanked')?.classList.toggle('off', !RANKED_ON);
+  if (!RANKED_ON) { el.textContent = 'A szezon hamarosan indul'; if (em) em.innerHTML = rkEmblem(0, 'sm'); return; }
   if (r.pend && !(S && S.ranked)) { rankOnMatch('loss'); toast('Félbehagyott ranked meccs: vereségnek számított'); }
   el.textContent = r.t >= RK_LEG ? `Legenda · ${r.lp} pont` : `${rkName(r.t)} · ${r.st}/${rkNeed(r.t)} csillag`;
-  if (em) em.innerHTML = rkEmblem(r.t, 'xs');
+  if (em) em.innerHTML = rkEmblem(r.t, 'sm');
   const rw = Store.p.rankReward; if (rw && !rw.seen) rkRewardPopup();
 }
 function rkRewardPopup() {
@@ -2302,6 +2305,7 @@ function renderRanked() {
 }
 // ranked keresés: élő ellenfél (20 mp), különben bot
 function rankedSearch(dk) {
+  if (!RANKED_ON) return toast('A ranked szezon még nem indult el');
   if (window.APP_MODE && Store.db && Store.uid) { PVP.ranked = true; PVP.friendTo = null; pvpQuick(dk); }
   else rankedBot(dk);
 }
@@ -2310,4 +2314,4 @@ function rankedBot(dk) {
   startMatch(dk.hero, dk.id, { ranked: true });
   toast('Nincs most élő ellenfél – bot ellen játszol (a rangod számít)');
 }
-$('#goRanked').onclick = () => { if (!Store.p) return showCreate(); if (typeof frStart === 'function' && frOn()) { frStart(); FR.list.filter(d => d.status === 'accepted').forEach(d => frFetchPub(frOther(d), true)); } renderRanked(); show('scr-ranked'); };
+$('#goRanked').onclick = () => { if (!Store.p) return showCreate(); if (!RANKED_ON) return toast('🏆 A ranked szezon hamarosan indul!'); if (typeof frStart === 'function' && frOn()) { frStart(); FR.list.filter(d => d.status === 'accepted').forEach(d => frFetchPub(frOther(d), true)); } renderRanked(); show('scr-ranked'); };

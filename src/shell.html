@@ -1444,8 +1444,15 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%;}
 @keyframes vsOut{to{opacity:0;transform:scale(1.04)}}
 @media (prefers-reduced-motion:reduce){.vs-screen *{animation-duration:.01s!important;animation-delay:0s!important}}
 /* Ranked */
-.m-ranked{grid-template-columns:48px 1fr auto;min-height:70px;border-color:rgba(255,200,90,.65)!important;}
-.m-ranked .m-ic{display:grid;place-items:center;}
+.m-play.m-rank{margin-top:12px;color:#fff;border-color:#e6d2ff;
+  background:radial-gradient(ellipse at 50% 0%,rgba(255,255,255,.35),transparent 60%),linear-gradient(180deg,#a77bff,#6a3fd6 45%,#3a1d86 100%);
+  box-shadow:0 0 0 3px #2a1460,0 0 0 5px rgba(190,160,255,.55),0 0 26px rgba(160,110,255,.35),0 10px 22px rgba(0,0,0,.55),inset 0 -4px 0 rgba(20,0,60,.4);}
+.m-play.m-rank b{text-shadow:0 2px 6px rgba(0,0,0,.5);}
+.m-play.m-rank small{color:#efe4ff;}
+.m-play.m-rank .rk-ic{display:grid;place-items:center;width:56px;}
+.m-play.m-rank .rk-lock{display:none;}
+.m-play.m-rank.off{filter:grayscale(1) brightness(.8);opacity:.75;}
+.m-play.m-rank.off .rk-lock{display:block;position:absolute;top:-10px;right:14px;padding:3px 10px;border-radius:999px;background:#2a2f36;color:#fff;font-size:12px;font-weight:900;letter-spacing:.04em;border:1px solid rgba(255,255,255,.35);}
 .rk-emb{--a:#c98a4b;--b:#6b3d17;--c:#ffd8a8;position:relative;display:inline-grid;place-items:center;width:64px;height:72px;clip-path:polygon(50% 0,100% 18%,100% 62%,50% 100%,0 62%,0 18%);background:linear-gradient(160deg,var(--c),var(--a) 40%,var(--b));filter:drop-shadow(0 4px 10px rgba(0,0,0,.5));flex:none;}
 .rk-emb::before{content:'';position:absolute;inset:5px;clip-path:inherit;background:radial-gradient(circle at 50% 30%,rgba(255,255,255,.25),transparent 60%),linear-gradient(170deg,var(--b),var(--a));}
 .rk-emb i{position:relative;font-style:normal;font-family:var(--display);font-size:30px;color:#fff;text-shadow:0 2px 0 rgba(0,0,0,.45),0 0 10px var(--c);}
@@ -1908,7 +1915,7 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%;}
     <div class="profile-bar orn" id="profileBar"></div>
     <div class="menu-btns">
       <button class="m-play" id="goPlay"><i class="m-ic swords" aria-hidden="true"></i><span><b>Játék indítása</b><small>Bot elleni csata</small></span></button>
-      <button class="m-tile orn m-ranked" id="goRanked"><span class="m-ic" id="rankEmb" aria-hidden="true"></span><span class="m-txt"><b>Ranked</b><small id="rankSub">Bronz 5</small></span><i class="chev" aria-hidden="true"></i></button>
+      <button class="m-play m-rank" id="goRanked"><span class="m-ic rk-ic" id="rankEmb" aria-hidden="true"></span><span><b>Ranked</b><small id="rankSub">Bronz 5</small></span><span class="rk-lock" aria-hidden="true">🔒 Hamarosan</span></button>
       <button class="m-tile orn m-pvp" id="goPvp"><span class="m-ic ic-img ic-pvp" aria-hidden="true"></span><span class="m-txt"><b>PvP</b><small id="pvpSub">Játssz a barátaid ellen</small></span><span class="q-badge sp-badge" id="pvpBadge" hidden></span><i class="chev" aria-hidden="true"></i></button>
       <button class="m-tile orn m-friends" id="goFriends" hidden><span class="m-ic ic-img ic-friends" aria-hidden="true"></span><span class="m-txt"><b>Barátok</b><small>Kihívás és lapcsere</small></span><span class="q-badge" id="friendBadge" hidden></span><i class="chev" aria-hidden="true"></i></button>
       <button class="m-shop-img" id="goShop" aria-label="Bolt – boosterek, változatok, portrék"><img src="art/ui/shop-btn.webp" alt="" aria-hidden="true"><span class="badge" id="shopBadge" hidden>Ingyen pack!</span><i class="chev" aria-hidden="true"></i></button>
