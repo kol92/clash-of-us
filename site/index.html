@@ -1415,6 +1415,17 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%;}
 .fr-code b{font-family:var(--display);font-weight:400;font-size:30px;letter-spacing:.14em;color:var(--gold);}
 .fr-code .btn{min-height:40px;padding:0 14px;font-size:14px;}
 /* meccs eleji VS képernyő */
+/* Among Us lap: 10 shot, egy paprikás */
+.au-fx{position:fixed;inset:0;z-index:70;pointer-events:none;display:grid;place-content:center;justify-items:center;gap:8px;padding-bottom:10vh;background:radial-gradient(circle at 50% 45%,rgba(0,0,0,.45),transparent 60%);animation:vsFade .25s ease-out both;}
+.au-fx.out{animation:vsOut .3s ease-in forwards;}
+.au-tray{display:flex;gap:5px;padding:12px 14px;border-radius:999px;background:radial-gradient(ellipse at 50% 30%,#1f3b33,#0b1714);border:2px solid #3d6b5d;box-shadow:0 10px 30px rgba(0,0,0,.6);}
+.au-shot{position:relative;width:22px;height:34px;border-radius:3px 3px 6px 6px;border:2px solid rgba(255,255,255,.7);border-top-width:1px;background:linear-gradient(0deg,hsl(calc(var(--k) * 36) 85% 55%) 0 70%,rgba(255,255,255,.08) 70%);animation:auShake .9s ease-in-out both;animation-delay:calc(var(--k) * 30ms);display:grid;place-items:center;}
+.au-shot b{opacity:0;font-size:16px;}
+.au-shot.hot{background:linear-gradient(0deg,#ff2a00 0 70%,rgba(255,255,255,.1) 70%);box-shadow:0 0 18px 6px rgba(255,60,0,.8);transform:scale(1.3);transition:transform .2s;}
+.au-shot.hot b{opacity:1;}
+.au-title{font-family:var(--display);font-size:30px;color:#ff5a2a;letter-spacing:.08em;text-shadow:0 0 14px rgba(255,80,0,.8),0 3px 0 #5a1500;}
+.au-pep{position:fixed;z-index:71;font-size:30px;pointer-events:none;transform:translate(-50%,-50%);}
+@keyframes auShake{0%{transform:translateY(-40px);opacity:0}25%{transform:none;opacity:1}45%{transform:translateX(-4px) rotate(-6deg)}65%{transform:translateX(4px) rotate(6deg)}85%{transform:translateX(-2px)}100%{transform:none}}
 .overlay.vs-screen{position:fixed;inset:0;z-index:80;place-items:stretch;padding:0;backdrop-filter:none;overflow:hidden;background:radial-gradient(120% 60% at 50% 50%,#13263a,#04070c 70%);display:grid;grid-template-rows:1fr 1fr;overflow:hidden;cursor:pointer;-webkit-tap-highlight-color:transparent;}
 .vs-screen.out{animation:vsOut .32s ease-in forwards;}
 .vs-side{position:relative;overflow:hidden;}
@@ -2026,7 +2037,7 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%;}
 <script src="vendor/firebase-auth-compat.js"></script>
 <script src="vendor/firebase-firestore-compat.js"></script>
 <script src="vendor/firebase-database-compat.js"></script>
-<script>window.APP_VERSION = "2026.10.09-2154";</script>
+<script>window.APP_VERSION = "2026.10.09-2231";</script>
 <script>// ===== Best of Us – saját szerver (Firebase) =====
 // A játék eredetileg a Claude-os tárolót használta (window.claude.use('db' | 'user' | 'room')).
 // Ez a fájl ugyanazt a felületet adja Firebase-ből, így a játék kódja szinte változatlan maradhat:
@@ -2356,6 +2367,7 @@ const CARDS = [
   { id:'a_mangos', drink:true, type:'action', name:'Mangós Ciroc Vodka', cost:4, tgt:'none', rarity:'r', text:'A hősöd 4 életet gyógyul.' },
   { id:'a_koktel', drink:true, type:'action', name:'Koktélarmageddon', cost:5, tgt:'none', rarity:'e', text:'Egy véletlen karakter +5 támadást kap, egy másik 5 sebzést. Bármelyik oldalon lehetnek.' },
   { id:'a_kancso', drink:true, type:'action', name:'Kancsó Long Island', cost:6, tgt:'two', rarity:'e', text:'3 sebzés két általad választott célpontnak: bármelyik karakternek vagy az ellenfél hősének.' },
+  { id:'a_amongus', drink:true, type:'action', name:'Among Us', cost:3, tgt:'none', rarity:'r', rand:true, text:'Te fizeted a kört: húzol egy lapot, a karaktereid +1/+1-et kapnak, mindkét hős 2 életet gyógyul. Egy véletlen résztvevő – bármelyik karakter vagy hős, mindkét oldalon – a paprikásat issza: 6 sebzés.' },
   { id:'a_talca', drink:true, type:'action', name:'Tálca shot', cost:6, tgt:'none', rarity:'e', text:'Mindenki 2 sebzést kap: az összes karakter és mindkét hős.' },
   { id:'a_stop', type:'action', name:'STOP', cost:4, tgt:'none', rarity:'e', text:'Leszedsz minden eszközt az ellenfél karaktereiről (amit ő tett rájuk). A hatásuk is megszűnik.' },
   { id:'a_adios', drink:true, type:'action', name:'Adios Motherfucker!', cost:5, tgt:'none', rarity:'l', text:'Megbénítod az ellenfél hősét: a következő körében nem játszhat ki lapot (a karakterei attól még támadnak).' },
@@ -2783,6 +2795,15 @@ function playCard(s, pi, hi, t) {
         });
         break;
       case 'a_adios': e.locked = true; ev(s, { t:'lock', side:ei, i:-1 }); break;
+      case 'a_amongus': {   // 10 shot, az egyikben durva paprika: mindenki iszik (mindkét oldal karakterei és hősei), egy valaki megszívja
+        const part = [];
+        for (const sd of [pi, ei]) s.players[sd].board.forEach((u, i) => { if (u && !isFixed(u)) { part.push({ sd, i }); if (sd === pi) { u.atk += 1; u.hp += 1; u.maxHp += 1; ev(s, { t:'buff', side:sd, i, n:1 }); } } });
+        for (const sd of [pi, ei]) { healHero(s, sd, 2); part.push({ sd, i:-1 }); }
+        const r = part[Math.floor(rnd() * part.length)];
+        ev(s, { t:'amongus', side:r.sd, i:r.i, id:r.i >= 0 ? s.players[r.sd].board[r.i].id : null });
+        if (r.i < 0) damageHero(s, r.sd, 6); else { reveal(s, r.sd, r.i); damageUnit(s, r.sd, r.i, 6); }
+        draw(s, pi);   // te fizetted a kört
+        break; }
       case 'a_talca':
         for (const sd of [pi, ei]) s.players[sd].board.forEach((u, i) => { if (u) damageUnit(s, sd, i, 2); });
         damageHero(s, ei, 2); damageHero(s, pi, 2);
@@ -2863,6 +2884,7 @@ function partyDrink(s, pi, si) {
     case 'a_tubi': damageUnit(s, ei, j, 6); damageHero(s, pi, 3); break;
     case 'a_kancso': damageUnit(s, ei, j, 3); damageHero(s, ei, 3); break;
     case 'a_talca': damageUnit(s, ei, j, 2); break;
+    case 'a_amongus': damageUnit(s, ei, j, 6); break;   // a parti lelke a paprikásat adja neki
     case 'a_koktel': if (o === 'buff') { u.atk += 5; ev(s, { t:'buff', side:ei, i:j, n:5 }); } else damageUnit(s, ei, j, 5); break;
     case 'a_mangos': healUnit(s, ei, j, 4); break;
     case 'a_rehab': healUnit(s, ei, j, 3); if (u.stun) { u.stun = 0; ev(s, { t:'unstun', side:ei, i:j }); } break;
@@ -3152,6 +3174,10 @@ function botChoose(real) {
       const c = clone(s); c.events = [];
       playCard(c, me, hi, t);
       let sc = scoreAfterCombat(c, me);
+      if (CARD[h.id].rand) {   // véletlen kimenetelű lap: több próbálkozás átlaga (különben a szerencsés próbára „ráharap”)
+        for (let k = 1; k < 8; k++) { const c2 = clone(s); c2.events = []; playCard(c2, me, hi, t); sc += scoreAfterCombat(c2, me); }
+        sc /= 8;
+      }
       if (h.id === 'a_kor') {   // egy lépés előre: mit tudnék vele kijátszani?
         sc = -1e9; const P2 = c.players[me];
         const others = p.hand.filter(x => x.id !== 'a_kor').map(x => cardCost(s, me, x.id)).filter(v => v <= p.energy + 1);
@@ -3346,6 +3372,7 @@ const ART = {
   c_kriszrantott: { src:'art/kriszrantott.webp?v=1b89215302acb952', av:'58% 22%', pos:'56% 22%' },
   a_rantott: { src:'art/rantott.webp?v=ce888fe848453ef6', av:'45% 40%', pos:'50% 38%' },
   c_tomiparti: { src:'art/tomiparti.webp?v=b7bb907f03a864ac', av:'47% 26%', pos:'47% 24%' },
+  a_amongus: { src:'art/amongus.webp?v=d851a28e0a755143', av:'50% 62%', pos:'50% 58%' },
   c_alvari: { src:'art/alvari.webp?v=1fa1af15528dd5e4', av:'50% 30%', pos:'50% 30%' },
   c_piftikiraly: { src:'art/piftikiraly.webp?v=744e23d9a3e39876', av:'50% 24%', pos:'50% 24%' },
   c_piftihaver1: { src:'art/piftihaver1.webp?v=1931be1f520c56bf', av:'48% 32%', pos:'48% 32%' },
@@ -3716,6 +3743,7 @@ function logEvents(evs, snap) {
       case 'chomp': L(`🦈 A Cápa megette: ${unitName(e.side, e.i)}`); break;
       case 'sharkgone': L('🦈 A Cápa eltűnt'); break;
       case 'shuffled': L(`🃏 ${e.side === ME ? 'A paklidba' : 'Az ellenfél paklijába'} került ${e.n} ${CARD[e.id].name}`); break;
+      case 'amongus': L(`🌶️ Among Us! A paprikás shotot ${e.i === -1 ? (e.side === ME ? 'a hősöd' : 'az ellenfél hőse') : unitName(e.side, e.i)} itta meg`); break;
       case 'flee': L(`🏃 ${unitName(e.side, e.i)} átmenekült egy másik helyre`); break;
       case 'doom': case 'expire': L(`⌛ ${unitName(e.side, e.i)} eltűnt`); break;
       case 'lock': L(`🔒 ${e.side === ME ? 'Le vagy bénítva' : 'Az ellenfél le van bénítva'}: a következő körben nem játszhat ki lapot`); break;
@@ -3868,6 +3896,7 @@ async function animateEvents(evs) {
       case 'jblwave': await jblWaveFx(e); break;
       case 'sharkgone': floatAt(anchor, '🦈 Elúszott…', 'info'); hold = Math.max(hold, 600); break;
       case 'shuffled': floatAt(anchor, `👑 +${e.n} Pifti haverja a ${e.side === ME ? 'paklidba' : 'paklijába'}!`, 'info'); hold = Math.max(hold, 900); break;
+      case 'amongus': await amongUsFx(el, anchor); break;
       case 'flee': floatAt(anchor, '🏃 Menekül!', 'info'); hold = Math.max(hold, 600); break;
       case 'gift': floatAt(anchor, `${e.id === 'i_ing' ? '👔' : '🍗'} ${CARD[e.id].name} a ${e.side === ME ? 'kezedbe' : 'kezébe'}!`, 'info'); hold = Math.max(hold, 700); break;
       case 'drinkgift': floatAt(anchor, e.side === ME ? `🍸 ${CARD[e.id].name} a kezedbe!` : '🍸 Ital a kezébe!', 'info'); hold = Math.max(hold, 700); break;
@@ -4486,6 +4515,26 @@ async function flyBotDraw(k) {
 }
 
 // ---------- meccs eleji „X vs Y” képernyő (2026-10-09): ~3 mp, koppintásra átugorható ----------
+// Among Us: 10 shot a tálcán, az egyik paprikás – kiderül, kié lett
+async function amongUsFx(el, anchor) {
+  const o = document.createElement('div'); o.className = 'au-fx';
+  const k = Math.floor(Math.random() * 10);
+  o.innerHTML = `<div class="au-tray">${Array.from({ length: 10 }, (_, i) => `<i class="au-shot" style="--k:${i}">${i === k ? '<b>🌶️</b>' : ''}</i>`).join('')}</div><div class="au-title">AMONG US</div>`;
+  document.body.appendChild(o);
+  await sleep(1100);
+  const hot = o.querySelectorAll('.au-shot')[k]; hot.classList.add('hot');
+  await sleep(650);
+  const pep = document.createElement('div'); pep.className = 'au-pep'; pep.textContent = '🌶️'; document.body.appendChild(pep);
+  const a = hot.getBoundingClientRect(), b = (anchor || el).getBoundingClientRect();
+  pep.style.left = a.left + a.width / 2 + 'px'; pep.style.top = a.top + a.height / 2 + 'px';
+  o.classList.add('out');
+  await pep.animate([{ transform: 'translate(-50%,-50%) scale(1)' }, { transform: `translate(calc(-50% + ${b.left + b.width / 2 - a.left - a.width / 2}px),calc(-50% + ${b.top + b.height / 2 - a.top - a.height / 2}px)) scale(2.2) rotate(360deg)` }],
+    { duration: 520, easing: 'cubic-bezier(.4,0,.6,1)', fill: 'forwards' }).finished;
+  pep.remove(); o.remove();
+  if (el) fx(el, 'fx-quake');
+  if (anchor) floatAt(anchor, '🌶️ Megszívta!', 'dmg');
+  await sleep(350);
+}
 function vsIntro() {
   return new Promise(done => {
     const side = pi => {
@@ -4721,7 +4770,7 @@ function starterCollection() {
   return coll;
 }
 // Később bekerült gyakori lapok: a meglévő profilok is megkapják (gv = kiosztási verzió)
-const STARTER_ADDS = { 2: ['a_delfin', 'i_varazsho', 'i_lepke'], 3: ['a_rehab'], 4: ['c_pp'], 5: ['c_nfc'], 6: ['a_cheddar'], 7: ['c_vajda', 'c_veghtomi'], 8: ['c_kovacs'], 9: ['a_kitiltva'], 10: ['a_haver'], 11: PLAYABLE.filter(c => c.rarity === 'r' && !c.variantOf).map(c => c.id), 12: ['c_sasimeselo'], 13: ['c_norbi'], 14: ['c_udvarhelyi'], 15: ['c_molnar'], 16: CARDS.filter(c => c.finisher).map(c => c.id), 17: ['c_barnaelet'], 18: ['c_amszterdam'], 19: ['c_davidsofor'], 20: ['a_szulinap'], 21: ['c_atiuldozott'], 22: ['c_alvari'] };   // 16: mindenki megkapja mind a 9 Kánon esemény lapot   // 12: Laci új kezdőpaklijához   // 11: minden ritka lapból 1 (a kezdőpaklikhoz)
+const STARTER_ADDS = { 2: ['a_delfin', 'i_varazsho', 'i_lepke'], 3: ['a_rehab'], 4: ['c_pp'], 5: ['c_nfc'], 6: ['a_cheddar'], 7: ['c_vajda', 'c_veghtomi'], 8: ['c_kovacs'], 9: ['a_kitiltva'], 10: ['a_haver'], 11: PLAYABLE.filter(c => c.rarity === 'r' && !c.variantOf).map(c => c.id), 12: ['c_sasimeselo'], 13: ['c_norbi'], 14: ['c_udvarhelyi'], 15: ['c_molnar'], 16: CARDS.filter(c => c.finisher).map(c => c.id), 17: ['c_barnaelet'], 18: ['c_amszterdam'], 19: ['c_davidsofor'], 20: ['a_szulinap'], 21: ['c_atiuldozott'], 22: ['c_alvari'], 23: ['a_amongus'] };   // 16: mindenki megkapja mind a 9 Kánon esemény lapot   // 12: Laci új kezdőpaklijához   // 11: minden ritka lapból 1 (a kezdőpaklikhoz)
 const GRANT_V = Math.max(1, ...Object.keys(STARTER_ADDS).map(Number));
 // Ajándékok: minden profil egyszer kapja meg (a meglévők a következő megnyitáskor, az újak létrehozáskor)
 const GIFTS = [{ id: 'g-2026-09-28', packs: 1 }, { id: 'g-2026-09-28b', packs: 5 },

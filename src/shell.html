@@ -1400,6 +1400,17 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%;}
 .fr-code b{font-family:var(--display);font-weight:400;font-size:30px;letter-spacing:.14em;color:var(--gold);}
 .fr-code .btn{min-height:40px;padding:0 14px;font-size:14px;}
 /* meccs eleji VS képernyő */
+/* Among Us lap: 10 shot, egy paprikás */
+.au-fx{position:fixed;inset:0;z-index:70;pointer-events:none;display:grid;place-content:center;justify-items:center;gap:8px;padding-bottom:10vh;background:radial-gradient(circle at 50% 45%,rgba(0,0,0,.45),transparent 60%);animation:vsFade .25s ease-out both;}
+.au-fx.out{animation:vsOut .3s ease-in forwards;}
+.au-tray{display:flex;gap:5px;padding:12px 14px;border-radius:999px;background:radial-gradient(ellipse at 50% 30%,#1f3b33,#0b1714);border:2px solid #3d6b5d;box-shadow:0 10px 30px rgba(0,0,0,.6);}
+.au-shot{position:relative;width:22px;height:34px;border-radius:3px 3px 6px 6px;border:2px solid rgba(255,255,255,.7);border-top-width:1px;background:linear-gradient(0deg,hsl(calc(var(--k) * 36) 85% 55%) 0 70%,rgba(255,255,255,.08) 70%);animation:auShake .9s ease-in-out both;animation-delay:calc(var(--k) * 30ms);display:grid;place-items:center;}
+.au-shot b{opacity:0;font-size:16px;}
+.au-shot.hot{background:linear-gradient(0deg,#ff2a00 0 70%,rgba(255,255,255,.1) 70%);box-shadow:0 0 18px 6px rgba(255,60,0,.8);transform:scale(1.3);transition:transform .2s;}
+.au-shot.hot b{opacity:1;}
+.au-title{font-family:var(--display);font-size:30px;color:#ff5a2a;letter-spacing:.08em;text-shadow:0 0 14px rgba(255,80,0,.8),0 3px 0 #5a1500;}
+.au-pep{position:fixed;z-index:71;font-size:30px;pointer-events:none;transform:translate(-50%,-50%);}
+@keyframes auShake{0%{transform:translateY(-40px);opacity:0}25%{transform:none;opacity:1}45%{transform:translateX(-4px) rotate(-6deg)}65%{transform:translateX(4px) rotate(6deg)}85%{transform:translateX(-2px)}100%{transform:none}}
 .overlay.vs-screen{position:fixed;inset:0;z-index:80;place-items:stretch;padding:0;backdrop-filter:none;overflow:hidden;background:radial-gradient(120% 60% at 50% 50%,#13263a,#04070c 70%);display:grid;grid-template-rows:1fr 1fr;overflow:hidden;cursor:pointer;-webkit-tap-highlight-color:transparent;}
 .vs-screen.out{animation:vsOut .32s ease-in forwards;}
 .vs-side{position:relative;overflow:hidden;}

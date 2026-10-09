@@ -178,6 +178,7 @@ const ART = {
   c_kriszrantott: { src:'art/kriszrantott.webp', av:'58% 22%', pos:'56% 22%' },
   a_rantott: { src:'art/rantott.webp', av:'45% 40%', pos:'50% 38%' },
   c_tomiparti: { src:'art/tomiparti.webp', av:'47% 26%', pos:'47% 24%' },
+  a_amongus: { src:'art/amongus.webp', av:'50% 62%', pos:'50% 58%' },
   c_alvari: { src:'art/alvari.webp', av:'50% 30%', pos:'50% 30%' },
   c_piftikiraly: { src:'art/piftikiraly.webp', av:'50% 24%', pos:'50% 24%' },
   c_piftihaver1: { src:'art/piftihaver1.webp', av:'48% 32%', pos:'48% 32%' },
@@ -548,6 +549,7 @@ function logEvents(evs, snap) {
       case 'chomp': L(`🦈 A Cápa megette: ${unitName(e.side, e.i)}`); break;
       case 'sharkgone': L('🦈 A Cápa eltűnt'); break;
       case 'shuffled': L(`🃏 ${e.side === ME ? 'A paklidba' : 'Az ellenfél paklijába'} került ${e.n} ${CARD[e.id].name}`); break;
+      case 'amongus': L(`🌶️ Among Us! A paprikás shotot ${e.i === -1 ? (e.side === ME ? 'a hősöd' : 'az ellenfél hőse') : unitName(e.side, e.i)} itta meg`); break;
       case 'flee': L(`🏃 ${unitName(e.side, e.i)} átmenekült egy másik helyre`); break;
       case 'doom': case 'expire': L(`⌛ ${unitName(e.side, e.i)} eltűnt`); break;
       case 'lock': L(`🔒 ${e.side === ME ? 'Le vagy bénítva' : 'Az ellenfél le van bénítva'}: a következő körben nem játszhat ki lapot`); break;
@@ -700,6 +702,7 @@ async function animateEvents(evs) {
       case 'jblwave': await jblWaveFx(e); break;
       case 'sharkgone': floatAt(anchor, '🦈 Elúszott…', 'info'); hold = Math.max(hold, 600); break;
       case 'shuffled': floatAt(anchor, `👑 +${e.n} Pifti haverja a ${e.side === ME ? 'paklidba' : 'paklijába'}!`, 'info'); hold = Math.max(hold, 900); break;
+      case 'amongus': await amongUsFx(el, anchor); break;
       case 'flee': floatAt(anchor, '🏃 Menekül!', 'info'); hold = Math.max(hold, 600); break;
       case 'gift': floatAt(anchor, `${e.id === 'i_ing' ? '👔' : '🍗'} ${CARD[e.id].name} a ${e.side === ME ? 'kezedbe' : 'kezébe'}!`, 'info'); hold = Math.max(hold, 700); break;
       case 'drinkgift': floatAt(anchor, e.side === ME ? `🍸 ${CARD[e.id].name} a kezedbe!` : '🍸 Ital a kezébe!', 'info'); hold = Math.max(hold, 700); break;
@@ -1318,6 +1321,26 @@ async function flyBotDraw(k) {
 }
 
 // ---------- meccs eleji „X vs Y” képernyő (2026-10-09): ~3 mp, koppintásra átugorható ----------
+// Among Us: 10 shot a tálcán, az egyik paprikás – kiderül, kié lett
+async function amongUsFx(el, anchor) {
+  const o = document.createElement('div'); o.className = 'au-fx';
+  const k = Math.floor(Math.random() * 10);
+  o.innerHTML = `<div class="au-tray">${Array.from({ length: 10 }, (_, i) => `<i class="au-shot" style="--k:${i}">${i === k ? '<b>🌶️</b>' : ''}</i>`).join('')}</div><div class="au-title">AMONG US</div>`;
+  document.body.appendChild(o);
+  await sleep(1100);
+  const hot = o.querySelectorAll('.au-shot')[k]; hot.classList.add('hot');
+  await sleep(650);
+  const pep = document.createElement('div'); pep.className = 'au-pep'; pep.textContent = '🌶️'; document.body.appendChild(pep);
+  const a = hot.getBoundingClientRect(), b = (anchor || el).getBoundingClientRect();
+  pep.style.left = a.left + a.width / 2 + 'px'; pep.style.top = a.top + a.height / 2 + 'px';
+  o.classList.add('out');
+  await pep.animate([{ transform: 'translate(-50%,-50%) scale(1)' }, { transform: `translate(calc(-50% + ${b.left + b.width / 2 - a.left - a.width / 2}px),calc(-50% + ${b.top + b.height / 2 - a.top - a.height / 2}px)) scale(2.2) rotate(360deg)` }],
+    { duration: 520, easing: 'cubic-bezier(.4,0,.6,1)', fill: 'forwards' }).finished;
+  pep.remove(); o.remove();
+  if (el) fx(el, 'fx-quake');
+  if (anchor) floatAt(anchor, '🌶️ Megszívta!', 'dmg');
+  await sleep(350);
+}
 function vsIntro() {
   return new Promise(done => {
     const side = pi => {

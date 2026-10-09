@@ -78,6 +78,7 @@ const CARDS = [
   { id:'a_mangos', drink:true, type:'action', name:'Mangós Ciroc Vodka', cost:4, tgt:'none', rarity:'r', text:'A hősöd 4 életet gyógyul.' },
   { id:'a_koktel', drink:true, type:'action', name:'Koktélarmageddon', cost:5, tgt:'none', rarity:'e', text:'Egy véletlen karakter +5 támadást kap, egy másik 5 sebzést. Bármelyik oldalon lehetnek.' },
   { id:'a_kancso', drink:true, type:'action', name:'Kancsó Long Island', cost:6, tgt:'two', rarity:'e', text:'3 sebzés két általad választott célpontnak: bármelyik karakternek vagy az ellenfél hősének.' },
+  { id:'a_amongus', drink:true, type:'action', name:'Among Us', cost:3, tgt:'none', rarity:'r', rand:true, text:'Te fizeted a kört: húzol egy lapot, a karaktereid +1/+1-et kapnak, mindkét hős 2 életet gyógyul. Egy véletlen résztvevő – bármelyik karakter vagy hős, mindkét oldalon – a paprikásat issza: 6 sebzés.' },
   { id:'a_talca', drink:true, type:'action', name:'Tálca shot', cost:6, tgt:'none', rarity:'e', text:'Mindenki 2 sebzést kap: az összes karakter és mindkét hős.' },
   { id:'a_stop', type:'action', name:'STOP', cost:4, tgt:'none', rarity:'e', text:'Leszedsz minden eszközt az ellenfél karaktereiről (amit ő tett rájuk). A hatásuk is megszűnik.' },
   { id:'a_adios', drink:true, type:'action', name:'Adios Motherfucker!', cost:5, tgt:'none', rarity:'l', text:'Megbénítod az ellenfél hősét: a következő körében nem játszhat ki lapot (a karakterei attól még támadnak).' },
@@ -505,6 +506,15 @@ function playCard(s, pi, hi, t) {
         });
         break;
       case 'a_adios': e.locked = true; ev(s, { t:'lock', side:ei, i:-1 }); break;
+      case 'a_amongus': {   // 10 shot, az egyikben durva paprika: mindenki iszik (mindkét oldal karakterei és hősei), egy valaki megszívja
+        const part = [];
+        for (const sd of [pi, ei]) s.players[sd].board.forEach((u, i) => { if (u && !isFixed(u)) { part.push({ sd, i }); if (sd === pi) { u.atk += 1; u.hp += 1; u.maxHp += 1; ev(s, { t:'buff', side:sd, i, n:1 }); } } });
+        for (const sd of [pi, ei]) { healHero(s, sd, 2); part.push({ sd, i:-1 }); }
+        const r = part[Math.floor(rnd() * part.length)];
+        ev(s, { t:'amongus', side:r.sd, i:r.i, id:r.i >= 0 ? s.players[r.sd].board[r.i].id : null });
+        if (r.i < 0) damageHero(s, r.sd, 6); else { reveal(s, r.sd, r.i); damageUnit(s, r.sd, r.i, 6); }
+        draw(s, pi);   // te fizetted a kört
+        break; }
       case 'a_talca':
         for (const sd of [pi, ei]) s.players[sd].board.forEach((u, i) => { if (u) damageUnit(s, sd, i, 2); });
         damageHero(s, ei, 2); damageHero(s, pi, 2);
@@ -585,6 +595,7 @@ function partyDrink(s, pi, si) {
     case 'a_tubi': damageUnit(s, ei, j, 6); damageHero(s, pi, 3); break;
     case 'a_kancso': damageUnit(s, ei, j, 3); damageHero(s, ei, 3); break;
     case 'a_talca': damageUnit(s, ei, j, 2); break;
+    case 'a_amongus': damageUnit(s, ei, j, 6); break;   // a parti lelke a paprikásat adja neki
     case 'a_koktel': if (o === 'buff') { u.atk += 5; ev(s, { t:'buff', side:ei, i:j, n:5 }); } else damageUnit(s, ei, j, 5); break;
     case 'a_mangos': healUnit(s, ei, j, 4); break;
     case 'a_rehab': healUnit(s, ei, j, 3); if (u.stun) { u.stun = 0; ev(s, { t:'unstun', side:ei, i:j }); } break;
@@ -874,6 +885,10 @@ function botChoose(real) {
       const c = clone(s); c.events = [];
       playCard(c, me, hi, t);
       let sc = scoreAfterCombat(c, me);
+      if (CARD[h.id].rand) {   // véletlen kimenetelű lap: több próbálkozás átlaga (különben a szerencsés próbára „ráharap”)
+        for (let k = 1; k < 8; k++) { const c2 = clone(s); c2.events = []; playCard(c2, me, hi, t); sc += scoreAfterCombat(c2, me); }
+        sc /= 8;
+      }
       if (h.id === 'a_kor') {   // egy lépés előre: mit tudnék vele kijátszani?
         sc = -1e9; const P2 = c.players[me];
         const others = p.hand.filter(x => x.id !== 'a_kor').map(x => cardCost(s, me, x.id)).filter(v => v <= p.energy + 1);
