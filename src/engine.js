@@ -96,7 +96,7 @@ const CARDS = [
   { id:'f_egyutt', type:'action', name:'Együtt sírtok, együtt nevettek', cost:6, rarity:'l', finisher:true, hero:'gabi', tgt:'summon', text:'Megidéz egy Gyerek Zanát (3/3, Lendület) és egy Gyerek Gabit (3/3, Izom).' },
   { id:'f_jbl', type:'action', name:'JBL', cost:6, rarity:'l', finisher:true, hero:'laci', tgt:'ownSlot', text:'Lerakod a JBL hangfalat (0/4). A köröd végén 1 sebzést okoz minden ellenséges karakternek és az ellenfél hősének. Amíg él, az ellenfél két szélső helye zárva van, és legfeljebb 2 karaktere lehet. Ha kijátszáskor 2-nél több karaktere van, a szélső helyeken állók elpusztulnak.' },
   { id:'f_metamorf', type:'action', name:'Metamorfózis', cost:6, rarity:'l', finisher:true, hero:'krisz', text:'Krisz Baszóvá változik, és 12 élete lesz. Baszó minden köröd végén a karaktereid után 3-at üt: mindig a legbalra álló ellenséges karaktert, ha nincs ilyen, az ellenfél hősét. Neki nem lehet visszaütni.' },
-  { id:'f_atok', type:'action', name:'Az összetartás átka', cost:6, rarity:'l', finisher:true, hero:'tomi', tgt:'grave', text:'Két véletlen karakter visszatér a temetődből a pályára, az eredeti értékeinél +1/+1-gyel.' },
+  { id:'f_atok', type:'action', name:'Az összetartás átka', cost:6, rarity:'l', finisher:true, hero:'tomi', tgt:'grave', text:'Két véletlen karakter visszatér a temetődből a pályára, +1/+1-gyel, és mindkettő kap egy-egy véletlen erőt: Izom, Láthatatlan, Provokáció, Pajzs vagy Sunyulás.' },
   { id:'f_munkahely', type:'action', name:'A munkahely', cost:6, rarity:'l', finisher:true, hero:'david', text:'Húzol 2 lapot, és kijátssza a Munkahely helyszínt: a te lapjaid 1-gyel olcsóbbak, az ellenfélé 1-gyel drágábbak. Ha a Munkahely eltűnik, Dávid 5 életet gyógyul.' },
   { id:'f_gepuzem', type:'action', name:'Gépüzemmód', cost:6, rarity:'l', finisher:true, hero:'milo', text:'Ha Milo meghalna, egyszer visszatér 10 élettel.' },
   { id:'f_capa', type:'action', name:'Hátad mögött, cápa megesz!', cost:6, rarity:'l', finisher:true, hero:'barna', text:'Megidéz egy 9/9-es Cápát, amely azonnal megeszi az ellenfél egy véletlen karakterét, és a helyére áll (ha nincs ellenséges karakter, a jobb szélre kerül). 4 körön át a köröd elején egyet úszik afelé a karakter felé, akit az ellenfél utoljára lerakott, és megeszi, aki az útjába kerül. Nem támad, Láthatatlan: a támadások átmennek rajta.' },
@@ -194,6 +194,13 @@ function makePlayer(heroId, deckId) {
   const maxHp = heroId === PASSIVE.bigHp ? 24 : 20;
   return { heroId, deckId, hp:maxHp, maxHp, deck:buildDeck(deckId), hand:[], board:Array(LANES).fill(null), grave:[],
            energy:0, maxEnergy:0, turns:0, fatigue:0, charThisTurn:false, played:0 };
+}
+const BOONS = ['muscle', 'invis', 'taunt', 'shield', 'sneak'];
+const BOON_NAME = { muscle:'Izom', invis:'Láthatatlan', taunt:'Provokáció', shield:'Pajzs', sneak:'Sunyulás' };
+function giveBoon(u, b) {
+  if (b === 'muscle') u.muscle = true; else if (b === 'invis') u.invis = true; else if (b === 'taunt') u.taunt = true;
+  else if (b === 'shield') u.shield = true; else if (b === 'sneak') u.hidden = true;
+  u.boon = b;
 }
 function makeUnit(s, id, owner) {
   const c = CARD[id];
@@ -545,14 +552,16 @@ function playCard(s, pi, hi, t) {
         }
         break; }
       case 'f_metamorf': p.baszo = true; p.hp = 12; p.maxHp = 12; ev(s, { t:'morph', side:pi, i:-1 }); break;
-      case 'f_atok': {   // két véletlen saját karakter vissza a temetőből, +2/+2
+      case 'f_atok': {   // két véletlen saját karakter vissza a temetőből, +1/+1 és egy-egy véletlen erő
         const sl = openSlots(s, pi);
         const pool = p.grave.map((g, k) => k).filter(k => { const x = CARD[p.grave[k].id]; return x && x.type === 'char' && !x.token; });
         const pick = [];
         while (pick.length < Math.min(2, sl.length) && pool.length) pick.push(pool.splice(Math.floor(rnd() * pool.length), 1)[0]);
         const ids = pick.map(k => p.grave[k].id);
         pick.sort((a, b) => b - a).forEach(k => p.grave.splice(k, 1));
-        ids.forEach((id, k) => { const u = makeUnit(s, id, pi); u.atk += 1; u.hp += 1; u.maxHp += 1; p.board[sl[k]] = u; ev(s, { t:'rise', side:pi, i:sl[k], id }); });
+        const bo = BOONS.slice();   // 2026-10-09: mindkettő kap egy (különböző) véletlen erőt is
+        ids.forEach((id, k) => { const u = makeUnit(s, id, pi); u.atk += 1; u.hp += 1; u.maxHp += 1; u.owner = pi; p.board[sl[k]] = u; ev(s, { t:'rise', side:pi, i:sl[k], id });
+          const b = bo.splice(Math.floor(rnd() * bo.length), 1)[0]; giveBoon(u, b); ev(s, { t:'boon', side:pi, i:sl[k], b }); });
         break; }
       case 'f_munkahely': draw(s, pi); if (s.winner == null) draw(s, pi); dropLocation(s, 'loc'); s.location = { id:'l_munkahely', owner:pi }; ev(s, { t:'summon', side:pi, i:-1, id:'l_munkahely' }); break;
       case 'f_gepuzem': p.machine = 1; ev(s, { t:'machineon', side:pi, i:-1 }); break;
@@ -721,16 +730,17 @@ function strike(s, i) {
   }
   const tj = tauntAt(s, ei), j = tj >= 0 ? tj : i;   // Provokáció: ha van ilyen karakter, mindenki őt üti
   const x = s.players[ei].board[j];
-  if (tj < 0 && (u.id === 'c_nyiti' || !x || CARD[x.id].invis)) { damageHero(s, ei, a); return; }
+  if (tj < 0 && (u.id === 'c_nyiti' || !x || isInv(x))) { damageHero(s, ei, a); return; }
   reveal(s, ei, j);
-  const r = x.stun || CARD[u.id].invis ? 0 : effAtk(s, ei, j);   // Láthatatlan támadót nem lehet visszaütni
+  const r = x.stun || isInv(u) ? 0 : effAtk(s, ei, j);   // Láthatatlan támadót nem lehet visszaütni
   const sh = x.shield;
   damageUnit(s, ei, j, a);
   // Izom: ami sebzés a karakter halála után megmarad, az ellenfél hősét éri (a Pajzs elnyeli az egészet)
   if ((CARD[u.id].muscle || u.muscle) && !sh && x.hp < 0) { ev(s, { t:'overflow', side:ei, i:-1, n:-x.hp }); damageHero(s, ei, -x.hp, true); }
   damageUnit(s, pi, i, r); cleanup(s);
 }
-const invisAt = (s, side, i) => { const u = s.players[side].board[i]; return !!(u && CARD[u.id].invis); };   // Láthatatlan: a támadás átmegy rajta
+const isInv = u => !!(u && (CARD[u.id].invis || u.invis));   // Láthatatlan: a lapon vagy kapott erőként (Tomi Kánon eseménye)
+const invisAt = (s, side, i) => isInv(s.players[side].board[i]);   // Láthatatlan: a támadás átmegy rajta
 function tauntAt(s, side) { return s.players[side].board.findIndex(u => u && !u.hidden && (CARD[u.id].taunt || u.taunt)); }
 
 const atiFree = (s, side, i) => s.players[side].board.every((x, j) => j === i || !x);
@@ -755,7 +765,7 @@ function baszoStrike(s) {
   const pi = s.active, p = s.players[pi];
   if (!p.baszo || p.struck || s.winner != null) return;
   p.struck = true; s.baszoHit = pi;
-  const ei = other(pi), j = s.players[ei].board.findIndex(u => u && !CARD[u.id].invis);
+  const ei = other(pi), j = s.players[ei].board.findIndex(u => u && !isInv(u));
   ev(s, { t:'heroatk', side:pi, i:-1, tj:j });
   if (j >= 0) { reveal(s, ei, j); damageUnit(s, ei, j, 3); cleanup(s); } else damageHero(s, ei, 3);
   s.baszoHit = null;
@@ -853,10 +863,10 @@ function evalState(s, me) {
     return x;
   };
   for (let i = 0; i < LANES; i++) {
-    const u = P.board[i], x0 = E.board[i], x = x0 && !CARD[x0.id].invis ? x0 : null;   // a Láthatatlan lap nem áll útban
+    const u = P.board[i], x0 = E.board[i], x = x0 && !isInv(x0) ? x0 : null;   // a Láthatatlan lap nem áll útban
     if (u) { v += val(me, i); if ((!x || u.id === 'c_nyiti') && !u.stun && !CARD[u.id].noAttack) v += effAtk(s, me, i) * 0.6; }
     if (x0) v -= val(other(me), i);
-    if (x && (!u || CARD[u.id].invis || x.id === 'c_nyiti') && !x.stun && !CARD[x.id].noAttack) v -= effAtk(s, other(me), i) * 0.8;
+    if (x && (!u || isInv(u) || x.id === 'c_nyiti') && !x.stun && !CARD[x.id].noAttack) v -= effAtk(s, other(me), i) * 0.8;
   }
   v += P.hand.length * 0.6 - E.hand.length * 0.3 + (P.espresso || 0) * 0.55;   // Espresso Martini: a jövő körben érkező lapok
   if (s.location && s.location.owner === me) v += 1.0;

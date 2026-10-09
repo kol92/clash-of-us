@@ -2037,7 +2037,7 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%;}
 <script src="vendor/firebase-auth-compat.js"></script>
 <script src="vendor/firebase-firestore-compat.js"></script>
 <script src="vendor/firebase-database-compat.js"></script>
-<script>window.APP_VERSION = "2026.10.09-2245";</script>
+<script>window.APP_VERSION = "2026.10.09-2259";</script>
 <script>// ===== Best of Us – saját szerver (Firebase) =====
 // A játék eredetileg a Claude-os tárolót használta (window.claude.use('db' | 'user' | 'room')).
 // Ez a fájl ugyanazt a felületet adja Firebase-ből, így a játék kódja szinte változatlan maradhat:
@@ -2385,7 +2385,7 @@ const CARDS = [
   { id:'f_egyutt', type:'action', name:'Együtt sírtok, együtt nevettek', cost:6, rarity:'l', finisher:true, hero:'gabi', tgt:'summon', text:'Megidéz egy Gyerek Zanát (3/3, Lendület) és egy Gyerek Gabit (3/3, Izom).' },
   { id:'f_jbl', type:'action', name:'JBL', cost:6, rarity:'l', finisher:true, hero:'laci', tgt:'ownSlot', text:'Lerakod a JBL hangfalat (0/4). A köröd végén 1 sebzést okoz minden ellenséges karakternek és az ellenfél hősének. Amíg él, az ellenfél két szélső helye zárva van, és legfeljebb 2 karaktere lehet. Ha kijátszáskor 2-nél több karaktere van, a szélső helyeken állók elpusztulnak.' },
   { id:'f_metamorf', type:'action', name:'Metamorfózis', cost:6, rarity:'l', finisher:true, hero:'krisz', text:'Krisz Baszóvá változik, és 12 élete lesz. Baszó minden köröd végén a karaktereid után 3-at üt: mindig a legbalra álló ellenséges karaktert, ha nincs ilyen, az ellenfél hősét. Neki nem lehet visszaütni.' },
-  { id:'f_atok', type:'action', name:'Az összetartás átka', cost:6, rarity:'l', finisher:true, hero:'tomi', tgt:'grave', text:'Két véletlen karakter visszatér a temetődből a pályára, az eredeti értékeinél +1/+1-gyel.' },
+  { id:'f_atok', type:'action', name:'Az összetartás átka', cost:6, rarity:'l', finisher:true, hero:'tomi', tgt:'grave', text:'Két véletlen karakter visszatér a temetődből a pályára, +1/+1-gyel, és mindkettő kap egy-egy véletlen erőt: Izom, Láthatatlan, Provokáció, Pajzs vagy Sunyulás.' },
   { id:'f_munkahely', type:'action', name:'A munkahely', cost:6, rarity:'l', finisher:true, hero:'david', text:'Húzol 2 lapot, és kijátssza a Munkahely helyszínt: a te lapjaid 1-gyel olcsóbbak, az ellenfélé 1-gyel drágábbak. Ha a Munkahely eltűnik, Dávid 5 életet gyógyul.' },
   { id:'f_gepuzem', type:'action', name:'Gépüzemmód', cost:6, rarity:'l', finisher:true, hero:'milo', text:'Ha Milo meghalna, egyszer visszatér 10 élettel.' },
   { id:'f_capa', type:'action', name:'Hátad mögött, cápa megesz!', cost:6, rarity:'l', finisher:true, hero:'barna', text:'Megidéz egy 9/9-es Cápát, amely azonnal megeszi az ellenfél egy véletlen karakterét, és a helyére áll (ha nincs ellenséges karakter, a jobb szélre kerül). 4 körön át a köröd elején egyet úszik afelé a karakter felé, akit az ellenfél utoljára lerakott, és megeszi, aki az útjába kerül. Nem támad, Láthatatlan: a támadások átmennek rajta.' },
@@ -2483,6 +2483,13 @@ function makePlayer(heroId, deckId) {
   const maxHp = heroId === PASSIVE.bigHp ? 24 : 20;
   return { heroId, deckId, hp:maxHp, maxHp, deck:buildDeck(deckId), hand:[], board:Array(LANES).fill(null), grave:[],
            energy:0, maxEnergy:0, turns:0, fatigue:0, charThisTurn:false, played:0 };
+}
+const BOONS = ['muscle', 'invis', 'taunt', 'shield', 'sneak'];
+const BOON_NAME = { muscle:'Izom', invis:'Láthatatlan', taunt:'Provokáció', shield:'Pajzs', sneak:'Sunyulás' };
+function giveBoon(u, b) {
+  if (b === 'muscle') u.muscle = true; else if (b === 'invis') u.invis = true; else if (b === 'taunt') u.taunt = true;
+  else if (b === 'shield') u.shield = true; else if (b === 'sneak') u.hidden = true;
+  u.boon = b;
 }
 function makeUnit(s, id, owner) {
   const c = CARD[id];
@@ -2834,14 +2841,16 @@ function playCard(s, pi, hi, t) {
         }
         break; }
       case 'f_metamorf': p.baszo = true; p.hp = 12; p.maxHp = 12; ev(s, { t:'morph', side:pi, i:-1 }); break;
-      case 'f_atok': {   // két véletlen saját karakter vissza a temetőből, +2/+2
+      case 'f_atok': {   // két véletlen saját karakter vissza a temetőből, +1/+1 és egy-egy véletlen erő
         const sl = openSlots(s, pi);
         const pool = p.grave.map((g, k) => k).filter(k => { const x = CARD[p.grave[k].id]; return x && x.type === 'char' && !x.token; });
         const pick = [];
         while (pick.length < Math.min(2, sl.length) && pool.length) pick.push(pool.splice(Math.floor(rnd() * pool.length), 1)[0]);
         const ids = pick.map(k => p.grave[k].id);
         pick.sort((a, b) => b - a).forEach(k => p.grave.splice(k, 1));
-        ids.forEach((id, k) => { const u = makeUnit(s, id, pi); u.atk += 1; u.hp += 1; u.maxHp += 1; p.board[sl[k]] = u; ev(s, { t:'rise', side:pi, i:sl[k], id }); });
+        const bo = BOONS.slice();   // 2026-10-09: mindkettő kap egy (különböző) véletlen erőt is
+        ids.forEach((id, k) => { const u = makeUnit(s, id, pi); u.atk += 1; u.hp += 1; u.maxHp += 1; u.owner = pi; p.board[sl[k]] = u; ev(s, { t:'rise', side:pi, i:sl[k], id });
+          const b = bo.splice(Math.floor(rnd() * bo.length), 1)[0]; giveBoon(u, b); ev(s, { t:'boon', side:pi, i:sl[k], b }); });
         break; }
       case 'f_munkahely': draw(s, pi); if (s.winner == null) draw(s, pi); dropLocation(s, 'loc'); s.location = { id:'l_munkahely', owner:pi }; ev(s, { t:'summon', side:pi, i:-1, id:'l_munkahely' }); break;
       case 'f_gepuzem': p.machine = 1; ev(s, { t:'machineon', side:pi, i:-1 }); break;
@@ -3010,16 +3019,17 @@ function strike(s, i) {
   }
   const tj = tauntAt(s, ei), j = tj >= 0 ? tj : i;   // Provokáció: ha van ilyen karakter, mindenki őt üti
   const x = s.players[ei].board[j];
-  if (tj < 0 && (u.id === 'c_nyiti' || !x || CARD[x.id].invis)) { damageHero(s, ei, a); return; }
+  if (tj < 0 && (u.id === 'c_nyiti' || !x || isInv(x))) { damageHero(s, ei, a); return; }
   reveal(s, ei, j);
-  const r = x.stun || CARD[u.id].invis ? 0 : effAtk(s, ei, j);   // Láthatatlan támadót nem lehet visszaütni
+  const r = x.stun || isInv(u) ? 0 : effAtk(s, ei, j);   // Láthatatlan támadót nem lehet visszaütni
   const sh = x.shield;
   damageUnit(s, ei, j, a);
   // Izom: ami sebzés a karakter halála után megmarad, az ellenfél hősét éri (a Pajzs elnyeli az egészet)
   if ((CARD[u.id].muscle || u.muscle) && !sh && x.hp < 0) { ev(s, { t:'overflow', side:ei, i:-1, n:-x.hp }); damageHero(s, ei, -x.hp, true); }
   damageUnit(s, pi, i, r); cleanup(s);
 }
-const invisAt = (s, side, i) => { const u = s.players[side].board[i]; return !!(u && CARD[u.id].invis); };   // Láthatatlan: a támadás átmegy rajta
+const isInv = u => !!(u && (CARD[u.id].invis || u.invis));   // Láthatatlan: a lapon vagy kapott erőként (Tomi Kánon eseménye)
+const invisAt = (s, side, i) => isInv(s.players[side].board[i]);   // Láthatatlan: a támadás átmegy rajta
 function tauntAt(s, side) { return s.players[side].board.findIndex(u => u && !u.hidden && (CARD[u.id].taunt || u.taunt)); }
 
 const atiFree = (s, side, i) => s.players[side].board.every((x, j) => j === i || !x);
@@ -3044,7 +3054,7 @@ function baszoStrike(s) {
   const pi = s.active, p = s.players[pi];
   if (!p.baszo || p.struck || s.winner != null) return;
   p.struck = true; s.baszoHit = pi;
-  const ei = other(pi), j = s.players[ei].board.findIndex(u => u && !CARD[u.id].invis);
+  const ei = other(pi), j = s.players[ei].board.findIndex(u => u && !isInv(u));
   ev(s, { t:'heroatk', side:pi, i:-1, tj:j });
   if (j >= 0) { reveal(s, ei, j); damageUnit(s, ei, j, 3); cleanup(s); } else damageHero(s, ei, 3);
   s.baszoHit = null;
@@ -3142,10 +3152,10 @@ function evalState(s, me) {
     return x;
   };
   for (let i = 0; i < LANES; i++) {
-    const u = P.board[i], x0 = E.board[i], x = x0 && !CARD[x0.id].invis ? x0 : null;   // a Láthatatlan lap nem áll útban
+    const u = P.board[i], x0 = E.board[i], x = x0 && !isInv(x0) ? x0 : null;   // a Láthatatlan lap nem áll útban
     if (u) { v += val(me, i); if ((!x || u.id === 'c_nyiti') && !u.stun && !CARD[u.id].noAttack) v += effAtk(s, me, i) * 0.6; }
     if (x0) v -= val(other(me), i);
-    if (x && (!u || CARD[u.id].invis || x.id === 'c_nyiti') && !x.stun && !CARD[x.id].noAttack) v -= effAtk(s, other(me), i) * 0.8;
+    if (x && (!u || isInv(u) || x.id === 'c_nyiti') && !x.stun && !CARD[x.id].noAttack) v -= effAtk(s, other(me), i) * 0.8;
   }
   v += P.hand.length * 0.6 - E.hand.length * 0.3 + (P.espresso || 0) * 0.55;   // Espresso Martini: a jövő körben érkező lapok
   if (s.location && s.location.owner === me) v += 1.0;
@@ -3252,7 +3262,7 @@ function cardHelpHTML(id, u) {
   if (c.stun || u?.stun || /bén/i.test(c.text)) add('stun');
   if (u && u.fresh && !u.haste && !u.stun) add('fresh');
   if (u && (u.doom || u.expire != null)) add('doom');
-  if (c.invis) add('invis');
+  if (c.invis || u?.invis) add('invis');
   if (c.rarity === 'l') add('legend');
   if (c.finisher) rows.unshift(['Kánon esemény', `Ultra erős lap, csak ${HERO[c.hero].name} paklijába tehető (a jobb felső sarokban az ő portréja). Kijátszáskor elsötétül a pálya, és különleges bevonulással érkezik.`]);
   return `<dl class="help">${rows.map(([a, b]) => `<div><dt>${a}</dt><dd>${b}</dd></div>`).join('')}</dl>`;
@@ -3730,6 +3740,7 @@ function logEvents(evs, snap) {
       case 'heal': L(`💚 ${nm(e.side, e.i)}: +${e.n}`); break;
       case 'overflow': L(`💪 Izom: ${e.n} átüt a hősre`); break;
       case 'death': L(`💀 ${CARD[e.id].name} meghalt (${e.side === ME ? 'tiéd' : 'ellenfélé'})`); break;
+      case 'boon': L(`✨ ${unitName(e.side, e.i)} új erőt kapott: ${BOON_NAME[e.b]}`); break;
       case 'summon': case 'rise': L(`✨ ${CARD[e.id]?.name || 'Egy lap'} a pályára került (${e.side === ME ? 'nálad' : 'az ellenfélnél'})`); break;
       case 'revive': L(`✨ ${unitName(e.side, e.i)} feltámadt`); break;
       case 'buff': if (e.i >= 0 && e.n) L(`▲ ${unitName(e.side, e.i)}: +${e.n} támadás`); break;
@@ -3889,6 +3900,7 @@ async function animateEvents(evs) {
         else floatAt(anchor, `${CARD[e.id]?.name || 'Query'}!`, 'info');
         hold = Math.max(hold, e.id === 'c_query' ? 300 : 520); break;
       case 'rise': floatAt(anchor, `✝️ ${CARD[e.id].name} visszatért! +1/+1`, 'buff'); hold = Math.max(hold, 750); break;
+      case 'boon': floatAt(anchor, `✨ ${BOON_NAME[e.b]}!`, 'buff'); hold = Math.max(hold, 750); break;
       case 'morph': fx(el, 'fx-heroheal'); fx($('#app'), 'fx-quake'); floatAt(anchor, '🦋 Metamorfózis! Itt van Baszó', 'buff'); hold = Math.max(hold, 1000); break;
       case 'machineon': floatAt(anchor, '⚙️ Gépüzemmód bekapcsolva', 'info'); hold = Math.max(hold, 700); break;
       case 'machine': fx(el, 'fx-heroheal'); fx($('#app'), 'fx-quake'); floatAt(anchor, '⚙️ GÉPÜZEMMÓD! Vissza 10 élettel', 'buff'); hold = Math.max(hold, 1200); break;
@@ -4021,7 +4033,7 @@ function chooseOpt(c) {
 // Baszó támadása: a hős portréja nekilendül a célpontnak (a legbalra álló ellenséges karakter vagy az ellenfél hőse)
 async function baszoAnim(pi) {
   const port = barEl(pi)?.querySelector('.hport'), foe = other(pi);
-  const j = S.players[foe].board.findIndex(x => x && !CARD[x.id].invis);
+  const j = S.players[foe].board.findIndex(x => x && !isInv(x));
   const target = j >= 0 ? (unitAt(foe, j) || cellEl(foe, j)) : barEl(foe);
   if (!port || !target) { await runFx(() => baszoStrike(S)); return; }
   const a = port.getBoundingClientRect(), b = target.getBoundingClientRect();
@@ -4100,7 +4112,7 @@ function unitHTML(u, side, i) {
     <span class="st atk">?</span><span class="st hp">?</span>${u.stun ? `<span class="tags"><span class="zz stun" aria-hidden="true">bénult</span><span class="stc" role="img" aria-label="Bénult még ${u.stun} körig" title="Bénult még ${u.stun} körig"><b>${u.stun}</b></span></span>` : ''}</button>`;
   const c = CARD[u.id], atk = S.players[side].board[i]?.uid === u.uid ? effAtk(S, side, i) : u.atk, sleeping = u.fresh && !u.haste && u.id !== 'c_korso' && !c.noAttack && !u.stun;
   const tags = (sleeping ? '<span class="stb rest" role="img" aria-label="Pihen" title="Pihen: ebben a körben még nem támad"></span>' : u.id === 'c_capa' ? '' : c.noAttack ? STB_NOATK : u.id === 'c_ati' && !u.stun && !atiFree(S, side, i) ? STB_NOATK : '')
-    + (c.invis ? `<span class="stb invis" role="img" aria-label="Láthatatlan" title="Láthatatlan: a támadások átmennek rajta"></span>${u.id === 'c_capa' ? `<span class="stc" role="img" aria-label="Még ${u.swims ?? 4} úszás" title="Még ennyi úszás, utána eltűnik"><b>${u.swims ?? 4}</b></span>` : ''}` : '')
+    + (c.invis || u.invis ? `<span class="stb invis" role="img" aria-label="Láthatatlan" title="Láthatatlan: a támadások átmennek rajta"></span>${u.id === 'c_capa' ? `<span class="stc" role="img" aria-label="Még ${u.swims ?? 4} úszás" title="Még ennyi úszás, utána eltűnik"><b>${u.swims ?? 4}</b></span>` : ''}` : '')
     + (u.expire != null || u.doom ? '<span class="stb doom" role="img" aria-label="Eltűnik" title="Eltűnik: a köröd végén magától elpusztul"></span>' : '') + (u.stun ? `<span class="zz stun" aria-hidden="true">bénult</span><span class="stc" role="img" aria-label="Bénult még ${u.stun} körig" title="Bénult még ${u.stun} körig"><b>${u.stun}</b></span>` : '')
     + (u.hidden ? '<span class="stb hid" role="img" aria-label="Rejtve" title="Rejtve: az ellenfél nem látja"></span>' : '')
     + (c.taunt || u.taunt ? '<span class="stb taunt" role="img" aria-label="Provokál" title="Provokáció: mindenki őt támadja"></span>' : '');
@@ -4276,7 +4288,7 @@ $('#scr-game').addEventListener('click', e => {
     const gear = u.items.map(id => { const k = foe.indexOf(id), byFoe = k >= 0; if (byFoe) foe.splice(k, 1);
       const owner = byFoe ? 1 - side : side;
       return `<button class="gear-card" data-gear="${id}" data-own="${owner}">${cardHTML(id, { foil: foilOf(owner, id) })}<small>${owner === ME ? 'tőled' : 'az ellenféltől'}</small></button>`; }).join('');
-    openModal(cardHTML(u.id, { big: true, foil: CARD[u.id].foilOnly || !!u.foil }), `Most: ${effAtk(S, side, +cell.dataset.i)} támadás, ${u.hp}/${u.maxHp} élet${u.shield ? ', Pajzs' : ''}${u.stun ? `, bénult még ${u.stun} körig` : ''}`,
+    openModal(cardHTML(u.id, { big: true, foil: CARD[u.id].foilOnly || !!u.foil }), `Most: ${effAtk(S, side, +cell.dataset.i)} támadás, ${u.hp}/${u.maxHp} élet${u.shield ? ', Pajzs' : ''}${u.boon ? `, kapott erő: ${BOON_NAME[u.boon]}` : ''}${u.stun ? `, bénult még ${u.stun} körig` : ''}`,
       (gear ? `<div class="gear-box"><div class="gear-lbl">Eszközök rajta (${u.items.length}) · koppints a részletekért</div><div class="gear-row">${gear}</div></div>` : '') + cardHelpHTML(u.id, u));
     const ov = $('#layer').lastElementChild;
     ov.querySelector('.gear-row')?.addEventListener('click', ev => { const g = ev.target.closest('[data-gear]'); if (!g) return; ev.stopPropagation();
@@ -4340,7 +4352,7 @@ async function attackAnim(pi, i, u) {
   const mf = u.id === 'c_laszy' ? (u.nextMisfire = laszyRoll(S, pi, i)) : null;
   if (mf) return misfireAnim(pi, i, el, mf);
   const foe = other(pi), tj = tauntAt(S, foe), j = tj >= 0 ? tj : i, opp = S.players[foe].board[j];
-  const toHero = tj < 0 && (!opp || u.id === 'c_nyiti' || CARD[opp.id].invis);
+  const toHero = tj < 0 && (!opp || u.id === 'c_nyiti' || isInv(opp));
   const target = toHero ? barEl(foe) : unitAt(foe, j);
   const a = el.getBoundingClientRect(), b = target.getBoundingClientRect();
   const dir = pi === ME ? -1 : 1;

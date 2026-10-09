@@ -55,7 +55,7 @@ function cardHelpHTML(id, u) {
   if (c.stun || u?.stun || /bén/i.test(c.text)) add('stun');
   if (u && u.fresh && !u.haste && !u.stun) add('fresh');
   if (u && (u.doom || u.expire != null)) add('doom');
-  if (c.invis) add('invis');
+  if (c.invis || u?.invis) add('invis');
   if (c.rarity === 'l') add('legend');
   if (c.finisher) rows.unshift(['Kánon esemény', `Ultra erős lap, csak ${HERO[c.hero].name} paklijába tehető (a jobb felső sarokban az ő portréja). Kijátszáskor elsötétül a pálya, és különleges bevonulással érkezik.`]);
   return `<dl class="help">${rows.map(([a, b]) => `<div><dt>${a}</dt><dd>${b}</dd></div>`).join('')}</dl>`;
@@ -533,6 +533,7 @@ function logEvents(evs, snap) {
       case 'heal': L(`💚 ${nm(e.side, e.i)}: +${e.n}`); break;
       case 'overflow': L(`💪 Izom: ${e.n} átüt a hősre`); break;
       case 'death': L(`💀 ${CARD[e.id].name} meghalt (${e.side === ME ? 'tiéd' : 'ellenfélé'})`); break;
+      case 'boon': L(`✨ ${unitName(e.side, e.i)} új erőt kapott: ${BOON_NAME[e.b]}`); break;
       case 'summon': case 'rise': L(`✨ ${CARD[e.id]?.name || 'Egy lap'} a pályára került (${e.side === ME ? 'nálad' : 'az ellenfélnél'})`); break;
       case 'revive': L(`✨ ${unitName(e.side, e.i)} feltámadt`); break;
       case 'buff': if (e.i >= 0 && e.n) L(`▲ ${unitName(e.side, e.i)}: +${e.n} támadás`); break;
@@ -692,6 +693,7 @@ async function animateEvents(evs) {
         else floatAt(anchor, `${CARD[e.id]?.name || 'Query'}!`, 'info');
         hold = Math.max(hold, e.id === 'c_query' ? 300 : 520); break;
       case 'rise': floatAt(anchor, `✝️ ${CARD[e.id].name} visszatért! +1/+1`, 'buff'); hold = Math.max(hold, 750); break;
+      case 'boon': floatAt(anchor, `✨ ${BOON_NAME[e.b]}!`, 'buff'); hold = Math.max(hold, 750); break;
       case 'morph': fx(el, 'fx-heroheal'); fx($('#app'), 'fx-quake'); floatAt(anchor, '🦋 Metamorfózis! Itt van Baszó', 'buff'); hold = Math.max(hold, 1000); break;
       case 'machineon': floatAt(anchor, '⚙️ Gépüzemmód bekapcsolva', 'info'); hold = Math.max(hold, 700); break;
       case 'machine': fx(el, 'fx-heroheal'); fx($('#app'), 'fx-quake'); floatAt(anchor, '⚙️ GÉPÜZEMMÓD! Vissza 10 élettel', 'buff'); hold = Math.max(hold, 1200); break;
@@ -824,7 +826,7 @@ function chooseOpt(c) {
 // Baszó támadása: a hős portréja nekilendül a célpontnak (a legbalra álló ellenséges karakter vagy az ellenfél hőse)
 async function baszoAnim(pi) {
   const port = barEl(pi)?.querySelector('.hport'), foe = other(pi);
-  const j = S.players[foe].board.findIndex(x => x && !CARD[x.id].invis);
+  const j = S.players[foe].board.findIndex(x => x && !isInv(x));
   const target = j >= 0 ? (unitAt(foe, j) || cellEl(foe, j)) : barEl(foe);
   if (!port || !target) { await runFx(() => baszoStrike(S)); return; }
   const a = port.getBoundingClientRect(), b = target.getBoundingClientRect();
@@ -903,7 +905,7 @@ function unitHTML(u, side, i) {
     <span class="st atk">?</span><span class="st hp">?</span>${u.stun ? `<span class="tags"><span class="zz stun" aria-hidden="true">bénult</span><span class="stc" role="img" aria-label="Bénult még ${u.stun} körig" title="Bénult még ${u.stun} körig"><b>${u.stun}</b></span></span>` : ''}</button>`;
   const c = CARD[u.id], atk = S.players[side].board[i]?.uid === u.uid ? effAtk(S, side, i) : u.atk, sleeping = u.fresh && !u.haste && u.id !== 'c_korso' && !c.noAttack && !u.stun;
   const tags = (sleeping ? '<span class="stb rest" role="img" aria-label="Pihen" title="Pihen: ebben a körben még nem támad"></span>' : u.id === 'c_capa' ? '' : c.noAttack ? STB_NOATK : u.id === 'c_ati' && !u.stun && !atiFree(S, side, i) ? STB_NOATK : '')
-    + (c.invis ? `<span class="stb invis" role="img" aria-label="Láthatatlan" title="Láthatatlan: a támadások átmennek rajta"></span>${u.id === 'c_capa' ? `<span class="stc" role="img" aria-label="Még ${u.swims ?? 4} úszás" title="Még ennyi úszás, utána eltűnik"><b>${u.swims ?? 4}</b></span>` : ''}` : '')
+    + (c.invis || u.invis ? `<span class="stb invis" role="img" aria-label="Láthatatlan" title="Láthatatlan: a támadások átmennek rajta"></span>${u.id === 'c_capa' ? `<span class="stc" role="img" aria-label="Még ${u.swims ?? 4} úszás" title="Még ennyi úszás, utána eltűnik"><b>${u.swims ?? 4}</b></span>` : ''}` : '')
     + (u.expire != null || u.doom ? '<span class="stb doom" role="img" aria-label="Eltűnik" title="Eltűnik: a köröd végén magától elpusztul"></span>' : '') + (u.stun ? `<span class="zz stun" aria-hidden="true">bénult</span><span class="stc" role="img" aria-label="Bénult még ${u.stun} körig" title="Bénult még ${u.stun} körig"><b>${u.stun}</b></span>` : '')
     + (u.hidden ? '<span class="stb hid" role="img" aria-label="Rejtve" title="Rejtve: az ellenfél nem látja"></span>' : '')
     + (c.taunt || u.taunt ? '<span class="stb taunt" role="img" aria-label="Provokál" title="Provokáció: mindenki őt támadja"></span>' : '');
@@ -1079,7 +1081,7 @@ $('#scr-game').addEventListener('click', e => {
     const gear = u.items.map(id => { const k = foe.indexOf(id), byFoe = k >= 0; if (byFoe) foe.splice(k, 1);
       const owner = byFoe ? 1 - side : side;
       return `<button class="gear-card" data-gear="${id}" data-own="${owner}">${cardHTML(id, { foil: foilOf(owner, id) })}<small>${owner === ME ? 'tőled' : 'az ellenféltől'}</small></button>`; }).join('');
-    openModal(cardHTML(u.id, { big: true, foil: CARD[u.id].foilOnly || !!u.foil }), `Most: ${effAtk(S, side, +cell.dataset.i)} támadás, ${u.hp}/${u.maxHp} élet${u.shield ? ', Pajzs' : ''}${u.stun ? `, bénult még ${u.stun} körig` : ''}`,
+    openModal(cardHTML(u.id, { big: true, foil: CARD[u.id].foilOnly || !!u.foil }), `Most: ${effAtk(S, side, +cell.dataset.i)} támadás, ${u.hp}/${u.maxHp} élet${u.shield ? ', Pajzs' : ''}${u.boon ? `, kapott erő: ${BOON_NAME[u.boon]}` : ''}${u.stun ? `, bénult még ${u.stun} körig` : ''}`,
       (gear ? `<div class="gear-box"><div class="gear-lbl">Eszközök rajta (${u.items.length}) · koppints a részletekért</div><div class="gear-row">${gear}</div></div>` : '') + cardHelpHTML(u.id, u));
     const ov = $('#layer').lastElementChild;
     ov.querySelector('.gear-row')?.addEventListener('click', ev => { const g = ev.target.closest('[data-gear]'); if (!g) return; ev.stopPropagation();
@@ -1143,7 +1145,7 @@ async function attackAnim(pi, i, u) {
   const mf = u.id === 'c_laszy' ? (u.nextMisfire = laszyRoll(S, pi, i)) : null;
   if (mf) return misfireAnim(pi, i, el, mf);
   const foe = other(pi), tj = tauntAt(S, foe), j = tj >= 0 ? tj : i, opp = S.players[foe].board[j];
-  const toHero = tj < 0 && (!opp || u.id === 'c_nyiti' || CARD[opp.id].invis);
+  const toHero = tj < 0 && (!opp || u.id === 'c_nyiti' || isInv(opp));
   const target = toHero ? barEl(foe) : unitAt(foe, j);
   const a = el.getBoundingClientRect(), b = target.getBoundingClientRect();
   const dir = pi === ME ? -1 : 1;
