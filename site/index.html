@@ -2088,7 +2088,7 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%;}
 <script src="vendor/firebase-auth-compat.js"></script>
 <script src="vendor/firebase-firestore-compat.js"></script>
 <script src="vendor/firebase-database-compat.js"></script>
-<script>window.APP_VERSION = "2026.10.10-0554";</script>
+<script>window.APP_VERSION = "2026.10.10-1430";</script>
 <script>// ===== Best of Us – saját szerver (Firebase) =====
 // A játék eredetileg a Claude-os tárolót használta (window.claude.use('db' | 'user' | 'room')).
 // Ez a fájl ugyanazt a felületet adja Firebase-ből, így a játék kódja szinte változatlan maradhat:
@@ -2436,7 +2436,7 @@ const CARDS = [
   { id:'f_egyutt', type:'action', name:'Együtt sírtok, együtt nevettek', cost:6, rarity:'l', finisher:true, hero:'gabi', tgt:'summon', text:'Megidéz egy Gyerek Zanát (3/3, Lendület) és egy Gyerek Gabit (3/3, Izom).' },
   { id:'f_jbl', type:'action', name:'JBL', cost:6, rarity:'l', finisher:true, hero:'laci', tgt:'ownSlot', text:'Lerakod a JBL hangfalat (0/4). A köröd végén 1 sebzést okoz minden ellenséges karakternek és az ellenfél hősének. Amíg él, az ellenfél két szélső helye zárva van, és legfeljebb 2 karaktere lehet. Ha kijátszáskor 2-nél több karaktere van, a szélső helyeken állók elpusztulnak.' },
   { id:'f_metamorf', type:'action', name:'Metamorfózis', cost:6, rarity:'l', finisher:true, hero:'krisz', text:'Krisz Baszóvá változik, és 12 élete lesz. Baszó minden köröd végén a karaktereid után 3-at üt: mindig a legbalra álló ellenséges karaktert, ha nincs ilyen, az ellenfél hősét. Neki nem lehet visszaütni.' },
-  { id:'f_atok', type:'action', name:'Az összetartás átka', cost:6, rarity:'l', finisher:true, hero:'tomi', tgt:'grave', text:'Két véletlen karakter visszatér a temetődből a pályára, +1/+1-gyel, és mindkettő kap egy-egy véletlen erőt: Izom, Láthatatlan, Provokáció, Pajzs vagy Sunyulás.' },
+  { id:'f_atok', type:'action', name:'Az összetartás átka', cost:6, rarity:'l', finisher:true, hero:'tomi', tgt:'grave', text:'Két véletlen karakter visszatér a temetődből a pályára, +1/+1-gyel, és mindkettő kap egy-egy véletlen erőt: Izom, Láthatatlan, Provokáció, Pajzs, Sunyulás vagy Lendület.' },
   { id:'f_munkahely', type:'action', name:'A munkahely', cost:6, rarity:'l', finisher:true, hero:'david', text:'Húzol 2 lapot, és kijátssza a Munkahely helyszínt: a te lapjaid 1-gyel olcsóbbak, az ellenfélé 1-gyel drágábbak. Ha a Munkahely eltűnik, Dávid 5 életet gyógyul.' },
   { id:'f_gepuzem', type:'action', name:'Gépüzemmód', cost:6, rarity:'l', finisher:true, hero:'milo', text:'Ha Milo meghalna, egyszer visszatér 10 élettel.' },
   { id:'f_capa', type:'action', name:'Hátad mögött, cápa megesz!', cost:6, rarity:'l', finisher:true, hero:'barna', text:'Megidéz egy 9/9-es Cápát, amely azonnal megeszi az ellenfél egy véletlen karakterét, és a helyére áll (ha nincs ellenséges karakter, a jobb szélre kerül). 4 körön át a köröd elején egyet úszik afelé a karakter felé, akit az ellenfél utoljára lerakott, és megeszi, aki az útjába kerül. Nem támad, Láthatatlan: a támadások átmennek rajta.' },
@@ -2535,11 +2535,11 @@ function makePlayer(heroId, deckId) {
   return { heroId, deckId, hp:maxHp, maxHp, deck:buildDeck(deckId), hand:[], board:Array(LANES).fill(null), grave:[],
            energy:0, maxEnergy:0, turns:0, fatigue:0, charThisTurn:false, played:0 };
 }
-const BOONS = ['muscle', 'invis', 'taunt', 'shield', 'sneak'];
-const BOON_NAME = { muscle:'Izom', invis:'Láthatatlan', taunt:'Provokáció', shield:'Pajzs', sneak:'Sunyulás' };
+const BOONS = ['muscle', 'invis', 'taunt', 'shield', 'sneak', 'haste'];
+const BOON_NAME = { muscle:'Izom', invis:'Láthatatlan', taunt:'Provokáció', shield:'Pajzs', sneak:'Sunyulás', haste:'Lendület' };
 function giveBoon(u, b) {
   if (b === 'muscle') u.muscle = true; else if (b === 'invis') u.invis = true; else if (b === 'taunt') u.taunt = true;
-  else if (b === 'shield') u.shield = true; else if (b === 'sneak') u.hidden = true;
+  else if (b === 'shield') u.shield = true; else if (b === 'sneak') u.hidden = true; else if (b === 'haste') u.haste = true;
   u.boon = b;
 }
 function makeUnit(s, id, owner) {

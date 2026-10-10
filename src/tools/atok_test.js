@@ -11,10 +11,10 @@ for (let k = 0; k < 300; k++) {
   if (k === 0) { ok(us.length === 2, 'két karakter visszatért'); ok(us.every(u => u.atk === E.CARD[u.id].atk + 1), '+1/+1'); }
   if (bs.length !== 2 || bs[0] === bs[1]) { ok(false, 'két különböző erő ' + bs); break; }
   for (const u of us) { seen[u.boon] = (seen[u.boon] || 0) + 1;
-    const okb = { muscle: u.muscle, invis: u.invis, taunt: u.taunt, shield: u.shield, sneak: u.hidden }[u.boon];
+    const okb = { muscle: u.muscle, invis: u.invis, taunt: u.taunt, shield: u.shield, sneak: u.hidden, haste: u.haste }[u.boon];
     if (!okb) { ok(false, 'az erő ténylegesen rajta van: ' + u.boon); } }
 }
-ok(Object.keys(seen).length === 5, 'mind az 5 erő előfordul: ' + JSON.stringify(seen));
+ok(Object.keys(seen).length === 6, 'mind a 6 erő előfordul: ' + JSON.stringify(seen));
 // kapott Láthatatlan: a támadás átmegy rajta
 const s = E.newGame('tomi', E.DECK_OF('tomi'), 'gabi', E.DECK_OF('gabi'), 0); s.events = []; s.active = 1;
 s.players.forEach(p => p.board = [null, null, null, null]);
