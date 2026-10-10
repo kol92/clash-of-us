@@ -2286,7 +2286,7 @@ function renderRanked() {
     <div class="rk-hero">${rkEmblem(r.t, 'xl')}<div class="rk-name">${rkName(r.t)}</div>
       ${r.t >= RK_LEG ? `<div class="rk-lp">${r.lp} Legenda-pont</div>` : rkStars(r.t, r.st)}
       <small class="rk-sea">${escH(se.name)} · még ${days} nap · ${r.w} győzelem, ${r.l} vereség${r.streak >= 2 ? ` · 🔥 ${r.streak} győzelem sorozat` : ''}</small></div>
-    <button class="btn primary rk-play" id="rkPlay">⚔️ Ranked meccs</button>
+    <button class="rk-playimg" id="rkPlay" aria-label="Ranked meccs"></button>
     <p class="q-note rk-how">Élő ellenfelet keresünk; ha 20 mp alatt nincs senki, egy bot ellen játszol – a rangod mindkét esetben számít.</p>
     <div class="lbl">Szezon végi jutalom (a szezon legjobb rangja szerint)</div>
     <div class="rk-rews">${RK_REWARDS.map(x => `<div class="rk-rew${r.best >= x.min ? ' got' : ''}">${rkEmblem(x.min, 'xs')}<span><b>${x.name}</b><small>${rkRewText(x.rew)}</small></span>${r.best >= x.min && x === nextRw ? '<em>elérve</em>' : ''}</div>`).join('')}</div>
