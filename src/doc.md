@@ -414,6 +414,9 @@ Hősképesség-ötletek a táblázatban (még nem zöldek, nincsenek beépítve)
 - **Hátlapok (2026-10-12):** a játékos választhat hátlapot (Gyűjtemény → „🃏 Hátlap” gomb): Klasszikus (alap) és Legenda (`art/back_legend.webp`, a ranked Legenda jutalma; zárolva, amíg nincs meg). A választott hátlap látszik a saját paklin, húzáskor, a mulligan-cserénél, a saját rejtett lapokon – PvP-ben az ellenfél is ezt látja (`cos.back`); a bot hátlapja a klasszikus. (`BACKS`, `p.backs`, `p.cardBack`, CSS `--bk` / `--bk-sm`.)
 - Meccs végén a ranked eredmény-dobozban: jelvény, új rang, csillagok (az új csillag „bepattan”), megjegyzés (pl. „🔥 Győzelmi sorozat: +1 bónusz csillag”, „🛡 Kitartás…”, „Szintlépés! Ezüst 2”). A coin/küldetés/Season Pass ugyanúgy jár, mint a sima meccsen.
 
+## Gál Zoli + Fehér szarvas bunda (2026-10-12)
+- Ha Gál Zolin rajta van a Fehér szarvas bunda, a támadása után **nem pusztul el** (a bunda +3 életet és Provokációt is ad). Mindkét lap szövegébe bekerült. A bot is tudja (nem értékeli le a bundás Zolit).
+
 ## Változatok a kezdőpaklikban (2026-10-12)
 - Ha a játékosnak megvan egy lap különleges változata (pl. Pifti, TZS, Gál Zoli, Fogel, Rehab), a kezdőpaklikban automatikusan a változat kerül a sima lap helyére, annyi példányban, amennyi megvan belőle (`upgradeList` az `allDecks`-ben). Bot elleni meccsben, PvP-ben és rankedben is így megy; a pakli megnézésekor is a változat látszik. A bot paklija nem változik.
 

@@ -2100,7 +2100,7 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%;}
 <script src="vendor/firebase-auth-compat.js"></script>
 <script src="vendor/firebase-firestore-compat.js"></script>
 <script src="vendor/firebase-database-compat.js"></script>
-<script>window.APP_VERSION = "2026.10.12-1402"; window.APP_BUILD = "2026.10.12-1402";</script>
+<script>window.APP_VERSION = "2026.10.12-1435"; window.APP_BUILD = "2026.10.12-1435";</script>
 <script>// ===== Best of Us – saját szerver (Firebase) =====
 // A játék eredetileg a Claude-os tárolót használta (window.claude.use('db' | 'user' | 'room')).
 // Ez a fájl ugyanazt a felületet adja Firebase-ből, így a játék kódja szinte változatlan maradhat:
@@ -2370,8 +2370,8 @@ const CARDS = [
   { id:'c_gabileg', type:'char', name:'Gabi, a legyőz\u00ADhetetlen', cost:5, atk:4, hp:4, rarity:'l', revive:true, text:'Amikor először meghal, újraéled a helyén 1 élettel.' },
   { id:'c_zsibrita', type:'char', name:'Zsibrita', cost:3, atk:2, hp:3, rarity:'r', playTgt:'push', text:'Kijátszáskor egy ellenséges karaktert áttolhatsz az ellenfél egy üres sávjába.' },
   { id:'c_vera', type:'char', name:'Vera', cost:3, atk:1, hp:2, rarity:'r', playTgt:'enemy', text:'Kijátszáskor: válassz egy ellenséges karaktert, az visszakerül az ellenfél kezébe.' },
-  { id:'c_zoli', type:'char', name:'Gál Zoli', cost:3, atk:3, hp:1, rarity:'k', haste:true, text:'Egy támadás után magától elpusztul.' },
-  { id:'c_zoli2', type:'char', name:'Gál Zoli', cost:3, atk:3, hp:1, rarity:'k', variantOf:'c_zoli', shopOnly:true, price:100, haste:true, text:'Egy támadás után magától elpusztul.' },
+  { id:'c_zoli', type:'char', name:'Gál Zoli', cost:3, atk:3, hp:1, rarity:'k', haste:true, text:'Egy támadás után magától elpusztul – kivéve, ha rajta van a Fehér szarvas bunda.' },
+  { id:'c_zoli2', type:'char', name:'Gál Zoli', cost:3, atk:3, hp:1, rarity:'k', variantOf:'c_zoli', shopOnly:true, price:100, haste:true, text:'Egy támadás után magától elpusztul – kivéve, ha rajta van a Fehér szarvas bunda.' },
   { id:'c_kristof', type:'char', name:'Kristóf', cost:3, atk:2, hp:2, rarity:'r', text:'Kijátszáskor: a kezedbe kerül egy véletlen Ital lap.' },
   { id:'c_sasimeselo', type:'char', name:'Sasi, a mesélő', cost:3, atk:2, hp:2, rarity:'r', text:'Kijátszáskor: húzol egy lapot.' },
   { id:'c_vajda', type:'char', name:'Vajda Peti', cost:3, atk:3, hp:4, rarity:'k', text:'' },
@@ -2414,7 +2414,7 @@ const CARDS = [
   { id:'i_akuma', drink:true, type:'item', name:'Akuma', cost:2, atk:5, hp:0, rarity:'l', haste:true, doom:true, text:'A köröd végén a karakter, akin van, meghal.' },
   { id:'i_uto', type:'item', name:'TomiNegan ütője', cost:3, atk:3, hp:0, rarity:'l', muscle:true, text:'' },
   { id:'i_vodkakancso', drink:true, type:'item', name:'Vodka Kancsó', cost:3, atk:4, hp:0, rarity:'r', muscle:true, hangover:true, text:'Utána a következő körödben a karakter bénult: nem támad, és nem üt vissza.' },
-  { id:'i_bunda', type:'item', name:'Fehér szarvas bunda', cost:2, atk:0, hp:3, rarity:'r', taunt:true, text:'' },
+  { id:'i_bunda', type:'item', name:'Fehér szarvas bunda', cost:2, atk:0, hp:3, rarity:'r', taunt:true, text:'Gál Zoli benne nem pusztul el a támadása után.' },
   { id:'i_aranylanc', type:'item', name:'Tomi nyaklánca', cost:3, atk:2, hp:3, rarity:'l', text:'' },
   // --- Akciók ---
   { id:'a_dinnyes', drink:true, type:'action', name:'Dinnyés Absolute Vodka', cost:1, tgt:'enemyOrHero', rarity:'k', text:'3 sebzés egy ellenséges karakternek vagy az ellenfél hősének.' },
@@ -3110,7 +3110,8 @@ function attackLane(s, i) {
     if (s.winner != null || s.players[pi].board[i] !== u) break;
     strike(s, i);
   }
-  if (bid(u.id) === 'c_zoli' && s.players[pi].board[i] === u) { u.hp = 0; ev(s, { t:'expire', side:pi, i }); cleanup(s); }
+  // Gál Zoli egy támadás után elpusztul – kivéve, ha rajta van a Fehér szarvas bunda (2026-10-12)
+  if (bid(u.id) === 'c_zoli' && s.players[pi].board[i] === u && !(u.items || []).includes('i_bunda')) { u.hp = 0; ev(s, { t:'expire', side:pi, i }); cleanup(s); }
   checkWin(s);
   return true;
 }
@@ -3219,7 +3220,7 @@ function evalState(s, me) {
     let x = a * 1.1 + u.hp * 0.9 + (u.shield ? 1.5 : 0);
     if (u.stun) x = u.hp * 0.9 - 1;
     if (u.doom) x = 0;
-    if (u.id === 'c_korso') x = 0.6; if (bid(u.id) === 'c_zoli') x *= 0.6; if (u.id === 'c_zana') x += a * 0.8;
+    if (u.id === 'c_korso') x = 0.6; if (bid(u.id) === 'c_zoli' && !(u.items || []).includes('i_bunda')) x *= 0.6; if (u.id === 'c_zana') x += a * 0.8;
     if (CARD[u.id].noAttack) x = u.hp * 0.5;   // JBL hangfal: fal, nem üt
     if (CARD[u.id].fixed) x = -7;              // Cápa: annak az oldalnak árt, ahol áll
     return x;
