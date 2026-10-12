@@ -3,7 +3,7 @@ const ECON = { goldPlain: 0.005, goldShiny: 0.05, goldDupe: 100, heroFaChance: 0
                odds: [['l', 1.5], ['e', 6.5], ['r', 22], ['k', 70]] };
 // a „token” lapok (pl. Query) csak más lap hatására kerülnek játékba: nincsenek packban, gyűjteményben, pakliban
 const PLAYABLE = CARDS.filter(c => !c.token && !c.off);   // off: kánon esemény lap, amíg nincs hozzá grafika – sehol nem látszik
-const SETS = { base: { name: 'Base set', cards: PLAYABLE.filter(c => !c.variantOf).map(c => c.id) } };
+const SETS = { base: { name: 'Base set', cards: PLAYABLE.filter(c => !c.variantOf && !c.passOnly).map(c => c.id) } };   // passOnly: csak a Season Passból
 const VARIANT_CHANCE = 0.2;   // ha az alaplap jön, 1 az 5-höz eséllyel a ritkább változata lesz belőle
 const DECK_SIZE = 20;
 const maxCopies = id => CARD[id].rarity === 'l' ? 1 : 2;
@@ -519,7 +519,7 @@ const SHOP_REFRESH = '2026-10-16';   // a limitált kínálat következő friss�
 function renderShop() {
   const p = Store.p; if (!p) return;
   const free = freePackReady();
-  const items = SHOP_ITEMS(), ports = Object.keys(PORTRAITS).filter(k => ART[k]);
+  const items = SHOP_ITEMS(), ports = Object.keys(PORTRAITS).filter(k => ART[k] && !PORTRAITS[k].passOnly);
   let refresh = 'A kínálat időnként frissül – ami most itt van, csak a következő frissítésig kapható.';
   if (SHOP_REFRESH) { const end = new Date(SHOP_REFRESH + 'T00:00'), d = Math.ceil((end - new Date()) / 864e5), md = `${end.getMonth() + 1}. ${end.getDate()}.`;
     refresh = d > 1 ? `Frissül: <b>${d} nap múlva</b> (${md}) – addig kapható, ami most itt van.` : d === 1 ? `Frissül: <b>holnap</b> (${md}) – ez az utolsó nap!` : 'Hamarosan új kínálat érkezik – addig még kapható, ami most itt van.'; }
@@ -995,7 +995,7 @@ function renderQuests() {
 // A jutalmat kézzel kell átvenni; ami a szezon végéig átvétlen marad, a következő szezon indulásakor automatikusan jóváíródik.
 const PASS_XP = { win: 60, draw: 40, loss: 30, daily: 100, weekly: 300, perLevel: 250 };
 const SEASONS = [
-  { id: 's1', name: '1. szezon · Nyitókör', start: new Date(2026, 8, 28, 0, 0), end: new Date(2026, 10, 2, 0, 1),
+  { id: 's1', name: '0. szezon · Bétateszt', start: new Date(2026, 8, 28, 0, 0), end: new Date(2026, 9, 12, 0, 0),
     tiers: [
       { coins: 50 }, { packs: 1 }, { coins: 75 }, { packs: 1 }, { shiny: 1 },
       { coins: 100 }, { packs: 2 }, { coins: 75 }, { packs: 1 }, { shiny: 1 },
@@ -1003,6 +1003,16 @@ const SEASONS = [
       { coins: 150 }, { packs: 2 }, { card: 'c_tzs2' }, { packs: 2 }, { shiny: 1 },
       { coins: 150 }, { packs: 2 }, { coins: 150 }, { packs: 3 }, { card: 'i_aranylanc' },
       { coins: 200 }, { packs: 3 }, { shiny: 1 }, { coins: 250 }, { heroPick: true },
+    ] },
+  // 2026-10-12: a játék indulása – 30 napos szezon, a ranked első szezonja is
+  { id: 's2', name: '1. szezon · Nyitókör', start: new Date(2026, 9, 12, 0, 0), end: new Date(2026, 10, 11, 0, 0),
+    tiers: [
+      { coins: 50 }, { packs: 1 }, { coins: 75 }, { card: 'c_pifti2', had: 250 }, { shiny: 1 },
+      { coins: 100 }, { packs: 2 }, { card: 'c_tzs2', had: 250 }, { packs: 1 }, { shiny: 1 },
+      { coins: 100 }, { packs: 2 }, { coins: 100 }, { packs: 1 }, { port: 'p_milo_busz' },
+      { coins: 150 }, { packs: 2 }, { shiny: 1 }, { packs: 2 }, { card: 'c_nyitinap' },
+      { coins: 150 }, { packs: 2 }, { coins: 150 }, { packs: 3 }, { port: 'p_krisz_vip' },
+      { coins: 200 }, { packs: 3 }, { shiny: 1 }, { coins: 250 }, { goldPick: true },
     ] },
 ];
 const curSeason = (d = new Date()) => SEASONS.find(s => d >= s.start && d < s.end) || null;
@@ -1014,6 +1024,8 @@ function rewLabel(r) {
   if (r.fa) return `${r.fa} Full Art pack`;
   if (r.card) return CARD[r.card].variantOf ? `${CARD[r.card].name} – különleges változat` : `${CARD[r.card].name} – Full Art`;
   if (r.heroPick) return 'Választott Full Art hős';
+  if (r.goldPick) return 'Választott Arany hős';
+  if (r.port) return `${PORTRAITS[r.port].name} – hős portré`;
   return '';
 }
 function rewIcon(r) {
@@ -1023,6 +1035,8 @@ function rewIcon(r) {
   if (r.fa) return '<span class="q-pack fa" aria-hidden="true"></span>';
   if (r.card) return ART[r.card] ? `<span class="sp-thumb" aria-hidden="true" style="background-image:url('${artSrc(r.card)}')"></span>` : '<span class="sp-mystery" aria-hidden="true"><b>★</b></span>';
   if (r.heroPick) return '<span class="sp-mystery" aria-hidden="true"><b>?</b></span>';
+  if (r.goldPick) return '<span class="sp-mystery gold" aria-hidden="true"><b>★</b></span>';
+  if (r.port) return ART[r.port] ? `<span class="sp-thumb" aria-hidden="true" style="background-image:url('${artSrc(r.port)}')"></span>` : '';
   return '';
 }
 // jutalom jóváírása; kártya/hős esetén a megmutatandó lapot adja vissza
@@ -1031,6 +1045,9 @@ function grantRew(p, r, heroId) {
   else if (r.packs) p.giftPacks = (p.giftPacks || 0) + r.packs;
   else if (r.shiny) p.shinyPacks = (p.shinyPacks || 0) + r.shiny;
   else if (r.fa) p.faPacks = (p.faPacks || 0) + r.fa;
+  else if (r.card && r.had && ((p.coll[r.card]?.n || 0) + (p.coll[r.card]?.f || 0)) > 0) { p.coins += r.had; return { coinsInstead: r.had }; }   // már megvan (a 0. szezonból) → helyette coin
+  else if (r.port) { if (!(p.portraits || []).includes(r.port)) p.portraits = [...(p.portraits || []), r.port]; p.heroSkin = { ...(p.heroSkin || {}), [PORTRAITS[r.port].hero]: r.port }; return { port: r.port }; }
+  else if (r.goldPick) { const h = heroId || GOLD_HEROES[0]; p.heroGold = p.heroGold || {}; if (p.heroGold[h]) p.coins += ECON.goldDupe; else p.heroGold[h] = 1; p.heroSkin = { ...(p.heroSkin || {}), [h]: 'gold' }; return { goldHero: h }; }
   else if (r.card) { const e = p.coll[r.card] || (p.coll[r.card] = { n: 0, f: 0 }); e.f += CARD[r.card].variantOf ? 2 : 1; return { id: r.card, foil: true }; }   // változatból rögtön 2 (packból nem szerezhető, így kijön egy pakli)
   else if (r.heroPick) {
     const h = heroId || (HEROES.find(x => !(p.heroFa || {})[x.id]) || HEROES[0]).id;
@@ -1076,6 +1093,15 @@ function renderPassBadge() {
   if (sm) sm.textContent = c > 0 ? `${c} átvehető jutalom!` : `${s.name.split(' · ')[0]} · még ${days} nap`;
 }
 function showPassReveal(got) {
+  if (got.coinsInstead) { toast(`+${got.coinsInstead} coin`); return; }
+  if (got.port || got.goldHero) {
+    const hid = got.port ? PORTRAITS[got.port].hero : got.goldHero, h = HERO[hid];
+    const o = document.createElement('div'); o.className = 'overlay';
+    o.innerHTML = `<div class="modal sp-reveal"><h3>Season Pass jutalom</h3>${heroCardHTML(h, got.port ? { big: true, port: got.port } : { big: true, gold: true, foil: true })}
+      <p class="live">${got.port ? `${PORTRAITS[got.port].name} – ${h.name} új portréja, mindig Full Artban. Rögtön ezt viseli – a Gyűjteményben a hősre koppintva visszaválthatsz.` : `Arany ${h.name}! Mostantól ezt viseli – a Gyűjteményben a hősre koppintva visszaválthatsz.`}</p><button class="btn primary" data-x>Szuper!</button></div>`;
+    o.onclick = e => { if (e.target.closest('[data-x]')) o.remove(); };
+    $('#layer').appendChild(o); renderMenuFan(); return;
+  }
   const o = document.createElement('div'); o.className = 'overlay';
   o.innerHTML = `<div class="modal sp-reveal"><h3>Season Pass jutalom</h3>${pcHTML(got, { big: true, foil: true })}
     <p class="live">${pcName(got)} – ${!got.hero && CARD[got.id].variantOf ? 'különleges változat, Full Art – 2 példány' : 'Full Art'}. Bekerült a gyűjteményedbe.</p><button class="btn primary" data-x>Szuper!</button></div>`;
@@ -1091,6 +1117,7 @@ function claimTier(i) {
     if (got) showPassReveal(got); else toast(`+${rewLabel(r)}`);
   };
   if (r.heroPick) pickHero(null, finish, 'Válaszd ki a Full Art hősödet', 'Ennek a hősnek a Full Art változatát kapod meg. A már meglévőket ✨ jelzi.');
+  else if (r.goldPick) pickHero(null, finish, 'Válaszd ki az Arany hősödet', 'Ennek a hősnek az Arany változatát kapod meg (ha már megvan, helyette coint).');
   else finish();
 }
 function claimAll() {
@@ -1098,7 +1125,7 @@ function claimAll() {
   const P = p.pass, lv = passLevel(P.xp); let n = 0, hero = -1, shown = null;
   for (let i = 0; i < Math.min(lv, s.tiers.length); i++) {
     if (P.claimed.includes(i)) continue;
-    if (s.tiers[i].heroPick) { hero = i; continue; }   // a hőst külön kell kiválasztani
+    if (s.tiers[i].heroPick || s.tiers[i].goldPick) { hero = i; continue; }   // a hőst külön kell kiválasztani
     const got = grantRew(p, s.tiers[i]); P.claimed.push(i); n++; if (got) shown = got;
   }
   const ex = Math.max(0, lv - s.tiers.length - (P.extra || 0));
@@ -1118,11 +1145,11 @@ function renderPass() {
   const done = lv >= max;
   const row = (r, i) => {
     const st = P.claimed.includes(i) ? 'claimed' : lv >= i + 1 ? 'ready' : 'locked';
-    const big = r.shiny || r.fa || r.card || r.heroPick;
+    const big = r.shiny || r.fa || r.card || r.heroPick || r.goldPick || r.port;
     return `<div class="sp-row ${st}${big ? ' big' : ''}${i === lv ? ' cur' : ''}" data-i="${i}">
       <div class="sp-lv"><b>${i + 1}</b></div>
       <div class="sp-ic">${rewIcon(r)}</div>
-      <div class="sp-name"><b>${rewLabel(r)}</b>${r.heroPick ? '<small>Te választod ki, melyik hős legyen</small>' : r.card ? `<small>${CARD[r.card].passOnly ? 'Csak Full Art, csak a Season Passból' : `${RAR[CARD[r.card].rarity]}, garantált Full Art`}</small>` : ''}</div>
+      <div class="sp-name"><b>${rewLabel(r)}</b>${r.heroPick || r.goldPick ? '<small>Te választod ki, melyik hős legyen</small>' : r.port ? '<small>Csak a Season Passból · mindig Full Art</small>' : r.card ? `<small>${CARD[r.card].passOnly ? 'Csak Full Art, csak a Season Passból' : `${RAR[CARD[r.card].rarity]}, garantált Full Art`}</small>` : ''}</div>
       <div class="sp-act">${st === 'claimed' ? '<span class="q-ok">✓</span>' : st === 'ready' ? `<button class="btn primary sp-claim" data-c="${i}">Átvesz</button>` : '<span class="sp-lock" aria-label="Zárolva">🔒</span>'}</div>
     </div>`;
   };
@@ -2172,7 +2199,7 @@ function dupeModal() {
 // Ezüst 4–1: csak minden második vereség vesz el csillagot („Kitartás”); győzelem után az első vereség ingyenes.
 // Arany: minden vereség −1 csillag, 0 csillagnál visszaesés. Legenda: Legenda-pont (+1/−1), onnan nem esel vissza.
 // Szezon = a Season Pass szezonja (ha nincs, naptári hónap). Szezonváltáskor a szezon legjobb rangja szerinti jutalom, majd újrakezdés Bronz 5-ről.
-const RANKED_ON = false;   // 2026-10-09: kész, de még kikapcsolva – a szezon indulásakor true (és a jutalmak véglegesítése)
+const RANKED_ON = true;   // 2026-10-09: kész, de még kikapcsolva – a szezon indulásakor true (és a jutalmak véglegesítése)
 const RK_NAMES = ['Bronz', 'Ezüst', 'Arany'];
 const RK_LEG = 15;
 const rkNeed = t => t < 5 ? 2 : t < 10 ? 3 : 4;

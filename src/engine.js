@@ -45,6 +45,7 @@ const CARDS = [
   { id:'c_fogel', type:'char', name:'Fogel', cost:5, atk:2, hp:4, rarity:'r', text:'Kijátszáskor: a többi karaktered +2 életet kap. Ez akkor is megmarad, ha Fogel meghal.' },
   { id:'c_fogel2', type:'char', name:'Fogel', cost:5, atk:2, hp:4, rarity:'r', variantOf:'c_fogel', shopOnly:true, price:100, text:'Kijátszáskor: a többi karaktered +2 életet kap. Ez akkor is megmarad, ha Fogel meghal.' },
   { id:'c_boros', type:'char', name:'Boros', cost:5, atk:3, hp:5, rarity:'r', taunt:true, text:'Amíg él, az ellenfél karakterei mindig őt támadják, bárhol áll.' },
+  { id:'c_nyitinap', type:'char', name:'Nyiti, a napszúrás túlélője', cost:4, atk:3, hp:3, rarity:'l', passOnly:true, text:'A köröd végén minden más karakter 1 sebzést kap (mindkét oldalon).' },
   { id:'c_nyiti', type:'char', name:'Nyiti', cost:5, atk:5, hp:4, rarity:'l', text:'Mindig közvetlenül az ellenfél hősét támadja, akkor is, ha áll vele szemben karakter.' },
   { id:'c_nfc', type:'char', name:'A Nagy Fehér Cigány', cost:6, atk:8, hp:2, rarity:'k', muscle:true, text:'' },
   { id:'c_laszy', type:'char', name:'Laszy', cost:6, atk:6, hp:4, miss:.25, rarity:'e', haste:true, muscle:true, text:'Támadáskor 25% eséllyel egy saját karakteredet vagy a saját hősödet találja el.' },
@@ -817,6 +818,13 @@ function finishTurn(s) {
     const ei = other(pi); ev(s, { t:'jblwave', side:pi, i });
     s.players[ei].board.forEach((x, j) => { if (x) { reveal(s, ei, j); damageUnit(s, ei, j, 1); } });
     damageHero(s, ei, 1); cleanup(s);
+  });
+  // Nyiti, a napszúrás túlélője (2026-10-12): a gazdája körének végén minden más karakter 1 sebzést kap, mindkét oldalon
+  p.board.forEach((u, i) => {
+    if (!u || bid(u.id) !== 'c_nyitinap' || s.winner != null) return;
+    ev(s, { t:'heatwave', side:pi, i });
+    for (const sd of [pi, other(pi)]) s.players[sd].board.forEach((x, j) => { if (x && x !== u && !isFixed(x)) { if (sd !== pi) reveal(s, sd, j); damageUnit(s, sd, j, 1); } });
+    cleanup(s);
   });
   p.locked = false;   // az Adios Motherfucker! bénítása a megbénított játékos körének végén jár le
   if (s.winner == null && has(p, 'endHeal')) {

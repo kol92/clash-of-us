@@ -121,6 +121,9 @@ const ART = {
   p_bence_prebou: { src:'art/p_bence_prebou.webp', av:'50% 26%', pos:'50% 24%', port:'52% 22%' },
   p_sasi_izmos:   { src:'art/p_sasi_izmos.webp', av:'78% 24%', pos:'64% 22%', port:'80% 20%' },
   p_krisz_utca:   { src:'art/p_krisz_utca.webp', av:'58% 44%', pos:'56% 30%', port:'58% 44%' },
+  p_milo_busz:    { src:'art/p_milo_busz.webp', av:'34% 22%', pos:'40% 22%', port:'34% 20%' },
+  p_krisz_vip:    { src:'art/p_krisz_vip.webp', av:'42% 20%', pos:'44% 20%', port:'42% 18%' },
+  c_nyitinap:     { src:'art/nyitinap.webp', av:'72% 34%', pos:'66% 36%' },
   g_barna: { src:'art/g_barna.webp', av:'64% 20%', pos:'62% 20%', port:'64% 16%' },
   g_laci:  { src:'art/g_laci.webp',  av:'46% 20%', pos:'46% 20%', port:'46% 16%' },
   g_sasi:  { src:'art/g_sasi.webp',  av:'46% 17%', pos:'46% 16%', port:'46% 12%' },
@@ -263,6 +266,8 @@ const PORTRAITS = {
   p_bence_prebou: { hero: 'bence', name: 'Bence, Pre-BoU', price: 150 },
   p_sasi_izmos:   { hero: 'sasi',  name: 'Sasi, az Izmos', price: 150 },
   p_krisz_utca:   { hero: 'krisz', name: 'Krisz, az utca ura', price: 250 },
+  p_milo_busz:    { hero: 'milo',  name: 'Milo, a 213-as utasa', passOnly: true },   // 1. szezon, 15. szint
+  p_krisz_vip:    { hero: 'krisz', name: 'Krisz, a VIP', passOnly: true },           // 1. szezon, 25. szint
 };
 const isPort = v => !!(v && PORTRAITS[v] && ART[v]);
 function heroCardHTML(h, o = {}) {
@@ -534,6 +539,7 @@ function logEvents(evs, snap) {
       case 'overflow': L(`💪 Izom: ${e.n} átüt a hősre`); break;
       case 'death': L(`💀 ${CARD[e.id].name} meghalt (${e.side === ME ? 'tiéd' : 'ellenfélé'})`); break;
       case 'regdraw': L(`🍺 ${e.side === ME ? 'Helyszínt cseréltél – Törzsvendégként húztál egy lapot' : 'Dávid helyszínt cserélt, és húzott egy lapot'}`); break;
+      case 'heatwave': L(`☀️ Napszúrás: ${e.side === ME ? 'Nyitid' : 'Az ellenfél Nyitije'} miatt minden más karakter 1 sebzést kapott`); break;
       case 'boon': L(`✨ ${unitName(e.side, e.i)} új erőt kapott: ${BOON_NAME[e.b]}`); break;
       case 'summon': case 'rise': L(`✨ ${CARD[e.id]?.name || 'Egy lap'} a pályára került (${e.side === ME ? 'nálad' : 'az ellenfélnél'})`); break;
       case 'revive': L(`✨ ${unitName(e.side, e.i)} feltámadt`); break;
@@ -707,6 +713,7 @@ async function animateEvents(evs) {
       case 'swim': floatAt(anchor, e.dir > 0 ? '🦈 →' : '🦈 ←', 'info'); hold = Math.max(hold, 350); break;
       case 'nocounter': floatAt(anchor, 'Baszót nem lehet visszaütni!', 'info'); hold = Math.max(hold, 500); break;
       case 'jblwave': await jblWaveFx(e); break;
+      case 'heatwave': fx($('#app'), 'fx-quake'); floatAt(anchor, '☀️ Napszúrás! Mindenki −1', 'dmg'); hold = Math.max(hold, 800); break;
       case 'sharkgone': floatAt(anchor, '🦈 Elúszott…', 'info'); hold = Math.max(hold, 600); break;
       case 'shuffled': floatAt(anchor, `👑 +${e.n} Pifti haverja a ${e.side === ME ? 'paklidba' : 'paklijába'}!`, 'info'); hold = Math.max(hold, 900); break;
       case 'amongus': await amongUsFx(el, anchor); break;

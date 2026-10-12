@@ -1,0 +1,13 @@
+const E = require(require('path').join(__dirname, '..', 'engine.js'));
+let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('HIBA:', m); } else console.log('ok  ', m); };
+const U = (id, x = {}) => ({ uid: Math.random(), id, atk: E.CARD[id].atk, hp: E.CARD[id].hp, maxHp: E.CARD[id].hp, items: [], foe: [], temp: 0, ...x });
+const s = E.newGame('bence', E.DECK_OF('bence'), 'gabi', E.DECK_OF('gabi'), 0); s.events = []; s.active = 0;
+s.players.forEach(p => p.board = [null, null, null, null]);
+s.players[0].board = [U('c_nyitinap'), null, U('c_vajda'), null]; s.players[1].board = [null, U('c_pifti'), null, U('c_sasi')];
+E.finishTurn(s);
+ok(s.players[0].board[0].hp === 3, 'Nyiti sértetlen');
+ok(s.players[0].board[2].hp === 3, 'saját Vajda −1');
+ok(!s.players[1].board[1], 'ellenséges Pifti (1 élet) meghalt');
+ok(s.players[1].board[3].hp === 3, 'ellenséges Toma −1');
+ok(!E.CARDS.find(c => c.id === 'c_nyitinap').token && E.CARD.c_nyitinap.passOnly, 'passOnly');
+console.log(fails ? 'HIBÁK: ' + fails : 'NYITI OK');
