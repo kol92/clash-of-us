@@ -2309,12 +2309,12 @@ function backPicker() {
   $('#layer').appendChild(o);
 }
 // ---- Best of Us TCG nap (2026-10-12): aznap belépők ajándék Bence-portrét kapnak, felugró ablakkal ----
-const DAY_GIFT = { id: 'bou-day-2026-10-12', date: '2026-10-12', port: 'p_bence_kerites' };
+const DAY_GIFT = { id: 'bou-day-2026-10-12', from: Date.UTC(2026, 9, 11, 22, 0, 0), until: Date.UTC(2026, 9, 12, 22, 0, 0), port: 'p_bence_kerites' };   // 2026-10-12 0:00–23:59:59 magyar idő szerint
 function dayGiftCheck() {
   const p = Store.p; if (!p || p.onboard || (typeof S !== 'undefined' && S) || $('#layer .overlay')) return;
-  const d = new Date(), today = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  const now = Date.now();
   p.gifts = p.gifts || [];
-  if (today !== DAY_GIFT.date || p.gifts.includes(DAY_GIFT.id)) return;
+  if (now < DAY_GIFT.from || now >= DAY_GIFT.until || p.gifts.includes(DAY_GIFT.id)) return;
   p.gifts.push(DAY_GIFT.id);
   const k = DAY_GIFT.port, P = PORTRAITS[k], h = HERO[P.hero];
   if (!(p.portraits || []).includes(k)) p.portraits = [...(p.portraits || []), k];

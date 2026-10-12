@@ -398,7 +398,7 @@ Hősképesség-ötletek a táblázatban (még nem zöldek, nincsenek beépítve)
   - Pifti/TZS változat: aki a 0. szezonban már megszerezte, helyette csendben 250 coint kap (`had:250`; a felületen nincs külön jelezve, átvételkor „+250 coin”).
   - A Krisz-portré Tomi kérése szerint a 20. szinten lett volna, de ott már Nyiti van (egy szinten egy jutalom), ezért a 25.-re került.
   - Portrék (`port`): csak a Season Passból (`passOnly`), a boltban nem jelennek meg; átvételkor a hős rögtön ezt viseli. Arany hős (`goldPick`): hősválasztó; ha már megvan, helyette `ECON.goldDupe` coin.
-- **Best of Us TCG nap (2026-10-12):** aki aznap (helyi idő) megnyitja a játékot – az új játékosok is, a bevezető után –, felugró ablakot kap: „🎉 Boldog Best of Us TCG napot!”, és ajándékba **Bence, a kerítésmászó** hős-portrét (rögtön ezt viseli). Egyszeri (`DAY_GIFT`, `p.gifts`), a boltban nem kapható.
+- **Best of Us TCG nap (2026-10-12):** aki aznap 0:00 és 23:59:59 között (magyar idő, a telefon időzónájától függetlenül) megnyitja a játékot – az új játékosok is, a bevezető után –, felugró ablakot kap: „🎉 Boldog Best of Us TCG napot!”, és ajándékba **Bence, a kerítésmászó** hős-portrét (rögtön ezt viseli). Egyszeri (`DAY_GIFT`, `p.gifts`), a boltban nem kapható.
 - **Nyiti, a napszúrás túlélője** 4 · 3/3, legendás, csak Season Pass (`passOnly`, packból nem jön, nem cserélhető) – „A köröd végén minden más karakter 1 sebzést kap (mindkét oldalon).” A Cápa nem sebződik, a rejtett ellenséges lap felfordul. Animáció: „☀️ Napszúrás! Mindenki −1”, meccsnapló. Teszt (4000 meccs, kezdőpaklikban egy 3–5-ös karakter helyett): 47,8% – Toma 54,0%, Laczkó 46,9% mellett; helyzetfüggő (a nagy életű paklikban erős).
 
 ## Ranked (2026-10-09)
