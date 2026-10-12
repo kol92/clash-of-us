@@ -39,7 +39,7 @@
     limit() { return this; }
     docs() { const o = L(), depth = this.path.split('/').length + 1;
       return Object.keys(o).filter(p => p.startsWith(this.path + '/') && p.split('/').length === depth).sort().filter(p => this.filters.every(([f, op, v]) => {
-        const x = o[p][f]; return op === '==' ? x === v : op === 'array-contains' ? Array.isArray(x) && x.includes(v) : true; })).map(p => snap(p, o)); }
+        const x = f.split('.').reduce((a, k) => a == null ? a : a[k], o[p]); return op === '==' ? x === v : op === 'array-contains' ? Array.isArray(x) && x.includes(v) : true; })).map(p => snap(p, o)); }
     async get() { const docs = this.docs(); return { docs, size: docs.length, empty: !docs.length }; }
     onSnapshot(next) { let last = null; const f = () => { const docs = this.docs(); const s = JSON.stringify(docs.map(d => [d.id, d.data()])); if (s !== last) { last = s; next({ docs, size: docs.length, empty: !docs.length }); } }; listeners.add(f); f(); return () => listeners.delete(f); }
     doc(id) { return new DocumentReference(this.path + '/' + (id || Math.random().toString(36).slice(2, 12))); }

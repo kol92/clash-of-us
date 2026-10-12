@@ -418,6 +418,12 @@ Hősképesség-ötletek a táblázatban (még nem zöldek, nincsenek beépítve)
 - Ha Gál Zolin rajta van a Fehér szarvas bunda, a támadása után **nem pusztul el** (a bunda +3 életet és Provokációt is ad). Mindkét lap szövegébe bekerült. A bot is tudja (nem értékeli le a bundás Zolit).
 - Kiegészítés (2026-10-12, Tomi): bundában Gál Zoli **Pajzsot is kap** (felrakáskor, „✨ Pajzs!” felirattal; ha már volt pajzsa, nem kap újat). A szövegek frissítve: bunda – „Gál Zoli benne nem pusztul el a támadása után, és Pajzsot is kap.”; Zoli – „… kivéve, ha rajta van a Fehér szarvas bunda (abban Pajzsot is kap).” Teszt: `tools/bunda_test.js`.
 
+## Ranked ranglista – mindenki (2026-10-12)
+- A ranked képernyőn a ranglistán **minden játékos** rajta van, aki az aktuális szezonban már játszott ranked meccset (nem csak a barátok). Fülek: **Mindenki** / **Barátok**. Az első 50 látszik, és ha te lejjebb vagy, a saját sorod a végén (a valódi helyezéseddel).
+- Forrás: a játékosok nyilvános `pub` profilja (`where('rank.season','==',szezon)`), percenként legfeljebb egyszer frissül. A `pub` rangadataiba bekerült a szezonbeli ranked meccsek száma (`rank.g`) – akinek 0 meccse és Bronz 5, 0★ rangja van, nem kerül fel. Szabálymódosítás nem kellett (a `pub` minden belépett játékosnak olvasható).
+- Jelölések a sorban: 🤝 barát, ⏳ jelölés folyamatban.
+- Egy játékosra koppintva kártya ugrik fel (rang, győzelmek, ranked meccsek): **➕ Bejelölöm barátnak**, vagy ha ő már bejelölt, **🤝 Elfogadom**; ha már barátok vagytok / a jelölés elment, azt írja ki.
+
 ## Bot-szintek (2026-10-12)
 - Három szint (`BOT_LV` és `botChoose(s, lvl)` az engine.js-ben):
   - **😊 Könnyű (1):** zajos döntések (a lépések pontszámához ±2,5 HP-nyi véletlen zaj), és minden lépés előtt 12% eséllyel idő előtt befejezi a kört. A nyerő lépést nem hagyja ki.
