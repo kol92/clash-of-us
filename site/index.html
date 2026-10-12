@@ -2097,7 +2097,7 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%;}
 <script src="vendor/firebase-auth-compat.js"></script>
 <script src="vendor/firebase-firestore-compat.js"></script>
 <script src="vendor/firebase-database-compat.js"></script>
-<script>window.APP_VERSION = "2026.10.12-1320";</script>
+<script>window.APP_VERSION = "2026.10.12-1306"; window.APP_BUILD = "2026.10.12-1321";</script>
 <script>// ===== Best of Us – saját szerver (Firebase) =====
 // A játék eredetileg a Claude-os tárolót használta (window.claude.use('db' | 'user' | 'room')).
 // Ez a fájl ugyanazt a felületet adja Firebase-ből, így a játék kódja szinte változatlan maradhat:
@@ -5118,7 +5118,7 @@ function acctModal() {
       <p class="live">A gyűjteményed a fiókodhoz kötve, a felhőben van – bármelyik telefonon belépve folytathatod.</p>
       <button class="btn" data-a="import">Régi profil betöltése kódból</button>
       <button class="btn" data-a="out">Kijelentkezés</button>
-      <small class="where">Verzió: ${escH(window.APP_VERSION || '')}</small>
+      <small class="where">Verzió: ${escH(window.APP_BUILD || window.APP_VERSION || '')}</small>
       <button class="btn primary" data-x>Bezárás</button></div>`;
     o.querySelector('b').textContent = who;
   } else {

@@ -258,7 +258,7 @@ function acctModal() {
       <p class="live">A gyűjteményed a fiókodhoz kötve, a felhőben van – bármelyik telefonon belépve folytathatod.</p>
       <button class="btn" data-a="import">Régi profil betöltése kódból</button>
       <button class="btn" data-a="out">Kijelentkezés</button>
-      <small class="where">Verzió: ${escH(window.APP_VERSION || '')}</small>
+      <small class="where">Verzió: ${escH(window.APP_BUILD || window.APP_VERSION || '')}</small>
       <button class="btn primary" data-x>Bezárás</button></div>`;
     o.querySelector('b').textContent = who;
   } else {

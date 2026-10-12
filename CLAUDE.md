@@ -31,6 +31,7 @@ cd <repo>
 bash src/deploy.sh "Rövid magyar újdonság-szöveg" "commit üzenet"
 ```
 - Az első paraméter az **Újdonságok** szöveg, amit a játékosok frissítéskor látnak. **Személyes / rejtett / technikai változásnál legyen üres: `""`.**
+- **Csendes kitétel:** üres szövegnél a játékosok NEM kapnak „Új verzió érhető el!” értesítőt (a `src/announce.json`-ban tárolt bejelentett verzió marad; az új build a következő app-indításkor magától betöltődik). Kivétel: ha az `engine.js` változott, mindig új bejelentett verzió lesz (szöveg nélküli értesítővel), mert a PvP csak azonos bejelentett verziót párosít. `window.APP_VERSION` = bejelentett verzió, `window.APP_BUILD` = tényleges build.
 - A szkript előbb lefuttatja a `tools/fin_test.js`-t; ha hibát talál, nem tesz ki semmit.
 - Push után a Cloudflare 1–3 perc alatt kiteszi. A játékosoknak az app teljes bezárása + újranyitása hozza be az új verziót.
 - Ha a session commit-aláírást (Co-Authored-By stb.) kér, add a commit üzenethez.

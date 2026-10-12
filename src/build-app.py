@@ -11,6 +11,15 @@ FB = '/home/claude/app/node_modules/firebase'
 if not os.path.isdir(FB): FB = os.path.join(SRC, 'vendor')   # a repóban: src/vendor (a Firebase compat fájlok bemásolva)
 VERSION = time.strftime('%Y.%m.%d-%H%M')
 NOTE = ' '.join(sys.argv[1:]).strip()
+# Bejelentett verzió: csak akkor változik (és jön a „Új verzió érhető el!” sáv), ha van Újdonság-szöveg, vagy változott a motor
+# (a PvP csak azonos bejelentett verziójú játékosokat párosít). Csendes (üres szövegű) buildnél marad a régi → nincs értesítő.
+ANN_F = os.path.join(SRC, 'announce.json')
+ENGINE_H = hashlib.sha1(open(os.path.join(SRC, 'engine.js'), 'rb').read()).hexdigest()[:12]
+ANN = json.load(open(ANN_F)) if os.path.exists(ANN_F) else {}
+if NOTE or ANN.get('engine') != ENGINE_H or not ANN.get('v'):
+    ANN = {'v': VERSION, 'engine': ENGINE_H}
+    json.dump(ANN, open(ANN_F, 'w'))
+ANN_V = ANN['v']
 
 shutil.rmtree(DIST, ignore_errors=True)
 os.makedirs(DIST)
@@ -62,7 +71,7 @@ html = f'''<!doctype html>
 <script src="vendor/firebase-auth-compat.js"></script>
 <script src="vendor/firebase-firestore-compat.js"></script>
 <script src="vendor/firebase-database-compat.js"></script>
-<script>window.APP_VERSION = {json.dumps(VERSION)};</script>
+<script>window.APP_VERSION = {json.dumps(ANN_V)}; window.APP_BUILD = {json.dumps(VERSION)};</script>
 <script>{backend}</script>
 <script>{pwa}</script>
 <script>
@@ -103,7 +112,7 @@ for root, _, files in sorted(os.walk(DIST)):
 sw = open(os.path.join(SRC, 'app', 'sw.js'), encoding='utf-8').read()
 sw = sw.replace('__APP_VERSION__', VERSION).replace("'bou-assets-v1'", repr('bou-assets-' + h.hexdigest()[:10]))
 open(os.path.join(DIST, 'sw.js'), 'w', encoding='utf-8').write(sw)
-json.dump({'v': VERSION, 'note': NOTE}, open(os.path.join(DIST, 'version.json'), 'w'), ensure_ascii=False)
+json.dump({'v': ANN_V, 'note': NOTE if ANN_V == VERSION else '', 'build': VERSION}, open(os.path.join(DIST, 'version.json'), 'w'), ensure_ascii=False)
 open(os.path.join(DIST, '_headers'), 'w').write('''/
   Cache-Control: no-cache
 /index.html
