@@ -76,6 +76,7 @@ Csak build (kitétel nélkül): `cd src && python3 build-app.py ""` → `src/dis
 - Napi coin-plafon: `ECON.dailyCap` (most 200). A szerencsekerék coinja nem számít bele.
 - Bolt: limitált kínálat, `SHOP_REFRESH` (meta.js) a következő frissítés dátuma (most `2026-10-16`). Rotációkor a felhasználó küldi az új kínálatot, és új dátumot kell beállítani.
 - A bot sosem cseréli le a saját Munkahelyét helyszínre.
+- Animált lapok: `ART[id].vid = 'art/vid/NEV.mp4'` (H.264 600×800, ~1 MB, `-crf 29 -movflags +faststart -an`); csak nagy lapnézetben fut, a service worker kihagyja az .mp4-et. Részletek: doc.md „Animált lapok”.
 - Bot-szintek: `BOT_LV` (engine.js) 1 Könnyű / 2 Normál / 3 Nehéz; `S.botLv`, `botLvPref()` és `rkBotLv()` (meta.js). Mérés: `node tools/botlv.js A B N`.
 - Paklik: megosztás kóddal/linkkel (`deckCode` / `parseDeckCode` / `deckImportModal`, link: `?deck=KÓD`), paklisegéd 🪄 (`deckHelperFill`, a `[DECKHELP-START]` jelölők között – így Node-ból szimulálható).
 - Ranked (meta.js vége): **2026-10-12 óta bekapcsolva (`RANKED_ON = true`)**; jutalmak: `RK_REWARDS`. Rang a `p.rank`-ban, szezon = `curSeason()` (Season Pass) vagy naptári hónap.

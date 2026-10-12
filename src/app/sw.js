@@ -19,6 +19,7 @@ self.addEventListener('fetch', e => {
     return;   // Firebase-hívások: mindig élőben
   }
   if (url.pathname.endsWith('version.json')) return;   // mindig élőben
+  if (url.pathname.endsWith('.mp4')) return;   // videók: a böngésző kezeli (iPhone-on darabokban kéri le, a gyorsítótárból nem indulna el)
   if (/\/(art|vendor|icons)\//.test(url.pathname)) { e.respondWith(cacheFirst(req, ASSETS)); return; }
   e.respondWith(networkFirst(req, PAGES));
 });

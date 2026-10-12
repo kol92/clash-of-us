@@ -97,6 +97,9 @@ h1,h2,h3{font-family:var(--display);font-weight:400;letter-spacing:.01em;text-wr
 .art.has-art{background-size:var(--zoom,cover);}
 .card.foil .art.has-art{background-size:cover;}
 .art.has-art::after{display:none;}
+.art-vid{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .35s;pointer-events:none;}
+.art-vid.on{opacity:1;}
+@media (prefers-reduced-motion:reduce){.art-vid{display:none;}}
 
 .card.t-hero.big .art{height:64%;}
 .av.has-art{background:var(--img) var(--av,50% 15%)/227% auto no-repeat;color:transparent;}
@@ -2129,7 +2132,7 @@ button.rk-row:active{transform:scale(.98);}
 <script src="vendor/firebase-auth-compat.js"></script>
 <script src="vendor/firebase-firestore-compat.js"></script>
 <script src="vendor/firebase-database-compat.js"></script>
-<script>window.APP_VERSION = "2026.10.12-2037"; window.APP_BUILD = "2026.10.12-2037";</script>
+<script>window.APP_VERSION = "2026.10.12-2133"; window.APP_BUILD = "2026.10.12-2133";</script>
 <script>// ===== Best of Us – saját szerver (Firebase) =====
 // A játék eredetileg a Claude-os tárolót használta (window.claude.use('db' | 'user' | 'room')).
 // Ez a fájl ugyanazt a felületet adja Firebase-ből, így a játék kódja szinte változatlan maradhat:
@@ -3439,7 +3442,7 @@ function cardHTML(id, o = {}) {
   const fcls = fk === 'kanon' ? (o.foil ? ' framed xf xf-kanon xf-kanonfa kholo' : ' framed xf xf-kanon') + tlc : fk === 'foil' ? ' foil' : ' framed' + tlc;
   return `<div class="card ${TYPE[c.type][1]}${c.finisher ? ' kanon' : ''}${c.variantOf ? ' variant' : ''}${c.diamond ? ' diamond' : ''}${o.big ? ' big' : ''}${fcls}${o.cls ? ' ' + o.cls : ''}" style="--h:${hueOf(id)}" ${o.big ? `data-rar="${rarKey(c)}"` : ''} ${o.attrs || ''}>
     <div class="cframe">
-      ${ART[id] ? `<div class="art has-art" style="${artStyle(id, o.big)}"></div>`
+      ${ART[id] ? `<div class="art has-art" style="${artStyle(id, o.big)}">${o.big && ART[id].vid ? artVidHTML(id) : ''}</div>`
         : `<div class="art"><span class="mono">${initials(c.name)}</span>${o.big && !o.foil ? '<span class="artnote">Illusztráció helye</span>' : ''}</div>`}
       <div class="ctype">${c.finisher ? '<i class="ic-kanon" aria-hidden="true"></i>Kánon esemény' : TYPE[c.type][0]}${c.drink ? ' · Ital' : ''}<i class="rar r-${rarKey(c)}" title="${RAR[rarKey(c)]}"></i></div>
       ${c.finisher ? `<i class="kanon-hero" title="${HERO[c.hero].name}" style="--h:${HERO[c.hero].hue};${ART[c.hero] ? `background-image:url('${artSrc(c.hero, false)}');background-position:${ART[c.hero].av || '50% 15%'}` : ''}">${ART[c.hero] ? '' : initials(HERO[c.hero].name)}</i>` : ''}
@@ -3524,7 +3527,7 @@ const ART = {
   a_kor: { src:'art/viz.webp?v=a17ce0b241a73985', av:'50% 45%', pos:'50% 40%' },
   a_szulinap: { src:'art/szulinap.webp?v=63830bc272447d6b', av:'50% 40%', pos:'50% 42%' },
   c_bou: { src:'art/bou.webp?v=0d88173a1f2ebc00', av:'52% 42%', pos:'50% 40%' },
-  c_bou_d: { src:'art/bou_d.webp?v=f9b5aa7cf5da8331', av:'52% 42%', pos:'50% 40%' },
+  c_bou_d: { src:'art/bou_d.webp?v=046e996681baafb3', av:'52% 42%', pos:'50% 40%', vid:'art/vid/bou_d.mp4?v=a1954aa7' },   // animált (2026-10-12)
   c_davidsofor: { src:'art/davidsofor.webp?v=02dc86dba9551b19', av:'35% 20%', pos:'35% 20%' },
   c_lacifinale: { src:'art/lacifinale.webp?v=e418a56b8cf48724', av:'48% 16%', pos:'48% 16%' },
   i_ing: { src:'art/ing.webp?v=102023358e87523a', av:'50% 40%', pos:'50% 35%' },
@@ -3594,6 +3597,8 @@ const ART = {
 };
 // kis lapokhoz (kéz, tábla, gyűjtemény) a 360 px-es kép, nagy nézethez a teljes
 const artSrc = (id, big) => big ? ART[id].src : ART[id].src.replace('art/', 'art/sm/');
+// Animált lapkép (2026-10-12): csak a nagy lapnézetben fut; amíg nem indul el (vagy ha nem tud, pl. alacsony fogyasztású mód), az állókép látszik
+const artVidHTML = id => `<video class="art-vid" src="${ART[id].vid}" muted loop autoplay playsinline disablepictureinpicture preload="auto" aria-hidden="true" style="object-position:${ART[id].pos || '50% 18%'}" oncanplay="this.muted=true;this.play().catch(()=>{})" onplaying="this.classList.add('on')"></video>`;
 const artStyle = (id, big = false) => ART[id] ? `--img:url('${artSrc(id, big)}');--av:${ART[id].av || '50% 15%'};--pos:${ART[id].pos || '50% 18%'};${ART[id].zoom ? `--zoom:${ART[id].zoom};` : ''}` : '';
 // Előtöltés: minden kis kép és keret induláskor letöltődik és dekódolódik, a nagyok utána, ráérősen
 const PRELOADED = [];

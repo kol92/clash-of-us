@@ -418,6 +418,13 @@ Hősképesség-ötletek a táblázatban (még nem zöldek, nincsenek beépítve)
 - Ha Gál Zolin rajta van a Fehér szarvas bunda, a támadása után **nem pusztul el** (a bunda +3 életet és Provokációt is ad). Mindkét lap szövegébe bekerült. A bot is tudja (nem értékeli le a bundás Zolit).
 - Kiegészítés (2026-10-12, Tomi): bundában Gál Zoli **Pajzsot is kap** (felrakáskor, „✨ Pajzs!” felirattal; ha már volt pajzsa, nem kap újat). A szövegek frissítve: bunda – „Gál Zoli benne nem pusztul el a támadása után, és Pajzsot is kap.”; Zoli – „… kivéve, ha rajta van a Fehér szarvas bunda (abban Pajzsot is kap).” Teszt: `tools/bunda_test.js`.
 
+## Animált lapok (2026-10-12) – első: a gyémánt Best of Us
+- A gyémánt **Best of Us** lap (c_bou_d) animált grafikát kapott (Tomi videója, 8 mp-es körbefutó csillogás). Az állókép a videó első kockája lett.
+- Hol mozog: a **nagy lapnézetben** (lap kinagyítása, gyűjtemény, packnyitás/szerencsekerék felfedés, kijátszott lap kinagyítása). A táblán és a kis lapokon állókép marad (akkumulátor, iPhone-teljesítmény).
+- Működés: `ART[id].vid` (ui.js) → a `cardHTML` nagy nézetben egy némított, ismétlődő `<video>`-t tesz az állókép fölé, ami csak akkor tűnik elő, amikor ténylegesen elindult. Alacsony fogyasztású módban / ha nem indul el / „csökkentett mozgás” beállításnál az állókép látszik.
+- Fájl: `art/vid/NEV.mp4` – H.264, 600×800, ~1 MB (`ffmpeg … -vf scale=600:800 -c:v libx264 -preset slow -crf 29 -movflags +faststart -an`). A build verziózza (`?v=hash`). A service worker NEM gyorsítótárazza a videókat (iPhone-on úgy nem indulnának), azokat a böngésző a sima HTTP-gyorsítótárból kezeli; nem töltődnek le előre, csak ha valaki megnézi a lapot.
+- Új animált lap: a videót (3:4, 3–8 mp, körbefutó, szöveg nélkül) így kell átkódolni, és az `ART` bejegyzésbe `vid:'art/vid/NEV.mp4'`.
+
 ## Új hátlapok: Ametiszt és Rubin (2026-10-12)
 - **Ametiszt** (lila, `collector`): jár, ha a játékosnak megvan a **Base set összes lapja** (jelenleg 87 – a packok teljes kínálata), legalább 1 példányban; a sima és a Full Art példány is számít, és a lap variánsa is beszámít. A Season Pass-only és bolti lapok nem kellenek hozzá. Ha később új lap jön a Base setbe, a már megszerzett hátlap megmarad.
 - **Rubin** (piros, `champion`): jár, ha a játékos összesen **50 meccset megnyert** (`p.stats.w` – bot, PvP és ranked győzelem is számít).

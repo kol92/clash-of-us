@@ -91,7 +91,7 @@ function cardHTML(id, o = {}) {
   const fcls = fk === 'kanon' ? (o.foil ? ' framed xf xf-kanon xf-kanonfa kholo' : ' framed xf xf-kanon') + tlc : fk === 'foil' ? ' foil' : ' framed' + tlc;
   return `<div class="card ${TYPE[c.type][1]}${c.finisher ? ' kanon' : ''}${c.variantOf ? ' variant' : ''}${c.diamond ? ' diamond' : ''}${o.big ? ' big' : ''}${fcls}${o.cls ? ' ' + o.cls : ''}" style="--h:${hueOf(id)}" ${o.big ? `data-rar="${rarKey(c)}"` : ''} ${o.attrs || ''}>
     <div class="cframe">
-      ${ART[id] ? `<div class="art has-art" style="${artStyle(id, o.big)}"></div>`
+      ${ART[id] ? `<div class="art has-art" style="${artStyle(id, o.big)}">${o.big && ART[id].vid ? artVidHTML(id) : ''}</div>`
         : `<div class="art"><span class="mono">${initials(c.name)}</span>${o.big && !o.foil ? '<span class="artnote">Illusztráció helye</span>' : ''}</div>`}
       <div class="ctype">${c.finisher ? '<i class="ic-kanon" aria-hidden="true"></i>Kánon esemény' : TYPE[c.type][0]}${c.drink ? ' · Ital' : ''}<i class="rar r-${rarKey(c)}" title="${RAR[rarKey(c)]}"></i></div>
       ${c.finisher ? `<i class="kanon-hero" title="${HERO[c.hero].name}" style="--h:${HERO[c.hero].hue};${ART[c.hero] ? `background-image:url('${artSrc(c.hero, false)}');background-position:${ART[c.hero].av || '50% 15%'}` : ''}">${ART[c.hero] ? '' : initials(HERO[c.hero].name)}</i>` : ''}
@@ -176,7 +176,7 @@ const ART = {
   a_kor: { src:'art/viz.webp', av:'50% 45%', pos:'50% 40%' },
   a_szulinap: { src:'art/szulinap.webp', av:'50% 40%', pos:'50% 42%' },
   c_bou: { src:'art/bou.webp', av:'52% 42%', pos:'50% 40%' },
-  c_bou_d: { src:'art/bou_d.webp', av:'52% 42%', pos:'50% 40%' },
+  c_bou_d: { src:'art/bou_d.webp', av:'52% 42%', pos:'50% 40%', vid:'art/vid/bou_d.mp4' },   // animált (2026-10-12)
   c_davidsofor: { src:'art/davidsofor.webp', av:'35% 20%', pos:'35% 20%' },
   c_lacifinale: { src:'art/lacifinale.webp', av:'48% 16%', pos:'48% 16%' },
   i_ing: { src:'art/ing.webp', av:'50% 40%', pos:'50% 35%' },
@@ -246,6 +246,8 @@ const ART = {
 };
 // kis lapokhoz (kéz, tábla, gyűjtemény) a 360 px-es kép, nagy nézethez a teljes
 const artSrc = (id, big) => big ? ART[id].src : ART[id].src.replace('art/', 'art/sm/');
+// Animált lapkép (2026-10-12): csak a nagy lapnézetben fut; amíg nem indul el (vagy ha nem tud, pl. alacsony fogyasztású mód), az állókép látszik
+const artVidHTML = id => `<video class="art-vid" src="${ART[id].vid}" muted loop autoplay playsinline disablepictureinpicture preload="auto" aria-hidden="true" style="object-position:${ART[id].pos || '50% 18%'}" oncanplay="this.muted=true;this.play().catch(()=>{})" onplaying="this.classList.add('on')"></video>`;
 const artStyle = (id, big = false) => ART[id] ? `--img:url('${artSrc(id, big)}');--av:${ART[id].av || '50% 15%'};--pos:${ART[id].pos || '50% 18%'};${ART[id].zoom ? `--zoom:${ART[id].zoom};` : ''}` : '';
 // Előtöltés: minden kis kép és keret induláskor letöltődik és dekódolódik, a nagyok utána, ráérősen
 const PRELOADED = [];
