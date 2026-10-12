@@ -1336,7 +1336,7 @@ function tutCheck() {
     COACH.el.innerHTML = `<small class="coach-n">${S.tut.l ? `${S.tut.l + 1}. lecke` : 'Oktató'} · ${S.tut.step + 1}/${tutLesson().steps.length}</small><p>${st.txt}</p>`
       + (st.kind === 'info' ? `<div><button class="btn primary" data-c="ok">${st.last ? 'Játsszunk!' : 'Tovább'}</button>${S.tut.step === 0 && !S.tut.onboard && !S.tut.l ? '<button class="btn ghost" data-c="skip">Kihagyom</button>' : ''}</div>` : `<div class="coach-do">${st.kind === 'end' ? '👉 Kör vége' : st.kind === 'tap' ? '👉 Koppints a kiemelt elemre' : '👉 Húzd a lapot a kiemelt helyre'}</div>`);
     COACH.el.onclick = e => { const b = e.target.closest('[data-c]'); if (!b) return;
-      if (b.dataset.c === 'skip') { tutHide(); S.tut = null; if (Store.p) { Store.p.tutSkip = true; save(); } renderPick(); show('scr-pick'); return; }
+      if (b.dataset.c === 'skip') { tutHide(); S.tut = null; if (Store.p) { Store.p.tutSkip = true; save(); } openBotPick(); return; }
       tutAdvance(); };
     document.body.append(COACH.ring, COACH.el);
   }
@@ -1381,7 +1381,7 @@ function tutFinish() {
   o.onclick = e => { const b = e.target.closest('[data-r]'); if (!b) return; o.remove();
     const r = b.dataset.r;
     if (r === 'next') startTutorial({ lesson: L + 1 });
-    else if (r === 'play') { renderPick(); show('scr-pick'); }
+    else if (r === 'play') openBotPick();
     else { S = null; renderMenuFan(); renderProfileBar(); show('scr-menu'); if (r === 'list') lessonPicker(); } };
   setTimeout(() => $('#layer').appendChild(o), 700);
 }
@@ -1552,13 +1552,8 @@ function renderPvp() {
   };
   pvpCleanup();
 }
-function pvpPickDeck(title, done) {
-  const ds = allDecks().filter(d => !deckIssue(d));
-  const o = document.createElement('div'); o.className = 'overlay';
-  o.innerHTML = `<div class="modal hero-pick"><h3>${title}</h3><div class="hp-list">${ds.map(d => `<button class="hero-row" data-d="${d.id}">${heroPortrait(d.hero)}<span><b></b><small>${HERO[d.hero].name}</small></span></button>`).join('')}</div><button class="btn ghost" data-x>Mégse</button></div>`;
-  o.querySelectorAll('.hero-row b').forEach((b, i) => b.textContent = ds[i].name);
-  o.onclick = e => { const b = e.target.closest('[data-d]'); if (b) { o.remove(); done(ds.find(d => d.id === b.dataset.d)); return; } if (e.target.closest('[data-x]') || e.target === o) o.remove(); };
-  $('#layer').appendChild(o);
+function pvpPickDeck(title, done, opt = {}) {   // ugyanaz a pakliválasztó képernyő, mint a bot elleni meccsnél
+  openDeckPick({ title: title.replace(/<[^>]*>/g, ''), note: opt.note || 'Válaszd ki, melyik paklival játszol. A hőst a pakli határozza meg.', btn: opt.btn || 'Ezzel játszom', done, ...opt });
 }
 const pvpMe = dk => ({ ver: window.APP_VERSION || '', uid: Store.uid, name: Store.p.name || 'Játékos', hero: dk.hero, deckName: dk.name, list: { ...dk.list },
   cos: { back: myBack(), heroGold: heroSkin(dk.hero) === 'gold', heroFa: heroSkin(dk.hero) === 'fa', port: isPort(heroSkin(dk.hero)) ? heroSkin(dk.hero) : null, foils: Object.keys(dk.list).filter(id => ownsFoil(id)), foilN: myFoils(dk.list) } });   // amit az ellenfél is lát: Full Art hős és lapok
@@ -1813,7 +1808,7 @@ function pvpEmoteMenu() {
 function pvpQuick(dk) {
   PVP.searchDeck = dk; PVP.searchT0 = Date.now();
   const o = document.createElement('div'); o.className = 'overlay pv-search';
-  o.innerHTML = `<div class="modal"><div class="pv-spin">⚔️</div><h3>${PVP.friendTo ? `Várjuk: ${escH(PVP.friendTo.name)}` : PVP.ranked ? '🏆 Ranked ellenfél keresése…' : 'Ellenfél keresése…'}</h3><p class="live" id="pvSearchT">0:00</p><p class="live">${PVP.ranked ? '20 másodpercig élő ellenfelet keresünk – ha nincs senki, egy bot ellen játszol, a rangod úgy is számít.' : PVP.friendTo ? 'Elküldtük neki a kihívást – amint elfogadja, indul a meccs.' : 'Amint valaki más is élő meccset keres, indul a játék. Szólj a haveroknak, hogy nyomják meg ők is az „Élő meccs keresése” gombot!'}</p><button class="btn" data-x>Mégse</button></div>`;
+  o.innerHTML = `<div class="modal"><div class="pv-spin">⚔️</div><h3>${PVP.friendTo ? `Várjuk: ${escH(PVP.friendTo.name)}` : PVP.ranked ? '🏆 Ranked ellenfél keresése…' : 'Ellenfél keresése…'}</h3><p class="live" id="pvSearchT">0:00</p><p class="live">${PVP.ranked ? (PVP.rkBot ? '20 másodpercig élő ellenfelet keresünk – ha nincs senki, egy bot ellen játszol, a rangod úgy is számít.' : 'Élő ellenfelet keresünk – addig várunk, amíg valaki nem jön. Szólj a haveroknak, hogy nyomják meg ők is a Ranked meccset!') : PVP.friendTo ? 'Elküldtük neki a kihívást – amint elfogadja, indul a meccs.' : 'Amint valaki más is élő meccset keres, indul a játék. Szólj a haveroknak, hogy nyomják meg ők is az „Élő meccs keresése” gombot!'}</p><button class="btn" data-x>Mégse</button></div>`;
   o.onclick = e => { if (e.target.closest('[data-x]')) pvpStopSearch(true); };
   $('#layer').appendChild(o);
   pvpSearchTick(); PVP.hb = setInterval(pvpSearchTick, 4000);
@@ -1835,7 +1830,7 @@ async function pvpSearchTick() {
     if (PVP.searchDeck) PVP.hb = setInterval(pvpSearchTick, 4000);
     return;
   }
-  if (PVP.ranked && now - PVP.searchT0 > 20000 && !PVP.friendTo) {   // ranked: 20 mp után bot
+  if (PVP.ranked && PVP.rkBot && now - PVP.searchT0 > 20000 && !PVP.friendTo) {   // ranked: 20 mp után bot
     const dk = PVP.searchDeck; pvpStopSearch(true); rankedBot(dk); return;
   }
   if (!mine && !PVP.creating && !PVP.searching) {
@@ -2358,7 +2353,7 @@ function renderRanked() {
       ${r.t >= RK_LEG ? `<div class="rk-lp">${r.lp} Legenda-pont</div>` : rkStars(r.t, r.st)}
       <small class="rk-sea">${escH(se.name)} · még ${days} nap · ${r.w} győzelem, ${r.l} vereség${r.streak >= 2 ? ` · 🔥 ${r.streak} győzelem sorozat` : ''}</small></div>
     <button class="rk-playimg" id="rkPlay" aria-label="Ranked meccs"></button>
-    <p class="q-note rk-how">Élő ellenfelet keresünk; ha 20 mp alatt nincs senki, egy bot ellen játszol – a rangod mindkét esetben számít.</p>
+    <p class="q-note rk-how">${Store.p.rkBot !== false ? 'Élő ellenfelet keresünk; ha 20 mp alatt nincs senki, egy bot ellen játszol – a rangod mindkét esetben számít.' : 'Csak élő ellenfél ellen játszol: addig vársz, amíg valaki nem jön.'} (A pakliválasztásnál állíthatod.)</p>
     <div class="lbl">Szezon végi jutalmak (minden elért lépcső jár)</div>
     <div class="rk-rews">${RK_REWARDS.map(x => `<div class="rk-rew${r.best >= x.min ? ' got' : ''}">${rkEmblem(x.min, 'xs')}<span><b>${x.name}</b><small>${rkRewText(x.rew)}</small></span>${r.best >= x.min ? '<em>elérve</em>' : ''}</div>`).join('')}</div>
     <div class="lbl">Barátok ranglistája</div>
@@ -2372,12 +2367,12 @@ function renderRanked() {
       <li>Aranyban minden vereség −1 csillag, és 0 csillagnál visszaesel egy fokozatot.</li>
       <li>Legendában Legenda-pontokat gyűjtesz, onnan már nem esel vissza.</li>
       <li>A szezon a Season Passsal együtt ér véget: akkor jár minden elért lépcső jutalma (Bronz 4, Ezüst 5, Arany 5, Legenda), és mindenki Bronz 5-ről kezd.</li></ul></details>`;
-  $('#rkPlay').onclick = () => pvpPickDeck('Melyik paklival mész rankedbe?', dk => rankedSearch(dk));
+  $('#rkPlay').onclick = () => pvpPickDeck('Ranked pakli', dk => rankedSearch(dk), { ranked: true, btn: '🏆 Ranked meccs indítása', note: 'Válaszd ki, melyik paklival mész rankedbe.' });
 }
 // ranked keresés: élő ellenfél (20 mp), különben bot
 function rankedSearch(dk) {
   if (!RANKED_ON) return toast('A ranked szezon még nem indult el');
-  if (window.APP_MODE && Store.db && Store.uid) { PVP.ranked = true; PVP.friendTo = null; pvpQuick(dk); }
+  if (window.APP_MODE && Store.db && Store.uid) { PVP.ranked = true; PVP.rkBot = Store.p?.rkBot !== false; PVP.friendTo = null; pvpQuick(dk); }
   else rankedBot(dk);
 }
 function rankedBot(dk) {

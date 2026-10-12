@@ -309,11 +309,26 @@ function renderMenuFan() {
 renderMenuFan();
 $('#goPlay').onclick = () => { if (!Store.p) return showCreate(); const P = Store.p;
   if (!P.tutDone && !P.tutSkip && P.stats.w + P.stats.l + P.stats.d === 0) return startTutorial();   // első játék: vezetett oktató meccs
-  renderPick(); show('scr-pick'); };
+  openBotPick(); };
 $('#goColl').onclick = () => { renderColl(); show('scr-coll'); };
 $('#goRules').onclick = () => show('scr-rules');
 
+// Egységes pakliválasztó (2026-10-12, Laci kérése): a bot elleni meccs, a PvP és a ranked is ugyanezt a képernyőt használja.
+// ui.pick = null → bot elleni meccs; különben { title, note, btn, done(pakli), back: képernyő-id, ranked }
+function openBotPick() { ui.pick = null; renderPick(); show('scr-pick'); }
+function openDeckPick(opt) {
+  const cur = document.querySelector('.screen:not([hidden])');
+  ui.pick = { back: cur ? cur.id : 'scr-menu', ...opt };
+  renderPick(); show('scr-pick');
+}
 function renderPick() {
+  const P = ui.pick, sc = $('#scr-pick');
+  sc.querySelector('.top h2').textContent = P?.title || 'Válassz paklit';
+  sc.querySelector('.pick-note').textContent = P?.note || 'A hőst a pakli határozza meg. Saját paklit és hőst a Paklik menüben állíthatsz össze.';
+  $('#startBtn').textContent = P?.btn || 'Meccs indítása';
+  const rb = $('#rkBotRow');
+  if (rb) { rb.hidden = !P?.ranked; if (P?.ranked) { const on = Store.p?.rkBot !== false; rb.querySelector('input').checked = on;
+    rb.querySelector('small').textContent = on ? 'Ha 20 mp alatt nincs élő ellenfél, bot ellen játszol (a rangod így is számít).' : 'Addig vársz, amíg egy élő ellenfél nem jön – bármeddig.'; } }
   const ds = allDecks();
   if (!ds.some(d => d.id === ui.deck && !deckIssue(d))) ui.deck = 'roham';
   ui.deckOpen = ui.deckOpen || null;
@@ -325,7 +340,11 @@ function renderPick() {
   $('#deckPick').querySelectorAll('.deck-opt b').forEach((b, i) => b.textContent = ds[i].name);
 }
 $('#deckPick').onclick = e => { const m = e.target.closest('[data-more]'); if (m) { ui.deckOpen = ui.deckOpen === m.dataset.more ? null : m.dataset.more; renderPick(); return; } const b = e.target.closest('[data-d]'); if (b) { ui.deck = b.dataset.d; renderPick(); } };
-$('#startBtn').onclick = () => { const d = allDecks().find(x => x.id === ui.deck); if (!d || deckIssue(d)) return; startMatch(d.hero, ui.deck); };
+$('#startBtn').onclick = () => { const d = allDecks().find(x => x.id === ui.deck); if (!d || deckIssue(d)) return;
+  if (ui.pick?.done) { const P = ui.pick; ui.pick = null; show(P.back || 'scr-menu'); if (P.back === 'scr-ranked') renderRanked(); P.done(d); return; }
+  startMatch(d.hero, ui.deck); };
+$('#scr-pick [data-back]').onclick = () => { const P = ui.pick; ui.pick = null; if (P?.back && P.back !== 'scr-game') { show(P.back); if (P.back === 'scr-ranked') renderRanked(); } else { renderMenuFan(); renderProfileBar(); show('scr-menu'); } };
+$('#rkBotRow input').onchange = e => { if (Store.p) { Store.p.rkBot = e.target.checked; save(); } renderPick(); };
 
 // ---- gyűjtemény-szűrő (Astra UI): név, típus, ritkaság, költség, megvan/hiányzik ----
 const CF = { q: '', type: new Set(), rar: new Set(), cost: new Set(), own: '' };
@@ -1482,7 +1501,7 @@ function endMatch() {
   const wasRanked = !!S.ranked;
   o.onclick = e => { const b = e.target.closest('[data-r]'); if (!b) return; o.remove();
     if (b.dataset.r === 'again' && wasRanked) { const d = allDecks().find(x => x.id === ui.deck); if (d && !deckIssue(d)) rankedSearch(d); else { renderRanked(); show('scr-ranked'); } return; }
-    if (b.dataset.r === 'again') { const d = allDecks().find(x => x.id === ui.deck); if (d && !deckIssue(d)) startMatch(d.hero, ui.deck); else { renderPick(); show('scr-pick'); } } else { renderMenuFan(); renderProfileBar(); show('scr-menu'); } };
+    if (b.dataset.r === 'again') { const d = allDecks().find(x => x.id === ui.deck); if (d && !deckIssue(d)) startMatch(d.hero, ui.deck); else openBotPick(); } else { renderMenuFan(); renderProfileBar(); show('scr-menu'); } };
   setTimeout(() => $('#layer').appendChild(o), 700);
 }
 window.addEventListener('resize', () => { if (S && !$('#scr-game').hidden) render(); });
