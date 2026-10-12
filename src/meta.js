@@ -317,7 +317,7 @@ function renderProfileBar() {
   const ss = $('#saveState'); if (ss) ss.textContent = window.APP_MODE ? '👤 Fiók' : Store.mode === 'cloud' ? '☁️ Felhőben mentve' : '📱 Ezen az eszközön mentve';
   el.querySelector('.pb-name').textContent = p.name;
   try { applyBack(); } catch (e) {}
-  renderQuestBadge(); renderPassBadge(); try { renderRankTile(); } catch (e) {} try { if (!$('#scr-menu').hidden) { dayGiftCheck(); deckLinkCheck(); } } catch (e) {}
+  renderQuestBadge(); renderPassBadge(); try { renderRankTile(); } catch (e) {} try { if (!$('#scr-menu').hidden) { dayGiftCheck(); backAwardCheck(); deckLinkCheck(); } } catch (e) {}
   const wb = $('#wheelBadge'); if (wb) wb.hidden = !wheelReady();
   const badge = $('#shopBadge'); if (badge) badge.hidden = !freePackReady() && !(p.giftPacks > 0) && !(p.faPacks > 0) && !(p.shinyPacks > 0);
 }
@@ -2463,7 +2463,34 @@ function rkResultHTML(x) {
 const BACKS = {
   base:   { name: 'Klasszikus', src: 'art/back.webp', sm: 'art/sm/back.webp', how: 'Alap hátlap' },
   legend: { name: 'Legenda', src: 'art/back_legend.webp', sm: 'art/sm/back_legend.webp', how: 'Ranked jutalom: érj el Legendát egy szezonban' },
+  // 2026-10-12: gyűjtő- és győzelmi hátlap (automatikusan jár, ha teljesül)
+  collector: { name: 'Ametiszt', src: 'art/back_collector.webp', sm: 'art/sm/back_collector.webp', how: 'Gyűjtsd össze a Base set összes lapját (sima is elég)',
+    prog: p => { const [a, b] = backCollProg(p); return `${a}/${b} lap megvan`; }, earned: p => { const [a, b] = backCollProg(p); return a >= b; } },
+  champion: { name: 'Rubin', src: 'art/back_champion.webp', sm: 'art/sm/back_champion.webp', how: 'Nyerj meg 50 meccset',
+    prog: p => `${Math.min(50, p.stats?.w || 0)}/50 győzelem`, earned: p => (p.stats?.w || 0) >= 50 },
 };
+// a Base set minden lapjából legalább 1 (sima vagy Full Art; a lap variánsa is számít)
+function backCollProg(p) {
+  const fam = id => [id, ...CARDS.filter(c => c.variantOf === id).map(c => c.id)];
+  const has = id => fam(id).some(x => { const e = p.coll?.[x]; return e && (e.n || 0) + (e.f || 0) > 0; });
+  const all = SETS.base.cards; return [all.filter(has).length, all.length];
+}
+// ha teljesült egy hátlap feltétele, megkapja, és a menüben felugrik
+function backAwardCheck() {
+  const p = Store.p; if (!p || p.onboard || (typeof S !== 'undefined' && S) || $('#layer .overlay')) return;
+  const k = Object.keys(BACKS).find(k => BACKS[k].earned && !ownsBack(k) && BACKS[k].earned(p)); if (!k) return;
+  p.backs = [...(p.backs || []), k]; save();
+  const b = BACKS[k], o = document.createElement('div'); o.className = 'overlay';
+  o.innerHTML = `<div class="modal acct-box bk-new"><h3>🎉 Új hátlap: ${b.name}!</h3><div class="bk-new-art" style="background-image:url('${b.src}')"></div>
+    <p class="live">${k === 'collector' ? 'Összegyűjtötted a Base set összes lapját – ez a hátlap a gyűjtők jutalma.' : 'Megnyertél 50 meccset – ez a hátlap a bajnokoké.'} Bármikor válthatsz a Gyűjteményben a 🃏 Hátlap gombbal.</p>
+    <button class="btn primary" data-use>Ezt használom</button><button class="btn ghost" data-x>Maradok a mostaninál</button></div>`;
+  o.onclick = e => {
+    if (e.target.closest('[data-use]')) { p.cardBack = k; applyBack(); save(); toast(`${b.name} hátlap beállítva`); }
+    else if (!e.target.closest('[data-x]')) return;
+    o.remove(); setTimeout(() => { try { backAwardCheck(); deckLinkCheck(); } catch (er) {} }, 200);
+  };
+  $('#layer').appendChild(o);
+}
 const ownsBack = k => k === 'base' || (Store.p?.backs || []).includes(k);
 const myBack = () => { const k = Store.p?.cardBack; return k && BACKS[k] && ownsBack(k) ? k : 'base'; };
 const backVars = k => { const b = BACKS[k] || BACKS.base; return `--bk:url('${b.src}');--bk-sm:url('${b.sm}')`; };
@@ -2472,7 +2499,7 @@ function backPicker() {
   const p = Store.p; if (!p) return;
   const o = document.createElement('div'); o.className = 'overlay';
   const draw = () => { o.innerHTML = `<div class="modal acct-box"><h3>🃏 Hátlap</h3><p class="live">Ez látszik a lapjaid hátoldalán: a paklidon, húzáskor, és a rejtett lapjaidon (PvP-ben az ellenfeled is ezt látja).</p>
-    <div class="bk-list">${Object.entries(BACKS).map(([k, b]) => `<button class="bk-opt${myBack() === k ? ' on' : ''}${ownsBack(k) ? '' : ' lock'}" data-bk="${k}"><i style="background-image:url('${b.sm}')"></i><b>${b.name}${ownsBack(k) ? '' : ' 🔒'}</b><small>${myBack() === k ? 'Használatban' : ownsBack(k) ? 'Koppints a választáshoz' : b.how}</small></button>`).join('')}</div>
+    <div class="bk-list">${Object.entries(BACKS).map(([k, b]) => `<button class="bk-opt${myBack() === k ? ' on' : ''}${ownsBack(k) ? '' : ' lock'}" data-bk="${k}"><i style="background-image:url('${b.sm}')"></i><b>${b.name}${ownsBack(k) ? '' : ' 🔒'}</b><small>${myBack() === k ? 'Használatban' : ownsBack(k) ? 'Koppints a választáshoz' : b.how + (b.prog ? ` · ${b.prog(p)}` : '')}</small></button>`).join('')}</div>
     <button class="btn primary" data-x>Kész</button></div>`; };
   draw();
   o.onclick = e => { if (e.target.closest('[data-x]') || e.target === o) return o.remove();
@@ -2496,7 +2523,7 @@ function dayGiftCheck() {
   const o = document.createElement('div'); o.className = 'overlay';
   o.innerHTML = `<div class="modal sp-reveal"><h3>🎉 Boldog Best of Us TCG napot!</h3>${heroCardHTML(h, { big: true, port: k })}
     <p class="live">Ma indul a játék – ezért ajándékba kapod <b>${P.name}</b> portrét: ${h.name} új kinézete, mindig Full Artban. Rögtön ezt viseli – a Gyűjteményben a hősre koppintva visszaválthatsz.</p><button class="btn primary" data-x>Köszi!</button></div>`;
-  o.onclick = e => { if (e.target.closest('[data-x]')) { o.remove(); setTimeout(() => { try { deckLinkCheck(); } catch (er) {} }, 200); } };
+  o.onclick = e => { if (e.target.closest('[data-x]')) { o.remove(); setTimeout(() => { try { backAwardCheck(); deckLinkCheck(); } catch (er) {} }, 200); } };
   $('#layer').appendChild(o);
 }
 function renderRankTile() {
