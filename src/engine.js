@@ -900,10 +900,20 @@ function botView(s) {
   foe.board.forEach((u, i) => { if (u && u.hidden) foe.board[i] = { ...u, id:'c_pifti', atk:2, hp:2, maxHp:2, shield:false, haste:false }; });
   return v;
 }
-function botChoose(real) {
-  const s = botView(real);
-  const me = s.active, p = s.players[me];
-  let best = null, bestSc = scoreAfterCombat(s, me) + 0.05;
+// Bot-szintek (2026-10-12): 1 = Könnyű (zajos döntések, néha korábban befejezi a kört), 2 = Normál (a régi bot), 3 = Nehéz (két lapra előre gondolkodik)
+const BOT_LV = { 1: { noise: 2.5, stop: 0.12 }, 2: {}, 3: { look: 6, deep: 0.5 } };
+const gauss = () => { let u = 0, v = 0; while (!u) u = Math.random(); while (!v) v = Math.random(); return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v); };
+// Nehéz bot: az ellenfél válaszcsapását is számolja (a köre végén a mostani lapjaival visszaüt – lapkijátszás nélkül)
+function scoreDeep(s, me, d) {
+  const c = clone(s); c.events = [];
+  for (let i = 0; i < LANES; i++) attackLane(c, i);
+  const a = evalState(c, me); if (!d || c.winner != null) return a;
+  try { finishTurn(c); if (c.winner == null && c.active !== me) for (let i = 0; i < LANES; i++) attackLane(c, i); } catch (e) { return a; }
+  return (1 - d) * a + d * Math.max(-1e5, Math.min(1e5, evalState(c, me)));
+}
+function botMoves(s, me, d = 0) {   // minden kijátszható lap × célpont, a lépés utáni (harccal együtt számolt) pontszámmal
+  const p = s.players[me], out = [];
+  const scoreAfterCombat = (x, m) => scoreDeep(x, m, d);
   p.hand.forEach((h, hi) => {
     if (!canPlay(s, me, hi)) return;
     if (CARD[h.id].type === 'loc' && locIs(s, 'l_munkahely') && s.location.owner === me) return;   // a saját Munkahelyét nem cseréli le
@@ -922,10 +932,36 @@ function botChoose(real) {
         P2.hand.forEach((h2, h2i) => { if (h2.id === 'a_kor' || !canPlay(c, me, h2i) || (!tight && cardCost(c, me, h2.id) <= p.energy)) return;
           for (const t2 of targetsFor(c, me, h2.id)) { const c2 = clone(c); c2.events = []; playCard(c2, me, h2i, t2); sc = Math.max(sc, scoreAfterCombat(c2, me) + 0.1); } });
       }
-      if (sc > bestSc) { bestSc = sc; best = { hi, t }; }
+      out.push({ hi, t, sc, c });
     }
   });
-  return best;
+  return out;
+}
+function botChoose(real, lvl = 2) {
+  const s = botView(real), me = s.active, L = BOT_LV[lvl] || BOT_LV[2];
+  const pass = scoreDeep(s, me, L.deep || 0) + 0.05;
+  const mv = botMoves(s, me, L.deep || 0);
+  if (!mv.length) return null;
+  if (L.noise) {   // Könnyű: néha idő előtt befejezi a kört, és „elnézi” a lépéseket
+    if (Math.random() < L.stop) return null;
+    let best = null, bs = pass + gauss() * L.noise;
+    for (const m of mv) { if (m.sc >= 1e5) return { hi: m.hi, t: m.t };   // a nyerő lépést azért nem hagyja ki
+      const x = m.sc + gauss() * L.noise; if (x > bs) { bs = x; best = m; } }
+    return best && { hi: best.hi, t: best.t };
+  }
+  if (L.look) {   // Nehéz: a legjobb néhány lépésnél azt is megnézi, mit tud utána még kijátszani ugyanebben a körben
+    mv.sort((a, b) => b.sc - a.sc);
+    let best = null, bs = pass;
+    for (const m of mv.slice(0, L.look)) {
+      let v = m.sc;
+      if (v < 1e5 && m.c.winner == null) for (const m2 of botMoves(m.c, me, L.deep || 0)) v = Math.max(v, m2.sc - 0.02);
+      if (v > bs) { bs = v; best = m; }
+    }
+    return best && { hi: best.hi, t: best.t };
+  }
+  let best = null, bs = pass;
+  for (const m of mv) if (m.sc > bs) { bs = m.sc; best = m; }
+  return best && { hi: best.hi, t: best.t };
 }
 
-if (typeof module !== 'undefined') module.exports = { baszoStrike, sharkSwim, atiFlee, openSlots, closedLane, CARDS_ALL: CARDS, DECK_OF, LANES, MAX_HALF, mulligan, botMulligan, beginGame, CARDS, CARD, HEROES, HERO, DECKS, newGame, playCard, canPlay, targetsFor, cardCost, attackLane, finishTurn, runEndTurn, botChoose, canAttack, effAtk };
+if (typeof module !== 'undefined') module.exports = { BOT_LV, baszoStrike, sharkSwim, atiFlee, openSlots, closedLane, CARDS_ALL: CARDS, DECK_OF, LANES, MAX_HALF, mulligan, botMulligan, beginGame, CARDS, CARD, HEROES, HERO, DECKS, newGame, playCard, canPlay, targetsFor, cardCost, attackLane, finishTurn, runEndTurn, botChoose, canAttack, effAtk };

@@ -2531,7 +2531,7 @@ function renderRanked() {
       ${r.t >= RK_LEG ? `<div class="rk-lp">${r.lp} Legenda-pont</div>` : rkStars(r.t, r.st)}
       <small class="rk-sea">${escH(se.name)} · még ${days} nap · ${r.w} győzelem, ${r.l} vereség${r.streak >= 2 ? ` · 🔥 ${r.streak} győzelem sorozat` : ''}</small></div>
     <button class="rk-playimg" id="rkPlay" aria-label="Ranked meccs"></button>
-    <p class="q-note rk-how">${Store.p.rkBot !== false ? 'Élő ellenfelet keresünk; ha 20 mp alatt nincs senki, egy bot ellen játszol – a rangod mindkét esetben számít.' : 'Csak élő ellenfél ellen játszol: addig vársz, amíg valaki nem jön.'} (A pakliválasztásnál állíthatod.)</p>
+    <p class="q-note rk-how">${Store.p.rkBot !== false ? `Élő ellenfelet keresünk; ha 20 mp alatt nincs senki, egy bot ellen játszol – a rangod mindkét esetben számít. A bot a ranggal erősödik (most: ${BOT_LV_NAME[rkBotLv()]}).` : 'Csak élő ellenfél ellen játszol: addig vársz, amíg valaki nem jön.'} (A pakliválasztásnál állíthatod.)</p>
     <div class="lbl">Szezon végi jutalmak (minden elért lépcső jár)</div>
     <div class="rk-rews">${RK_REWARDS.map(x => `<div class="rk-rew${r.best >= x.min ? ' got' : ''}">${rkEmblem(x.min, 'xs')}<span><b>${x.name}</b><small>${rkRewText(x.rew)}</small></span>${r.best >= x.min ? '<em>elérve</em>' : ''}</div>`).join('')}</div>
     <div class="lbl">Barátok ranglistája</div>
@@ -2553,6 +2553,10 @@ function rankedSearch(dk) {
   if (window.APP_MODE && Store.db && Store.uid) { PVP.ranked = true; PVP.rkBot = Store.p?.rkBot !== false; PVP.friendTo = null; pvpQuick(dk); }
   else rankedBot(dk);
 }
+// bot-szint (2026-10-12): a bot elleni meccsben választható; az új játékosnak (első 5 meccs) Könnyű az alap.
+// Rankedben a rang dönt: Bronz 5–3 Könnyű, Bronz 2 – Ezüst 1 Normál, Arany és Legenda Nehéz.
+function botLvPref() { const p = Store.p; if (!p) return 2; if (p.botLv) return p.botLv; const g = (p.stats?.w || 0) + (p.stats?.l || 0) + (p.stats?.d || 0); return g < 5 ? 1 : 2; }
+function rkBotLv() { const r = ensureRank(Store.p); const t = r ? r.t : 0; return t <= 2 ? 1 : t < 10 ? 2 : 3; }
 function rankedBot(dk) {
   ui.deck = dk.id;
   startMatch(dk.hero, dk.id, { ranked: true });

@@ -418,6 +418,19 @@ Hősképesség-ötletek a táblázatban (még nem zöldek, nincsenek beépítve)
 - Ha Gál Zolin rajta van a Fehér szarvas bunda, a támadása után **nem pusztul el** (a bunda +3 életet és Provokációt is ad). Mindkét lap szövegébe bekerült. A bot is tudja (nem értékeli le a bundás Zolit).
 - Kiegészítés (2026-10-12, Tomi): bundában Gál Zoli **Pajzsot is kap** (felrakáskor, „✨ Pajzs!” felirattal; ha már volt pajzsa, nem kap újat). A szövegek frissítve: bunda – „Gál Zoli benne nem pusztul el a támadása után, és Pajzsot is kap.”; Zoli – „… kivéve, ha rajta van a Fehér szarvas bunda (abban Pajzsot is kap).” Teszt: `tools/bunda_test.js`.
 
+## Bot-szintek (2026-10-12)
+- Három szint (`BOT_LV` és `botChoose(s, lvl)` az engine.js-ben):
+  - **😊 Könnyű (1):** zajos döntések (a lépések pontszámához ±2,5 HP-nyi véletlen zaj), és minden lépés előtt 12% eséllyel idő előtt befejezi a kört. A nyerő lépést nem hagyja ki.
+  - **Normál (2):** a régi bot, változatlan (mindig a pillanatnyilag legjobb lap + harc utáni állást választja).
+  - **😈 Nehéz (3):** a legjobb 6 lépésénél azt is megnézi, mit tud utána még kijátszani ugyanabban a körben, és az értékelésbe 50%-ban beszámítja az ellenfél visszacsapását is (az ellenfél a köre végén a mostani lapjaival üt).
+- Mérés (`node tools/botlv.js A B N`, véletlen hős-párok, kezdőpaklik): Könnyű a Normál ellen 20,3%, Normál–Normál 52,3%, Nehéz a Normál ellen ~65% (400 meccs). A Nehéz bot gyors: ~90 ms egy teljes meccs Node-ban.
+- Bot elleni meccs: a pakliválasztó alján **🤖 Bot erőssége** választó (Könnyű / Normál / Nehéz), a választás megmarad (`p.botLv`). Amíg nem választ, az első 5 meccsén Könnyű, utána Normál az alap (`botLvPref`).
+- Ranked bot: a rang dönt (`rkBotLv`) – Bronz 5–3: Könnyű, Bronz 2 – Ezüst 1: Normál, Arany és Legenda: Nehéz. A ranked képernyő kiírja, épp milyen botot kapsz.
+- A VS képernyőn: „Bot · Könnyű/Normál/Nehéz”. A jutalmak (coin, küldetés) szinttől függetlenek.
+
+## Bence, a kerítésmászó – új grafika (2026-10-12)
+- Tomi kérésére lecserélve a hős-portré képe („DANGER FOR BENCE” táblás kerítés). A lap neve, a kiosztás (Best of Us TCG nap ajándéka) nem változott.
+
 ## Paklik megosztása (2026-10-12)
 - A pakliszerkesztőben **📤 Megosztás** gomb (kezdőpaklinál is): szöveg + link (`https://bestofus.pages.dev/?deck=KÓD`), a telefon megosztó menüjével (Messenger stb.) vagy **Kód másolása** gombbal.
 - Kód: `BOU-P1.<base64url(hős|név|lap*db,…)>.<7 karakteres ellenőrző összeg>` – a kód utáni / előtti szöveg nem zavar, az egész üzenet bemásolható.

@@ -124,7 +124,7 @@ const ART = {
   p_milo_busz:    { src:'art/p_milo_busz.webp', av:'34% 22%', pos:'40% 22%', port:'34% 20%' },
   p_krisz_vip:    { src:'art/p_krisz_vip.webp', av:'42% 20%', pos:'44% 20%', port:'42% 18%' },
   p_laci_kave:    { src:'art/p_laci_kave.webp', av:'60% 28%', pos:'60% 26%', port:'60% 24%' },
-  p_bence_kerites:{ src:'art/p_bence_kerites.webp', av:'52% 24%', pos:'52% 24%', port:'52% 22%' },
+  p_bence_kerites:{ src:'art/p_bence_kerites.webp', av:'52% 21%', pos:'52% 22%', port:'52% 20%' },
   c_nyitinap:     { src:'art/nyitinap.webp', av:'72% 34%', pos:'66% 36%' },
   g_barna: { src:'art/g_barna.webp', av:'64% 20%', pos:'62% 20%', port:'64% 16%' },
   g_laci:  { src:'art/g_laci.webp',  av:'46% 20%', pos:'46% 20%', port:'46% 16%' },
@@ -326,6 +326,8 @@ function renderPick() {
   sc.querySelector('.top h2').textContent = P?.title || 'Válassz paklit';
   sc.querySelector('.pick-note').textContent = P?.note || 'A hőst a pakli határozza meg. Saját paklit és hőst a Paklik menüben állíthatsz össze.';
   $('#startBtn').textContent = P?.btn || 'Meccs indítása';
+  const lr = $('#botLvRow');
+  if (lr) { lr.hidden = !!P; if (!P) { const lv = botLvPref(); lr.querySelectorAll('[data-lv]').forEach(b => b.setAttribute('aria-pressed', String(+b.dataset.lv === lv))); lr.querySelector('small').textContent = BOT_LV_TIP[lv]; } }
   const rb = $('#rkBotRow');
   if (rb) { rb.hidden = !P?.ranked; if (P?.ranked) { const on = Store.p?.rkBot !== false; rb.querySelector('input').checked = on;
     rb.querySelector('small').textContent = on ? 'Ha 20 mp alatt nincs élő ellenfél, bot ellen játszol (a rangod így is számít).' : 'Addig vársz, amíg egy élő ellenfél nem jön – bármeddig.'; } }
@@ -344,6 +346,7 @@ $('#startBtn').onclick = () => { const d = allDecks().find(x => x.id === ui.deck
   if (ui.pick?.done) { const P = ui.pick; ui.pick = null; show(P.back || 'scr-menu'); if (P.back === 'scr-ranked') renderRanked(); P.done(d); return; }
   startMatch(d.hero, ui.deck); };
 $('#scr-pick [data-back]').onclick = () => { const P = ui.pick; ui.pick = null; if (P?.back && P.back !== 'scr-game') { show(P.back); if (P.back === 'scr-ranked') renderRanked(); } else { renderMenuFan(); renderProfileBar(); show('scr-menu'); } };
+$('#botLvRow').onclick = e => { const b = e.target.closest('[data-lv]'); if (!b || !Store.p) return; Store.p.botLv = +b.dataset.lv; save(); renderPick(); };
 $('#rkBotRow input').onchange = e => { if (Store.p) { Store.p.rkBot = e.target.checked; save(); } renderPick(); };
 
 // ---- gyűjtemény-szűrő (Astra UI): név, típus, ritkaság, költség, megvan/hiányzik ----
@@ -1296,7 +1299,7 @@ async function botTurn() {
   busy = true; render(); turnBanner(false); await sleep(1000);
   let ch;
   const plan = S.tut ? tutBotPlan() : null;   // oktató: fix ellenfél-lépések
-  const nextMove = () => { if (!plan) return botChoose(S); const m = plan.shift(); if (!m) return null;
+  const nextMove = () => { if (!plan) return botChoose(S, S.botLv || 2); const m = plan.shift(); if (!m) return null;
     const hi = S.players[BOT].hand.findIndex(c => c.id === m[0]); return hi < 0 ? null : { hi, t: { ...m[1], side: BOT } }; };
   while (S.winner == null && (ch = nextMove())) {
     await showPlayed(S.players[BOT].hand[ch.hi].id, ch.t, !!S.players[BOT].hand[ch.hi].foil);
@@ -1383,6 +1386,8 @@ async function amongUsFx(el, anchor) {
   if (anchor) floatAt(anchor, '🌶️ Megszívta!', 'dmg');
   await sleep(350);
 }
+const BOT_LV_NAME = { 1: 'Könnyű', 2: 'Normál', 3: 'Nehéz' };
+const BOT_LV_TIP = { 1: 'Laza bot: néha elnézi a lépéseit. Jó kezdésnek és tanulásnak.', 2: 'Rendes ellenfél: mindig a pillanatnyilag legjobb lépést keresi.', 3: 'Kemény bot: előre tervez, és számol a visszavágásoddal is.' };
 function vsIntro() {
   return new Promise(done => {
     const side = pi => {
@@ -1391,7 +1396,7 @@ function vsIntro() {
       const pos = ART[aid]?.port || ART[aid]?.pos || ART[aid]?.av || '50% 15%';
       return `<div class="vs-side ${pi === ME ? 'me' : 'foe'}${gold ? ' gold' : ''}${port || gold || heroFaOf(pi) ? ' fa' : ''}" style="--h:${h.hue}">
         <div class="vs-art" style="${ART[aid] ? `background-image:url('${artSrc(aid, false)}');` : ''}background-position:${pos}"></div>
-        <div class="vs-plate"><small>${pi === ME ? `Te · ${escH(who)}` : S.pvp ? `Ellenfél · ${escH(who)}` : 'Bot'}</small><b>${escH(h.name)}</b></div></div>`;
+        <div class="vs-plate"><small>${pi === ME ? `Te · ${escH(who)}` : S.pvp ? `Ellenfél · ${escH(who)}` : `Bot · ${BOT_LV_NAME[S.botLv || 2]}`}</small><b>${escH(h.name)}</b></div></div>`;
     };
     const firstTxt = S.active === ME ? 'Te kezdesz' : `${S.pvp ? escH(S.names?.[BOT] || 'Az ellenfél') : 'Az ellenfél'} kezd`;
     const o = document.createElement('div'); o.className = 'overlay vs-screen';
@@ -1409,6 +1414,7 @@ function startMatch(heroId, deckId, opt = {}) {
   const first = Math.random() < .5 ? ME : BOT;
   const mine = (allDecks().find(d => d.id === deckId) || allDecks()[0]).list;
   S = newGame(heroId, { ...mine }, bh, bd, first, { mulligan: true, foils: [0, 1].map(k => k === ME ? myFoils(mine) : {}) }); S.events = [];
+  S.botLv = opt.ranked ? rkBotLv() : (opt.lv || botLvPref());   // bot-szint: rankedben a rangtól függ
   if (opt.ranked) { S.ranked = true; const r = ensureRank(Store.p); if (r) { r.pend = Date.now(); save(); } }   // ha bezárja az appot, vereségnek számít
   ui.sel = null; busy = true; ui.handSeen = null; ui.botHandN = null; ui.flying = new Set(); show('scr-game');
   $('#layer').innerHTML = '';

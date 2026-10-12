@@ -1506,6 +1506,12 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%;}
 .bk-opt.on{border-color:var(--gold);box-shadow:0 0 14px rgba(255,200,80,.45);}
 .bk-opt.lock{opacity:.55;filter:grayscale(.8);cursor:default;}
 .bk-btn{margin:0 0 8px;}
+.bot-lv{display:grid;gap:6px;margin:0 0 10px;padding:10px 12px;border-radius:12px;background:rgba(10,20,30,.85);border:1px solid rgba(255,255,255,.14);}
+.bot-lv[hidden]{display:none;}
+.bot-lv .bl-lbl{font-size:12px;font-weight:900;letter-spacing:.06em;text-transform:uppercase;color:var(--gold);}
+.bot-lv .seg{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));width:100%;box-sizing:border-box;}
+.bot-lv .seg button{padding:8px 4px;}
+.bot-lv small{font-size:12px;color:var(--mute);font-weight:700;line-height:1.35;}
 .rk-botrow{display:flex;align-items:center;gap:12px;margin:0 0 10px;padding:10px 14px;border-radius:12px;background:rgba(10,20,30,.85);border:1px solid rgba(255,255,255,.14);cursor:pointer;}
 .rk-botrow input{width:22px;height:22px;accent-color:#f2c14e;flex:none;}
 .rk-botrow span{display:grid;gap:2px;}.rk-botrow small{font-size:12px;color:var(--mute);}
@@ -1956,7 +1962,7 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%;}
     <div class="top"><button class="back" data-back aria-label="Vissza">‹</button><h2>Válassz paklit</h2></div>
     <p class="pick-note">A hőst a pakli határozza meg. Saját paklit és hőst a Paklik menüben állíthatsz össze.</p>
     <div class="deck-pick" id="deckPick"></div>
-    <div class="pick-go"><label class="rk-botrow" id="rkBotRow" hidden><input type="checkbox" checked><span><b>🤖 Bot ellen is mehet</b><small></small></span></label><button class="btn primary" id="startBtn" style="width:100%">Meccs indítása</button></div>
+    <div class="pick-go"><div class="bot-lv" id="botLvRow" hidden><span class="bl-lbl">🤖 Bot erőssége</span><div class="seg" role="group" aria-label="Bot erőssége"><button data-lv="1">😊 Könnyű</button><button data-lv="2">Normál</button><button data-lv="3">😈 Nehéz</button></div><small></small></div><label class="rk-botrow" id="rkBotRow" hidden><input type="checkbox" checked><span><b>🤖 Bot ellen is mehet</b><small></small></span></label><button class="btn primary" id="startBtn" style="width:100%">Meccs indítása</button></div>
   </section>
 
   <section class="screen" id="scr-coll" hidden>
