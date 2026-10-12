@@ -385,7 +385,16 @@ h1,h2,h3{font-family:var(--display);font-weight:400;letter-spacing:.01em;text-wr
 .own-n{font-size:11px;font-weight:900;color:var(--mute);font-variant-numeric:tabular-nums;}
 .coll-slot:not(.missing) .own-n{color:var(--gold);}
 /* paklik */
-#newDeck{width:100%;margin:6px 0 14px;}
+#newDeck{width:100%;margin:6px 0 8px;}
+#impDeck{width:100%;margin:0 0 14px;}
+.ed-helprow{display:flex;margin:0 0 6px;}
+.ed-help{flex:1;white-space:nowrap;}
+.dk-prev{display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:center;padding:10px;border-radius:12px;background:rgba(0,0,0,.25);border:1px solid var(--line);}
+.dk-prev .hp-img{width:48px;height:58px;}
+.dk-prev b{display:block;font-family:var(--display);font-weight:400;font-size:17px;line-height:1.1;}
+.dk-prev small{display:block;font-size:12px;color:var(--mute);font-weight:700;line-height:1.35;}
+.dk-prev .miss{color:#ffb35c;}
+.dk-err{margin:0;font-size:13px;font-weight:800;color:#ff8a7a;}
 .deck-list{display:grid;gap:10px;padding-bottom:28px;}
 .deck-card{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;text-align:left;padding:10px 12px;border-radius:16px;background:var(--felt);border:1px solid var(--line);}
 .dc-art{display:flex;}.dc-img{width:38px;height:52px;border-radius:7px;margin-right:-14px;border:2px solid #0b1c21;
@@ -1999,6 +2008,7 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%;}
       <div class="ed-left">
         <div class="seg ed-filter" id="edFilter" role="group" aria-label="Szűrés">
           <button data-f="all">Mind</button><button data-f="char">Karakter</button><button data-f="action">Akció</button><button data-f="item">Eszköz</button><button data-f="loc">Helyszín</button></div>
+        <div class="ed-helprow"><button class="btn small ed-help" id="edHelp">🪄 Segíts!</button></div>
         <p class="ed-tip">Koppints egy lapra, hogy a paklihoz add. Nyomd hosszan a részletekért.</p>
         <div class="ed-pool" id="edPool"></div>
       </div>
@@ -2007,7 +2017,7 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%;}
         <div id="edList" class="ed-list"></div>
         <div class="ed-curve" id="edCurve" aria-label="Energiagörbe"></div>
         <p class="ed-status" id="edStatus"></p>
-        <div class="ed-actions"><button class="btn small primary" id="edSave">Mentés</button><button class="btn small" id="edCopy">Másolat készítése</button><button class="btn small ghost" id="edDelete">Törlés</button></div>
+        <div class="ed-actions"><button class="btn small primary" id="edSave">Mentés</button><button class="btn small" id="edCopy">Másolat készítése</button><button class="btn small" id="edShare">📤 Megosztás</button><button class="btn small ghost" id="edDelete">Törlés</button></div>
         <div class="ed-confirm" id="edConfirm" hidden><span>Biztosan törlöd?</span><button class="btn small" id="edConfirmNo">Mégse</button><button class="btn small primary" id="edConfirmYes">Törlés</button></div>
       </aside>
     </div>

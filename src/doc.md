@@ -416,6 +416,19 @@ Hősképesség-ötletek a táblázatban (még nem zöldek, nincsenek beépítve)
 
 ## Gál Zoli + Fehér szarvas bunda (2026-10-12)
 - Ha Gál Zolin rajta van a Fehér szarvas bunda, a támadása után **nem pusztul el** (a bunda +3 életet és Provokációt is ad). Mindkét lap szövegébe bekerült. A bot is tudja (nem értékeli le a bundás Zolit).
+- Kiegészítés (2026-10-12, Tomi): bundában Gál Zoli **Pajzsot is kap** (felrakáskor, „✨ Pajzs!” felirattal; ha már volt pajzsa, nem kap újat). A szövegek frissítve: bunda – „Gál Zoli benne nem pusztul el a támadása után, és Pajzsot is kap.”; Zoli – „… kivéve, ha rajta van a Fehér szarvas bunda (abban Pajzsot is kap).” Teszt: `tools/bunda_test.js`.
+
+## Paklik megosztása (2026-10-12)
+- A pakliszerkesztőben **📤 Megosztás** gomb (kezdőpaklinál is): szöveg + link (`https://bestofus.pages.dev/?deck=KÓD`), a telefon megosztó menüjével (Messenger stb.) vagy **Kód másolása** gombbal.
+- Kód: `BOU-P1.<base64url(hős|név|lap*db,…)>.<7 karakteres ellenőrző összeg>` – a kód utáni / előtti szöveg nem zavar, az egész üzenet bemásolható.
+- Beillesztés: Paklik menü → **📥 Pakli beillesztése** (szövegmező + „Beillesztés a vágólapról”). Előnézet: hős, lapszám, mennyi van meg belőle, mi hiányzik. A pakli a beillesztő **saját gyűjteményéből** áll össze: ha egy lap nincs meg, de a változata (vagy az alapja) igen, azt teszi be; ami hiányzik, kimarad – a 🪄 gombbal pótolható. Utána a szerkesztőben Mentés.
+- Linkkel megnyitva: a kód eltárolódik, és a főmenübe érve (bemutató, napi ajándék után) magától felugrik a beillesztés.
+- Ismeretlen lap (újabb verzióból) kimarad, az előnézet jelzi. Szerver nem kell hozzá (nincs új Firestore-szabály).
+
+## Paklisegéd – 🪄 Segíts! (2026-10-12)
+- A pakliszerkesztőben (saját paklinál) **🪄 Segíts! (+N lap)** gomb: 20 lapra egészíti ki a paklit a játékos **saját lapjaiból**; a már betett lapok maradnak. Utána **↶ Visszavonás**-ra vált (amíg nem nyúlsz a paklihoz). A betett lapok lilán felvillannak.
+- Sorrend / pontozás (`deckHelperFill`, meta.js): a hős Kánon eseménye (+6) → a hős kezdőpaklijának lapjai (+2,5) → ritkaság (gyakori 1, ritka 1,5, epikus 2,2, legendás 3) + a lapfajta súlya a hős kezdőpaklija szerint (pl. Tominál eszközök) + energiagörbe-cél (0/1/2/3/4/5/6+ = 0/5/7/4/2/1/1). Legalább 11 karakter kerül bele. Megvan a különleges változat → azt teszi be.
+- Teszt (bot-meccsek a 9 kezdőpakli ellen, hősönként 320): kezdő gyűjteménnyel átlag ~52% (Barna 44, Tomi 46, Sasi 48, Dávid 48, Krisz 50, Milo 53, Laci 53, Bence 56, Gabi 68); teljes gyűjteménnyel átlag ~56% (Dávid 40 – a többieké 47–71). Vagyis legalább kezdőpakli-erős paklit rak össze; Gabinál a segéd paklija érezhetően jobb a kezdőpaklijánál.
 
 ## Változatok a kezdőpaklikban (2026-10-12)
 - Ha a játékosnak megvan egy lap különleges változata (pl. Pifti, TZS, Gál Zoli, Fogel, Rehab), a kezdőpaklikban automatikusan a változat kerül a sima lap helyére, annyi példányban, amennyi megvan belőle (`upgradeList` az `allDecks`-ben). Bot elleni meccsben, PvP-ben és rankedben is így megy; a pakli megnézésekor is a változat látszik. A bot paklija nem változik.

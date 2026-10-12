@@ -400,7 +400,16 @@ h1,h2,h3{font-family:var(--display);font-weight:400;letter-spacing:.01em;text-wr
 .own-n{font-size:11px;font-weight:900;color:var(--mute);font-variant-numeric:tabular-nums;}
 .coll-slot:not(.missing) .own-n{color:var(--gold);}
 /* paklik */
-#newDeck{width:100%;margin:6px 0 14px;}
+#newDeck{width:100%;margin:6px 0 8px;}
+#impDeck{width:100%;margin:0 0 14px;}
+.ed-helprow{display:flex;margin:0 0 6px;}
+.ed-help{flex:1;white-space:nowrap;}
+.dk-prev{display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:center;padding:10px;border-radius:12px;background:rgba(0,0,0,.25);border:1px solid var(--line);}
+.dk-prev .hp-img{width:48px;height:58px;}
+.dk-prev b{display:block;font-family:var(--display);font-weight:400;font-size:17px;line-height:1.1;}
+.dk-prev small{display:block;font-size:12px;color:var(--mute);font-weight:700;line-height:1.35;}
+.dk-prev .miss{color:#ffb35c;}
+.dk-err{margin:0;font-size:13px;font-weight:800;color:#ff8a7a;}
 .deck-list{display:grid;gap:10px;padding-bottom:28px;}
 .deck-card{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;text-align:left;padding:10px 12px;border-radius:16px;background:var(--felt);border:1px solid var(--line);}
 .dc-art{display:flex;}.dc-img{width:38px;height:52px;border-radius:7px;margin-right:-14px;border:2px solid #0b1c21;
@@ -2017,6 +2026,7 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%;}
       <div class="ed-left">
         <div class="seg ed-filter" id="edFilter" role="group" aria-label="Szűrés">
           <button data-f="all">Mind</button><button data-f="char">Karakter</button><button data-f="action">Akció</button><button data-f="item">Eszköz</button><button data-f="loc">Helyszín</button></div>
+        <div class="ed-helprow"><button class="btn small ed-help" id="edHelp">🪄 Segíts!</button></div>
         <p class="ed-tip">Koppints egy lapra, hogy a paklihoz add. Nyomd hosszan a részletekért.</p>
         <div class="ed-pool" id="edPool"></div>
       </div>
@@ -2025,7 +2035,7 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%;}
         <div id="edList" class="ed-list"></div>
         <div class="ed-curve" id="edCurve" aria-label="Energiagörbe"></div>
         <p class="ed-status" id="edStatus"></p>
-        <div class="ed-actions"><button class="btn small primary" id="edSave">Mentés</button><button class="btn small" id="edCopy">Másolat készítése</button><button class="btn small ghost" id="edDelete">Törlés</button></div>
+        <div class="ed-actions"><button class="btn small primary" id="edSave">Mentés</button><button class="btn small" id="edCopy">Másolat készítése</button><button class="btn small" id="edShare">📤 Megosztás</button><button class="btn small ghost" id="edDelete">Törlés</button></div>
         <div class="ed-confirm" id="edConfirm" hidden><span>Biztosan törlöd?</span><button class="btn small" id="edConfirmNo">Mégse</button><button class="btn small primary" id="edConfirmYes">Törlés</button></div>
       </aside>
     </div>
@@ -2100,7 +2110,7 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%;}
 <script src="vendor/firebase-auth-compat.js"></script>
 <script src="vendor/firebase-firestore-compat.js"></script>
 <script src="vendor/firebase-database-compat.js"></script>
-<script>window.APP_VERSION = "2026.10.12-1435"; window.APP_BUILD = "2026.10.12-1435";</script>
+<script>window.APP_VERSION = "2026.10.12-1954"; window.APP_BUILD = "2026.10.12-1954";</script>
 <script>// ===== Best of Us – saját szerver (Firebase) =====
 // A játék eredetileg a Claude-os tárolót használta (window.claude.use('db' | 'user' | 'room')).
 // Ez a fájl ugyanazt a felületet adja Firebase-ből, így a játék kódja szinte változatlan maradhat:
@@ -2370,8 +2380,8 @@ const CARDS = [
   { id:'c_gabileg', type:'char', name:'Gabi, a legyőz\u00ADhetetlen', cost:5, atk:4, hp:4, rarity:'l', revive:true, text:'Amikor először meghal, újraéled a helyén 1 élettel.' },
   { id:'c_zsibrita', type:'char', name:'Zsibrita', cost:3, atk:2, hp:3, rarity:'r', playTgt:'push', text:'Kijátszáskor egy ellenséges karaktert áttolhatsz az ellenfél egy üres sávjába.' },
   { id:'c_vera', type:'char', name:'Vera', cost:3, atk:1, hp:2, rarity:'r', playTgt:'enemy', text:'Kijátszáskor: válassz egy ellenséges karaktert, az visszakerül az ellenfél kezébe.' },
-  { id:'c_zoli', type:'char', name:'Gál Zoli', cost:3, atk:3, hp:1, rarity:'k', haste:true, text:'Egy támadás után magától elpusztul – kivéve, ha rajta van a Fehér szarvas bunda.' },
-  { id:'c_zoli2', type:'char', name:'Gál Zoli', cost:3, atk:3, hp:1, rarity:'k', variantOf:'c_zoli', shopOnly:true, price:100, haste:true, text:'Egy támadás után magától elpusztul – kivéve, ha rajta van a Fehér szarvas bunda.' },
+  { id:'c_zoli', type:'char', name:'Gál Zoli', cost:3, atk:3, hp:1, rarity:'k', haste:true, text:'Egy támadás után magától elpusztul – kivéve, ha rajta van a Fehér szarvas bunda (abban Pajzsot is kap).' },
+  { id:'c_zoli2', type:'char', name:'Gál Zoli', cost:3, atk:3, hp:1, rarity:'k', variantOf:'c_zoli', shopOnly:true, price:100, haste:true, text:'Egy támadás után magától elpusztul – kivéve, ha rajta van a Fehér szarvas bunda (abban Pajzsot is kap).' },
   { id:'c_kristof', type:'char', name:'Kristóf', cost:3, atk:2, hp:2, rarity:'r', text:'Kijátszáskor: a kezedbe kerül egy véletlen Ital lap.' },
   { id:'c_sasimeselo', type:'char', name:'Sasi, a mesélő', cost:3, atk:2, hp:2, rarity:'r', text:'Kijátszáskor: húzol egy lapot.' },
   { id:'c_vajda', type:'char', name:'Vajda Peti', cost:3, atk:3, hp:4, rarity:'k', text:'' },
@@ -2414,7 +2424,7 @@ const CARDS = [
   { id:'i_akuma', drink:true, type:'item', name:'Akuma', cost:2, atk:5, hp:0, rarity:'l', haste:true, doom:true, text:'A köröd végén a karakter, akin van, meghal.' },
   { id:'i_uto', type:'item', name:'TomiNegan ütője', cost:3, atk:3, hp:0, rarity:'l', muscle:true, text:'' },
   { id:'i_vodkakancso', drink:true, type:'item', name:'Vodka Kancsó', cost:3, atk:4, hp:0, rarity:'r', muscle:true, hangover:true, text:'Utána a következő körödben a karakter bénult: nem támad, és nem üt vissza.' },
-  { id:'i_bunda', type:'item', name:'Fehér szarvas bunda', cost:2, atk:0, hp:3, rarity:'r', taunt:true, text:'Gál Zoli benne nem pusztul el a támadása után.' },
+  { id:'i_bunda', type:'item', name:'Fehér szarvas bunda', cost:2, atk:0, hp:3, rarity:'r', taunt:true, text:'Gál Zoli benne nem pusztul el a támadása után, és Pajzsot is kap.' },
   { id:'i_aranylanc', type:'item', name:'Tomi nyaklánca', cost:3, atk:2, hp:3, rarity:'l', text:'' },
   // --- Akciók ---
   { id:'a_dinnyes', drink:true, type:'action', name:'Dinnyés Absolute Vodka', cost:1, tgt:'enemyOrHero', rarity:'k', text:'3 sebzés egy ellenséges karakternek vagy az ellenfél hősének.' },
@@ -2797,6 +2807,8 @@ function playCard(s, pi, hi, t) {
     if (c.shield) u.shield = true; if (c.haste) u.haste = true; if (c.doom) u.doom = true; if (c.muscle) u.muscle = true; if (c.hangover) u.hangover = true; if (c.taunt) u.taunt = true;
     u.items.push(c.id);
     ev(s, { t:'buff', side:pi, i:t.i });
+    // Fehér szarvas bunda Gál Zolin: Pajzsot is kap (2026-10-12)
+    if (c.id === 'i_bunda' && bid(u.id) === 'c_zoli' && !u.shield) { u.shield = true; ev(s, { t:'boon', side:pi, i:t.i, b:'shield' }); }
     if (c.selfDmg) damageHero(s, pi, c.selfDmg);
   } else if (c.type === 'loc') {
     const had = !!s.location;
@@ -5200,7 +5212,7 @@ function renderProfileBar() {
   const ss = $('#saveState'); if (ss) ss.textContent = window.APP_MODE ? '👤 Fiók' : Store.mode === 'cloud' ? '☁️ Felhőben mentve' : '📱 Ezen az eszközön mentve';
   el.querySelector('.pb-name').textContent = p.name;
   try { applyBack(); } catch (e) {}
-  renderQuestBadge(); renderPassBadge(); try { renderRankTile(); } catch (e) {} try { if (!$('#scr-menu').hidden) dayGiftCheck(); } catch (e) {}
+  renderQuestBadge(); renderPassBadge(); try { renderRankTile(); } catch (e) {} try { if (!$('#scr-menu').hidden) { dayGiftCheck(); deckLinkCheck(); } } catch (e) {}
   const wb = $('#wheelBadge'); if (wb) wb.hidden = !wheelReady();
   const badge = $('#shopBadge'); if (badge) badge.hidden = !freePackReady() && !(p.giftPacks > 0) && !(p.faPacks > 0) && !(p.shinyPacks > 0);
 }
@@ -5660,6 +5672,48 @@ function upgradeList(list) {
   }
   return out;
 }
+// ---- paklisegéd (2026-10-12): kiegészíti a paklit 20 lapra a játékos SAJÁT lapjaiból ----
+// A már betett lapokat megtartja. Sorrend: a hős kánon eseménye → a hős kezdőpaklijának lapjai (azok összhangban vannak a hőssel)
+// → a többi a ritkaság, a lapfajta (a kezdőpakli aránya szerint) és az energiagörbe alapján. Ha megvan egy lap különleges változata, azt teszi be.
+// [DECKHELP-START]
+const DH_CURVE = [0, 5, 7, 4, 2, 1, 1];   // cél: hány lap legyen 0,1,2,3,4,5,6+ energiás (a kezdőpaklik átlaga)
+const DH_RW = { k: 1, r: 1.5, e: 2.2, l: 3 };
+function deckHelperFill(list0, hero, own) {
+  const list = { ...list0 }, n = () => Object.values(list).reduce((a, b) => a + b, 0);
+  const bo = id => CARD[id].variantOf || id;
+  const same = id => Object.entries(list).reduce((a, [x, k]) => a + (bo(x) === bo(id) ? k : 0), 0);
+  const cap = id => CARD[id].rarity === 'l' ? 1 : 2;
+  const ok = id => { const c = CARD[id]; return c && !c.token && !c.off && own(id) > (list[id] || 0) && same(id) < cap(id) && (!c.hero || c.hero === hero); };
+  const fam = {}; for (const c of CARDS) if (!c.token && !c.off) (fam[bo(c.id)] = fam[bo(c.id)] || []).push(c.id);
+  for (const k in fam) fam[k].sort((a, b) => (CARD[a].variantOf ? 0 : 1) - (CARD[b].variantOf ? 0 : 1));   // a különleges változat előre
+  const pick = base => (fam[base] || []).find(ok);
+  const stK = Object.keys(DECKS).find(k => DECKS[k].hero === hero), st = {}, tyShare = {};
+  if (stK) { let t = 0; for (const [id, k] of Object.entries(DECKS[stK].list)) { st[bo(id)] = (st[bo(id)] || 0) + k; tyShare[CARD[id].type] = (tyShare[CARD[id].type] || 0) + k; t += k; } for (const x in tyShare) tyShare[x] /= t; }
+  const curve = () => { const c = [0, 0, 0, 0, 0, 0, 0]; for (const [id, k] of Object.entries(list)) c[Math.min(6, CARD[id].cost)] += k; return c; };
+  const chars = () => Object.entries(list).reduce((a, [id, k]) => a + (CARD[id].type === 'char' ? k : 0), 0);
+  const added = [];
+  const put = id => { list[id] = (list[id] || 0) + 1; added.push(id); };
+  while (n() < DECK_SIZE) {
+    const cv = curve(), left = DECK_SIZE - n(), needChar = Math.max(0, 11 - chars()) >= left;
+    let best = null, bs = -1e9;
+    for (const base in fam) {
+      const id = pick(base); if (!id) continue;
+      const c = CARD[id]; if (needChar && c.type !== 'char') continue;
+      const b = Math.min(6, c.cost), need = DH_CURVE[b] - cv[b];
+      let sc = DH_RW[c.rarity] || 1;
+      if (c.hero === hero) sc += 6;                                  // a hős saját kánon eseménye
+      if (st[base]) sc += 2.5 + 0.5 * Math.max(0, st[base] - same(id));   // a kezdőpakliban is benne van
+      sc += 3 * (tyShare[c.type] || 0.05);
+      sc += need > 0 ? 0.4 * Math.min(need, 3) : need - 0.6;          // energiagörbe
+      if (same(id)) sc -= 0.25;
+      if (sc > bs) { bs = sc; best = id; }
+    }
+    if (!best) break;   // nincs több betehető lap
+    put(best);
+  }
+  return { list, added };
+}
+// [DECKHELP-END]
 function allDecks() {
   const starters = Object.entries(DECKS).map(([id, d]) => ({ id, name: d.name, desc: d.desc, hero: d.hero, list: upgradeList(d.list), starter: true }));
   return starters.concat(Store.p ? Store.p.decks : []);
@@ -5683,7 +5737,7 @@ function heroPortrait(hid, cls = '') {
 }
 function renderDecks() {
   const ds = allDecks();
-  $('#decksBody').innerHTML = `<button class="btn primary" id="newDeck">+ Új pakli</button>
+  $('#decksBody').innerHTML = `<button class="btn primary" id="newDeck">+ Új pakli</button><button class="btn" id="impDeck">📥 Pakli beillesztése</button>
     <div class="deck-list">${ds.map(d => {
       const prob = deckIssue(d), h = HERO[d.hero];
       return `<button class="deck-card" data-deck="${d.id}">
@@ -5693,6 +5747,7 @@ function renderDecks() {
     }).join('')}</div>`;
   $('#decksBody').querySelectorAll('.deck-card').forEach((b, i) => b.querySelector('b').textContent = ds[i].name);
   $('#newDeck').onclick = () => pickHero(null, hid => openEditor(null, hid));
+  $('#impDeck').onclick = () => deckImportModal('');
   $('#decksBody').querySelector('.deck-list').onclick = e => { const b = e.target.closest('[data-deck]'); if (b) openEditor(b.dataset.deck); };
 }
 
@@ -5716,7 +5771,7 @@ function openEditor(deckId, heroId) {
   ED.readonly = !!src?.starter;
   ED.deck = src ? { id: src.id, name: src.name, hero: src.hero || null, list: { ...src.list }, starter: src.starter }
                : { id: 'd' + Date.now().toString(36), name: `${HERO[heroId]?.name || 'Saját'} pakli ${Store.p.decks.length + 1}`, hero: heroId || null, list: {} };
-  ED.isNew = !src; ED.filter = 'all';
+  ED.isNew = !src; ED.filter = 'all'; ED.undo = null;
   show('scr-edit'); renderEditor();
 }
 function renderEditor() {
@@ -5746,11 +5801,15 @@ function renderEditor() {
   }).join('') || '<p class="ed-empty">Ebből a fajtából nincs még lapod.</p>';
   document.querySelectorAll('#edFilter button').forEach(b => b.setAttribute('aria-pressed', b.dataset.f === ED.filter));
   $('#edSave').hidden = ED.readonly; $('#edDelete').hidden = ED.readonly || ED.isNew; $('#edCopy').hidden = !ED.readonly;
+  $('#edHelp').parentNode.hidden = ED.readonly;
+  $('#edHelp').textContent = ED.undo ? '↶ Visszavonás' : n >= DECK_SIZE ? '🪄 Kész a pakli' : `🪄 Segíts! (+${DECK_SIZE - n} lap)`;
+  $('#edHelp').classList.toggle('undo', !!ED.undo);
+  $('#edShare').disabled = !n;
   $('#edStatus').textContent = ED.readonly ? 'Kezdőpakli – másold le, ha módosítanád.' : prob ? `Még nem játszható: ${prob}` : '✓ Játékra kész';
   $('#edStatus').className = 'ed-status' + (!ED.readonly && !prob ? ' ok' : '');
 }
 const cardCostBase = id => CARD[id].cost;
-$('#edHero').onclick = () => { if (!ED.readonly) pickHero(ED.deck.hero, hid => { ED.deck.hero = hid; renderEditor(); }); };
+$('#edHero').onclick = () => { if (!ED.readonly) pickHero(ED.deck.hero, hid => { ED.deck.hero = hid; ED.undo = null; renderEditor(); }); };
 // koppintás: hozzáad; hosszú nyomás / jobb klikk: részletek
 let edPress = null;
 $('#edPool').addEventListener('pointerdown', e => {
@@ -5768,7 +5827,7 @@ $('#edPool').addEventListener('click', e => {
   if (CARD[id].hero && CARD[id].hero !== ED.deck.hero) { toast(`Ez ${HERO[CARD[id].hero].name} kánon eseménye, csak az ő paklijába teheted`); return; }
   if (sameCount(d, id) > (d[id] || 0) && sameCount(d, id) >= maxCopies(id)) { toast('A változattal együtt is max. 2'); return; }
   if ((d[id] || 0) >= Math.min(maxCopies(id), owned(id))) { toast(owned(id) < maxCopies(id) ? 'Nincs több ebből a lapból' : CARD[id].rarity === 'l' ? 'Legendásból 1 lehet a pakliban' : 'Egy lapból legfeljebb 2 lehet'); return; }
-  d[id] = (d[id] || 0) + 1; renderEditor();
+  d[id] = (d[id] || 0) + 1; ED.undo = null; renderEditor();
   const row = $(`#edList [data-rm="${id}"]`);
   if (row) { row.scrollIntoView({ block: 'nearest' }); row.animate([{ background: 'rgba(255,211,77,.45)' }, { background: '' }], { duration: 500 }); }
 });
@@ -5777,7 +5836,7 @@ $('#edList').addEventListener('click', e => {
   const b = e.target.closest('[data-rm]');
   if (!b) return;
   if (ED.readonly) { openModal(cardHTML(b.dataset.rm, { big: true, foil: ownsFoil(b.dataset.rm) }), '', cardHelpHTML(b.dataset.rm)); return; }
-  const d = ED.deck.list, id = b.dataset.rm; d[id]--; if (!d[id]) delete d[id]; renderEditor();
+  const d = ED.deck.list, id = b.dataset.rm; d[id]--; if (!d[id]) delete d[id]; ED.undo = null; renderEditor();
 });
 $('#edFilter').addEventListener('click', e => { const b = e.target.closest('[data-f]'); if (b) { ED.filter = b.dataset.f; renderEditor(); } });
 $('#edName').addEventListener('input', e => { if (!ED.readonly) ED.deck.name = e.target.value.slice(0, 24); });
@@ -5800,6 +5859,125 @@ $('#edConfirmYes').onclick = async () => {
   $('#edConfirm').hidden = true; await save(); toast('Pakli törölve'); show('scr-decks'); renderDecks();
 };
 $('#edBack').onclick = () => { show('scr-decks'); renderDecks(); };
+// 🪄 paklisegéd gomb
+function edHelpRun() {
+  const d = ED.deck;
+  if (ED.undo) { d.list = ED.undo; ED.undo = null; renderEditor(); toast('Javaslat visszavonva'); return; }
+  if (!d.hero) { toast('Előbb válassz hőst – a hőshöz illő lapokat keresem'); return pickHero(null, hid => { d.hero = hid; renderEditor(); edHelpRun(); }); }
+  if (deckCount(d.list) >= DECK_SIZE) { toast('Tele a pakli – vegyél ki pár lapot, és a helyükre javaslok'); return; }
+  const prev = { ...d.list }, r = deckHelperFill(d.list, d.hero, owned);
+  if (!r.added.length) { toast('Nincs több betehető lapod – nyiss packokat!'); return; }
+  d.list = r.list; ED.undo = prev; renderEditor();
+  const ids = [...new Set(r.added)];
+  ids.forEach(id => { const row = $(`#edList [data-rm="${id}"]`); if (row) row.animate([{ background: 'rgba(160,120,255,.6)' }, { background: '' }], { duration: 1100 }); });
+  toast(deckCount(d.list) >= DECK_SIZE ? `🪄 ${r.added.length} lapot tettem be – kész a pakli!` : `🪄 ${r.added.length} lapot tettem be – több nincs, ami beférne`);
+}
+$('#edHelp').onclick = edHelpRun;
+
+// ---- pakli megosztása kóddal / linkkel (2026-10-12) ----
+// Kód: BOU-P1.<base64url(hős|név|lap*db,…)>.<ellenőrző összeg>. A link: …/?deck=<kód>
+const DK_PREFIX = 'BOU-P1.';
+function deckCode(d) {
+  const body = [d.hero || '', (d.name || '').replace(/\|/g, ' ').slice(0, 24), Object.entries(d.list).filter(([, k]) => k > 0).map(([id, k]) => id + '*' + k).join(',')].join('|');
+  return DK_PREFIX + b64u(body) + '.' + pvpHash(body).toString(36).padStart(7, '0');   // fix 7 karakter, hogy a kód utáni szöveg ne ragadjon hozzá
+}
+function parseDeckCode(text) {
+  const m = String(text || '').replace(/\s+/g, '').match(/BOU-P1\.([A-Za-z0-9_-]+)\.([0-9a-z]{7})/);
+  if (!m) throw new Error('Nem találok paklikódot. Másold be az egész üzenetet vagy a linket.');
+  let body; try { body = unb64u(m[1]); } catch { throw new Error('A kód sérült – másold ki újra az egészet.'); }
+  if (pvpHash(body).toString(36).padStart(7, '0') !== m[2]) throw new Error('A kód hiányos vagy sérült – másold ki újra az egészet.');
+  const [hero, name, rows] = body.split('|');
+  if (!HERO[hero]) throw new Error('Ismeretlen hős a kódban – frissítsd az appot.');
+  const list = {}; let unknown = 0;
+  for (const r of (rows || '').split(',').filter(Boolean)) { const [id, k] = r.split('*'); if (CARD[id] && !CARD[id].token) list[id] = (list[id] || 0) + Math.max(1, Math.min(2, +k || 1)); else unknown++; }
+  return { hero, name: name || 'Kapott pakli', list, unknown };
+}
+// a kapott listából azt rakja össze, ami a saját gyűjteményedben megvan (ha az adott lap nincs meg, de a változata igen, azt teszi be)
+function adaptDeckList(list) {
+  const out = {}, miss = {};
+  for (const [id, k] of Object.entries(list)) {
+    const base = baseOf(id), fam = [id, ...CARDS.filter(c => baseOf(c.id) === base && c.id !== id).map(c => c.id)];
+    let left = k;
+    for (const f of fam) {
+      if (!left) break;
+      const room = Math.min(owned(f) - (out[f] || 0), maxCopies(f) - sameCount(out, f));
+      const use = Math.min(left, Math.max(0, room)); if (use > 0) { out[f] = (out[f] || 0) + use; left -= use; }
+    }
+    if (left) miss[base] = (miss[base] || 0) + left;
+  }
+  return { list: out, miss };
+}
+function deckShareModal() {
+  const d = ED.deck, code = deckCode(d), url = INV_URL + '?deck=' + code, h = HERO[d.hero];
+  const text = `Nézd meg a(z) „${d.name}” paklimat (${h ? h.name : '?'}) a Best of Us-ban! Másold ki ezt az üzenetet, és a játékban: Paklik → 📥 Pakli beillesztése.`;
+  const o = document.createElement('div'); o.className = 'overlay';
+  o.innerHTML = `<div class="modal acct-box"><h3>📤 Pakli megosztása</h3>
+    <p class="live">Küldd el a haverodnak (Messenger, bármi). Ő a Paklik menüben a <b>📥 Pakli beillesztése</b> gombbal bemásolja, és megkapja a saját paklijai közé – abból, ami az ő gyűjteményében megvan.</p>
+    <textarea class="xfer-code" readonly rows="4"></textarea>
+    <button class="btn primary" data-share>Küldés…</button><button class="btn" data-copy>Kód másolása</button><button class="btn ghost" data-x>Bezár</button></div>`;
+  o.querySelector('textarea').value = text + '\n' + url;
+  o.onclick = async e => {
+    if (e.target.closest('[data-x]') || e.target === o) return o.remove();
+    if (e.target.closest('[data-share]')) {
+      try { if (navigator.share) { await navigator.share({ title: 'Best of Us pakli', text, url }); return; } } catch (er) { if (er && er.name === 'AbortError') return; }
+      e.target.closest('[data-share]').nextElementSibling.click(); return;
+    }
+    if (e.target.closest('[data-copy]')) {
+      try { await navigator.clipboard.writeText(text + '\n' + url); toast('Kimásolva ✔ – illeszd be a chatbe'); }
+      catch { const t = o.querySelector('textarea'); t.focus(); t.select(); toast('Jelöld ki és másold ki a szöveget'); }
+    }
+  };
+  $('#layer').appendChild(o);
+}
+$('#edShare').onclick = () => { if (deckCount(ED.deck.list)) deckShareModal(); };
+function deckImportModal(pre) {
+  if (!Store.p) return;
+  const o = document.createElement('div'); o.className = 'overlay';
+  o.innerHTML = `<div class="modal acct-box"><h3>📥 Pakli beillesztése</h3>
+    <p class="live">Másold be ide a haverod üzenetét vagy a paklikódot (BOU-P1.…).</p>
+    <textarea class="xfer-code" rows="4" placeholder="BOU-P1.…"></textarea>
+    ${navigator.clipboard?.readText ? '<button class="btn small" data-paste>📋 Beillesztés a vágólapról</button>' : ''}
+    <div data-prev></div>
+    <button class="btn primary" data-go disabled>Hozzáadás a paklijaimhoz</button><button class="btn ghost" data-x>Mégse</button></div>`;
+  const ta = o.querySelector('textarea'), prev = o.querySelector('[data-prev]'), go = o.querySelector('[data-go]');
+  let cur = null;
+  const upd = () => {
+    cur = null; go.disabled = true;
+    if (!ta.value.trim()) { prev.innerHTML = ''; return; }
+    let r; try { r = parseDeckCode(ta.value); } catch (er) { prev.innerHTML = `<p class="dk-err"></p>`; prev.firstChild.textContent = er.message; return; }
+    const a = adaptDeckList(r.list), want = deckCount(r.list), have = deckCount(a.list);
+    const miss = Object.entries(a.miss).map(([id, k]) => CARD[id].name + (k > 1 ? ' ×' + k : ''));
+    cur = { ...r, list: a.list, missN: want - have + r.unknown };
+    prev.innerHTML = `<div class="dk-prev">${heroPortrait(r.hero)}<span><b></b><small>${HERO[r.hero].name} · ${want} lap · neked ${have} megvan belőle</small>${miss.length || r.unknown ? `<small class="miss">Hiányzik: ${miss.join(', ')}${r.unknown ? `${miss.length ? ', ' : ''}${r.unknown} ismeretlen lap (frissítsd az appot)` : ''} – a 🪄 gombbal kiegészítheted a saját lapjaidból.</small>` : '<small>✓ Minden lapod megvan hozzá!</small>'}</span></div>`;
+    prev.querySelector('b').textContent = r.name;
+    go.disabled = false;
+  };
+  ta.addEventListener('input', upd);
+  if (pre) { ta.value = pre; upd(); }
+  o.onclick = async e => {
+    if (e.target.closest('[data-x]') || e.target === o) return o.remove();
+    if (e.target.closest('[data-paste]')) { try { ta.value = await navigator.clipboard.readText(); upd(); } catch { toast('Nem sikerült – nyomd hosszan a mezőt, és Beillesztés'); } return; }
+    if (e.target.closest('[data-go]') && cur) {
+      o.remove();
+      ED.readonly = false; ED.isNew = true; ED.filter = 'all'; ED.undo = null;
+      ED.deck = { id: 'd' + Date.now().toString(36), name: cur.name.slice(0, 24), hero: cur.hero, list: cur.list };
+      show('scr-edit'); renderEditor();
+      toast(cur.missN ? `${cur.missN} lap hiányzott – a 🪄 Segíts! gomb pótolja` : 'Megvan! Nyomd meg a Mentést');
+    }
+  };
+  $('#layer').appendChild(o);
+  if (!pre) setTimeout(() => ta.focus(), 50);
+}
+// …/?deck=KÓD link: eltesszük, és a menübe érve felajánljuk a beillesztést
+try {
+  const q = new URLSearchParams(location.search);
+  if (q.has('deck')) { localStorage.setItem('bou_deck', q.get('deck') || ''); history.replaceState(null, '', location.pathname + location.hash); }
+} catch (e) {}
+function deckLinkCheck() {
+  if (!Store.p || Store.p.onboard || (typeof S !== 'undefined' && S) || document.querySelector('#layer .overlay')) return;   // majd ha szabad a menü (bemutató, napi ajándék után)
+  let c = ''; try { c = localStorage.getItem('bou_deck') || ''; if (c) localStorage.removeItem('bou_deck'); } catch {}
+  if (c) deckImportModal(c.startsWith(DK_PREFIX) ? c : DK_PREFIX + c);
+}
 
 // ---- küldetések ----
 // Napi: 3 küldetés, helyi éjfélkor cserélődnek, mindegyik 1 Base set packot ad.
@@ -7213,7 +7391,7 @@ function dayGiftCheck() {
   const o = document.createElement('div'); o.className = 'overlay';
   o.innerHTML = `<div class="modal sp-reveal"><h3>🎉 Boldog Best of Us TCG napot!</h3>${heroCardHTML(h, { big: true, port: k })}
     <p class="live">Ma indul a játék – ezért ajándékba kapod <b>${P.name}</b> portrét: ${h.name} új kinézete, mindig Full Artban. Rögtön ezt viseli – a Gyűjteményben a hősre koppintva visszaválthatsz.</p><button class="btn primary" data-x>Köszi!</button></div>`;
-  o.onclick = e => { if (e.target.closest('[data-x]')) o.remove(); };
+  o.onclick = e => { if (e.target.closest('[data-x]')) { o.remove(); setTimeout(() => { try { deckLinkCheck(); } catch (er) {} }, 200); } };
   $('#layer').appendChild(o);
 }
 function renderRankTile() {

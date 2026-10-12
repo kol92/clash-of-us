@@ -18,8 +18,8 @@ const CARDS = [
   { id:'c_gabileg', type:'char', name:'Gabi, a legyőz\u00ADhetetlen', cost:5, atk:4, hp:4, rarity:'l', revive:true, text:'Amikor először meghal, újraéled a helyén 1 élettel.' },
   { id:'c_zsibrita', type:'char', name:'Zsibrita', cost:3, atk:2, hp:3, rarity:'r', playTgt:'push', text:'Kijátszáskor egy ellenséges karaktert áttolhatsz az ellenfél egy üres sávjába.' },
   { id:'c_vera', type:'char', name:'Vera', cost:3, atk:1, hp:2, rarity:'r', playTgt:'enemy', text:'Kijátszáskor: válassz egy ellenséges karaktert, az visszakerül az ellenfél kezébe.' },
-  { id:'c_zoli', type:'char', name:'Gál Zoli', cost:3, atk:3, hp:1, rarity:'k', haste:true, text:'Egy támadás után magától elpusztul – kivéve, ha rajta van a Fehér szarvas bunda.' },
-  { id:'c_zoli2', type:'char', name:'Gál Zoli', cost:3, atk:3, hp:1, rarity:'k', variantOf:'c_zoli', shopOnly:true, price:100, haste:true, text:'Egy támadás után magától elpusztul – kivéve, ha rajta van a Fehér szarvas bunda.' },
+  { id:'c_zoli', type:'char', name:'Gál Zoli', cost:3, atk:3, hp:1, rarity:'k', haste:true, text:'Egy támadás után magától elpusztul – kivéve, ha rajta van a Fehér szarvas bunda (abban Pajzsot is kap).' },
+  { id:'c_zoli2', type:'char', name:'Gál Zoli', cost:3, atk:3, hp:1, rarity:'k', variantOf:'c_zoli', shopOnly:true, price:100, haste:true, text:'Egy támadás után magától elpusztul – kivéve, ha rajta van a Fehér szarvas bunda (abban Pajzsot is kap).' },
   { id:'c_kristof', type:'char', name:'Kristóf', cost:3, atk:2, hp:2, rarity:'r', text:'Kijátszáskor: a kezedbe kerül egy véletlen Ital lap.' },
   { id:'c_sasimeselo', type:'char', name:'Sasi, a mesélő', cost:3, atk:2, hp:2, rarity:'r', text:'Kijátszáskor: húzol egy lapot.' },
   { id:'c_vajda', type:'char', name:'Vajda Peti', cost:3, atk:3, hp:4, rarity:'k', text:'' },
@@ -62,7 +62,7 @@ const CARDS = [
   { id:'i_akuma', drink:true, type:'item', name:'Akuma', cost:2, atk:5, hp:0, rarity:'l', haste:true, doom:true, text:'A köröd végén a karakter, akin van, meghal.' },
   { id:'i_uto', type:'item', name:'TomiNegan ütője', cost:3, atk:3, hp:0, rarity:'l', muscle:true, text:'' },
   { id:'i_vodkakancso', drink:true, type:'item', name:'Vodka Kancsó', cost:3, atk:4, hp:0, rarity:'r', muscle:true, hangover:true, text:'Utána a következő körödben a karakter bénult: nem támad, és nem üt vissza.' },
-  { id:'i_bunda', type:'item', name:'Fehér szarvas bunda', cost:2, atk:0, hp:3, rarity:'r', taunt:true, text:'Gál Zoli benne nem pusztul el a támadása után.' },
+  { id:'i_bunda', type:'item', name:'Fehér szarvas bunda', cost:2, atk:0, hp:3, rarity:'r', taunt:true, text:'Gál Zoli benne nem pusztul el a támadása után, és Pajzsot is kap.' },
   { id:'i_aranylanc', type:'item', name:'Tomi nyaklánca', cost:3, atk:2, hp:3, rarity:'l', text:'' },
   // --- Akciók ---
   { id:'a_dinnyes', drink:true, type:'action', name:'Dinnyés Absolute Vodka', cost:1, tgt:'enemyOrHero', rarity:'k', text:'3 sebzés egy ellenséges karakternek vagy az ellenfél hősének.' },
@@ -445,6 +445,8 @@ function playCard(s, pi, hi, t) {
     if (c.shield) u.shield = true; if (c.haste) u.haste = true; if (c.doom) u.doom = true; if (c.muscle) u.muscle = true; if (c.hangover) u.hangover = true; if (c.taunt) u.taunt = true;
     u.items.push(c.id);
     ev(s, { t:'buff', side:pi, i:t.i });
+    // Fehér szarvas bunda Gál Zolin: Pajzsot is kap (2026-10-12)
+    if (c.id === 'i_bunda' && bid(u.id) === 'c_zoli' && !u.shield) { u.shield = true; ev(s, { t:'boon', side:pi, i:t.i, b:'shield' }); }
     if (c.selfDmg) damageHero(s, pi, c.selfDmg);
   } else if (c.type === 'loc') {
     const had = !!s.location;
