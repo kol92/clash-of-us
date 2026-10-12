@@ -371,7 +371,7 @@ h1,h2,h3{font-family:var(--display);font-weight:400;letter-spacing:.01em;text-wr
 .flip.rev{--fw:min(210px,56vw);}
 .flip.rev .flip-in{transition:none;}
 .face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:calc(var(--fw)*.11);}
-.face.back{width:auto;height:auto;transform:rotateY(180deg);background:url('art/back.webp?v=6afbed2738549753') 50% 50%/cover;box-shadow:0 8px 20px rgba(0,0,0,.6),0 0 0 2px #c9a24a;}
+.face.back{width:auto;height:auto;transform:rotateY(180deg);background:var(--bk,url('art/back.webp?v=6afbed2738549753')) 50% 50%/cover;box-shadow:0 8px 20px rgba(0,0,0,.6),0 0 0 2px #c9a24a;}
 .flip:not(.open):not(.rev) .face.back{animation:backGlow 1.6s ease-in-out infinite;}
 @keyframes backGlow{50%{box-shadow:0 8px 20px rgba(0,0,0,.6),0 0 0 2px var(--rc),0 0 22px 4px var(--rc)}}
 .face.front .card{--cw:var(--fw);}
@@ -439,10 +439,10 @@ h1,h2,h3{font-family:var(--display);font-weight:400;letter-spacing:.01em;text-wr
 
 .unit.facedown{--tc:#c9a24a;}
 .unit.facedown .uin{background:#0b1c21;}
-.back-art{background:url('art/sm/back.webp?v=38549753') 50% 45%/cover!important;}
+.back-art{background:var(--bk-sm,url('art/sm/back.webp?v=38549753')) 50% 45%/cover!important;}
 .back-art::after{display:none;}
 .unit.facedown .st{background:linear-gradient(#5a6b78,#34424c)!important;color:#dfe8ee!important;}
-.card.backcard{--cw:min(250px,68vw);background:url('art/back.webp?v=6afbed2738549753') center/cover;box-shadow:0 0 0 3px #c9a24a,0 10px 30px rgba(0,0,0,.6);}
+.card.backcard{--cw:min(250px,68vw);background:var(--bk,url('art/back.webp?v=6afbed2738549753')) center/cover;box-shadow:0 0 0 3px #c9a24a,0 10px 30px rgba(0,0,0,.6);}
 .sneak-tag{position:absolute;left:50%;top:6px;transform:translateX(-50%);z-index:2;font-size:9px;font-weight:900;letter-spacing:.12em;text-transform:uppercase;
   background:rgba(20,10,40,.8);color:#d8c8ff;padding:2px 6px;border-radius:6px;border:1px solid rgba(183,123,255,.6);white-space:nowrap;}
 .unit:has(.sneak-tag){box-shadow:0 0 0 2px rgba(183,123,255,.55),0 5px 12px rgba(0,0,0,.45);}
@@ -769,14 +769,14 @@ h1,h2,h3{font-family:var(--display);font-weight:400;letter-spacing:.01em;text-wr
 /* ---------- pakli-kupac + húzás ---------- */
 .hbar{grid-template-columns:1fr auto auto;}
 .deckpile{position:relative;z-index:1;width:38px;height:54px;padding:0;border:0;background:none;margin:0 4px 4px 2px;align-self:center;}
-.deckpile i{position:absolute;inset:0;border-radius:5px;background:url('art/sm/back.webp?v=38549753') center/cover;border:1px solid rgba(214,184,120,.65);
+.deckpile i{position:absolute;inset:0;border-radius:5px;background:var(--bk-sm,url('art/sm/back.webp?v=38549753')) center/cover;border:1px solid rgba(214,184,120,.65);
   box-shadow:2px 2px 0 #20323c,4px 4px 0 #13212a,0 5px 10px rgba(0,0,0,.6);}
 .deckpile b{position:absolute;left:50%;bottom:-7px;transform:translateX(-50%);min-width:24px;box-sizing:border-box;padding:0 5px;border-radius:9px;background:#0b1820;
   border:1px solid rgba(214,184,120,.8);font-family:var(--display);font-weight:400;font-size:13px;color:#fff;line-height:17px;text-align:center;}
 .deckpile.low b{color:#ffc2c8;border-color:var(--red);}
 .deckpile.empty i{background:rgba(255,93,108,.08);border:1px dashed rgba(255,93,108,.7);box-shadow:none;}
 .deckpile.empty b{color:#fff;background:#6b1320;border-color:var(--red);}
-.drawghost{position:fixed;z-index:65;pointer-events:none;border-radius:5px;background:url('art/sm/back.webp?v=38549753') center/cover;
+.drawghost{position:fixed;z-index:65;pointer-events:none;border-radius:5px;background:var(--bk-sm,url('art/sm/back.webp?v=38549753')) center/cover;
   box-shadow:0 8px 18px rgba(0,0,0,.6),0 0 0 1px rgba(214,184,120,.7);transform-origin:50% 50%;will-change:transform;}
 @media (max-height:760px){.deckpile{width:32px;height:46px;}}
 
@@ -930,7 +930,7 @@ h1,h2,h3{font-family:var(--display);font-weight:400;letter-spacing:.01em;text-wr
 .mull-c.swap .mull-x{display:block;}
 .mull-flip{position:relative;display:block;transform-style:preserve-3d;}
 .mf-back,.mf-front{display:block;backface-visibility:hidden;-webkit-backface-visibility:hidden;}
-.mf-back{position:absolute;inset:0;transform:rotateY(180deg);border-radius:8px;background:url('art/sm/back.webp?v=38549753') center/cover;box-shadow:0 0 0 1px #c9a24a;}
+.mf-back{position:absolute;inset:0;transform:rotateY(180deg);border-radius:8px;background:var(--bk-sm,url('art/sm/back.webp?v=38549753')) center/cover;box-shadow:0 0 0 1px #c9a24a;}
 #mullOk{min-width:190px;}
 
 /* ---------- pakliépítő: bal oldalt a gyűjtemény, jobb oldalt a pakli listája ---------- */
@@ -1504,6 +1504,14 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%;}
 .rk-res.down{border-color:rgba(255,110,110,.6);}
 .rk-res-t{display:grid;gap:4px;}.rk-res-t b{font-size:16px;}.rk-note{color:var(--mute);font-size:12px;}
 .sp-mystery.gold{background:radial-gradient(circle at 50% 35%,#fff3b0,#e2a72b 60%,#7a5410);color:#5a3a00;}
+/* hátlap-választó */
+.bk-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;width:100%;}
+.bk-opt{display:grid;gap:6px;justify-items:center;padding:8px;border-radius:14px;border:2px solid rgba(255,255,255,.12);background:rgba(0,0,0,.25);color:var(--ink);font:inherit;cursor:pointer;}
+.bk-opt i{display:block;width:100%;aspect-ratio:3/4;border-radius:8px;background-size:cover;background-position:center;box-shadow:0 6px 14px rgba(0,0,0,.5);}
+.bk-opt b{font-size:14px;}.bk-opt small{font-size:11px;color:var(--mute);text-align:center;}
+.bk-opt.on{border-color:var(--gold);box-shadow:0 0 14px rgba(255,200,80,.45);}
+.bk-opt.lock{opacity:.55;filter:grayscale(.8);cursor:default;}
+.bk-btn{margin:0 0 8px;}
 .lesson-box{display:grid;gap:10px;}
 .lesson-row{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:12px;border-radius:14px;border:1px solid rgba(255,255,255,.12);background:linear-gradient(160deg,#1d3550,#0f1d2e);color:var(--ink);font:inherit;cursor:pointer;}
 .lesson-row.done{border-color:rgba(120,220,160,.45);}
@@ -2089,7 +2097,7 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%;}
 <script src="vendor/firebase-auth-compat.js"></script>
 <script src="vendor/firebase-firestore-compat.js"></script>
 <script src="vendor/firebase-database-compat.js"></script>
-<script>window.APP_VERSION = "2026.10.12-1300";</script>
+<script>window.APP_VERSION = "2026.10.12-1306";</script>
 <script>// ===== Best of Us – saját szerver (Firebase) =====
 // A játék eredetileg a Claude-os tárolót használta (window.claude.use('db' | 'user' | 'room')).
 // Ez a fájl ugyanazt a felületet adja Firebase-ből, így a játék kódja szinte változatlan maradhat:
@@ -3639,6 +3647,7 @@ function renderColl(bodyOnly) {
   const have = PLAYABLE.filter(c => owned(c.id) > 0).length, foils = PLAYABLE.filter(c => ownsFoil(c.id)).length;
   const dup = typeof dupeList === 'function' && Store.p ? dupeList(Store.p) : { out: [] };
   $('#collBody').innerHTML = `<p class="coll-sum">${have}/${PLAYABLE.length} különböző lap · ${foils} Full Art változat</p>` + (groups.length ? '' : '<p class="cf-empty">Nincs a szűrésnek megfelelő lap.</p>') +
+    `<button class="btn bk-btn" id="bkBtn">🃏 Hátlap: ${BACKS[myBack()].name}</button>` +
     (dup.out.length ? `<button class="btn dupe-btn" id="dupeBtn">♻️ ${dup.out.reduce((s, x) => s + x.n + x.f, 0)} fölösleges lap beváltása · +${dup.coins} coin</button>` : '') + groups.map(([t, type]) => `<div class="lbl">${t}</div><div class="coll-grid">${
     type ? PLAYABLE.filter(c => c.type === type && cfMatch(c)).sort((a, b) => a.cost - b.cost).map(c => {
       const n = ui.foil || c.foilOnly ? (Store.p?.coll[c.id]?.f || 0) : (Store.p?.coll[c.id]?.n || 0);
@@ -3671,6 +3680,7 @@ function collCardModal(id, cap) {
   }, true);
 }
 $('#collBody').onclick = e => {
+  if (e.target.closest('#bkBtn')) return backPicker();
   if (e.target.closest('#dupeBtn')) return dupeModal();
   const c = e.target.closest('[data-card]'), h = e.target.closest('[data-hcard]'), hg = e.target.closest('[data-hgold]');
   if (h && !ui.foil && Store.p && heroSkins(h.dataset.hcard).length > 1) return skinModal(h.dataset.hcard);
@@ -3804,7 +3814,7 @@ function logEvents(evs, snap) {
       case 'play': {
         const secret = e.side !== ME && c.sneak;
         const tg = e.tg ? ' → ' + nm(e.tg.side, e.tg.i) : '';
-        L(secret ? `🂠 ${who(e.side)} lerakott egy rejtett lapot` : `▶ ${who(e.side)} kijátszotta: <b>${escH(c.name)}</b>${tg}`); break; }
+        L(secret ? `🃏 ${who(e.side)} lerakott egy rejtett lapot` : `▶ ${who(e.side)} kijátszotta: <b>${escH(c.name)}</b>${tg}`); break; }
       case 'attack': L(`⚔ ${unitName(e.side, e.i)} támad`); break;
       case 'heroatk': L(`⚔ ${who(e.side)} (Baszó) odacsap`); break;
       case 'dmg': L(`💥 ${nm(e.side, e.i)}: −${e.n}`); break;
@@ -3824,7 +3834,7 @@ function logEvents(evs, snap) {
       case 'stolen': L(`🫳 ${unitName(e.side, e.i)} átállt a másik oldalra`); break;
       case 'push': L(`➡ Egy karakter arrébb tolva`); break;
       case 'misfire': L(`🍺 ${unitName(e.side, e.i)} mellé ütött`); break;
-      case 'reveal': if (e.side !== ME) L(`🂠 Felfordult: ${CARD[e.id].name}`); break;
+      case 'reveal': if (e.side !== ME) L(`🃏 Felfordult: ${CARD[e.id].name}`); break;
       case 'party': L(e.none ? `🍸 A parti lelke kiosztott egy italt (${CARD[e.id].name}), de nem volt kire` : `🍸 ${CARD[e.id].name} → ${CARD[e.tid]?.name || 'egy karakter'}`); break;
       case 'drinkgift': case 'gift': L(`🎁 ${e.side === ME ? CARD[e.id].name + ' a kezedbe' : 'Egy lap az ellenfél kezébe'}`); break;
       case 'coin': L(`💧 ${e.side === ME ? 'Kaptál' : 'Az ellenfél kapott'} egy pohár vizet`); break;
@@ -4178,11 +4188,12 @@ function heroBar(pi) {
       <div class="hpbar" role="img" aria-label="Élet: ${Math.max(0, p.hp)} / ${p.maxHp}"><span class="hps"><i style="width:${Math.max(0, p.hp) / p.maxHp * 100}%"></i></span><b>${Math.max(0, p.hp)} / ${p.maxHp}</b></div></div>
     <div class="res"><div class="en hudm${p.energy > p.maxEnergy ? ' bonus' : ''}" role="img" aria-label="Energia: ${p.energy} / ${p.maxEnergy}" title="Energia (most / legfeljebb)"><b>${p.energy}/${p.maxEnergy}</b></div>
       <div class="counts">Kéz ${p.hand.length} · <button class="gravebtn" data-grave="${pi}" aria-label="Temető: ${p.grave.length} lap"><i class="ic-grave" aria-hidden="true"></i>${p.grave.length}</button></div></div>
-    <button class="deckpile${p.deck.length ? p.deck.length <= 3 ? ' low' : '' : ' empty'}" data-deck="${pi}" aria-label="Húzópakli: ${p.deck.length} lap maradt" title="Húzópakli: ennyi lap maradt"><i></i><b>${p.deck.length}</b></button>`;
+    <button class="deckpile${p.deck.length ? p.deck.length <= 3 ? ' low' : '' : ' empty'}" data-deck="${pi}"${pi === BOT ? ` style="${oppBackVars()}"` : ''} aria-label="Húzópakli: ${p.deck.length} lap maradt" title="Húzópakli: ennyi lap maradt"><i></i><b>${p.deck.length}</b></button>`;
 }
 const STB_NOATK = '<span class="stb noatk" role="img" aria-label="Nem támad" title="Nem támad"></span>';
+const oppBackVars = () => backVars(S?.pvp && S.cos?.[BOT]?.back && BACKS[S.cos[BOT].back] ? S.cos[BOT].back : 'base');   // az ellenfél hátlapja (botnál a klasszikus)
 function unitHTML(u, side, i) {
-  if (u.hidden && side !== ME) return `<button data-uid="${u.uid}" class="unit facedown" aria-label="Rejtett lap">
+  if (u.hidden && side !== ME) return `<button data-uid="${u.uid}" class="unit facedown" aria-label="Rejtett lap" style="${oppBackVars()}">
     <span class="uin"><span class="art back-art"></span><span class="uname">Rejtett lap</span></span>
     <span class="st atk">?</span><span class="st hp">?</span>${u.stun ? `<span class="tags"><span class="zz stun" aria-hidden="true">bénult</span><span class="stc" role="img" aria-label="Bénult még ${u.stun} körig" title="Bénult még ${u.stun} körig"><b>${u.stun}</b></span></span>` : ''}</button>`;
   const c = CARD[u.id], atk = S.players[side].board[i]?.uid === u.uid ? effAtk(S, side, i) : u.atk, sleeping = u.fresh && !u.haste && u.id !== 'c_korso' && !c.noAttack && !u.stun;
@@ -4501,7 +4512,7 @@ async function showPlayed(id, tg, foil) {
   if (CARD[id].finisher) return;   // a kánon eseménynek saját, nagy bevonulása van (playIntro)
   const secret = !!CARD[id].sneak;
   const back = document.createElement('div'); back.className = 'played';
-  back.innerHTML = `<div class="wrap"><span class="tag">${S.pvp ? escH(S.names?.[BOT] || 'Az ellenfél') : HERO[S.players[BOT].heroId].name} ${secret ? 'lerakott egy rejtett lapot' : 'kijátszotta'}</span><span class="flip rev"><span class="flip-in"><span class="face back"></span><span class="face front">${cardHTML(id, { big: true, foil })}</span></span></span>${foil && !CARD[id].sneak ? '<span class="fa-flash">✨ Full Art ✨</span>' : ''}<span class="skip">Koppints a folytatáshoz</span></div>`;
+  back.innerHTML = `<div class="wrap"><span class="tag">${S.pvp ? escH(S.names?.[BOT] || 'Az ellenfél') : HERO[S.players[BOT].heroId].name} ${secret ? 'lerakott egy rejtett lapot' : 'kijátszotta'}</span><span class="flip rev" style="${oppBackVars()}"><span class="flip-in"><span class="face back"></span><span class="face front">${cardHTML(id, { big: true, foil })}</span></span></span>${foil && !CARD[id].sneak ? '<span class="fa-flash">✨ Full Art ✨</span>' : ''}<span class="skip">Koppints a folytatáshoz</span></div>`;
   $('#layer').appendChild(back);
   const wrap = back.querySelector('.wrap');
   const eb = $('#eBar').getBoundingClientRect(), wr = wrap.getBoundingClientRect();
@@ -5165,6 +5176,7 @@ function renderProfileBar() {
     <div class="pb-day"><small>Mai coin</small><div class="meter"><i style="width:${e / ECON.dailyCap * 100}%"></i></div><small class="num">${e}/${ECON.dailyCap}</small></div>`;
   const ss = $('#saveState'); if (ss) ss.textContent = window.APP_MODE ? '👤 Fiók' : Store.mode === 'cloud' ? '☁️ Felhőben mentve' : '📱 Ezen az eszközön mentve';
   el.querySelector('.pb-name').textContent = p.name;
+  try { applyBack(); } catch (e) {}
   renderQuestBadge(); renderPassBadge(); try { renderRankTile(); } catch (e) {} try { if (!$('#scr-menu').hidden) dayGiftCheck(); } catch (e) {}
   const wb = $('#wheelBadge'); if (wb) wb.hidden = !wheelReady();
   const badge = $('#shopBadge'); if (badge) badge.hidden = !freePackReady() && !(p.giftPacks > 0) && !(p.faPacks > 0) && !(p.shinyPacks > 0);
@@ -6409,7 +6421,7 @@ function pvpPickDeck(title, done) {
   $('#layer').appendChild(o);
 }
 const pvpMe = dk => ({ ver: window.APP_VERSION || '', uid: Store.uid, name: Store.p.name || 'Játékos', hero: dk.hero, deckName: dk.name, list: { ...dk.list },
-  cos: { heroGold: heroSkin(dk.hero) === 'gold', heroFa: heroSkin(dk.hero) === 'fa', port: isPort(heroSkin(dk.hero)) ? heroSkin(dk.hero) : null, foils: Object.keys(dk.list).filter(id => ownsFoil(id)), foilN: myFoils(dk.list) } });   // amit az ellenfél is lát: Full Art hős és lapok
+  cos: { back: myBack(), heroGold: heroSkin(dk.hero) === 'gold', heroFa: heroSkin(dk.hero) === 'fa', port: isPort(heroSkin(dk.hero)) ? heroSkin(dk.hero) : null, foils: Object.keys(dk.list).filter(id => ownsFoil(id)), foilN: myFoils(dk.list) } });   // amit az ellenfél is lát: Full Art hős és lapok
 async function pvpCreate(dk) {
   try { await Store.db.collection('pvp').add({ parts: [Store.uid], status: 'open', created: Date.now(), updated: Date.now(), host: pvpMe(dk), guest: null, v: 0 }); toast('Kihívás létrehozva – szólj a haveroknak!'); }
   catch (e) { toast(e?.code === 'quota_exceeded' ? 'Megtelt a tárhely, próbáld később' : 'Nem sikerült létrehozni (lehet, hogy nincs írási jogod)'); }
@@ -7054,14 +7066,15 @@ const RK_LEG = 15;
 const rkNeed = t => t < 5 ? 2 : t < 10 ? 3 : 4;
 const rkTierCls = t => t >= RK_LEG ? 'legend' : ['bronze', 'silver', 'gold'][Math.floor(t / 5)];
 const rkName = t => t >= RK_LEG ? 'Legenda' : `${RK_NAMES[Math.floor(t / 5)]} ${5 - (t % 5)}`;
-const RK_REWARDS = [
-  { min: 0,  name: 'Bronz',   rew: { packs: 1 } },
-  { min: 5,  name: 'Ezüst',   rew: { packs: 3 } },
-  { min: 10, name: 'Arany',   rew: { shiny: 1, packs: 3, coins: 150 } },
-  { min: 15, name: 'Legenda', rew: { shiny: 2, packs: 5, coins: 500 } },
+const RK_REWARDS = [   // 2026-10-12, Tomi: minden elért lépcső jutalma jár (halmozódik)
+  { min: 1,  name: 'Bronz 4',  rew: { packs: 2 } },
+  { min: 5,  name: 'Ezüst 5',  rew: { shiny: 2 } },
+  { min: 10, name: 'Arany 5',  rew: { coins: 1000 } },
+  { min: 15, name: 'Legenda',  rew: { back: 'legend' } },
 ];
-const rkRewardFor = t => [...RK_REWARDS].reverse().find(r => t >= r.min);
-const rkRewText = r => [r.shiny ? `${r.shiny} Shiny pack` : '', r.packs ? `${r.packs} booster pack` : '', r.coins ? `${r.coins} coin` : ''].filter(Boolean).join(' + ');
+const rkRewardFor = t => [...RK_REWARDS].reverse().find(r => t >= r.min) || null;
+const rkRewardsUpTo = t => RK_REWARDS.filter(r => t >= r.min);
+const rkRewText = r => [r.shiny ? `${r.shiny} Shiny pack` : '', r.packs ? `${r.packs} booster pack` : '', r.coins ? `${r.coins} coin` : '', r.back ? `${BACKS[r.back].name} hátlap` : ''].filter(Boolean).join(' + ');
 function rkSeason() { const s = curSeason(); if (s) return { id: s.id, end: s.end, name: s.name }; const d = new Date(); return { id: `m${d.getFullYear()}-${d.getMonth() + 1}`, end: new Date(d.getFullYear(), d.getMonth() + 1, 1), name: `${d.getFullYear()}. ${d.getMonth() + 1}. havi szezon` }; }
 function rkFresh(season) { return { season, t: 0, st: 0, streak: 0, shield: false, lp: 0, best: 0, w: 0, l: 0, games: 0 }; }
 // a profil rangja; szezonváltáskor jutalom + újrakezdés
@@ -7071,11 +7084,14 @@ function ensureRank(p) {
   if (!p.rank) { p.rank = rkFresh(se.id); return p.rank; }
   if (p.rank.season !== se.id) {
     const old = p.rank;
-    if (old.games > 0 && RANKED_ON) {
-      const rw = rkRewardFor(old.best).rew;
+    const got = old.games > 0 && RANKED_ON ? rkRewardsUpTo(old.best) : [];
+    if (got.length) {
+      const rw = {};
+      for (const x of got) for (const [k, v] of Object.entries(x.rew)) rw[k] = k === 'back' ? v : (rw[k] || 0) + v;
       if (rw.packs) p.giftPacks = (p.giftPacks || 0) + rw.packs;
       if (rw.shiny) p.shinyPacks = (p.shinyPacks || 0) + rw.shiny;
       if (rw.coins) p.coins += rw.coins;
+      if (rw.back && !(p.backs || []).includes(rw.back)) { p.backs = [...(p.backs || []), rw.back]; p.cardBack = rw.back; }
       p.rankReward = { season: old.season, best: old.best, lp: old.lp, w: old.w, l: old.l, rew: rw, seen: false };
     }
     p.rank = rkFresh(se.id); p._dirty = true; save();
@@ -7130,6 +7146,28 @@ function rkResultHTML(x) {
     ${a.t >= RK_LEG ? `<small>${a.lp} Legenda-pont</small>` : rkStars(a.t, a.st, gained)}${x.note ? `<small class="rk-note">${x.note}</small>` : ''}</div></div>`;
 }
 // menü csempe
+// ---- hátlapok (2026-10-12): a játékos választhat; a Legenda hátlap a ranked Legenda jutalma ----
+const BACKS = {
+  base:   { name: 'Klasszikus', src: 'art/back.webp?v=6afbed2738549753', sm: 'art/sm/back.webp?v=38549753', how: 'Alap hátlap' },
+  legend: { name: 'Legenda', src: 'art/back_legend.webp?v=296f06dfc32e07aa', sm: 'art/sm/back_legend.webp?v=c32e07aa', how: 'Ranked jutalom: érj el Legendát egy szezonban' },
+};
+const ownsBack = k => k === 'base' || (Store.p?.backs || []).includes(k);
+const myBack = () => { const k = Store.p?.cardBack; return k && BACKS[k] && ownsBack(k) ? k : 'base'; };
+const backVars = k => { const b = BACKS[k] || BACKS.base; return `--bk:url('${b.src}');--bk-sm:url('${b.sm}')`; };
+function applyBack() { const b = BACKS[myBack()]; const r = document.documentElement.style; r.setProperty('--bk', `url('${b.src}')`); r.setProperty('--bk-sm', `url('${b.sm}')`); }
+function backPicker() {
+  const p = Store.p; if (!p) return;
+  const o = document.createElement('div'); o.className = 'overlay';
+  const draw = () => { o.innerHTML = `<div class="modal acct-box"><h3>🃏 Hátlap</h3><p class="live">Ez látszik a lapjaid hátoldalán: a paklidon, húzáskor, és a rejtett lapjaidon (PvP-ben az ellenfeled is ezt látja).</p>
+    <div class="bk-list">${Object.entries(BACKS).map(([k, b]) => `<button class="bk-opt${myBack() === k ? ' on' : ''}${ownsBack(k) ? '' : ' lock'}" data-bk="${k}"><i style="background-image:url('${b.sm}')"></i><b>${b.name}${ownsBack(k) ? '' : ' 🔒'}</b><small>${myBack() === k ? 'Használatban' : ownsBack(k) ? 'Koppints a választáshoz' : b.how}</small></button>`).join('')}</div>
+    <button class="btn primary" data-x>Kész</button></div>`; };
+  draw();
+  o.onclick = e => { if (e.target.closest('[data-x]') || e.target === o) return o.remove();
+    const b = e.target.closest('[data-bk]'); if (!b) return; const k = b.dataset.bk;
+    if (!ownsBack(k)) return toast(BACKS[k].how);
+    p.cardBack = k; applyBack(); save(); draw(); };
+  $('#layer').appendChild(o);
+}
 // ---- Best of Us TCG nap (2026-10-12): aznap belépők ajándék Bence-portrét kapnak, felugró ablakkal ----
 const DAY_GIFT = { id: 'bou-day-2026-10-12', date: '2026-10-12', port: 'p_bence_kerites' };
 function dayGiftCheck() {
@@ -7163,7 +7201,7 @@ function rkRewardPopup() {
   const o = document.createElement('div'); o.className = 'overlay rk-season';
   o.innerHTML = `<div class="modal acct-box"><h3>🏆 Véget ért a ranked szezon</h3>${rkEmblem(rw.best, 'lg')}
     <p class="live">A szezon legjobb rangod: <b>${rkName(rw.best)}</b>${rw.best >= RK_LEG ? ` (${rw.lp} Legenda-pont)` : ''} · ${rw.w} győzelem, ${rw.l} vereség.</p>
-    <p class="tut-gift">🎁 Jutalom: <b>${rkRewText(rw.rew)}</b> – a Boosterek menüben vár.</p>
+    <p class="tut-gift">🎁 Jutalom: <b>${rkRewText(rw.rew)}</b>${rw.rew.packs || rw.rew.shiny ? ' – a packok a Boosterek menüben várnak' : ''}${rw.rew.back ? '. Az új hátlapot már használod (a Gyűjteményben a 🃏 Hátlap gombbal válthatsz)' : ''}.</p>
     <p class="live">Az új szezon Bronz 5-ről indul. Hajrá!</p><button class="btn primary" data-x>Szuper!</button></div>`;
   o.onclick = e => { if (e.target.closest('[data-x]')) { o.remove(); rw.seen = true; save(); } };
   $('#layer').appendChild(o);
@@ -7175,15 +7213,14 @@ function renderRanked() {
   const me = { name: Store.p.name, t: r.t, st: r.st, lp: r.lp, me: true };
   const fr = (typeof frOn === 'function' && frOn()) ? FR.list.filter(d => d.status === 'accepted').map(d => { const u = frOther(d), pb = FR.pub[u]; return pb && pb.rank && pb.rank.season === se.id ? { name: pb.name, ...pb.rank } : null; }).filter(Boolean) : [];
   const board = [me, ...fr].sort((a, b) => b.t - a.t || (b.t >= RK_LEG ? b.lp - a.lp : b.st - a.st));
-  const nextRw = rkRewardFor(r.best);
   body.innerHTML = `
     <div class="rk-hero">${rkEmblem(r.t, 'xl')}<div class="rk-name">${rkName(r.t)}</div>
       ${r.t >= RK_LEG ? `<div class="rk-lp">${r.lp} Legenda-pont</div>` : rkStars(r.t, r.st)}
       <small class="rk-sea">${escH(se.name)} · még ${days} nap · ${r.w} győzelem, ${r.l} vereség${r.streak >= 2 ? ` · 🔥 ${r.streak} győzelem sorozat` : ''}</small></div>
     <button class="rk-playimg" id="rkPlay" aria-label="Ranked meccs"></button>
     <p class="q-note rk-how">Élő ellenfelet keresünk; ha 20 mp alatt nincs senki, egy bot ellen játszol – a rangod mindkét esetben számít.</p>
-    <div class="lbl">Szezon végi jutalom (a szezon legjobb rangja szerint)</div>
-    <div class="rk-rews">${RK_REWARDS.map(x => `<div class="rk-rew${r.best >= x.min ? ' got' : ''}">${rkEmblem(x.min, 'xs')}<span><b>${x.name}</b><small>${rkRewText(x.rew)}</small></span>${r.best >= x.min && x === nextRw ? '<em>elérve</em>' : ''}</div>`).join('')}</div>
+    <div class="lbl">Szezon végi jutalmak (minden elért lépcső jár)</div>
+    <div class="rk-rews">${RK_REWARDS.map(x => `<div class="rk-rew${r.best >= x.min ? ' got' : ''}">${rkEmblem(x.min, 'xs')}<span><b>${x.name}</b><small>${rkRewText(x.rew)}</small></span>${r.best >= x.min ? '<em>elérve</em>' : ''}</div>`).join('')}</div>
     <div class="lbl">Barátok ranglistája</div>
     <div class="rk-board">${board.map((x, i) => `<div class="rk-row${x.me ? ' me' : ''}"><span class="rk-pos">${i + 1}.</span>${rkEmblem(x.t, 'xs')}<b>${escH(x.name || 'Barát')}</b><small>${x.t >= RK_LEG ? `Legenda · ${x.lp || 0} pont` : `${rkName(x.t)} · ${x.st}★`}</small></div>`).join('')}
       ${fr.length ? '' : '<p class="q-note">Még egy barátod sem játszott ranked meccset ebben a szezonban.</p>'}</div>
@@ -7194,7 +7231,7 @@ function renderRanked() {
       <li>Ezüst 4–1: csak minden második vereség vesz el csillagot (🛡 Kitartás), és egy győzelem után az első vereség mindig ingyenes.</li>
       <li>Aranyban minden vereség −1 csillag, és 0 csillagnál visszaesel egy fokozatot.</li>
       <li>Legendában Legenda-pontokat gyűjtesz, onnan már nem esel vissza.</li>
-      <li>A szezon a Season Passsal együtt ér véget: akkor jár a jutalom, és mindenki Bronz 5-ről kezd.</li></ul></details>`;
+      <li>A szezon a Season Passsal együtt ér véget: akkor jár minden elért lépcső jutalma (Bronz 4, Ezüst 5, Arany 5, Legenda), és mindenki Bronz 5-ről kezd.</li></ul></details>`;
   $('#rkPlay').onclick = () => pvpPickDeck('Melyik paklival mész rankedbe?', dk => rankedSearch(dk));
 }
 // ranked keresés: élő ellenfél (20 mp), különben bot

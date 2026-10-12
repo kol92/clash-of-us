@@ -356,7 +356,7 @@ h1,h2,h3{font-family:var(--display);font-weight:400;letter-spacing:.01em;text-wr
 .flip.rev{--fw:min(210px,56vw);}
 .flip.rev .flip-in{transition:none;}
 .face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:calc(var(--fw)*.11);}
-.face.back{width:auto;height:auto;transform:rotateY(180deg);background:url('art/back.webp') 50% 50%/cover;box-shadow:0 8px 20px rgba(0,0,0,.6),0 0 0 2px #c9a24a;}
+.face.back{width:auto;height:auto;transform:rotateY(180deg);background:var(--bk,url('art/back.webp')) 50% 50%/cover;box-shadow:0 8px 20px rgba(0,0,0,.6),0 0 0 2px #c9a24a;}
 .flip:not(.open):not(.rev) .face.back{animation:backGlow 1.6s ease-in-out infinite;}
 @keyframes backGlow{50%{box-shadow:0 8px 20px rgba(0,0,0,.6),0 0 0 2px var(--rc),0 0 22px 4px var(--rc)}}
 .face.front .card{--cw:var(--fw);}
@@ -424,10 +424,10 @@ h1,h2,h3{font-family:var(--display);font-weight:400;letter-spacing:.01em;text-wr
 
 .unit.facedown{--tc:#c9a24a;}
 .unit.facedown .uin{background:#0b1c21;}
-.back-art{background:url('art/sm/back.webp') 50% 45%/cover!important;}
+.back-art{background:var(--bk-sm,url('art/sm/back.webp')) 50% 45%/cover!important;}
 .back-art::after{display:none;}
 .unit.facedown .st{background:linear-gradient(#5a6b78,#34424c)!important;color:#dfe8ee!important;}
-.card.backcard{--cw:min(250px,68vw);background:url('art/back.webp') center/cover;box-shadow:0 0 0 3px #c9a24a,0 10px 30px rgba(0,0,0,.6);}
+.card.backcard{--cw:min(250px,68vw);background:var(--bk,url('art/back.webp')) center/cover;box-shadow:0 0 0 3px #c9a24a,0 10px 30px rgba(0,0,0,.6);}
 .sneak-tag{position:absolute;left:50%;top:6px;transform:translateX(-50%);z-index:2;font-size:9px;font-weight:900;letter-spacing:.12em;text-transform:uppercase;
   background:rgba(20,10,40,.8);color:#d8c8ff;padding:2px 6px;border-radius:6px;border:1px solid rgba(183,123,255,.6);white-space:nowrap;}
 .unit:has(.sneak-tag){box-shadow:0 0 0 2px rgba(183,123,255,.55),0 5px 12px rgba(0,0,0,.45);}
@@ -754,14 +754,14 @@ h1,h2,h3{font-family:var(--display);font-weight:400;letter-spacing:.01em;text-wr
 /* ---------- pakli-kupac + húzás ---------- */
 .hbar{grid-template-columns:1fr auto auto;}
 .deckpile{position:relative;z-index:1;width:38px;height:54px;padding:0;border:0;background:none;margin:0 4px 4px 2px;align-self:center;}
-.deckpile i{position:absolute;inset:0;border-radius:5px;background:url('art/sm/back.webp') center/cover;border:1px solid rgba(214,184,120,.65);
+.deckpile i{position:absolute;inset:0;border-radius:5px;background:var(--bk-sm,url('art/sm/back.webp')) center/cover;border:1px solid rgba(214,184,120,.65);
   box-shadow:2px 2px 0 #20323c,4px 4px 0 #13212a,0 5px 10px rgba(0,0,0,.6);}
 .deckpile b{position:absolute;left:50%;bottom:-7px;transform:translateX(-50%);min-width:24px;box-sizing:border-box;padding:0 5px;border-radius:9px;background:#0b1820;
   border:1px solid rgba(214,184,120,.8);font-family:var(--display);font-weight:400;font-size:13px;color:#fff;line-height:17px;text-align:center;}
 .deckpile.low b{color:#ffc2c8;border-color:var(--red);}
 .deckpile.empty i{background:rgba(255,93,108,.08);border:1px dashed rgba(255,93,108,.7);box-shadow:none;}
 .deckpile.empty b{color:#fff;background:#6b1320;border-color:var(--red);}
-.drawghost{position:fixed;z-index:65;pointer-events:none;border-radius:5px;background:url('art/sm/back.webp') center/cover;
+.drawghost{position:fixed;z-index:65;pointer-events:none;border-radius:5px;background:var(--bk-sm,url('art/sm/back.webp')) center/cover;
   box-shadow:0 8px 18px rgba(0,0,0,.6),0 0 0 1px rgba(214,184,120,.7);transform-origin:50% 50%;will-change:transform;}
 @media (max-height:760px){.deckpile{width:32px;height:46px;}}
 
@@ -915,7 +915,7 @@ h1,h2,h3{font-family:var(--display);font-weight:400;letter-spacing:.01em;text-wr
 .mull-c.swap .mull-x{display:block;}
 .mull-flip{position:relative;display:block;transform-style:preserve-3d;}
 .mf-back,.mf-front{display:block;backface-visibility:hidden;-webkit-backface-visibility:hidden;}
-.mf-back{position:absolute;inset:0;transform:rotateY(180deg);border-radius:8px;background:url('art/sm/back.webp') center/cover;box-shadow:0 0 0 1px #c9a24a;}
+.mf-back{position:absolute;inset:0;transform:rotateY(180deg);border-radius:8px;background:var(--bk-sm,url('art/sm/back.webp')) center/cover;box-shadow:0 0 0 1px #c9a24a;}
 #mullOk{min-width:190px;}
 
 /* ---------- pakliépítő: bal oldalt a gyűjtemény, jobb oldalt a pakli listája ---------- */
@@ -1489,6 +1489,14 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%;}
 .rk-res.down{border-color:rgba(255,110,110,.6);}
 .rk-res-t{display:grid;gap:4px;}.rk-res-t b{font-size:16px;}.rk-note{color:var(--mute);font-size:12px;}
 .sp-mystery.gold{background:radial-gradient(circle at 50% 35%,#fff3b0,#e2a72b 60%,#7a5410);color:#5a3a00;}
+/* hátlap-választó */
+.bk-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;width:100%;}
+.bk-opt{display:grid;gap:6px;justify-items:center;padding:8px;border-radius:14px;border:2px solid rgba(255,255,255,.12);background:rgba(0,0,0,.25);color:var(--ink);font:inherit;cursor:pointer;}
+.bk-opt i{display:block;width:100%;aspect-ratio:3/4;border-radius:8px;background-size:cover;background-position:center;box-shadow:0 6px 14px rgba(0,0,0,.5);}
+.bk-opt b{font-size:14px;}.bk-opt small{font-size:11px;color:var(--mute);text-align:center;}
+.bk-opt.on{border-color:var(--gold);box-shadow:0 0 14px rgba(255,200,80,.45);}
+.bk-opt.lock{opacity:.55;filter:grayscale(.8);cursor:default;}
+.bk-btn{margin:0 0 8px;}
 .lesson-box{display:grid;gap:10px;}
 .lesson-row{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:12px;border-radius:14px;border:1px solid rgba(255,255,255,.12);background:linear-gradient(160deg,#1d3550,#0f1d2e);color:var(--ink);font:inherit;cursor:pointer;}
 .lesson-row.done{border-color:rgba(120,220,160,.45);}

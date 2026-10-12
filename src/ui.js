@@ -370,6 +370,7 @@ function renderColl(bodyOnly) {
   const have = PLAYABLE.filter(c => owned(c.id) > 0).length, foils = PLAYABLE.filter(c => ownsFoil(c.id)).length;
   const dup = typeof dupeList === 'function' && Store.p ? dupeList(Store.p) : { out: [] };
   $('#collBody').innerHTML = `<p class="coll-sum">${have}/${PLAYABLE.length} különböző lap · ${foils} Full Art változat</p>` + (groups.length ? '' : '<p class="cf-empty">Nincs a szűrésnek megfelelő lap.</p>') +
+    `<button class="btn bk-btn" id="bkBtn">🃏 Hátlap: ${BACKS[myBack()].name}</button>` +
     (dup.out.length ? `<button class="btn dupe-btn" id="dupeBtn">♻️ ${dup.out.reduce((s, x) => s + x.n + x.f, 0)} fölösleges lap beváltása · +${dup.coins} coin</button>` : '') + groups.map(([t, type]) => `<div class="lbl">${t}</div><div class="coll-grid">${
     type ? PLAYABLE.filter(c => c.type === type && cfMatch(c)).sort((a, b) => a.cost - b.cost).map(c => {
       const n = ui.foil || c.foilOnly ? (Store.p?.coll[c.id]?.f || 0) : (Store.p?.coll[c.id]?.n || 0);
@@ -402,6 +403,7 @@ function collCardModal(id, cap) {
   }, true);
 }
 $('#collBody').onclick = e => {
+  if (e.target.closest('#bkBtn')) return backPicker();
   if (e.target.closest('#dupeBtn')) return dupeModal();
   const c = e.target.closest('[data-card]'), h = e.target.closest('[data-hcard]'), hg = e.target.closest('[data-hgold]');
   if (h && !ui.foil && Store.p && heroSkins(h.dataset.hcard).length > 1) return skinModal(h.dataset.hcard);
@@ -535,7 +537,7 @@ function logEvents(evs, snap) {
       case 'play': {
         const secret = e.side !== ME && c.sneak;
         const tg = e.tg ? ' → ' + nm(e.tg.side, e.tg.i) : '';
-        L(secret ? `🂠 ${who(e.side)} lerakott egy rejtett lapot` : `▶ ${who(e.side)} kijátszotta: <b>${escH(c.name)}</b>${tg}`); break; }
+        L(secret ? `🃏 ${who(e.side)} lerakott egy rejtett lapot` : `▶ ${who(e.side)} kijátszotta: <b>${escH(c.name)}</b>${tg}`); break; }
       case 'attack': L(`⚔ ${unitName(e.side, e.i)} támad`); break;
       case 'heroatk': L(`⚔ ${who(e.side)} (Baszó) odacsap`); break;
       case 'dmg': L(`💥 ${nm(e.side, e.i)}: −${e.n}`); break;
@@ -555,7 +557,7 @@ function logEvents(evs, snap) {
       case 'stolen': L(`🫳 ${unitName(e.side, e.i)} átállt a másik oldalra`); break;
       case 'push': L(`➡ Egy karakter arrébb tolva`); break;
       case 'misfire': L(`🍺 ${unitName(e.side, e.i)} mellé ütött`); break;
-      case 'reveal': if (e.side !== ME) L(`🂠 Felfordult: ${CARD[e.id].name}`); break;
+      case 'reveal': if (e.side !== ME) L(`🃏 Felfordult: ${CARD[e.id].name}`); break;
       case 'party': L(e.none ? `🍸 A parti lelke kiosztott egy italt (${CARD[e.id].name}), de nem volt kire` : `🍸 ${CARD[e.id].name} → ${CARD[e.tid]?.name || 'egy karakter'}`); break;
       case 'drinkgift': case 'gift': L(`🎁 ${e.side === ME ? CARD[e.id].name + ' a kezedbe' : 'Egy lap az ellenfél kezébe'}`); break;
       case 'coin': L(`💧 ${e.side === ME ? 'Kaptál' : 'Az ellenfél kapott'} egy pohár vizet`); break;
@@ -909,11 +911,12 @@ function heroBar(pi) {
       <div class="hpbar" role="img" aria-label="Élet: ${Math.max(0, p.hp)} / ${p.maxHp}"><span class="hps"><i style="width:${Math.max(0, p.hp) / p.maxHp * 100}%"></i></span><b>${Math.max(0, p.hp)} / ${p.maxHp}</b></div></div>
     <div class="res"><div class="en hudm${p.energy > p.maxEnergy ? ' bonus' : ''}" role="img" aria-label="Energia: ${p.energy} / ${p.maxEnergy}" title="Energia (most / legfeljebb)"><b>${p.energy}/${p.maxEnergy}</b></div>
       <div class="counts">Kéz ${p.hand.length} · <button class="gravebtn" data-grave="${pi}" aria-label="Temető: ${p.grave.length} lap"><i class="ic-grave" aria-hidden="true"></i>${p.grave.length}</button></div></div>
-    <button class="deckpile${p.deck.length ? p.deck.length <= 3 ? ' low' : '' : ' empty'}" data-deck="${pi}" aria-label="Húzópakli: ${p.deck.length} lap maradt" title="Húzópakli: ennyi lap maradt"><i></i><b>${p.deck.length}</b></button>`;
+    <button class="deckpile${p.deck.length ? p.deck.length <= 3 ? ' low' : '' : ' empty'}" data-deck="${pi}"${pi === BOT ? ` style="${oppBackVars()}"` : ''} aria-label="Húzópakli: ${p.deck.length} lap maradt" title="Húzópakli: ennyi lap maradt"><i></i><b>${p.deck.length}</b></button>`;
 }
 const STB_NOATK = '<span class="stb noatk" role="img" aria-label="Nem támad" title="Nem támad"></span>';
+const oppBackVars = () => backVars(S?.pvp && S.cos?.[BOT]?.back && BACKS[S.cos[BOT].back] ? S.cos[BOT].back : 'base');   // az ellenfél hátlapja (botnál a klasszikus)
 function unitHTML(u, side, i) {
-  if (u.hidden && side !== ME) return `<button data-uid="${u.uid}" class="unit facedown" aria-label="Rejtett lap">
+  if (u.hidden && side !== ME) return `<button data-uid="${u.uid}" class="unit facedown" aria-label="Rejtett lap" style="${oppBackVars()}">
     <span class="uin"><span class="art back-art"></span><span class="uname">Rejtett lap</span></span>
     <span class="st atk">?</span><span class="st hp">?</span>${u.stun ? `<span class="tags"><span class="zz stun" aria-hidden="true">bénult</span><span class="stc" role="img" aria-label="Bénult még ${u.stun} körig" title="Bénult még ${u.stun} körig"><b>${u.stun}</b></span></span>` : ''}</button>`;
   const c = CARD[u.id], atk = S.players[side].board[i]?.uid === u.uid ? effAtk(S, side, i) : u.atk, sleeping = u.fresh && !u.haste && u.id !== 'c_korso' && !c.noAttack && !u.stun;
@@ -1232,7 +1235,7 @@ async function showPlayed(id, tg, foil) {
   if (CARD[id].finisher) return;   // a kánon eseménynek saját, nagy bevonulása van (playIntro)
   const secret = !!CARD[id].sneak;
   const back = document.createElement('div'); back.className = 'played';
-  back.innerHTML = `<div class="wrap"><span class="tag">${S.pvp ? escH(S.names?.[BOT] || 'Az ellenfél') : HERO[S.players[BOT].heroId].name} ${secret ? 'lerakott egy rejtett lapot' : 'kijátszotta'}</span><span class="flip rev"><span class="flip-in"><span class="face back"></span><span class="face front">${cardHTML(id, { big: true, foil })}</span></span></span>${foil && !CARD[id].sneak ? '<span class="fa-flash">✨ Full Art ✨</span>' : ''}<span class="skip">Koppints a folytatáshoz</span></div>`;
+  back.innerHTML = `<div class="wrap"><span class="tag">${S.pvp ? escH(S.names?.[BOT] || 'Az ellenfél') : HERO[S.players[BOT].heroId].name} ${secret ? 'lerakott egy rejtett lapot' : 'kijátszotta'}</span><span class="flip rev" style="${oppBackVars()}"><span class="flip-in"><span class="face back"></span><span class="face front">${cardHTML(id, { big: true, foil })}</span></span></span>${foil && !CARD[id].sneak ? '<span class="fa-flash">✨ Full Art ✨</span>' : ''}<span class="skip">Koppints a folytatáshoz</span></div>`;
   $('#layer').appendChild(back);
   const wrap = back.querySelector('.wrap');
   const eb = $('#eBar').getBoundingClientRect(), wr = wrap.getBoundingClientRect();
