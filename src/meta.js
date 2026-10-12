@@ -765,8 +765,20 @@ async function rareReveal(o, f, c) {
 }
 
 // ---- paklik ----
+// Kezdőpaklik: ha megvan egy lap különleges változata (pl. Pifti, TZS), automatikusan azt teszi be a sima helyett (2026-10-12)
+function upgradeList(list) {
+  if (!Store.p) return list;
+  const out = { ...list };
+  for (const [id, k] of Object.entries(list)) {
+    const vars = CARDS.filter(v => v.variantOf === id && owned(v.id) > 0).sort((a, b) => owned(b.id) - owned(a.id));
+    let left = k;
+    for (const v of vars) { const use = Math.min(left, owned(v.id) - (out[v.id] || 0)); if (use > 0) { out[v.id] = (out[v.id] || 0) + use; left -= use; } }
+    if (left < k) { if (left) out[id] = left; else delete out[id]; }
+  }
+  return out;
+}
 function allDecks() {
-  const starters = Object.entries(DECKS).map(([id, d]) => ({ id, name: d.name, desc: d.desc, hero: d.hero, list: d.list, starter: true }));
+  const starters = Object.entries(DECKS).map(([id, d]) => ({ id, name: d.name, desc: d.desc, hero: d.hero, list: upgradeList(d.list), starter: true }));
   return starters.concat(Store.p ? Store.p.decks : []);
 }
 const deckCount = list => Object.values(list).reduce((a, b) => a + b, 0);

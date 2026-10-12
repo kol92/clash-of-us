@@ -414,6 +414,9 @@ Hősképesség-ötletek a táblázatban (még nem zöldek, nincsenek beépítve)
 - **Hátlapok (2026-10-12):** a játékos választhat hátlapot (Gyűjtemény → „🃏 Hátlap” gomb): Klasszikus (alap) és Legenda (`art/back_legend.webp`, a ranked Legenda jutalma; zárolva, amíg nincs meg). A választott hátlap látszik a saját paklin, húzáskor, a mulligan-cserénél, a saját rejtett lapokon – PvP-ben az ellenfél is ezt látja (`cos.back`); a bot hátlapja a klasszikus. (`BACKS`, `p.backs`, `p.cardBack`, CSS `--bk` / `--bk-sm`.)
 - Meccs végén a ranked eredmény-dobozban: jelvény, új rang, csillagok (az új csillag „bepattan”), megjegyzés (pl. „🔥 Győzelmi sorozat: +1 bónusz csillag”, „🛡 Kitartás…”, „Szintlépés! Ezüst 2”). A coin/küldetés/Season Pass ugyanúgy jár, mint a sima meccsen.
 
+## Változatok a kezdőpaklikban (2026-10-12)
+- Ha a játékosnak megvan egy lap különleges változata (pl. Pifti, TZS, Gál Zoli, Fogel, Rehab), a kezdőpaklikban automatikusan a változat kerül a sima lap helyére, annyi példányban, amennyi megvan belőle (`upgradeList` az `allDecks`-ben). Bot elleni meccsben, PvP-ben és rankedben is így megy; a pakli megnézésekor is a változat látszik. A bot paklija nem változik.
+
 ## Meccs eleji VS képernyő (2026-10-09)
 - Bot elleni és PvP meccs indulásakor (a kezdő kéz előtt) teljes képernyős „X vs Y” jelenet: felül az ellenfél hőse, alul a tiéd, átlósan elválasztva, a hős színével izzó kerettel; a nagy portrék a választott kinézettel (arany / portré skin). Felül „Bot” vagy „Ellenfél · név”, alul „Te · név”, középen becsapódó arany VS villanással, alatta ki kezd. ~3 mp után magától eltűnik, koppintásra azonnal továbblép. PvP-ben csak új meccsnél jelenik meg (folytatásnál nem); az oktató leckéknél nincs.
 
