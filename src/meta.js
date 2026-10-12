@@ -316,7 +316,7 @@ function renderProfileBar() {
     <div class="pb-day"><small>Mai coin</small><div class="meter"><i style="width:${e / ECON.dailyCap * 100}%"></i></div><small class="num">${e}/${ECON.dailyCap}</small></div>`;
   const ss = $('#saveState'); if (ss) ss.textContent = window.APP_MODE ? '👤 Fiók' : Store.mode === 'cloud' ? '☁️ Felhőben mentve' : '📱 Ezen az eszközön mentve';
   el.querySelector('.pb-name').textContent = p.name;
-  renderQuestBadge(); renderPassBadge(); try { renderRankTile(); } catch (e) {}
+  renderQuestBadge(); renderPassBadge(); try { renderRankTile(); } catch (e) {} try { if (!$('#scr-menu').hidden) dayGiftCheck(); } catch (e) {}
   const wb = $('#wheelBadge'); if (wb) wb.hidden = !wheelReady();
   const badge = $('#shopBadge'); if (badge) badge.hidden = !freePackReady() && !(p.giftPacks > 0) && !(p.faPacks > 0) && !(p.shinyPacks > 0);
 }
@@ -1008,7 +1008,7 @@ const SEASONS = [
   { id: 's2', name: '1. szezon · Nyitókör', start: new Date(2026, 9, 12, 0, 0), end: new Date(2026, 10, 11, 0, 0),
     tiers: [
       { coins: 50 }, { packs: 1 }, { coins: 75 }, { card: 'c_pifti2', had: 250 }, { shiny: 1 },
-      { coins: 100 }, { packs: 2 }, { card: 'c_tzs2', had: 250 }, { packs: 1 }, { shiny: 1 },
+      { coins: 100 }, { packs: 2 }, { card: 'c_tzs2', had: 250 }, { packs: 1 }, { port: 'p_laci_kave' },
       { coins: 100 }, { packs: 2 }, { coins: 100 }, { packs: 1 }, { port: 'p_milo_busz' },
       { coins: 150 }, { packs: 2 }, { shiny: 1 }, { packs: 2 }, { card: 'c_nyitinap' },
       { coins: 150 }, { packs: 2 }, { coins: 150 }, { packs: 3 }, { port: 'p_krisz_vip' },
@@ -2281,6 +2281,24 @@ function rkResultHTML(x) {
     ${a.t >= RK_LEG ? `<small>${a.lp} Legenda-pont</small>` : rkStars(a.t, a.st, gained)}${x.note ? `<small class="rk-note">${x.note}</small>` : ''}</div></div>`;
 }
 // menü csempe
+// ---- Best of Us TCG nap (2026-10-12): aznap belépők ajándék Bence-portrét kapnak, felugró ablakkal ----
+const DAY_GIFT = { id: 'bou-day-2026-10-12', date: '2026-10-12', port: 'p_bence_kerites' };
+function dayGiftCheck() {
+  const p = Store.p; if (!p || p.onboard || (typeof S !== 'undefined' && S) || $('#layer .overlay')) return;
+  const d = new Date(), today = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  p.gifts = p.gifts || [];
+  if (today !== DAY_GIFT.date || p.gifts.includes(DAY_GIFT.id)) return;
+  p.gifts.push(DAY_GIFT.id);
+  const k = DAY_GIFT.port, P = PORTRAITS[k], h = HERO[P.hero];
+  if (!(p.portraits || []).includes(k)) p.portraits = [...(p.portraits || []), k];
+  p.heroSkin = { ...(p.heroSkin || {}), [P.hero]: k };
+  save(); renderMenuFan();
+  const o = document.createElement('div'); o.className = 'overlay';
+  o.innerHTML = `<div class="modal sp-reveal"><h3>🎉 Boldog Best of Us TCG napot!</h3>${heroCardHTML(h, { big: true, port: k })}
+    <p class="live">Ma indul a játék – ezért ajándékba kapod <b>${P.name}</b> portrét: ${h.name} új kinézete, mindig Full Artban. Rögtön ezt viseli – a Gyűjteményben a hősre koppintva visszaválthatsz.</p><button class="btn primary" data-x>Köszi!</button></div>`;
+  o.onclick = e => { if (e.target.closest('[data-x]')) o.remove(); };
+  $('#layer').appendChild(o);
+}
 function renderRankTile() {
   const el = $('#rankSub'), em = $('#rankEmb'); if (!el || !Store.p) return;
   const r = ensureRank(Store.p);

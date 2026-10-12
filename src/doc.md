@@ -41,7 +41,7 @@
 - **Season Pass** (menü → Season Pass; ingyenes, mindenkinek):
   - 1. szezon · Nyitókör: 2026. szeptember 28. – november 2. (hétfő 0:01).
   - XP: győzelem 60, döntetlen 40, vereség 30; teljesített napi küldetés +100, heti küldetés +300. 30 szint, szintenként 250 XP.
-  - Jutalmak szintenként: 1. 50 coin · 2. 1 pack · 3. 75 coin · 4. 1 pack · 5. Shiny pack · 6. 100 coin · 7. 2 pack · 8. 75 coin · 9. 1 pack · 10. Shiny pack · 11. 100 coin · 12. Pifti különleges változat · 13. 100 coin · 14. 1 pack · 15. Shiny pack · 16. 150 coin · 17. 2 pack · 18. TZS különleges változat · 19. 2 pack · 20. Shiny pack · 21. 150 coin · 22. 2 pack · 23. 150 coin · 24. 3 pack · 25. Tomi nyaklánca Full Art (csak innen garantált) · 26. 200 coin · 27. 3 pack · 28. Shiny pack · 29. 250 coin · 30. választott Full Art hős.
+  - Jutalmak szintenként: 1. 50 coin · 2. 1 pack · 3. 75 coin · 4. 1 pack · 5. Shiny pack · 6. 100 coin · 7. 2 pack · 8. 75 coin · 9. 1 pack · **10. Laci, a reggeli feles (Laci hős-portré)** · 11. 100 coin · 12. Pifti különleges változat · 13. 100 coin · 14. 1 pack · 15. Shiny pack · 16. 150 coin · 17. 2 pack · 18. TZS különleges változat · 19. 2 pack · 20. Shiny pack · 21. 150 coin · 22. 2 pack · 23. 150 coin · 24. 3 pack · 25. Tomi nyaklánca Full Art (csak innen garantált) · 26. 200 coin · 27. 3 pack · 28. Shiny pack · 29. 250 coin · 30. választott Full Art hős.
   - Pifti (üvegekkel, garázsban) és TZS (páncélban) különleges változata csak Full Artban létezik, és csak a Season Passból szerezhető (packból soha). Ugyanaz a lap, mint az alap (a pakliban az alappal együtt legfeljebb 2 lehet belőle); a gyűjteményben az Alap nézetben is Full Artként látszik.
   - A 30. szint után minden további 250 XP 1 ráadás packot ad.
   - A jutalmat kézzel kell átvenni (egyenként vagy „Mind átveszem”). Ami a szezon végéig átvétlen marad, a következő szezon indulásakor automatikusan jóváíródik.
@@ -398,6 +398,7 @@ Hősképesség-ötletek a táblázatban (még nem zöldek, nincsenek beépítve)
   - Pifti/TZS változat: aki a 0. szezonban már megszerezte, helyette csendben 250 coint kap (`had:250`; a felületen nincs külön jelezve, átvételkor „+250 coin”).
   - A Krisz-portré Tomi kérése szerint a 20. szinten lett volna, de ott már Nyiti van (egy szinten egy jutalom), ezért a 25.-re került.
   - Portrék (`port`): csak a Season Passból (`passOnly`), a boltban nem jelennek meg; átvételkor a hős rögtön ezt viseli. Arany hős (`goldPick`): hősválasztó; ha már megvan, helyette `ECON.goldDupe` coin.
+- **Best of Us TCG nap (2026-10-12):** aki aznap (helyi idő) megnyitja a játékot – az új játékosok is, a bevezető után –, felugró ablakot kap: „🎉 Boldog Best of Us TCG napot!”, és ajándékba **Bence, a kerítésmászó** hős-portrét (rögtön ezt viseli). Egyszeri (`DAY_GIFT`, `p.gifts`), a boltban nem kapható.
 - **Nyiti, a napszúrás túlélője** 4 · 3/3, legendás, csak Season Pass (`passOnly`, packból nem jön, nem cserélhető) – „A köröd végén minden más karakter 1 sebzést kap (mindkét oldalon).” A Cápa nem sebződik, a rejtett ellenséges lap felfordul. Animáció: „☀️ Napszúrás! Mindenki −1”, meccsnapló. Teszt (4000 meccs, kezdőpaklikban egy 3–5-ös karakter helyett): 47,8% – Toma 54,0%, Laczkó 46,9% mellett; helyzetfüggő (a nagy életű paklikban erős).
 
 ## Ranked (2026-10-09)

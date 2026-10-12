@@ -123,6 +123,8 @@ const ART = {
   p_krisz_utca:   { src:'art/p_krisz_utca.webp', av:'58% 44%', pos:'56% 30%', port:'58% 44%' },
   p_milo_busz:    { src:'art/p_milo_busz.webp', av:'34% 22%', pos:'40% 22%', port:'34% 20%' },
   p_krisz_vip:    { src:'art/p_krisz_vip.webp', av:'42% 20%', pos:'44% 20%', port:'42% 18%' },
+  p_laci_kave:    { src:'art/p_laci_kave.webp', av:'60% 28%', pos:'60% 26%', port:'60% 24%' },
+  p_bence_kerites:{ src:'art/p_bence_kerites.webp', av:'52% 24%', pos:'52% 24%', port:'52% 22%' },
   c_nyitinap:     { src:'art/nyitinap.webp', av:'72% 34%', pos:'66% 36%' },
   g_barna: { src:'art/g_barna.webp', av:'64% 20%', pos:'62% 20%', port:'64% 16%' },
   g_laci:  { src:'art/g_laci.webp',  av:'46% 20%', pos:'46% 20%', port:'46% 16%' },
@@ -268,6 +270,8 @@ const PORTRAITS = {
   p_krisz_utca:   { hero: 'krisz', name: 'Krisz, az utca ura', price: 250 },
   p_milo_busz:    { hero: 'milo',  name: 'Milo, a 213-as utasa', passOnly: true },   // 1. szezon, 15. szint
   p_krisz_vip:    { hero: 'krisz', name: 'Krisz, a VIP', passOnly: true },           // 1. szezon, 25. szint
+  p_laci_kave:    { hero: 'laci',  name: 'Laci, a reggeli feles', passOnly: true },   // 1. szezon, 10. szint
+  p_bence_kerites:{ hero: 'bence', name: 'Bence, a kerítésmászó', passOnly: true },   // ajándék: Best of Us TCG nap (2026-10-12)
 };
 const isPort = v => !!(v && PORTRAITS[v] && ART[v]);
 function heroCardHTML(h, o = {}) {

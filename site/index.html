@@ -2089,7 +2089,7 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%;}
 <script src="vendor/firebase-auth-compat.js"></script>
 <script src="vendor/firebase-firestore-compat.js"></script>
 <script src="vendor/firebase-database-compat.js"></script>
-<script>window.APP_VERSION = "2026.10.12-1258";</script>
+<script>window.APP_VERSION = "2026.10.12-1300";</script>
 <script>// ===== Best of Us – saját szerver (Firebase) =====
 // A játék eredetileg a Claude-os tárolót használta (window.claude.use('db' | 'user' | 'room')).
 // Ez a fájl ugyanazt a felületet adja Firebase-ből, így a játék kódja szinte változatlan maradhat:
@@ -3392,6 +3392,8 @@ const ART = {
   p_krisz_utca:   { src:'art/p_krisz_utca.webp?v=35b986a0c7494b8d', av:'58% 44%', pos:'56% 30%', port:'58% 44%' },
   p_milo_busz:    { src:'art/p_milo_busz.webp?v=141aae57133e400a', av:'34% 22%', pos:'40% 22%', port:'34% 20%' },
   p_krisz_vip:    { src:'art/p_krisz_vip.webp?v=920e6ea62ac1f89c', av:'42% 20%', pos:'44% 20%', port:'42% 18%' },
+  p_laci_kave:    { src:'art/p_laci_kave.webp?v=c7b0ef65385c49f8', av:'60% 28%', pos:'60% 26%', port:'60% 24%' },
+  p_bence_kerites:{ src:'art/p_bence_kerites.webp?v=74817c85ddef5c14', av:'52% 24%', pos:'52% 24%', port:'52% 22%' },
   c_nyitinap:     { src:'art/nyitinap.webp?v=cdbcc561b41ba1d1', av:'72% 34%', pos:'66% 36%' },
   g_barna: { src:'art/g_barna.webp?v=2687c5a371343d73', av:'64% 20%', pos:'62% 20%', port:'64% 16%' },
   g_laci:  { src:'art/g_laci.webp?v=a6809a5542dbbb5b',  av:'46% 20%', pos:'46% 20%', port:'46% 16%' },
@@ -3537,6 +3539,8 @@ const PORTRAITS = {
   p_krisz_utca:   { hero: 'krisz', name: 'Krisz, az utca ura', price: 250 },
   p_milo_busz:    { hero: 'milo',  name: 'Milo, a 213-as utasa', passOnly: true },   // 1. szezon, 15. szint
   p_krisz_vip:    { hero: 'krisz', name: 'Krisz, a VIP', passOnly: true },           // 1. szezon, 25. szint
+  p_laci_kave:    { hero: 'laci',  name: 'Laci, a reggeli feles', passOnly: true },   // 1. szezon, 10. szint
+  p_bence_kerites:{ hero: 'bence', name: 'Bence, a kerítésmászó', passOnly: true },   // ajándék: Best of Us TCG nap (2026-10-12)
 };
 const isPort = v => !!(v && PORTRAITS[v] && ART[v]);
 function heroCardHTML(h, o = {}) {
@@ -5161,7 +5165,7 @@ function renderProfileBar() {
     <div class="pb-day"><small>Mai coin</small><div class="meter"><i style="width:${e / ECON.dailyCap * 100}%"></i></div><small class="num">${e}/${ECON.dailyCap}</small></div>`;
   const ss = $('#saveState'); if (ss) ss.textContent = window.APP_MODE ? '👤 Fiók' : Store.mode === 'cloud' ? '☁️ Felhőben mentve' : '📱 Ezen az eszközön mentve';
   el.querySelector('.pb-name').textContent = p.name;
-  renderQuestBadge(); renderPassBadge(); try { renderRankTile(); } catch (e) {}
+  renderQuestBadge(); renderPassBadge(); try { renderRankTile(); } catch (e) {} try { if (!$('#scr-menu').hidden) dayGiftCheck(); } catch (e) {}
   const wb = $('#wheelBadge'); if (wb) wb.hidden = !wheelReady();
   const badge = $('#shopBadge'); if (badge) badge.hidden = !freePackReady() && !(p.giftPacks > 0) && !(p.faPacks > 0) && !(p.shinyPacks > 0);
 }
@@ -5853,7 +5857,7 @@ const SEASONS = [
   { id: 's2', name: '1. szezon · Nyitókör', start: new Date(2026, 9, 12, 0, 0), end: new Date(2026, 10, 11, 0, 0),
     tiers: [
       { coins: 50 }, { packs: 1 }, { coins: 75 }, { card: 'c_pifti2', had: 250 }, { shiny: 1 },
-      { coins: 100 }, { packs: 2 }, { card: 'c_tzs2', had: 250 }, { packs: 1 }, { shiny: 1 },
+      { coins: 100 }, { packs: 2 }, { card: 'c_tzs2', had: 250 }, { packs: 1 }, { port: 'p_laci_kave' },
       { coins: 100 }, { packs: 2 }, { coins: 100 }, { packs: 1 }, { port: 'p_milo_busz' },
       { coins: 150 }, { packs: 2 }, { shiny: 1 }, { packs: 2 }, { card: 'c_nyitinap' },
       { coins: 150 }, { packs: 2 }, { coins: 150 }, { packs: 3 }, { port: 'p_krisz_vip' },
@@ -7126,6 +7130,24 @@ function rkResultHTML(x) {
     ${a.t >= RK_LEG ? `<small>${a.lp} Legenda-pont</small>` : rkStars(a.t, a.st, gained)}${x.note ? `<small class="rk-note">${x.note}</small>` : ''}</div></div>`;
 }
 // menü csempe
+// ---- Best of Us TCG nap (2026-10-12): aznap belépők ajándék Bence-portrét kapnak, felugró ablakkal ----
+const DAY_GIFT = { id: 'bou-day-2026-10-12', date: '2026-10-12', port: 'p_bence_kerites' };
+function dayGiftCheck() {
+  const p = Store.p; if (!p || p.onboard || (typeof S !== 'undefined' && S) || $('#layer .overlay')) return;
+  const d = new Date(), today = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  p.gifts = p.gifts || [];
+  if (today !== DAY_GIFT.date || p.gifts.includes(DAY_GIFT.id)) return;
+  p.gifts.push(DAY_GIFT.id);
+  const k = DAY_GIFT.port, P = PORTRAITS[k], h = HERO[P.hero];
+  if (!(p.portraits || []).includes(k)) p.portraits = [...(p.portraits || []), k];
+  p.heroSkin = { ...(p.heroSkin || {}), [P.hero]: k };
+  save(); renderMenuFan();
+  const o = document.createElement('div'); o.className = 'overlay';
+  o.innerHTML = `<div class="modal sp-reveal"><h3>🎉 Boldog Best of Us TCG napot!</h3>${heroCardHTML(h, { big: true, port: k })}
+    <p class="live">Ma indul a játék – ezért ajándékba kapod <b>${P.name}</b> portrét: ${h.name} új kinézete, mindig Full Artban. Rögtön ezt viseli – a Gyűjteményben a hősre koppintva visszaválthatsz.</p><button class="btn primary" data-x>Köszi!</button></div>`;
+  o.onclick = e => { if (e.target.closest('[data-x]')) o.remove(); };
+  $('#layer').appendChild(o);
+}
 function renderRankTile() {
   const el = $('#rankSub'), em = $('#rankEmb'); if (!el || !Store.p) return;
   const r = ensureRank(Store.p);
