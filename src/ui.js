@@ -91,7 +91,8 @@ function cardHTML(id, o = {}) {
   const fcls = fk === 'kanon' ? (o.foil ? ' framed xf xf-kanon xf-kanonfa kholo' : ' framed xf xf-kanon') + tlc : fk === 'foil' ? ' foil' : ' framed' + tlc;
   return `<div class="card ${TYPE[c.type][1]}${c.finisher ? ' kanon' : ''}${c.variantOf ? ' variant' : ''}${c.diamond ? ' diamond' : ''}${o.big ? ' big' : ''}${fcls}${o.cls ? ' ' + o.cls : ''}" style="--h:${hueOf(id)}" ${o.big ? `data-rar="${rarKey(c)}"` : ''} ${o.attrs || ''}>
     <div class="cframe">
-      ${ART[id] ? `<div class="art has-art" style="${artStyle(id, o.big)}">${o.big && ART[id].vid ? artVidHTML(id) : ''}</div>`
+      ${ART[id] && ART[id].fit && o.foil ? `<div class="art has-art fit" style="${artStyle(id, o.big)}--fit:${ART[id].fit};--fit-top:${ART[id].fitTop || '8%'}"><i class="art-blur"></i><i class="art-fit">${o.big && ART[id].vid ? artVidHTML(id) : ''}</i></div>`
+        : ART[id] ? `<div class="art has-art" style="${artStyle(id, o.big)}">${o.big && ART[id].vid ? artVidHTML(id) : ''}</div>`
         : `<div class="art"><span class="mono">${initials(c.name)}</span>${o.big && !o.foil ? '<span class="artnote">Illusztráció helye</span>' : ''}</div>`}
       <div class="ctype">${c.finisher ? '<i class="ic-kanon" aria-hidden="true"></i>Kánon esemény' : TYPE[c.type][0]}${c.drink ? ' · Ital' : ''}<i class="rar r-${rarKey(c)}" title="${RAR[rarKey(c)]}"></i></div>
       ${c.finisher ? `<i class="kanon-hero" title="${HERO[c.hero].name}" style="--h:${HERO[c.hero].hue};${ART[c.hero] ? `background-image:url('${artSrc(c.hero, false)}');background-position:${ART[c.hero].av || '50% 15%'}` : ''}">${ART[c.hero] ? '' : initials(HERO[c.hero].name)}</i>` : ''}
@@ -176,7 +177,7 @@ const ART = {
   a_kor: { src:'art/viz.webp', av:'50% 45%', pos:'50% 40%' },
   a_szulinap: { src:'art/szulinap.webp', av:'50% 40%', pos:'50% 42%' },
   c_bou: { src:'art/bou.webp', av:'52% 42%', pos:'50% 40%' },
-  c_bou_d: { src:'art/bou_d.webp', av:'52% 42%', pos:'50% 40%', vid:'art/vid/bou_d.mp4' },   // animált (2026-10-12)
+  c_bou_d: { src:'art/bou_d.webp', av:'52% 42%', pos:'50% 40%', vid:'art/vid/bou_d.mp4', fit:0.79, fitTop:'8%' },   // fit: a teljes kép a keret belsejébe kicsinyítve (a szélső emberek is látszanak)   // animált (2026-10-12)
   c_davidsofor: { src:'art/davidsofor.webp', av:'35% 20%', pos:'35% 20%' },
   c_lacifinale: { src:'art/lacifinale.webp', av:'48% 16%', pos:'48% 16%' },
   i_ing: { src:'art/ing.webp', av:'50% 40%', pos:'50% 35%' },

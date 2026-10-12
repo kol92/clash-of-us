@@ -423,6 +423,7 @@ Hősképesség-ötletek a táblázatban (még nem zöldek, nincsenek beépítve)
 - Hol mozog: a **nagy lapnézetben** (lap kinagyítása, gyűjtemény, packnyitás/szerencsekerék felfedés, kijátszott lap kinagyítása). A táblán és a kis lapokon állókép marad (akkumulátor, iPhone-teljesítmény).
 - Működés: `ART[id].vid` (ui.js) → a `cardHTML` nagy nézetben egy némított, ismétlődő `<video>`-t tesz az állókép fölé, ami csak akkor tűnik elő, amikor ténylegesen elindult. Alacsony fogyasztású módban / ha nem indul el / „csökkentett mozgás” beállításnál az állókép látszik.
 - Fájl: `art/vid/NEV.mp4` – H.264, 600×800, ~1 MB (`ffmpeg … -vf scale=600:800 -c:v libx264 -preset slow -crf 29 -movflags +faststart -an`). A build verziózza (`?v=hash`). A service worker NEM gyorsítótárazza a videókat (iPhone-on úgy nem indulnának), azokat a böngésző a sima HTTP-gyorsítótárból kezeli; nem töltődnek le előre, csak ha valaki megnézi a lapot.
+- Kép-illesztés (`fit`, 2026-10-12): a gyémánt keret oldalt a lap ~10,7%-át takarja, így a csoportképen a szélső emberek kilógtak. Az `ART` bejegyzés `fit:0.79, fitTop:'8%'` mezője Full Art elrendezésben a teljes képet (és a videót) a keret belsejébe kicsinyíti, mögötte ugyanaz a kép elmosva tölti ki a szegélyt. Más széles (csoport)képnél is használható.
 - Új animált lap: a videót (3:4, 3–8 mp, körbefutó, szöveg nélkül) így kell átkódolni, és az `ART` bejegyzésbe `vid:'art/vid/NEV.mp4'`.
 
 ## Új hátlapok: Ametiszt és Rubin (2026-10-12)
