@@ -582,6 +582,9 @@ function logEvents(evs, snap) {
     if (!g) { g = { half: S.half || 1, turn: Math.max(1, Math.ceil((S.half || 1) / 2)), side: S.active, lines: [] }; S.log.push(g); }
     return g;
   };
+  // döntő csapás (2026-10-13, Laci kérése): melyik sor ütötte ki a hőst, és mi okozta
+  let lastCause = null, kill = null;
+  const NOCAUSE = new Set(['dmg', 'death', 'reveal', 'heal', 'buff', 'draw', 'coin', 'burn', 'expire', 'revive', 'shield', 'debuff']);
   for (const e of evs) {
     if (e.t === 'turn') { const prev = S.log[S.log.length - 1], h = prev ? prev.half + 1 : (S.half || 1);
       S.log.push({ half: h, turn: Math.ceil(h / 2), side: e.side, lines: [] }); if (S.log.length > 60) S.log.shift(); continue; }
@@ -641,6 +644,19 @@ function logEvents(evs, snap) {
       case 'burn': L(`🔥 Tele a kéz: elégett egy lap`); break;
       case 'fatigue': L(`🪫 ${who(e.side)}: üres pakli, ${e.n} sebzés`); break;
     }
+    const gg = S.log[S.log.length - 1];
+    if (gg && gg.lines.length) {
+      const last = gg.lines.length - 1;
+      if (!NOCAUSE.has(e.t) || e.t === 'fatigue') lastCause = gg.lines[last];
+      if (e.t === 'dmg' && e.i === -1) kill = { g: gg, idx: last, side: e.side, cause: lastCause };
+      if (e.t === 'fatigue') kill = { g: gg, idx: last, side: e.side, cause: null };
+    }
+  }
+  if (S.winner != null && S.reason === 'ko' && kill && !S.killShot && (S.winner === 'draw' || kill.side !== S.winner)) {
+    const line = kill.g.lines[kill.idx], cause = kill.cause && kill.cause !== line ? kill.cause : '';
+    kill.g.lines[kill.idx] = `<span class="ko-line">${line}</span>`;
+    S.killShot = (cause ? cause.replace(/^\S+\s/, '') + ' → ' : '') + line.replace(/^\S+\s/, '');
+    kill.g.lines.push(`<span class="ko-sum">🏁 <b>Döntő csapás:</b> ${S.killShot}</span>`);
   }
 }
 function openLog() {
@@ -1577,6 +1593,7 @@ function endMatch() {
   const why = S.reason === 'time'
     ? `Letelt a ${MAX_HALF / 2} kör. Életek: te ${S.players[ME].hp}, ellenfél ${S.players[BOT].hp}.`
     : draw ? 'Mindkét hős egyszerre dőlt ki.' : win ? 'Az ellenfél hőse kiütve.' : 'A hősöd kiütve.';
+  const kill = S.killShot && S.reason !== 'time' ? `<span class="ko-why">🏁 Döntő csapás: ${S.killShot}</span>` : '';
   const aw = awardMatch(draw ? 'draw' : win ? 'win' : 'loss');
   if (S.ranked && !S.rkDone) { S.rkDone = true; S.rkRes = rankOnMatch(draw ? 'draw' : win ? 'win' : 'loss'); }
   const qd = S.qDone ? [] : questsOnMatch({ win, hero: S.players[ME].heroId, ...(S.qs || { actions: 0, items: 0, chars: 0, locs: 0, big: 0, heroDmg: 0, kills: 0 }) });
@@ -1586,7 +1603,7 @@ function endMatch() {
     + qd.map(q => `<div class="q-done-pop">✓ Küldetés teljesítve: <b>${q.txt}</b><em>+${q.rew}</em></div>`).join('')
     + (px ? `<div class="sp-pop${px.up ? ' up' : ''}"><b>+${px.gain} XP</b> Season Pass${px.up ? ` · <em>Szintlépés! ${px.lv}. szint – vedd át a jutalmat</em>` : ` · ${px.lv}. szint (${px.inLv}/${PASS_XP.perLevel})`}</div>` : '') + (S.ranked ? rkResultHTML(S.rkRes) : '');
   const o = document.createElement('div'); o.className = 'overlay';
-  o.innerHTML = `<div class="modal result${win ? '' : ' lose'}${draw ? '' : ' resart'}">${draw ? '<h2 class="banner-h"><img src="art/ui/banner-draw.webp" alt="Döntetlen"></h2>' : resultArt(win)}<p>${why}</p>${reward}
+  o.innerHTML = `<div class="modal result${win ? '' : ' lose'}${draw ? '' : ' resart'}">${draw ? '<h2 class="banner-h"><img src="art/ui/banner-draw.webp" alt="Döntetlen"></h2>' : resultArt(win)}<p>${why}</p>${kill}${reward}
     <button class="btn small ghost res-log" data-log>📜 Mi történt a meccsen?</button>
     <div class="row"><button class="btn" data-r="menu">Menü</button><button class="btn primary" data-r="again">${S.ranked ? 'Újabb ranked' : 'Új meccs'}</button></div></div>`;
   const wasRanked = !!S.ranked;
