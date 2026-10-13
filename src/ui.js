@@ -310,6 +310,19 @@ function heroCardHTML(h, o = {}) {
 
 // ---------- képernyők ----------
 function show(id) { document.querySelectorAll('.screen').forEach(x => x.hidden = x.id !== id); document.body.classList.toggle('in-game', id === 'scr-game'); document.body.dataset.scr = id; }
+// Android vissza gomb / gesztus (2026-10-13): egy szintet lép vissza az appon belül, nem lép ki
+try {
+  const _show = show;
+  show = function (id) { _show(id); try { if (id !== 'scr-menu' && history.state?.bou !== id) history.pushState({ bou: id }, ''); } catch (e) {} };
+  addEventListener('popstate', () => {
+    const cur = document.querySelector('.screen:not([hidden])'), id = cur ? cur.id : 'scr-menu';
+    const ov = [...document.querySelectorAll('#layer .overlay')].pop();
+    const keep = () => { try { history.pushState({ bou: id }, ''); } catch (e) {} };
+    if (ov) { const x = ov.querySelector('[data-x]'); if (x) x.click(); else if (!ov.classList.contains('vs-screen') && !ov.querySelector('.result')) ov.remove(); keep(); return; }
+    if (id === 'scr-game' || id === 'scr-menu') { if (id === 'scr-game') keep(); return; }
+    const b = cur.querySelector('.top [data-back], .top .back, #edBack'); if (b) b.click(); else { renderMenuFan(); renderProfileBar(); _show('scr-menu'); }
+  });
+} catch (e) {}
 document.querySelectorAll('[data-back]').forEach(b => b.onclick = () => { renderMenuFan(); renderProfileBar(); show('scr-menu'); });
 // iOS: csippentéses zoom tiltása (a dupla koppintást a touch-action kezeli)
 ['gesturestart', 'gesturechange'].forEach(t => document.addEventListener(t, e => e.preventDefault(), { passive: false }));
@@ -1438,7 +1451,7 @@ async function amongUsFx(el, anchor) {
   if (anchor) floatAt(anchor, '🌶️ Megszívta!', 'dmg');
   await sleep(350);
 }
-const BOT_LV_NAME = { 1: 'Könnyű', 2: 'Normál', 3: 'Nehéz' };
+const BOT_LV_NAME = { 1: 'Könnyű', 2: 'Normál', 3: 'Nehéz', 4: 'Mester' };
 const BOT_LV_TIP = { 1: 'Laza bot: néha elnézi a lépéseit. Jó kezdésnek és tanulásnak.', 2: 'Rendes ellenfél: mindig a pillanatnyilag legjobb lépést keresi.', 3: 'Kemény bot: előre tervez, és számol a visszavágásoddal is.' };
 function vsIntro() {
   return new Promise(done => {
@@ -1448,7 +1461,7 @@ function vsIntro() {
       const pos = ART[aid]?.port || ART[aid]?.pos || ART[aid]?.av || '50% 15%';
       return `<div class="vs-side ${pi === ME ? 'me' : 'foe'}${gold ? ' gold' : ''}${port || gold || heroFaOf(pi) ? ' fa' : ''}" style="--h:${h.hue}">
         <div class="vs-art" style="${ART[aid] ? `background-image:url('${artSrc(aid, false)}');` : ''}background-position:${pos}"></div>
-        <div class="vs-plate"><small>${pi === ME ? `Te · ${escH(who)}` : S.pvp ? `Ellenfél · ${escH(who)}` : `Bot · ${BOT_LV_NAME[S.botLv || 2]}`}</small><b>${escH(h.name)}</b></div></div>`;
+        <div class="vs-plate"><small>${pi === ME ? `Te · ${escH(who)}` : S.pvp ? `Ellenfél · ${escH(who)}` : `Bot · ${BOT_LV_NAME[S.botLv || 2]}${S.botLv === 4 ? ' (+6 élet)' : ''}`}</small><b>${escH(h.name)}</b></div></div>`;
     };
     const firstTxt = S.active === ME ? 'Te kezdesz' : `${S.pvp ? escH(S.names?.[BOT] || 'Az ellenfél') : 'Az ellenfél'} kezd`;
     const o = document.createElement('div'); o.className = 'overlay vs-screen';
@@ -1467,6 +1480,14 @@ function startMatch(heroId, deckId, opt = {}) {
   const mine = (allDecks().find(d => d.id === deckId) || allDecks()[0]).list;
   S = newGame(heroId, { ...mine }, bh, bd, first, { mulligan: true, foils: [0, 1].map(k => k === ME ? myFoils(mine) : {}) }); S.events = [];
   S.botLv = opt.ranked ? rkBotLv() : (opt.lv || botLvPref());   // bot-szint: rankedben a rangtól függ
+  if (S.botLv === 4) {   // Mester bot: a 🪄 paklisegéd a teljes kártyakészletből rakja össze a bot hősének paklijét
+    try {
+      const full = id => { const c = CARD[id]; return c.token || c.off || c.passOnly || c.shopOnly || c.wheelOnly || c.variantOf ? 0 : c.rarity === 'l' ? 1 : 2; };
+      const strong = deckHelperFill({}, bh, full).list;
+      if (deckCount(strong) === DECK_SIZE) S = Object.assign(newGame(heroId, { ...mine }, bh, strong, first, { mulligan: true, foils: [0, 1].map(k => k === ME ? myFoils(mine) : {}) }), { events: [], botLv: 4, ranked: S.ranked });
+    } catch (e) {}
+    S.players[BOT].hp += 6; S.players[BOT].maxHp += 6;   // nyílt előny: a Mester bot +6 élettel kezd (a VS képernyő kiírja)
+  }
   if (opt.ranked) { S.ranked = true; const r = ensureRank(Store.p); if (r) { r.pend = Date.now(); save(); } }   // ha bezárja az appot, vereségnek számít
   ui.sel = null; busy = true; ui.handSeen = null; ui.botHandN = null; ui.flying = new Set(); show('scr-game');
   $('#layer').innerHTML = '';

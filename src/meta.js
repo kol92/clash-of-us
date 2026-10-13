@@ -2422,7 +2422,7 @@ function rankOnMatch(res) {
   r.games++; delete r.pend;
   if (res === 'win') {
     r.w++;
-    const bonus = r.streak >= 2 && r.t < RK_LEG ? 1 : 0;
+    const bonus = r.streak >= 2 && r.t < RK_LEG && !(rkHard() && r.t >= 10) ? 1 : 0;   // 2. szezontól Aranyban nincs bónusz csillag
     r.streak++; r.shield = false;
     if (r.t >= RK_LEG) { r.lp++; note = '+1 Legenda-pont'; }
     else {
@@ -2608,7 +2608,7 @@ function renderRanked() {
       ${others.length ? '' : `<p class="q-note">${RKB.tab === 'fr' ? 'Még egy barátod sem játszott ranked meccset ebben a szezonban.' : RKB.busy ? 'Ranglista betöltése…' : 'Még senki más nem játszott ranked meccset ebben a szezonban.'}</p>`}
       ${RKB.tab !== 'fr' ? '<p class="q-note rk-tip">Koppints egy játékosra – innen is bejelölheted barátnak.</p>' : ''}</div>
     <details class="rk-rules"><summary>Hogyan működik?</summary><ul>
-      <li>Győzelem: +1 csillag. Sorozatban a 3. győzelemtől minden győzelem dupla, azaz 2 csillagot ér – Bronzban, Ezüstben és Aranyban is.</li>
+      <li>Győzelem: +1 csillag. Sorozatban a 3. győzelemtől minden győzelem dupla, azaz 2 csillagot ér – ${rkHard() ? 'Bronzban és Ezüstben (Aranyban nem)' : 'Bronzban, Ezüstben és Aranyban is'}.</li>${rkHard() ? '' : '\n      <li>A 2. szezontól (nov. 11.) nehezebb lesz: Aranyban nem jár dupla csillag, és Aranytól a Mester bot jön (erős pakli, +6 élet).</li>'}
       <li>Az elért ligából nem esel vissza: Ezüst 5 és Arany 5 alá sem, csak a ligán belül.</li>
       <li>Bronzban 2, Ezüstben 3, Aranyban 4 csillag kell egy fokozathoz. Arany 1 után jön a Legenda.</li>
       <li>Bronzban és Ezüst 5-ön a vereség nem visz el csillagot, és Ezüst 5 alá már nem eshetsz vissza.</li>
@@ -2628,7 +2628,9 @@ function rankedSearch(dk) {
 // bot-szint (2026-10-12): a bot elleni meccsben választható; az új játékosnak (első 5 meccs) Könnyű az alap.
 // Rankedben a rang dönt: Bronz 5–3 Könnyű, Bronz 2 – Ezüst 1 Normál, Arany és Legenda Nehéz.
 function botLvPref() { const p = Store.p; if (!p) return 2; if (p.botLv) return p.botLv; const g = (p.stats?.w || 0) + (p.stats?.l || 0) + (p.stats?.d || 0); return g < 5 ? 1 : 2; }
-function rkBotLv() { const r = ensureRank(Store.p); const t = r ? r.t : 0; return t <= 2 ? 1 : t < 10 ? 2 : 3; }
+function rkBotLv() { const r = ensureRank(Store.p); const t = r ? r.t : 0; return t <= 2 ? 1 : t < 10 ? 2 : rkHard() ? 4 : 3; }
+// 2. szezontól (2026-11-11, Tomi döntése 2026-10-13): Aranyban nincs dupla csillag, és Aranytól Mester bot jön
+const rkHard = () => Date.now() >= (SEASONS.find(x => x.id === 's2')?.end?.getTime() || Infinity);
 function rankedBot(dk) {
   ui.deck = dk.id;
   startMatch(dk.hero, dk.id, { ranked: true });

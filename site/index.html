@@ -1604,6 +1604,11 @@ button.rk-row:active{transform:scale(.98);}
   .g-right .lg-turn h4{font-size:11px;margin:0 0 3px;}
   .g-right ul{margin:0;padding-left:16px;} .g-right li{margin:1px 0;}
 }
+/* fejléc: a vissza gomb sosem zsugorodhat el (Androidon a szélesebb betűtípus miatt eltűnt a Gyűjteményből, 2026-10-13) */
+.top .back,.top>.back{flex:none;}
+.top h2{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.top .seg{flex:none;}
+@media (max-width:440px){#scr-coll .top{flex-wrap:wrap;row-gap:8px;} #scr-coll .top .seg{flex:1 1 100%;display:grid;grid-template-columns:1fr 1fr;}}
 .rk-botrow{display:flex;align-items:center;gap:12px;margin:0 0 10px;padding:10px 14px;border-radius:12px;background:rgba(10,20,30,.85);border:1px solid rgba(255,255,255,.14);cursor:pointer;}
 .rk-botrow input{width:22px;height:22px;accent-color:#f2c14e;flex:none;}
 .rk-botrow span{display:grid;gap:2px;}.rk-botrow small{font-size:12px;color:var(--mute);}
@@ -2195,7 +2200,7 @@ button.rk-row:active{transform:scale(.98);}
 <script src="vendor/firebase-auth-compat.js"></script>
 <script src="vendor/firebase-firestore-compat.js"></script>
 <script src="vendor/firebase-database-compat.js"></script>
-<script>window.APP_VERSION = "2026.10.13-1316"; window.APP_BUILD = "2026.10.13-1316";</script>
+<script>window.APP_VERSION = "2026.10.13-1459"; window.APP_BUILD = "2026.10.13-1459";</script>
 <script>// ===== Best of Us – saját szerver (Firebase) =====
 // A játék eredetileg a Claude-os tárolót használta (window.claude.use('db' | 'user' | 'room')).
 // Ez a fájl ugyanazt a felületet adja Firebase-ből, így a játék kódja szinte változatlan maradhat:
@@ -3348,7 +3353,7 @@ function botView(s) {
   return v;
 }
 // Bot-szintek (2026-10-12): 1 = Könnyű (zajos döntések, néha korábban befejezi a kört), 2 = Normál (a régi bot), 3 = Nehéz (két lapra előre gondolkodik)
-const BOT_LV = { 1: { noise: 2.5, stop: 0.12 }, 2: {}, 3: { look: 6, deep: 0.5 } };
+const BOT_LV = { 1: { noise: 2.5, stop: 0.12 }, 2: {}, 3: { look: 6, deep: 0.5 }, 4: { look: 6, deep: 0.5 } };   // 4 = Mester: a Nehéz gondolkodása + erősebb pakli (a pakli a ui.js startMatch-ben)
 const gauss = () => { let u = 0, v = 0; while (!u) u = Math.random(); while (!v) v = Math.random(); return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v); };
 // Nehéz bot: az ellenfél válaszcsapását is számolja (a köre végén a mostani lapjaival visszaüt – lapkijátszás nélkül)
 function scoreDeep(s, me, d) {
@@ -3724,6 +3729,19 @@ function heroCardHTML(h, o = {}) {
 
 // ---------- képernyők ----------
 function show(id) { document.querySelectorAll('.screen').forEach(x => x.hidden = x.id !== id); document.body.classList.toggle('in-game', id === 'scr-game'); document.body.dataset.scr = id; }
+// Android vissza gomb / gesztus (2026-10-13): egy szintet lép vissza az appon belül, nem lép ki
+try {
+  const _show = show;
+  show = function (id) { _show(id); try { if (id !== 'scr-menu' && history.state?.bou !== id) history.pushState({ bou: id }, ''); } catch (e) {} };
+  addEventListener('popstate', () => {
+    const cur = document.querySelector('.screen:not([hidden])'), id = cur ? cur.id : 'scr-menu';
+    const ov = [...document.querySelectorAll('#layer .overlay')].pop();
+    const keep = () => { try { history.pushState({ bou: id }, ''); } catch (e) {} };
+    if (ov) { const x = ov.querySelector('[data-x]'); if (x) x.click(); else if (!ov.classList.contains('vs-screen') && !ov.querySelector('.result')) ov.remove(); keep(); return; }
+    if (id === 'scr-game' || id === 'scr-menu') { if (id === 'scr-game') keep(); return; }
+    const b = cur.querySelector('.top [data-back], .top .back, #edBack'); if (b) b.click(); else { renderMenuFan(); renderProfileBar(); _show('scr-menu'); }
+  });
+} catch (e) {}
 document.querySelectorAll('[data-back]').forEach(b => b.onclick = () => { renderMenuFan(); renderProfileBar(); show('scr-menu'); });
 // iOS: csippentéses zoom tiltása (a dupla koppintást a touch-action kezeli)
 ['gesturestart', 'gesturechange'].forEach(t => document.addEventListener(t, e => e.preventDefault(), { passive: false }));
@@ -4852,7 +4870,7 @@ async function amongUsFx(el, anchor) {
   if (anchor) floatAt(anchor, '🌶️ Megszívta!', 'dmg');
   await sleep(350);
 }
-const BOT_LV_NAME = { 1: 'Könnyű', 2: 'Normál', 3: 'Nehéz' };
+const BOT_LV_NAME = { 1: 'Könnyű', 2: 'Normál', 3: 'Nehéz', 4: 'Mester' };
 const BOT_LV_TIP = { 1: 'Laza bot: néha elnézi a lépéseit. Jó kezdésnek és tanulásnak.', 2: 'Rendes ellenfél: mindig a pillanatnyilag legjobb lépést keresi.', 3: 'Kemény bot: előre tervez, és számol a visszavágásoddal is.' };
 function vsIntro() {
   return new Promise(done => {
@@ -4862,7 +4880,7 @@ function vsIntro() {
       const pos = ART[aid]?.port || ART[aid]?.pos || ART[aid]?.av || '50% 15%';
       return `<div class="vs-side ${pi === ME ? 'me' : 'foe'}${gold ? ' gold' : ''}${port || gold || heroFaOf(pi) ? ' fa' : ''}" style="--h:${h.hue}">
         <div class="vs-art" style="${ART[aid] ? `background-image:url('${artSrc(aid, false)}');` : ''}background-position:${pos}"></div>
-        <div class="vs-plate"><small>${pi === ME ? `Te · ${escH(who)}` : S.pvp ? `Ellenfél · ${escH(who)}` : `Bot · ${BOT_LV_NAME[S.botLv || 2]}`}</small><b>${escH(h.name)}</b></div></div>`;
+        <div class="vs-plate"><small>${pi === ME ? `Te · ${escH(who)}` : S.pvp ? `Ellenfél · ${escH(who)}` : `Bot · ${BOT_LV_NAME[S.botLv || 2]}${S.botLv === 4 ? ' (+6 élet)' : ''}`}</small><b>${escH(h.name)}</b></div></div>`;
     };
     const firstTxt = S.active === ME ? 'Te kezdesz' : `${S.pvp ? escH(S.names?.[BOT] || 'Az ellenfél') : 'Az ellenfél'} kezd`;
     const o = document.createElement('div'); o.className = 'overlay vs-screen';
@@ -4881,6 +4899,14 @@ function startMatch(heroId, deckId, opt = {}) {
   const mine = (allDecks().find(d => d.id === deckId) || allDecks()[0]).list;
   S = newGame(heroId, { ...mine }, bh, bd, first, { mulligan: true, foils: [0, 1].map(k => k === ME ? myFoils(mine) : {}) }); S.events = [];
   S.botLv = opt.ranked ? rkBotLv() : (opt.lv || botLvPref());   // bot-szint: rankedben a rangtól függ
+  if (S.botLv === 4) {   // Mester bot: a 🪄 paklisegéd a teljes kártyakészletből rakja össze a bot hősének paklijét
+    try {
+      const full = id => { const c = CARD[id]; return c.token || c.off || c.passOnly || c.shopOnly || c.wheelOnly || c.variantOf ? 0 : c.rarity === 'l' ? 1 : 2; };
+      const strong = deckHelperFill({}, bh, full).list;
+      if (deckCount(strong) === DECK_SIZE) S = Object.assign(newGame(heroId, { ...mine }, bh, strong, first, { mulligan: true, foils: [0, 1].map(k => k === ME ? myFoils(mine) : {}) }), { events: [], botLv: 4, ranked: S.ranked });
+    } catch (e) {}
+    S.players[BOT].hp += 6; S.players[BOT].maxHp += 6;   // nyílt előny: a Mester bot +6 élettel kezd (a VS képernyő kiírja)
+  }
   if (opt.ranked) { S.ranked = true; const r = ensureRank(Store.p); if (r) { r.pend = Date.now(); save(); } }   // ha bezárja az appot, vereségnek számít
   ui.sel = null; busy = true; ui.handSeen = null; ui.botHandN = null; ui.flying = new Set(); show('scr-game');
   $('#layer').innerHTML = '';
@@ -7497,7 +7523,7 @@ function rankOnMatch(res) {
   r.games++; delete r.pend;
   if (res === 'win') {
     r.w++;
-    const bonus = r.streak >= 2 && r.t < RK_LEG ? 1 : 0;
+    const bonus = r.streak >= 2 && r.t < RK_LEG && !(rkHard() && r.t >= 10) ? 1 : 0;   // 2. szezontól Aranyban nincs bónusz csillag
     r.streak++; r.shield = false;
     if (r.t >= RK_LEG) { r.lp++; note = '+1 Legenda-pont'; }
     else {
@@ -7683,7 +7709,7 @@ function renderRanked() {
       ${others.length ? '' : `<p class="q-note">${RKB.tab === 'fr' ? 'Még egy barátod sem játszott ranked meccset ebben a szezonban.' : RKB.busy ? 'Ranglista betöltése…' : 'Még senki más nem játszott ranked meccset ebben a szezonban.'}</p>`}
       ${RKB.tab !== 'fr' ? '<p class="q-note rk-tip">Koppints egy játékosra – innen is bejelölheted barátnak.</p>' : ''}</div>
     <details class="rk-rules"><summary>Hogyan működik?</summary><ul>
-      <li>Győzelem: +1 csillag. Sorozatban a 3. győzelemtől minden győzelem dupla, azaz 2 csillagot ér – Bronzban, Ezüstben és Aranyban is.</li>
+      <li>Győzelem: +1 csillag. Sorozatban a 3. győzelemtől minden győzelem dupla, azaz 2 csillagot ér – ${rkHard() ? 'Bronzban és Ezüstben (Aranyban nem)' : 'Bronzban, Ezüstben és Aranyban is'}.</li>${rkHard() ? '' : '\n      <li>A 2. szezontól (nov. 11.) nehezebb lesz: Aranyban nem jár dupla csillag, és Aranytól a Mester bot jön (erős pakli, +6 élet).</li>'}
       <li>Az elért ligából nem esel vissza: Ezüst 5 és Arany 5 alá sem, csak a ligán belül.</li>
       <li>Bronzban 2, Ezüstben 3, Aranyban 4 csillag kell egy fokozathoz. Arany 1 után jön a Legenda.</li>
       <li>Bronzban és Ezüst 5-ön a vereség nem visz el csillagot, és Ezüst 5 alá már nem eshetsz vissza.</li>
@@ -7703,7 +7729,9 @@ function rankedSearch(dk) {
 // bot-szint (2026-10-12): a bot elleni meccsben választható; az új játékosnak (első 5 meccs) Könnyű az alap.
 // Rankedben a rang dönt: Bronz 5–3 Könnyű, Bronz 2 – Ezüst 1 Normál, Arany és Legenda Nehéz.
 function botLvPref() { const p = Store.p; if (!p) return 2; if (p.botLv) return p.botLv; const g = (p.stats?.w || 0) + (p.stats?.l || 0) + (p.stats?.d || 0); return g < 5 ? 1 : 2; }
-function rkBotLv() { const r = ensureRank(Store.p); const t = r ? r.t : 0; return t <= 2 ? 1 : t < 10 ? 2 : 3; }
+function rkBotLv() { const r = ensureRank(Store.p); const t = r ? r.t : 0; return t <= 2 ? 1 : t < 10 ? 2 : rkHard() ? 4 : 3; }
+// 2. szezontól (2026-11-11, Tomi döntése 2026-10-13): Aranyban nincs dupla csillag, és Aranytól Mester bot jön
+const rkHard = () => Date.now() >= (SEASONS.find(x => x.id === 's2')?.end?.getTime() || Infinity);
 function rankedBot(dk) {
   ui.deck = dk.id;
   startMatch(dk.hero, dk.id, { ranked: true });

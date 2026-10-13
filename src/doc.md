@@ -459,6 +459,18 @@ Hősképesség-ötletek a táblázatban (még nem zöldek, nincsenek beépítve)
   - Telefonon semmi nem változott.
 - Számítógépen egérrel ugyanúgy játszható (kattintás = koppintás, húzás = húzás).
 
+## Ranked 2. szezontól: nehezebb Legenda (döntés: 2026-10-13, élesedik: 2026-11-11)
+- Ok: Krisztián ~2 óra alatt jutott Arany 5-ről Legendába (Aranyban kb. 75%-os győzelem, a dupla csillaggal ~22 meccs).
+- Az 1. szezon végétől (`rkHard()`: a `s2` szezon vége után) automatikusan:
+  - **Aranyban nincs dupla csillag** (a győzelmi sorozat bónusza csak Bronzban és Ezüstben jár).
+  - **Mester bot Aranytól** (`BOT_LV[4]`, `rkBotLv`): a Nehéz bot gondolkodása, a 🪄 paklisegéd által a teljes kártyakészletből összerakott paklival, és **+6 élettel kezd** (nyílt előny, a VS képernyő kiírja: „Bot · Mester (+6 élet)”).
+- Mérés: Mester a Nehéz ellen 66,5%, a Normál ellen ~75% (+6 élettel; pusztán erősebb paklival / mélyebb kereséssel csak ~50–52% volt a Nehéz ellen). Szimuláció Arany 5 → Legenda dupla csillag nélkül: 60%-os játékos ~81 meccs, 70%-os ~46, 55%-os ~133.
+- A ranked „Hogyan működik?” már most előre jelzi a változást.
+
+## Android: vissza gomb (2026-10-13)
+- A Gyűjtemény fejlécéből Androidon eltűnt a vissza gomb (a szélesebb betűtípus miatt a cím + Alap/Full Art kapcsoló nem fért el, és a gomb nulla szélességűre zsugorodott). Javítás: a fejléc vissza gombja sosem zsugorodik, a cím szükség esetén rövidül, keskeny (≤440 px) telefonon a Gyűjtemény kapcsolója a cím alá kerül.
+- A telefon saját **vissza gombja / gesztusa** most egy szintet lép vissza az appon belül (nyitott ablakot bezár, menüből a főmenübe visz; meccs közben nem csinál semmit) – eddig Androidon kilépett az appból.
+
 ## Ranked jutalmak azonnal (2026-10-13)
 - Tomi jelezte, hogy Ezüst 5 elérésekor nem kapta meg a 2 Shiny packot – eddig a lépcsők jutalma csak a **szezon végén** járt. Mostantól **azonnal jár, amikor eléred** a lépcsőt (Bronz 4: 2 pack, Ezüst 5: 2 Shiny pack, Arany 5: 1000 coin, Legenda: Legenda hátlap), szezononként egyszer (`rank.claimed`, `rkClaimDue`, `rkGrant`).
 - Meccs közben elért lépcső: az eredményképernyőn „🎁 Ranked jutalom – …” sor. Aki már korábban elérte: a főmenübe érve megkapja, „🏆 Ranked jutalom” felugró ablakkal (`rkTierPopup`).

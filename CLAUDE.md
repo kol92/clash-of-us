@@ -79,6 +79,7 @@ Csak build (kitétel nélkül): `cd src && python3 build-app.py ""` → `src/dis
 - Animált lapok: `ART[id].vid = 'art/vid/NEV.mp4'` (H.264 600×800, ~1 MB, `-crf 29 -movflags +faststart -an`); csak nagy lapnézetben fut, a service worker kihagyja az .mp4-et. Részletek: doc.md „Animált lapok”.
 - Bot-szintek: `BOT_LV` (engine.js) 1 Könnyű / 2 Normál / 3 Nehéz; `S.botLv`, `botLvPref()` és `rkBotLv()` (meta.js). Mérés: `node tools/botlv.js A B N`.
 - Paklik: megosztás kóddal/linkkel (`deckCode` / `parseDeckCode` / `deckImportModal`, link: `?deck=KÓD`), paklisegéd 🪄 (`deckHelperFill`, a `[DECKHELP-START]` jelölők között – így Node-ból szimulálható).
+- Ranked 2. szezontól (`rkHard()`, a `s2` vége, 2026-11-11 után): Aranyban nincs dupla csillag, Aranytól Mester bot (`BOT_LV[4]`, erős pakli + 6 élet). A következő szezon felvételekor ez magától él.
 - Ranked (meta.js vége): **2026-10-12 óta bekapcsolva (`RANKED_ON = true`)**; jutalmak: `RK_REWARDS`. Rang a `p.rank`-ban, szezon = `curSeason()` (Season Pass) vagy naptári hónap.
 - Season Pass: `SEASONS` (meta.js). Most az „1. szezon · Nyitókör” fut 2026-11-11-ig – előtte fel kell venni a következő szezont (új `id`, start/end, 30 `tiers`). Jutalomtípusok: `coins`, `packs`, `shiny`, `fa`, `card` (+`had`: coin, ha már megvan), `port` (hős-portré, `PORTRAITS`-ban `passOnly`), `heroPick` (Full Art hős), `goldPick` (Arany hős).
 - A szabálydokumentum (`src/doc.md`) a felhasználó claude.ai Projectjében is megvan („claude/clash-of-us-szabalyok.md”). Ha van Project-hozzáférésed, minden változás után töltsd fel oda is.

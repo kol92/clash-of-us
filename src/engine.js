@@ -901,7 +901,7 @@ function botView(s) {
   return v;
 }
 // Bot-szintek (2026-10-12): 1 = Könnyű (zajos döntések, néha korábban befejezi a kört), 2 = Normál (a régi bot), 3 = Nehéz (két lapra előre gondolkodik)
-const BOT_LV = { 1: { noise: 2.5, stop: 0.12 }, 2: {}, 3: { look: 6, deep: 0.5 } };
+const BOT_LV = { 1: { noise: 2.5, stop: 0.12 }, 2: {}, 3: { look: 6, deep: 0.5 }, 4: { look: 6, deep: 0.5 } };   // 4 = Mester: a Nehéz gondolkodása + erősebb pakli (a pakli a ui.js startMatch-ben)
 const gauss = () => { let u = 0, v = 0; while (!u) u = Math.random(); while (!v) v = Math.random(); return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v); };
 // Nehéz bot: az ellenfél válaszcsapását is számolja (a köre végén a mostani lapjaival visszaüt – lapkijátszás nélkül)
 function scoreDeep(s, me, d) {
