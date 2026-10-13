@@ -437,6 +437,14 @@ Hősképesség-ötletek a táblázatban (még nem zöldek, nincsenek beépítve)
 - Az ellenfél körében (PvP-ben és bot ellen is) a kezedben lévő lapok elsötétülnek, mint a ki nem játszható lapok – korábban ilyenkor mind „aktívnak” látszott.
 - A variáns lapok szalagja: „✦ Variáns” (kicsiben) / „✦ Ritka variáns” (nagy lapon) – korábban „Változat”.
 
+## Fekvő meccsképernyő tabletre és gépre (2026-10-13)
+- Ha a képernyő fekvő és nagy (`min-width:1000px`, `min-height:600px`, legalább 5:4 – pl. iPad fekve, laptop, monitor), a meccs saját elrendezést kap (`body.in-game` + media query a shell.html-ben, `renderWide()` a ui.js-ben):
+  - **Középen** a megszokott meccs, de szélesebb (max. 760 px) táblával, így a lapok a táblán kb. másfélszer akkorák, mint telefonon; nagyobb kéz (98 px-es lapok). A hős- és helyszínsáv telefonos szélességű marad (különben a magasságot ennék el).
+  - **Bal oldalt:** az **ellenfél keze lefordítva** (az ő hátlapjával, PvP-ben a választottjával), alatta az **utoljára kijátszott lap** nagyban (ki, hányadik körben, Kánon eseménynél a választott mód; rákoppintva részletek). Rejtett (Sunyuló) ellenséges lap nem jelenik meg itt.
+  - **Jobb oldalt:** az **élő napló** (az utolsó 8 kör, a legfrissebb felül).
+- A menük maradnak a középső oszlopban. Telefonon és álló tableten semmi nem változik. Egérrel húzva is pontosan oda kerül a lap, ahová húzod (tesztelve).
+- **Eszköz-mérés:** a nyilvános profilba (`pub`) bekerül, ki milyen eszközön játszik utoljára: `dev: 'phone' | 'tablet' | 'pc'` (`devKind()`), hogy lássuk, megéri-e a menüket is szélesre tenni.
+
 ## Meccs vége: napló gomb, Kánon esemény tovább látszik (2026-10-13)
 - Az eredményképernyőn (bot, ranked, PvP) **📜 Mi történt a meccsen?** gomb: megnyitja a meccsnaplót (az utolsó 12 kör), így látszik, mi ütötte ki a hőst.
 - A naplóban a választós Kánon eseménynél a választott mód is látszik, pl. „Gluténbomba (8 sebzés, de te is kapsz 8-at)”.

@@ -309,7 +309,7 @@ function heroCardHTML(h, o = {}) {
 }
 
 // ---------- képernyők ----------
-function show(id) { document.querySelectorAll('.screen').forEach(x => x.hidden = x.id !== id); }
+function show(id) { document.querySelectorAll('.screen').forEach(x => x.hidden = x.id !== id); document.body.classList.toggle('in-game', id === 'scr-game'); }
 document.querySelectorAll('[data-back]').forEach(b => b.onclick = () => { renderMenuFan(); renderProfileBar(); show('scr-menu'); });
 // iOS: csippentéses zoom tiltása (a dupla koppintást a touch-action kezeli)
 ['gesturestart', 'gesturechange'].forEach(t => document.addEventListener(t, e => e.preventDefault(), { passive: false }));
@@ -577,6 +577,7 @@ function logEvents(evs, snap) {
     switch (e.t) {
       case 'play': {
         const secret = e.side !== ME && c.sneak;
+        if (!secret) S.lastPlay = { id: e.id, side: e.side, foil: !!e.foil, o: e.o, turn: g.turn };
         const tg = e.tg ? ' → ' + nm(e.tg.side, e.tg.i) : '';
         const opt = c.opts && e.o != null && c.opts[e.o] ? ` (${escH(c.opts[e.o])})` : '';
         L(secret ? `🃏 ${who(e.side)} lerakott egy rejtett lapot` : `▶ ${who(e.side)} kijátszotta: <b>${escH(c.name)}</b>${opt}${tg}`); break; }
@@ -999,6 +1000,34 @@ let fitQ = false;
 new MutationObserver(() => { if (fitQ) return; fitQ = true; requestAnimationFrame(() => { fitQ = false; fitNames(document); }); }).observe(document.body, { childList: true, subtree: true });
 document.fonts?.ready?.then(() => { document.querySelectorAll('[data-fit]').forEach(e => delete e.dataset.fit); fitNames(document); });
 
+// Fekvő, nagy képernyő (2026-10-13): az ellenfél lefordított keze, az utoljára kijátszott lap és az élő napló
+const WIDE_MQ = matchMedia('(min-width:1000px) and (min-height:600px) and (min-aspect-ratio:5/4)');
+WIDE_MQ.addEventListener?.('change', () => { if (S && !$('#scr-game').hidden) render(); });
+function renderWide() {
+  if (!WIDE_MQ.matches || !S) return;
+  const gl = $('#gLeft');
+  if (!gl.querySelector('.gl-last')) gl.innerHTML = '<h4>Az ellenfél keze</h4><div class="gl-hand"></div><h4>Utoljára kijátszott lap</h4><div class="gl-last"></div>';
+  const n = S.players[BOT].hand.length, oh = gl.querySelector('.gl-hand');
+  oh.setAttribute('style', oppBackVars());
+  const mid = (n - 1) / 2;
+  setHTML(oh, n ? Array.from({ length: n }, (_, k) => `<i class="oh-card" style="--r:${((k - mid) * 3).toFixed(1)}deg;--y:${(Math.abs(k - mid) * 1.2).toFixed(1)}px"></i>`).join('') + `<span class="oh-n">${n} lap</span>` : '<span class="oh-none">Üres a keze</span>');
+  const lp = S.lastPlay, last = gl.querySelector('.gl-last');
+  const sig = lp ? `${lp.id}|${lp.side}|${lp.turn}|${lp.o}` : '-';
+  if (last.dataset.sig !== sig) {
+    last.dataset.sig = sig;
+    const who = lp ? (lp.side === ME ? 'Te' : S.pvp ? escH(S.names?.[lp.side] || 'Ellenfél') : HERO[S.players[lp.side].heroId].name) : '';
+    const opt = lp && CARD[lp.id].opts && lp.o != null ? CARD[lp.id].opts[lp.o] : '';
+    last.innerHTML = lp ? `<div class="gl-card" data-glc="${lp.id}">${cardHTML(lp.id, { big: true, foil: lp.foil })}</div><div class="gl-who">${who} · ${lp.turn}. kör${opt ? `<small>${escH(opt)}</small>` : ''}</div>` : '<p class="gl-empty">Itt látszik majd az utoljára kijátszott lap – nagyban, hogy el tudd olvasni.</p>';
+  }
+  const groups = (S.log || []).filter(g => g.lines.length), gr = $('#gRight');
+  const lsig = groups.length + ':' + (groups.length ? groups[groups.length - 1].lines.length : 0);
+  if (gr.dataset.sig !== lsig) {
+    gr.dataset.sig = lsig;
+    const body = groups.slice(-8).reverse().map(g => `<div class="lg-turn"><h4>${g.turn}. kör · ${g.side === ME ? 'a te köröd' : (S.pvp ? escH(S.names?.[g.side] || 'ellenfél') : HERO[S.players[g.side].heroId].name) + ' köre'}</h4><ul>${g.lines.map(l => `<li>${l}</li>`).join('')}</ul></div>`).join('');
+    gr.innerHTML = `<h4>📜 Mi történt?</h4><div class="gr-list">${body || '<p class="gl-empty">A meccs eseményei itt jelennek meg.</p>'}</div>`;
+  }
+}
+$('#gLeft').addEventListener('click', e => { const c = e.target.closest('[data-glc]'); if (c) openModal(cardHTML(c.dataset.glc, { big: true, foil: S?.lastPlay?.foil }), '', cardHelpHTML(c.dataset.glc)); });
 function render() {
   const myTurn = S.active === ME && !busy && S.winner == null;
   const hand = S.players[ME].hand;
@@ -1046,6 +1075,7 @@ function render() {
   });
   syncHandFx();
   }
+  try { renderWide(); } catch (e) {}
   // kiválasztás sáv
   const sb = $('#selbar');
   if (selCard && ui.pend != null && !ui.drag) {

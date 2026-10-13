@@ -1557,6 +1557,39 @@ button.rk-row:active{transform:scale(.98);}
 .res-log{margin:2px auto 8px;display:block;}
 .fin-skip{position:absolute;left:50%;bottom:7%;transform:translateX(-50%);font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.6);z-index:5;pointer-events:none;animation:finSkip 1.6s ease-in-out infinite;}
 @keyframes finSkip{50%{opacity:.35}}
+/* ===== Fekvő, nagy képernyős meccs (tablet fekve, számítógép) – 2026-10-13 =====
+   Középen a megszokott meccs szélesebben, felül az ellenfél lefordított keze; bal oldalt az utoljára kijátszott lap, jobb oldalt az élő napló. */
+.g-side{display:none;}
+@media (min-width:1000px) and (min-height:600px) and (min-aspect-ratio:5/4){
+  body.in-game #app{max-width:min(100vw,1480px);box-shadow:none;background:none;}
+  body.in-game #scr-game{display:grid;padding:0 14px;column-gap:16px;row-gap:6px;background:none;position:relative;isolation:isolate;
+    grid-template-columns:minmax(220px,1fr) minmax(0,760px) minmax(220px,1fr);
+    grid-template-rows:auto minmax(0,1fr) auto minmax(0,1fr) auto auto auto;
+    grid-template-areas:"left ebar right" "left elane right" "left mid right" "left plane right" "left sel right" "left hand right" "left pbar right";}
+  body.in-game #scr-game::before{content:'';grid-column:2;grid-row:1/-1;z-index:-1;margin:0 -8px;border-left:1px solid rgba(214,180,106,.25);border-right:1px solid rgba(214,180,106,.25);
+    background:radial-gradient(ellipse 78% 72% at 50% 50%,rgba(2,8,11,.5),rgba(2,8,11,.32) 70%,rgba(2,8,11,0) 100%),url('art/ui/board.webp?v=f77a1c20') center/100% 100% no-repeat,#08161c;box-shadow:0 0 60px rgba(0,0,0,.7);}
+  body.in-game #eBar{grid-area:ebar;margin:0;width:min(100%,560px);justify-self:center;} body.in-game #pBar{grid-area:pbar;margin:0;width:min(100%,560px);justify-self:center;}
+  body.in-game #eLane{grid-area:elane;} body.in-game #pLane{grid-area:plane;}
+  body.in-game .mid{grid-area:mid;width:min(100%,620px);justify-self:center;} body.in-game #selbar{grid-area:sel;} body.in-game #hand{grid-area:hand;}
+  body.in-game .hand{height:156px;} body.in-game .hand .card{--cw:98px;}
+  .gl-hand{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;row-gap:6px;min-height:64px;padding:4px 6px 2px;}
+  .gl-hand .oh-card{width:40px;aspect-ratio:5/7;border-radius:4px;margin:0 -5px;background:var(--bk-sm,url('art/sm/back.webp?v=38549753')) center/cover;border:1px solid rgba(214,184,120,.6);box-shadow:0 3px 8px rgba(0,0,0,.6);transform:rotate(var(--r,0deg)) translateY(var(--y,0px));}
+  .gl-hand .oh-n{flex-basis:100%;text-align:center;font-size:12px;font-weight:900;color:var(--mute);letter-spacing:.06em;}
+  .gl-hand .oh-none{font-size:12px;color:var(--mute);font-weight:800;}
+  body.in-game .g-side{display:flex;flex-direction:column;gap:10px;min-height:0;margin:12px 0;padding:14px;border-radius:18px;box-sizing:border-box;
+    background:linear-gradient(170deg,rgba(14,40,48,.88),rgba(6,16,20,.92));border:1px solid rgba(214,184,120,.4);box-shadow:0 10px 30px rgba(0,0,0,.55);}
+  body.in-game .g-left{grid-area:left;align-items:center;} body.in-game .g-right{grid-area:right;}
+  .g-side h4{margin:0;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);align-self:stretch;}
+  .g-left .gl-last{flex:1;min-height:0;display:flex;flex-direction:column;align-items:center;gap:8px;width:100%;}
+  .g-left .gl-card{flex:1;min-height:0;display:grid;place-items:center;width:100%;container-type:size;}
+  .g-left .gl-card .card{--cw:min(100cqw,calc(100cqh * .714),240px);cursor:pointer;}
+  .g-left .gl-who{font-size:13px;font-weight:800;color:var(--ink);text-align:center;}
+  .g-left .gl-who small{display:block;color:var(--mute);font-weight:700;}
+  .g-left .gl-empty,.g-right .gl-empty{margin:auto;color:var(--mute);font-size:13px;text-align:center;font-weight:700;}
+  .g-right .gr-list{flex:1;min-height:0;overflow-y:auto;display:grid;align-content:start;gap:10px;font-size:12.5px;line-height:1.35;}
+  .g-right .lg-turn h4{font-size:11px;margin:0 0 3px;}
+  .g-right ul{margin:0;padding-left:16px;} .g-right li{margin:1px 0;}
+}
 .rk-botrow{display:flex;align-items:center;gap:12px;margin:0 0 10px;padding:10px 14px;border-radius:12px;background:rgba(10,20,30,.85);border:1px solid rgba(255,255,255,.14);cursor:pointer;}
 .rk-botrow input{width:22px;height:22px;accent-color:#f2c14e;flex:none;}
 .rk-botrow span{display:grid;gap:2px;}.rk-botrow small{font-size:12px;color:var(--mute);}
@@ -2130,6 +2163,8 @@ button.rk-row:active{transform:scale(.98);}
   </section>
 
   <section class="screen" id="scr-game" hidden>
+    <aside class="g-side g-left" id="gLeft" aria-label="Utoljára kijátszott lap"></aside>
+    <aside class="g-side g-right" id="gRight" aria-label="Meccsnapló"></aside>
     <div class="hbar" id="eBar"></div>
     <div class="lane" id="eLane"></div>
     <div class="mid"><button class="locchip empty" id="loc"></button>
@@ -2146,7 +2181,7 @@ button.rk-row:active{transform:scale(.98);}
 <script src="vendor/firebase-auth-compat.js"></script>
 <script src="vendor/firebase-firestore-compat.js"></script>
 <script src="vendor/firebase-database-compat.js"></script>
-<script>window.APP_VERSION = "2026.10.13-1142"; window.APP_BUILD = "2026.10.13-1142";</script>
+<script>window.APP_VERSION = "2026.10.13-1217"; window.APP_BUILD = "2026.10.13-1217";</script>
 <script>// ===== Best of Us – saját szerver (Firebase) =====
 // A játék eredetileg a Claude-os tárolót használta (window.claude.use('db' | 'user' | 'room')).
 // Ez a fájl ugyanazt a felületet adja Firebase-ből, így a játék kódja szinte változatlan maradhat:
@@ -3674,7 +3709,7 @@ function heroCardHTML(h, o = {}) {
 }
 
 // ---------- képernyők ----------
-function show(id) { document.querySelectorAll('.screen').forEach(x => x.hidden = x.id !== id); }
+function show(id) { document.querySelectorAll('.screen').forEach(x => x.hidden = x.id !== id); document.body.classList.toggle('in-game', id === 'scr-game'); }
 document.querySelectorAll('[data-back]').forEach(b => b.onclick = () => { renderMenuFan(); renderProfileBar(); show('scr-menu'); });
 // iOS: csippentéses zoom tiltása (a dupla koppintást a touch-action kezeli)
 ['gesturestart', 'gesturechange'].forEach(t => document.addEventListener(t, e => e.preventDefault(), { passive: false }));
@@ -3942,6 +3977,7 @@ function logEvents(evs, snap) {
     switch (e.t) {
       case 'play': {
         const secret = e.side !== ME && c.sneak;
+        if (!secret) S.lastPlay = { id: e.id, side: e.side, foil: !!e.foil, o: e.o, turn: g.turn };
         const tg = e.tg ? ' → ' + nm(e.tg.side, e.tg.i) : '';
         const opt = c.opts && e.o != null && c.opts[e.o] ? ` (${escH(c.opts[e.o])})` : '';
         L(secret ? `🃏 ${who(e.side)} lerakott egy rejtett lapot` : `▶ ${who(e.side)} kijátszotta: <b>${escH(c.name)}</b>${opt}${tg}`); break; }
@@ -4364,6 +4400,34 @@ let fitQ = false;
 new MutationObserver(() => { if (fitQ) return; fitQ = true; requestAnimationFrame(() => { fitQ = false; fitNames(document); }); }).observe(document.body, { childList: true, subtree: true });
 document.fonts?.ready?.then(() => { document.querySelectorAll('[data-fit]').forEach(e => delete e.dataset.fit); fitNames(document); });
 
+// Fekvő, nagy képernyő (2026-10-13): az ellenfél lefordított keze, az utoljára kijátszott lap és az élő napló
+const WIDE_MQ = matchMedia('(min-width:1000px) and (min-height:600px) and (min-aspect-ratio:5/4)');
+WIDE_MQ.addEventListener?.('change', () => { if (S && !$('#scr-game').hidden) render(); });
+function renderWide() {
+  if (!WIDE_MQ.matches || !S) return;
+  const gl = $('#gLeft');
+  if (!gl.querySelector('.gl-last')) gl.innerHTML = '<h4>Az ellenfél keze</h4><div class="gl-hand"></div><h4>Utoljára kijátszott lap</h4><div class="gl-last"></div>';
+  const n = S.players[BOT].hand.length, oh = gl.querySelector('.gl-hand');
+  oh.setAttribute('style', oppBackVars());
+  const mid = (n - 1) / 2;
+  setHTML(oh, n ? Array.from({ length: n }, (_, k) => `<i class="oh-card" style="--r:${((k - mid) * 3).toFixed(1)}deg;--y:${(Math.abs(k - mid) * 1.2).toFixed(1)}px"></i>`).join('') + `<span class="oh-n">${n} lap</span>` : '<span class="oh-none">Üres a keze</span>');
+  const lp = S.lastPlay, last = gl.querySelector('.gl-last');
+  const sig = lp ? `${lp.id}|${lp.side}|${lp.turn}|${lp.o}` : '-';
+  if (last.dataset.sig !== sig) {
+    last.dataset.sig = sig;
+    const who = lp ? (lp.side === ME ? 'Te' : S.pvp ? escH(S.names?.[lp.side] || 'Ellenfél') : HERO[S.players[lp.side].heroId].name) : '';
+    const opt = lp && CARD[lp.id].opts && lp.o != null ? CARD[lp.id].opts[lp.o] : '';
+    last.innerHTML = lp ? `<div class="gl-card" data-glc="${lp.id}">${cardHTML(lp.id, { big: true, foil: lp.foil })}</div><div class="gl-who">${who} · ${lp.turn}. kör${opt ? `<small>${escH(opt)}</small>` : ''}</div>` : '<p class="gl-empty">Itt látszik majd az utoljára kijátszott lap – nagyban, hogy el tudd olvasni.</p>';
+  }
+  const groups = (S.log || []).filter(g => g.lines.length), gr = $('#gRight');
+  const lsig = groups.length + ':' + (groups.length ? groups[groups.length - 1].lines.length : 0);
+  if (gr.dataset.sig !== lsig) {
+    gr.dataset.sig = lsig;
+    const body = groups.slice(-8).reverse().map(g => `<div class="lg-turn"><h4>${g.turn}. kör · ${g.side === ME ? 'a te köröd' : (S.pvp ? escH(S.names?.[g.side] || 'ellenfél') : HERO[S.players[g.side].heroId].name) + ' köre'}</h4><ul>${g.lines.map(l => `<li>${l}</li>`).join('')}</ul></div>`).join('');
+    gr.innerHTML = `<h4>📜 Mi történt?</h4><div class="gr-list">${body || '<p class="gl-empty">A meccs eseményei itt jelennek meg.</p>'}</div>`;
+  }
+}
+$('#gLeft').addEventListener('click', e => { const c = e.target.closest('[data-glc]'); if (c) openModal(cardHTML(c.dataset.glc, { big: true, foil: S?.lastPlay?.foil }), '', cardHelpHTML(c.dataset.glc)); });
 function render() {
   const myTurn = S.active === ME && !busy && S.winner == null;
   const hand = S.players[ME].hand;
@@ -4411,6 +4475,7 @@ function render() {
   });
   syncHandFx();
   }
+  try { renderWide(); } catch (e) {}
   // kiválasztás sáv
   const sb = $('#selbar');
   if (selCard && ui.pend != null && !ui.drag) {
@@ -7070,13 +7135,18 @@ const frOther = d => d.parts.find(u => u !== Store.uid);
 const frName = uid => FR.pub[uid]?.name || (FR.list.find(d => frOther(d) === uid) || {}).names?.[uid] || 'Barát';
 const tradable = id => { const c = CARD[id]; return c && !c.token && !c.variantOf && !c.foilOnly && !c.passOnly; };
 const RAR_ORDER = { l: 0, e: 1, r: 2, k: 3 };
+// eszköztípus (2026-10-13): megmérjük, ki milyen eszközön játszik (telefon / tablet / gép) – a nagy képernyős fejlesztésekhez
+function devKind() {
+  const touch = navigator.maxTouchPoints > 0 || matchMedia('(pointer:coarse)').matches, a = Math.min(screen.width, screen.height);
+  return touch ? (a >= 600 ? 'tablet' : 'phone') : 'pc';
+}
 function frPubSync(now) {
   if (!frOn()) return;
   clearTimeout(FR.pubT);
   FR.pubT = setTimeout(() => {
     const p = Store.p, coll = {};
     for (const [id, e] of Object.entries(p.coll || {})) if (tradable(id) && (e.n || e.f)) coll[id] = [e.n || 0, e.f || 0];
-    const rk = ensureRank(p); Store.db.doc('pub/' + Store.uid).set({ name: p.name, code: frCode(Store.uid), w: p.stats?.w || 0, rank: { season: rk.season, t: rk.t, st: rk.st, lp: rk.lp, g: rk.games || 0 }, coll, ver: window.APP_VERSION || '', updated: Date.now() }).catch(() => {});
+    const rk = ensureRank(p); Store.db.doc('pub/' + Store.uid).set({ name: p.name, code: frCode(Store.uid), w: p.stats?.w || 0, rank: { season: rk.season, t: rk.t, st: rk.st, lp: rk.lp, g: rk.games || 0 }, coll, ver: window.APP_VERSION || '', dev: devKind(), updated: Date.now() }).catch(() => {});
   }, now ? 50 : 2500);
 }
 // ---- meghívó link: …/?inv=<barátkód> – aki ezzel regisztrál (vagy belép), automatikusan barátja lesz a meghívónak ----

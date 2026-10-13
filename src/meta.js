@@ -2074,13 +2074,18 @@ const frOther = d => d.parts.find(u => u !== Store.uid);
 const frName = uid => FR.pub[uid]?.name || (FR.list.find(d => frOther(d) === uid) || {}).names?.[uid] || 'Barát';
 const tradable = id => { const c = CARD[id]; return c && !c.token && !c.variantOf && !c.foilOnly && !c.passOnly; };
 const RAR_ORDER = { l: 0, e: 1, r: 2, k: 3 };
+// eszköztípus (2026-10-13): megmérjük, ki milyen eszközön játszik (telefon / tablet / gép) – a nagy képernyős fejlesztésekhez
+function devKind() {
+  const touch = navigator.maxTouchPoints > 0 || matchMedia('(pointer:coarse)').matches, a = Math.min(screen.width, screen.height);
+  return touch ? (a >= 600 ? 'tablet' : 'phone') : 'pc';
+}
 function frPubSync(now) {
   if (!frOn()) return;
   clearTimeout(FR.pubT);
   FR.pubT = setTimeout(() => {
     const p = Store.p, coll = {};
     for (const [id, e] of Object.entries(p.coll || {})) if (tradable(id) && (e.n || e.f)) coll[id] = [e.n || 0, e.f || 0];
-    const rk = ensureRank(p); Store.db.doc('pub/' + Store.uid).set({ name: p.name, code: frCode(Store.uid), w: p.stats?.w || 0, rank: { season: rk.season, t: rk.t, st: rk.st, lp: rk.lp, g: rk.games || 0 }, coll, ver: window.APP_VERSION || '', updated: Date.now() }).catch(() => {});
+    const rk = ensureRank(p); Store.db.doc('pub/' + Store.uid).set({ name: p.name, code: frCode(Store.uid), w: p.stats?.w || 0, rank: { season: rk.season, t: rk.t, st: rk.st, lp: rk.lp, g: rk.games || 0 }, coll, ver: window.APP_VERSION || '', dev: devKind(), updated: Date.now() }).catch(() => {});
   }, now ? 50 : 2500);
 }
 // ---- meghívó link: …/?inv=<barátkód> – aki ezzel regisztrál (vagy belép), automatikusan barátja lesz a meghívónak ----
