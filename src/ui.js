@@ -3,14 +3,30 @@ let ME = 0, BOT = 1;   // PvP-ben a vendégnél felcserélődik: mindig te vagy 
 const $ = q => document.querySelector(q);
 const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const sleep = ms => new Promise(r => setTimeout(r, ms));
+// Tablet (2026-10-13): álló tableten a böngésző nagyítja fel a lapot, hogy a játék telefonarányú magasságban (~880 px) kitöltse a képernyőt.
+// A viewport-skálázást maga a böngésző végzi, így az érintés/húzás/animációk koordinátái változatlanok maradnak. Telefonon és fekvő tableten nincs változás.
+const FIT_H = 880;
+function fitViewport() {
+  const m = document.querySelector('meta[name=viewport]'); if (!m) return;
+  const touch = navigator.maxTouchPoints > 0 || matchMedia('(pointer:coarse)').matches;
+  const a = Math.min(screen.width, screen.height), b = Math.max(screen.width, screen.height);
+  const portrait = matchMedia('(orientation:portrait)').matches, dw = portrait ? a : b, dh = portrait ? b : a;
+  let w = 0;
+  if (touch && a >= 600) { const W = Math.round(dw * FIT_H / dh); if (W < dw - 20) w = Math.max(480, W); }
+  const c = w ? `width=${w},user-scalable=no,viewport-fit=cover` : 'width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover';
+  if (m.getAttribute('content') !== c) m.setAttribute('content', c);
+}
+try { fitViewport(); } catch (e) {}
 // a valódi képernyőmagasság (iPhone-on a telepített app máshogy számolja a 100%-ot, ettől csúszott el a tábla)
 const setAppH = () => {
+  try { fitViewport(); } catch (e) {}
   let h = innerHeight;
   // iPhone, telepített app, átlátszó óra-sáv: a böngésző az óra-sáv nélkül adja meg a magasságot, de a képernyő tetejétől rajzol → a teljes képernyőmagasság kell
   const ios = /iphone|ipad|ipod/i.test(navigator.userAgent), standalone = navigator.standalone === true || matchMedia('(display-mode: standalone)').matches;
   if (ios && standalone) {
     let p = document.querySelector('.safe-probe'); if (!p) { p = document.createElement('i'); p.className = 'safe-probe'; document.body.appendChild(p); }
-    const top = parseFloat(getComputedStyle(p).paddingTop) || 0, full = Math.max(screen.width, screen.height) === Math.max(innerWidth, innerHeight) ? 0 : (innerWidth < innerHeight ? screen.height : screen.width);
+    const k = innerWidth / (innerWidth < innerHeight ? Math.min(screen.width, screen.height) : Math.max(screen.width, screen.height)) || 1;   // tableten a skálázott lap mértékegységében
+    const top = parseFloat(getComputedStyle(p).paddingTop) || 0, full = Math.max(screen.width, screen.height) === Math.max(innerWidth, innerHeight) ? 0 : Math.round((innerWidth < innerHeight ? screen.height : screen.width) * k);
     if (top > 0 && full && full - h > 10 && full - h <= top + 2) h = full;
   }
   document.documentElement.style.setProperty('--apph', h + 'px');

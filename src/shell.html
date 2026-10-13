@@ -21,6 +21,12 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font
 button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer;}
 button:focus-visible,.card:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
 #app{height:var(--apph,100%);max-width:480px;margin:0 auto;position:relative;box-sizing:border-box;}
+/* Nagy képernyő (tablet fekve, számítógép, 2026-10-13): az oldalsávokban elmosott asztal, a játék oszlopa árnyékkal, finom aranyszegéllyel */
+@media (min-width:560px){
+  body::before{content:'';position:fixed;inset:-40px;z-index:0;pointer-events:none;background:url('art/ui/board.webp') center/cover no-repeat;filter:blur(10px) brightness(.62) saturate(1.15);}
+  body::after{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;background:radial-gradient(60% 80% at 50% 50%,transparent 30%,rgba(0,0,0,.55) 100%);}
+  #app{z-index:1;box-shadow:0 0 70px rgba(0,0,0,.75),0 0 0 1px rgba(214,180,106,.22);background:radial-gradient(120% 70% at 50% 45%,#123a44 0%,var(--bg) 70%) var(--bg);}
+}
 .screen{height:100%;overflow-y:auto;box-sizing:border-box;padding-inline:16px;}
 h1,h2,h3{font-family:var(--display);font-weight:400;letter-spacing:.01em;text-wrap:balance;margin:0;}
 

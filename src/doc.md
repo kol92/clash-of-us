@@ -437,6 +437,13 @@ Hősképesség-ötletek a táblázatban (még nem zöldek, nincsenek beépítve)
 - Az ellenfél körében (PvP-ben és bot ellen is) a kezedben lévő lapok elsötétülnek, mint a ki nem játszható lapok – korábban ilyenkor mind „aktívnak” látszott.
 - A variáns lapok szalagja: „✦ Variáns” (kicsiben) / „✦ Ritka variáns” (nagy lapon) – korábban „Változat”.
 
+## Tablet és számítógép (2026-10-13)
+- A játék továbbra is egy telefonarányú oszlop (max. 480 px széles), de:
+  - **Álló tableten** (érintőképernyő, rövidebb oldala ≥ 600 px) a böngésző felnagyítja a lapot (`fitViewport` a ui.js elején, viewport `width=<számolt>`), hogy a játék ~880 px-es telefonarányú magasságban kitöltse a képernyőt. Pl. iPad 820×1180 → 612 px széles lap, ~1,34× nagyítás. Mivel a skálázást a böngésző végzi, az érintés, húzás és az animációk koordinátái nem változnak.
+  - **Fekvő tableten és számítógépen** a játék eddig is kitöltötte a magasságot; itt az oldalsávokba elmosott asztal-textúra került (`art/ui/board.webp`), a játék oszlopa árnyékot és halvány aranyszegélyt kapott (`@media (min-width:560px)`).
+  - Telefonon semmi nem változott.
+- Számítógépen egérrel ugyanúgy játszható (kattintás = koppintás, húzás = húzás).
+
 ## Ranked: liga-esésvédelem Aranyban is (2026-10-13)
 - Tomi kérése: az elért ligából nem lehet visszaesni. Ezüst 5 alá eddig sem, mostantól **Arany 5 alá sem** lehet esni (Arany 4–1-ből a vereség Arany 5-ig vihet vissza, csillagot a ligán belül továbbra is veszít). Üzenet: „Arany 5 alá nem eshetsz vissza”.
 - A győzelmi sorozat bónusza (a 3. egymás utáni győzelemtől +1, azaz 2 csillag/győzelem) Aranyban is jár – ez eddig is így volt, a szabályleírás most kimondja.

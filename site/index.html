@@ -36,6 +36,12 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font
 button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer;}
 button:focus-visible,.card:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
 #app{height:var(--apph,100%);max-width:480px;margin:0 auto;position:relative;box-sizing:border-box;}
+/* Nagy képernyő (tablet fekve, számítógép, 2026-10-13): az oldalsávokban elmosott asztal, a játék oszlopa árnyékkal, finom aranyszegéllyel */
+@media (min-width:560px){
+  body::before{content:'';position:fixed;inset:-40px;z-index:0;pointer-events:none;background:url('art/ui/board.webp?v=f77a1c20') center/cover no-repeat;filter:blur(10px) brightness(.62) saturate(1.15);}
+  body::after{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;background:radial-gradient(60% 80% at 50% 50%,transparent 30%,rgba(0,0,0,.55) 100%);}
+  #app{z-index:1;box-shadow:0 0 70px rgba(0,0,0,.75),0 0 0 1px rgba(214,180,106,.22);background:radial-gradient(120% 70% at 50% 45%,#123a44 0%,var(--bg) 70%) var(--bg);}
+}
 .screen{height:100%;overflow-y:auto;box-sizing:border-box;padding-inline:16px;}
 h1,h2,h3{font-family:var(--display);font-weight:400;letter-spacing:.01em;text-wrap:balance;margin:0;}
 
@@ -2137,7 +2143,7 @@ button.rk-row:active{transform:scale(.98);}
 <script src="vendor/firebase-auth-compat.js"></script>
 <script src="vendor/firebase-firestore-compat.js"></script>
 <script src="vendor/firebase-database-compat.js"></script>
-<script>window.APP_VERSION = "2026.10.13-0628"; window.APP_BUILD = "2026.10.13-0628";</script>
+<script>window.APP_VERSION = "2026.10.13-1022"; window.APP_BUILD = "2026.10.13-1022";</script>
 <script>// ===== Best of Us – saját szerver (Firebase) =====
 // A játék eredetileg a Claude-os tárolót használta (window.claude.use('db' | 'user' | 'room')).
 // Ez a fájl ugyanazt a felületet adja Firebase-ből, így a játék kódja szinte változatlan maradhat:
@@ -3359,14 +3365,30 @@ let ME = 0, BOT = 1;   // PvP-ben a vendégnél felcserélődik: mindig te vagy 
 const $ = q => document.querySelector(q);
 const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const sleep = ms => new Promise(r => setTimeout(r, ms));
+// Tablet (2026-10-13): álló tableten a böngésző nagyítja fel a lapot, hogy a játék telefonarányú magasságban (~880 px) kitöltse a képernyőt.
+// A viewport-skálázást maga a böngésző végzi, így az érintés/húzás/animációk koordinátái változatlanok maradnak. Telefonon és fekvő tableten nincs változás.
+const FIT_H = 880;
+function fitViewport() {
+  const m = document.querySelector('meta[name=viewport]'); if (!m) return;
+  const touch = navigator.maxTouchPoints > 0 || matchMedia('(pointer:coarse)').matches;
+  const a = Math.min(screen.width, screen.height), b = Math.max(screen.width, screen.height);
+  const portrait = matchMedia('(orientation:portrait)').matches, dw = portrait ? a : b, dh = portrait ? b : a;
+  let w = 0;
+  if (touch && a >= 600) { const W = Math.round(dw * FIT_H / dh); if (W < dw - 20) w = Math.max(480, W); }
+  const c = w ? `width=${w},user-scalable=no,viewport-fit=cover` : 'width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover';
+  if (m.getAttribute('content') !== c) m.setAttribute('content', c);
+}
+try { fitViewport(); } catch (e) {}
 // a valódi képernyőmagasság (iPhone-on a telepített app máshogy számolja a 100%-ot, ettől csúszott el a tábla)
 const setAppH = () => {
+  try { fitViewport(); } catch (e) {}
   let h = innerHeight;
   // iPhone, telepített app, átlátszó óra-sáv: a böngésző az óra-sáv nélkül adja meg a magasságot, de a képernyő tetejétől rajzol → a teljes képernyőmagasság kell
   const ios = /iphone|ipad|ipod/i.test(navigator.userAgent), standalone = navigator.standalone === true || matchMedia('(display-mode: standalone)').matches;
   if (ios && standalone) {
     let p = document.querySelector('.safe-probe'); if (!p) { p = document.createElement('i'); p.className = 'safe-probe'; document.body.appendChild(p); }
-    const top = parseFloat(getComputedStyle(p).paddingTop) || 0, full = Math.max(screen.width, screen.height) === Math.max(innerWidth, innerHeight) ? 0 : (innerWidth < innerHeight ? screen.height : screen.width);
+    const k = innerWidth / (innerWidth < innerHeight ? Math.min(screen.width, screen.height) : Math.max(screen.width, screen.height)) || 1;   // tableten a skálázott lap mértékegységében
+    const top = parseFloat(getComputedStyle(p).paddingTop) || 0, full = Math.max(screen.width, screen.height) === Math.max(innerWidth, innerHeight) ? 0 : Math.round((innerWidth < innerHeight ? screen.height : screen.width) * k);
     if (top > 0 && full && full - h > 10 && full - h <= top + 2) h = full;
   }
   document.documentElement.style.setProperty('--apph', h + 'px');
