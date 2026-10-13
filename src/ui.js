@@ -574,7 +574,7 @@ function logEvents(evs, snap) {
     const now = S.players[sd].board[i], was = snap[sd] && snap[sd][i];
     const u = was || now; if (!u) return 'egy karakter';
     if (sd !== ME && (hid ?? u.hidden)) return 'egy rejtett lap';
-    return CARD[u.id].name;
+    return `<b class="lc" data-lc="${u.id}">${escH(CARD[u.id].name)}</b>`;   // rákoppintva megnyílik a lap
   };
   const nm = (sd, i) => i === -1 ? (sd === ME ? 'a hősöd' : who(sd) + ' (hős)') : unitName(sd, i);
   const group = () => {   // az aktuális kör csoportja (a 'turn' esemény nyit újat)
@@ -593,7 +593,13 @@ function logEvents(evs, snap) {
         if (!secret) S.lastPlay = { id: e.id, side: e.side, foil: !!e.foil, o: e.o, turn: g.turn };
         const tg = e.tg ? ' → ' + nm(e.tg.side, e.tg.i) : '';
         const opt = c.opts && e.o != null && c.opts[e.o] ? ` (${escH(c.opts[e.o])})` : '';
-        L(secret ? `🃏 ${who(e.side)} lerakott egy rejtett lapot` : `▶ ${who(e.side)} kijátszotta: <b>${escH(c.name)}</b>${opt}${tg}`); break; }
+        L(secret ? `🃏 ${who(e.side)} lerakott egy rejtett lapot` : `▶ ${who(e.side)} kijátszotta: <b class="lc" data-lc="${e.id}">${escH(c.name)}</b>${opt}${tg}`); break; }
+      case 'passive': {   // hős-képesség (2026-10-13): látszódjon, miért sebződött / gyógyult / húzott
+        const hn = HERO[S.players[e.side].heroId]?.name || 'Hős', w = e.side === ME ? `A hősöd (${hn})` : hn;
+        const PT = { deathPing: 'meghalt egy karaktere → 1 sebzés az ellenfél hősének', teamPing: 'legalább 2 karaktere áll a táblán → 1 sebzés az ellenfél hősének',
+                     endHeal: 'a köre végén 1 életet gyógyít', extraDraw: 'minden 3. körében húz egy extra lapot', firstCharAtk: `+1 támadás: ${e.id ? `<b class="lc" data-lc="${e.id}">${escH(CARD[e.id].name)}</b>` : 'az első karaktere'}` };
+        L(`✨ ${w} képessége: ${PT[e.k] || ''}`); break; }
+      case 'locfx': L(`📍 <b class="lc" data-lc="${e.id}">${escH(CARD[e.id].name)}</b>: ${e.id === 'l_korhaz' ? (e.side === ME ? 'a karaktereid gyógyulnak' : 'az ellenfél karakterei gyógyulnak') : (e.side === ME ? 'minden karaktered 1 sebzést kap' : 'az ellenfél minden karaktere 1 sebzést kap')}`); break;
       case 'attack': L(`⚔ ${unitName(e.side, e.i)} támad`); break;
       case 'heroatk': L(`⚔ ${who(e.side)} (Baszó) odacsap`); break;
       case 'dmg': L(`💥 ${nm(e.side, e.i)}: −${e.n}`); break;
@@ -1040,6 +1046,11 @@ function renderWide() {
     gr.innerHTML = `<h4>📜 Mi történt?</h4><div class="gr-list">${body || '<p class="gl-empty">A meccs eseményei itt jelennek meg.</p>'}</div>`;
   }
 }
+// naplóban a lapnevekre koppintva megnyílik a lap (2026-10-13, Mimi kérése)
+document.addEventListener('click', e => {
+  const l = e.target.closest('.logbox [data-lc], #gRight [data-lc]'); if (!l || !CARD[l.dataset.lc]) return;
+  e.stopPropagation(); openModal(cardHTML(l.dataset.lc, { big: true }), '', cardHelpHTML(l.dataset.lc));
+}, true);
 $('#gLeft').addEventListener('click', e => { const c = e.target.closest('[data-glc]'); if (c) openModal(cardHTML(c.dataset.glc, { big: true, foil: S?.lastPlay?.foil }), '', cardHelpHTML(c.dataset.glc)); });
 function render() {
   const myTurn = S.active === ME && !busy && S.winner == null;

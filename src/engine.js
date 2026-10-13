@@ -269,7 +269,7 @@ function startTurn(s) {
   if (s.half === 2 && !s.noCoin) { addToHand(s, pi, 'a_kor'); ev(s, { t:'coin', side:pi, i:-1 }); }   // a második játékos kiegyenlítése
   atiFlee(s, pi);
   sharkSwim(s, pi);
-  if (has(p, 'extraDraw') && p.turns % 3 === 0) draw(s, pi);
+  if (has(p, 'extraDraw') && p.turns % 3 === 0) { ev(s, { t:'passive', side:pi, k:'extraDraw' }); draw(s, pi); }
   checkWin(s);
 }
 
@@ -379,7 +379,7 @@ function playCard(s, pi, hi, t) {
   if (c.type === 'char') {
     const u = makeUnit(s, c.id, pi); if (h.foil) u.foil = true;
     p.board[t.i] = u; p.lastPlaced = u.uid;   // a Cápa erre vadászik
-    if (has(p, 'firstCharAtk') && !p.charThisTurn && c.id !== 'c_korso' && c.cost <= 2) { u.atk += 1; ev(s, { t:'buff', side:pi, i:t.i }); }
+    if (has(p, 'firstCharAtk') && !p.charThisTurn && c.id !== 'c_korso' && c.cost <= 2) { u.atk += 1; ev(s, { t:'passive', side:pi, k:'firstCharAtk', id:c.id }); ev(s, { t:'buff', side:pi, i:t.i }); }
     p.charThisTurn = true;
     if (bid(c.id) === 'c_pp') {   // Query idézése: előbb jobbra, aztán balra, ha ott nincs hely, bárhova
       const os = openSlots(s, pi), spots = [t.i + 1, t.i - 1].filter(j => os.includes(j));
@@ -676,7 +676,7 @@ function cleanup(s) {
           if (CARD[u.id].deathHeal) healHero(s, side, CARD[u.id].deathHeal);   // Bence, Amszterdam hőse
           if (CARD[u.id].deathGift) { ev(s, { t:'gift', side, i, id:CARD[u.id].deathGift }); addToHand(s, side, CARD[u.id].deathGift); }   // Laci, La Grand Finale: az ing a kézbe
           const vsBaszo = s.baszoHit === other(side);   // Baszó ütésére meghalt lap nem vághat vissza neki
-          if (has(p, 'deathPing') && u.id !== 'c_korso' && !CARD[u.id].fixed && !vsBaszo) damageHero(s, other(side), 1);
+          if (has(p, 'deathPing') && u.id !== 'c_korso' && !CARD[u.id].fixed && !vsBaszo) { ev(s, { t:'passive', side, k:'deathPing' }); damageHero(s, other(side), 1); }
           if (CARD[u.id].deathBlast && vsBaszo) ev(s, { t:'nocounter', side, i });
           else if (CARD[u.id].deathBlast) {   // Kovács Bence: 2 sebzés a szemben állónak, ha nincs ott senki, az ellenfél hősének
             const os = other(side), x = s.players[os].board[i];
@@ -831,13 +831,14 @@ function finishTurn(s) {
   });
   p.locked = false;   // az Adios Motherfucker! bénítása a megbénított játékos körének végén jár le
   if (s.winner == null && has(p, 'endHeal')) {
+    ev(s, { t:'passive', side:pi, k:'endHeal' });
     let best = -1, gap = 0;
     p.board.forEach((u, i) => { if (u && u.maxHp - u.hp > gap) { gap = u.maxHp - u.hp; best = i; } });
     if (best >= 0) healUnit(s, pi, best, 1); else healHero(s, pi, 1);
   }
-  if (s.winner == null && has(p, 'teamPing') && p.board.filter(u => u && !isFixed(u)).length >= 2) damageHero(s, other(pi), 1);
-  if (locIs(s, 'l_morisson') && !isReg(s, pi)) p.board.forEach((u, i) => { if (u) damageUnit(s, pi, i, 1); });
-  if (locIs(s, 'l_korhaz')) p.board.forEach((u, i) => { if (u) healUnit(s, pi, i, isReg(s, pi) ? 2 : 1); });
+  if (s.winner == null && has(p, 'teamPing') && p.board.filter(u => u && !isFixed(u)).length >= 2) { ev(s, { t:'passive', side:pi, k:'teamPing' }); damageHero(s, other(pi), 1); }
+  if (locIs(s, 'l_morisson') && !isReg(s, pi) && p.board.some(u => u)) { ev(s, { t:'locfx', side:pi, id:'l_morisson' }); p.board.forEach((u, i) => { if (u) damageUnit(s, pi, i, 1); }); }
+  if (locIs(s, 'l_korhaz') && p.board.some(u => u)) { ev(s, { t:'locfx', side:pi, id:'l_korhaz' }); p.board.forEach((u, i) => { if (u) healUnit(s, pi, i, isReg(s, pi) ? 2 : 1); }); }
   p.board.forEach((u, i) => { if (u && u.stun) { u.stun--; if (!u.stun) { if (u.items.includes('i_buffalo')) { u.items = u.items.filter(x => x !== 'i_buffalo'); u.foe = (u.foe || []).filter(x => x !== 'i_buffalo'); bury(s, other(pi), 'i_buffalo', 'item'); } ev(s, { t:'unstun', side:pi, i }); } } });
   // Vodka Kancsó: a mostani támadás után a következő saját körében bénult
   p.board.forEach((u, i) => { if (u && u.hangover && u.hp > 0) { u.hangover = false; u.stun = Math.max(u.stun || 0, 1); ev(s, { t:'stun', side:pi, i }); } });

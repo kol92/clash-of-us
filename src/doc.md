@@ -459,6 +459,12 @@ Hősképesség-ötletek a táblázatban (még nem zöldek, nincsenek beépítve)
   - Telefonon semmi nem változott.
 - Számítógépen egérrel ugyanúgy játszható (kattintás = koppintás, húzás = húzás).
 
+## Érthetőbb meccsnapló (2026-10-13, Mimi visszajelzése)
+- A naplóban (📜 és a fekvő nézet oldalsó naplója) a **lapnevek kattinthatók**: koppintásra megnyílik a lap nagyban, a leírásával.
+- Új naplósorok, hogy látszódjon, **miért** sebződött / gyógyult valaki:
+  - hős-képességek (`passive` esemény): „✨ Sasi képessége: legalább 2 karaktere áll a táblán → 1 sebzés az ellenfél hősének”, Milo (meghalt egy karaktere → 1 sebzés), Gabi (kör végi gyógyítás), Laci (extra húzás minden 3. körben), Barna (+1 támadás az első olcsó karakterének);
+  - helyszínek kör végi hatása (`locfx`): „📍 Morrison's: minden karaktered 1 sebzést kap”, „📍 Siófoki Kórház: a karaktereid gyógyulnak”.
+
 ## Ranked 2. szezontól: nehezebb Legenda (döntés: 2026-10-13, élesedik: 2026-11-11)
 - Ok: Krisztián ~2 óra alatt jutott Arany 5-ről Legendába (Aranyban kb. 75%-os győzelem, a dupla csillaggal ~22 meccs).
 - Az 1. szezon végétől (`rkHard()`: a `s2` szezon vége után) automatikusan:
