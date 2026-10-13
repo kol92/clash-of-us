@@ -459,6 +459,11 @@ Hősképesség-ötletek a táblázatban (még nem zöldek, nincsenek beépítve)
   - Telefonon semmi nem változott.
 - Számítógépen egérrel ugyanúgy játszható (kattintás = koppintás, húzás = húzás).
 
+## Ranked jutalmak azonnal (2026-10-13)
+- Tomi jelezte, hogy Ezüst 5 elérésekor nem kapta meg a 2 Shiny packot – eddig a lépcsők jutalma csak a **szezon végén** járt. Mostantól **azonnal jár, amikor eléred** a lépcsőt (Bronz 4: 2 pack, Ezüst 5: 2 Shiny pack, Arany 5: 1000 coin, Legenda: Legenda hátlap), szezononként egyszer (`rank.claimed`, `rkClaimDue`, `rkGrant`).
+- Meccs közben elért lépcső: az eredményképernyőn „🎁 Ranked jutalom – …” sor. Aki már korábban elérte: a főmenübe érve megkapja, „🏆 Ranked jutalom” felugró ablakkal (`rkTierPopup`).
+- Szezon végén csak a még ki nem osztott lépcsők jutalma jár; a szezonzáró ablak ezt írja, ha mindent megkapott menet közben.
+
 ## Ranked: liga-esésvédelem Aranyban is (2026-10-13)
 - Tomi kérése: az elért ligából nem lehet visszaesni. Ezüst 5 alá eddig sem, mostantól **Arany 5 alá sem** lehet esni (Arany 4–1-ből a vereség Arany 5-ig vihet vissza, csillagot a ligán belül továbbra is veszít). Üzenet: „Arany 5 alá nem eshetsz vissza”.
 - A győzelmi sorozat bónusza (a 3. egymás utáni győzelemtől +1, azaz 2 csillag/győzelem) Aranyban is jár – ez eddig is így volt, a szabályleírás most kimondja.

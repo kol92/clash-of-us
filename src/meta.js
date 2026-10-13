@@ -2403,14 +2403,11 @@ function ensureRank(p) {
   if (!p.rank) { p.rank = rkFresh(se.id); return p.rank; }
   if (p.rank.season !== se.id) {
     const old = p.rank;
-    const got = old.games > 0 && RANKED_ON ? rkRewardsUpTo(old.best) : [];
-    if (got.length) {
+    const got = old.games > 0 && RANKED_ON ? rkRewardsUpTo(old.best).filter(x => !(old.claimed || []).includes(x.min)) : [];   // amit menet közben még nem kapott meg
+    if (got.length || old.games > 0) {
       const rw = {};
       for (const x of got) for (const [k, v] of Object.entries(x.rew)) rw[k] = k === 'back' ? v : (rw[k] || 0) + v;
-      if (rw.packs) p.giftPacks = (p.giftPacks || 0) + rw.packs;
-      if (rw.shiny) p.shinyPacks = (p.shinyPacks || 0) + rw.shiny;
-      if (rw.coins) p.coins += rw.coins;
-      if (rw.back && !(p.backs || []).includes(rw.back)) { p.backs = [...(p.backs || []), rw.back]; p.cardBack = rw.back; }
+      rkGrant(p, rw);
       p.rankReward = { season: old.season, best: old.best, lp: old.lp, w: old.w, l: old.l, rew: rw, seen: false };
     }
     p.rank = rkFresh(se.id); p._dirty = true; save();
@@ -2450,8 +2447,9 @@ function rankOnMatch(res) {
     }
   } else note = 'Döntetlen: a rangod nem változott';
   r.best = Math.max(r.best, r.t);
+  const rew = rkClaimDue(p, true);
   save(); frPubSync();
-  return { before, after: { t: r.t, st: r.st, lp: r.lp }, res, note, up: r.t > before.t, down: r.t < before.t };
+  return { before, after: { t: r.t, st: r.st, lp: r.lp }, res, note, up: r.t > before.t, down: r.t < before.t, rew };
 }
 function rkEmblem(t, cls = '') {
   return `<span class="rk-emb ${rkTierCls(t)} ${cls}" aria-hidden="true"><i>${t >= RK_LEG ? '★' : 5 - (t % 5)}</i></span>`;
@@ -2461,11 +2459,37 @@ function rkStars(t, st, anim) {
   return `<span class="rk-stars">${Array.from({ length: rkNeed(t) }, (_, k) => `<i class="${k < st ? 'on' : ''}${anim != null && k === anim ? ' pop' : ''}"></i>`).join('')}</span>`;
 }
 // a meccs végi ablakba: rangváltozás
+// 2026-10-13: a lépcső jutalma azonnal jár, amikor eléred (szezononként egyszer) – nem csak a szezon végén
+function rkGrant(p, rew) {
+  if (rew.packs) p.giftPacks = (p.giftPacks || 0) + rew.packs;
+  if (rew.shiny) p.shinyPacks = (p.shinyPacks || 0) + rew.shiny;
+  if (rew.coins) p.coins += rew.coins;
+  if (rew.back && !(p.backs || []).includes(rew.back)) { p.backs = [...(p.backs || []), rew.back]; p.cardBack = rew.back; try { applyBack(); } catch (e) {} }
+}
+function rkClaimDue(p, fromMatch) {
+  const r = p && p.rank; if (!r || !RANKED_ON) return [];
+  const due = RK_REWARDS.filter(x => r.best >= x.min && !(r.claimed || []).includes(x.min));
+  if (!due.length) return [];
+  for (const x of due) rkGrant(p, x.rew);
+  r.claimed = [...(r.claimed || []), ...due.map(x => x.min)];
+  if (!fromMatch) p.rkNew = [...(p.rkNew || []), ...due.map(x => x.min)];   // menüben felugró ablak
+  save(); return due;
+}
+function rkTierPopup() {
+  const p = Store.p; if (!p || !(p.rkNew || []).length || $('#layer .overlay')) return;
+  const xs = RK_REWARDS.filter(x => p.rkNew.includes(x.min));
+  const o = document.createElement('div'); o.className = 'overlay';
+  o.innerHTML = `<div class="modal acct-box" style="text-align:center;justify-items:center"><h3>🏆 Ranked jutalom</h3>${rkEmblem(xs[xs.length - 1].min, 'lg')}
+    ${xs.map(x => `<p class="tut-gift"><b>${x.name}</b> elérve: <b>${rkRewText(x.rew)}</b></p>`).join('')}
+    <p class="live">${xs.some(x => x.rew.packs || x.rew.shiny) ? 'A packok a Boosterek menüben várnak.' : ''}${xs.some(x => x.rew.back) ? ' Az új hátlapot már használod.' : ''}</p><button class="btn primary" data-x>Szuper!</button></div>`;
+  o.onclick = e => { if (e.target.closest('[data-x]')) { o.remove(); p.rkNew = []; save(); renderProfileBar(); } };
+  $('#layer').appendChild(o);
+}
 function rkResultHTML(x) {
   if (!x) return '';
   const a = x.after, gained = x.res === 'win' && !x.up && a.t < RK_LEG ? a.st - 1 : null;
   return `<div class="rk-res${x.up ? ' up' : x.down ? ' down' : ''}">${rkEmblem(a.t, 'sm')}<div class="rk-res-t"><b>${x.up ? `Szintlépés! ${rkName(a.t)}` : x.down ? `${rkName(a.t)}` : rkName(a.t)}</b>
-    ${a.t >= RK_LEG ? `<small>${a.lp} Legenda-pont</small>` : rkStars(a.t, a.st, gained)}${x.note ? `<small class="rk-note">${x.note}</small>` : ''}</div></div>`;
+    ${a.t >= RK_LEG ? `<small>${a.lp} Legenda-pont</small>` : rkStars(a.t, a.st, gained)}${x.note ? `<small class="rk-note">${x.note}</small>` : ''}</div></div>${(x.rew || []).map(y => `<div class="q-done-pop">🎁 Ranked jutalom – <b>${y.name}</b>: <em>${rkRewText(y.rew)}</em></div>`).join('')}`;
 }
 // menü csempe
 // ---- hátlapok (2026-10-12): a játékos választhat; a Legenda hátlap a ranked Legenda jutalma ----
@@ -2543,6 +2567,7 @@ function renderRankTile() {
   if (r.pend && !(S && S.ranked)) { rankOnMatch('loss'); toast('Félbehagyott ranked meccs: vereségnek számított'); }
   el.textContent = r.t >= RK_LEG ? `Legenda · ${r.lp} pont` : `${rkName(r.t)} · ${r.st}/${rkNeed(r.t)} csillag`;
   if (em) em.innerHTML = rkEmblem(r.t, 'sm');
+  if (!$('#scr-menu').hidden) { rkClaimDue(Store.p); rkTierPopup(); }   // akik már elérték a lépcsőt, most megkapják
   const rw = Store.p.rankReward; if (rw && !rw.seen) rkRewardPopup();
 }
 function rkRewardPopup() {
@@ -2550,7 +2575,7 @@ function rkRewardPopup() {
   const o = document.createElement('div'); o.className = 'overlay rk-season';
   o.innerHTML = `<div class="modal acct-box"><h3>🏆 Véget ért a ranked szezon</h3>${rkEmblem(rw.best, 'lg')}
     <p class="live">A szezon legjobb rangod: <b>${rkName(rw.best)}</b>${rw.best >= RK_LEG ? ` (${rw.lp} Legenda-pont)` : ''} · ${rw.w} győzelem, ${rw.l} vereség.</p>
-    <p class="tut-gift">🎁 Jutalom: <b>${rkRewText(rw.rew)}</b>${rw.rew.packs || rw.rew.shiny ? ' – a packok a Boosterek menüben várnak' : ''}${rw.rew.back ? '. Az új hátlapot már használod (a Gyűjteményben a 🃏 Hátlap gombbal válthatsz)' : ''}.</p>
+    ${rkRewText(rw.rew) ? `<p class="tut-gift">🎁 Jutalom: <b>${rkRewText(rw.rew)}</b>${rw.rew.packs || rw.rew.shiny ? ' – a packok a Boosterek menüben várnak' : ''}${rw.rew.back ? '. Az új hátlapot már használod (a Gyűjteményben a 🃏 Hátlap gombbal válthatsz)' : ''}.</p>` : '<p class="tut-gift">🎁 A lépcsők jutalmát már menet közben megkaptad.</p>'}
     <p class="live">Az új szezon Bronz 5-ről indul. Hajrá!</p><button class="btn primary" data-x>Szuper!</button></div>`;
   o.onclick = e => { if (e.target.closest('[data-x]')) { o.remove(); rw.seen = true; save(); } };
   $('#layer').appendChild(o);
@@ -2576,7 +2601,7 @@ function renderRanked() {
       <small class="rk-sea">${escH(se.name)} · még ${days} nap · ${r.w} győzelem, ${r.l} vereség${r.streak >= 2 ? ` · 🔥 ${r.streak} győzelem sorozat` : ''}</small></div>
     <button class="rk-playimg" id="rkPlay" aria-label="Ranked meccs"></button>
     <p class="q-note rk-how">${Store.p.rkBot !== false ? `Élő ellenfelet keresünk; ha 20 mp alatt nincs senki, egy bot ellen játszol – a rangod mindkét esetben számít. A bot a ranggal erősödik (most: ${BOT_LV_NAME[rkBotLv()]}).` : 'Csak élő ellenfél ellen játszol: addig vársz, amíg valaki nem jön.'} (A pakliválasztásnál állíthatod.)</p>
-    <div class="lbl">Szezon végi jutalmak (minden elért lépcső jár)</div>
+    <div class="lbl">Jutalmak – a lépcső elérésekor azonnal járnak</div>
     <div class="rk-rews">${RK_REWARDS.map(x => `<div class="rk-rew${r.best >= x.min ? ' got' : ''}">${rkEmblem(x.min, 'xs')}<span><b>${x.name}</b><small>${rkRewText(x.rew)}</small></span>${r.best >= x.min ? '<em>elérve</em>' : ''}</div>`).join('')}</div>
     <div class="lbl rk-lbhead"><span>Ranglista</span><span class="seg rk-tabs" role="group"><button data-rkt="all" aria-pressed="${RKB.tab !== 'fr'}">Mindenki</button><button data-rkt="fr" aria-pressed="${RKB.tab === 'fr'}">Barátok</button></span></div>
     <div class="rk-board">${shown.map(x => `<${x.me ? 'div' : 'button'} class="rk-row${x.me ? ' me' : ''}"${x.me ? '' : ` data-rkp="${x.uid}"`}><span class="rk-pos">${board.indexOf(x) + 1}.</span>${rkEmblem(x.t, 'xs')}<b>${escH(x.name || 'Játékos')}${!x.me && frSet.has(x.uid) ? ' <i class="rk-fr" title="Barátod">🤝</i>' : !x.me && pend.has(x.uid) ? ' <i class="rk-fr" title="Jelölés folyamatban">⏳</i>' : ''}</b><small>${x.t >= RK_LEG ? `Legenda · ${x.lp || 0} pont` : `${rkName(x.t)} · ${x.st}★`}</small></${x.me ? 'div' : 'button'}>`).join('')}
@@ -2590,7 +2615,8 @@ function renderRanked() {
       <li>Ezüst 4–1: csak minden második vereség vesz el csillagot (🛡 Kitartás), és egy győzelem után az első vereség mindig ingyenes.</li>
       <li>Aranyban minden vereség −1 csillag, és 0 csillagnál visszaesel egy fokozatot – de Arany 5 alá már nem eshetsz vissza.</li>
       <li>Legendában Legenda-pontokat gyűjtesz, onnan már nem esel vissza.</li>
-      <li>A szezon a Season Passsal együtt ér véget: akkor jár minden elért lépcső jutalma (Bronz 4, Ezüst 5, Arany 5, Legenda), és mindenki Bronz 5-ről kezd.</li></ul></details>`;
+      <li>A lépcsők jutalma (Bronz 4, Ezüst 5, Arany 5, Legenda) azonnal jár, amikor eléred – szezononként egyszer.</li>
+      <li>A szezon a Season Passsal együtt ér véget, és mindenki Bronz 5-ről kezd.</li></ul></details>`;
   $('#rkPlay').onclick = () => pvpPickDeck('Ranked pakli', dk => rankedSearch(dk), { ranked: true, btn: '🏆 Ranked meccs indítása', note: 'Válaszd ki, melyik paklival mész rankedbe.' });
 }
 // ranked keresés: élő ellenfél (20 mp), különben bot
