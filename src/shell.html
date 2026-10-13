@@ -1545,6 +1545,20 @@ button.rk-row:active{transform:scale(.98);}
 /* ===== Fekvő, nagy képernyős meccs (tablet fekve, számítógép) – 2026-10-13 =====
    Középen a megszokott meccs szélesebben, felül az ellenfél lefordított keze; bal oldalt az utoljára kijátszott lap, jobb oldalt az élő napló. */
 .g-side{display:none;}
+/* Széles nézet a Gyűjteményben, a Paklik listában és a pakliszerkesztőben is (2026-10-13, Laci kérése) */
+@media (min-width:1000px) and (min-height:600px) and (min-aspect-ratio:5/4){
+  body[data-scr="scr-coll"] #app,body[data-scr="scr-decks"] #app,body[data-scr="scr-edit"] #app{max-width:min(100vw,1280px);}
+  body[data-scr="scr-coll"] .screen,body[data-scr="scr-decks"] .screen,body[data-scr="scr-edit"] .screen{padding-inline:28px;}
+  body[data-scr="scr-coll"] .coll-grid{grid-template-columns:repeat(auto-fill,minmax(138px,1fr));gap:20px 14px;}
+  body[data-scr="scr-coll"] .coll-grid .card{--cw:136px;}
+  body[data-scr="scr-decks"] .deck-list{grid-template-columns:repeat(auto-fill,minmax(360px,1fr));gap:14px;}
+  body[data-scr="scr-decks"] #newDeck,body[data-scr="scr-decks"] #impDeck{max-width:560px;display:block;margin-inline:auto;}
+  body[data-scr="scr-edit"] .ed-body{grid-template-columns:1fr 360px;gap:16px;}
+  body[data-scr="scr-edit"] .ed-pool{grid-template-columns:repeat(auto-fill,minmax(122px,1fr));gap:16px 10px;}
+  body[data-scr="scr-edit"] .ed-card .card{--cw:118px;}
+  body[data-scr="scr-edit"] .ed-row{min-height:36px;} body[data-scr="scr-edit"] .ed-row .er-name{font-size:13px;}
+  body[data-scr="scr-edit"] .ed-side .ed-curve{height:46px;} body[data-scr="scr-edit"] .ed-status{font-size:12.5px;}
+}
 @media (min-width:1000px) and (min-height:600px) and (min-aspect-ratio:5/4){
   body.in-game #app{max-width:min(100vw,1480px);box-shadow:none;background:none;}
   body.in-game #scr-game{display:grid;padding:0 14px;column-gap:16px;row-gap:6px;background:none;position:relative;isolation:isolate;

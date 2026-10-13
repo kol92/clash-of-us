@@ -309,7 +309,7 @@ function heroCardHTML(h, o = {}) {
 }
 
 // ---------- képernyők ----------
-function show(id) { document.querySelectorAll('.screen').forEach(x => x.hidden = x.id !== id); document.body.classList.toggle('in-game', id === 'scr-game'); }
+function show(id) { document.querySelectorAll('.screen').forEach(x => x.hidden = x.id !== id); document.body.classList.toggle('in-game', id === 'scr-game'); document.body.dataset.scr = id; }
 document.querySelectorAll('[data-back]').forEach(b => b.onclick = () => { renderMenuFan(); renderProfileBar(); show('scr-menu'); });
 // iOS: csippentéses zoom tiltása (a dupla koppintást a touch-action kezeli)
 ['gesturestart', 'gesturechange'].forEach(t => document.addEventListener(t, e => e.preventDefault(), { passive: false }));

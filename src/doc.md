@@ -443,6 +443,7 @@ Hősképesség-ötletek a táblázatban (még nem zöldek, nincsenek beépítve)
   - **Bal oldalt:** az **ellenfél keze lefordítva** (az ő hátlapjával, PvP-ben a választottjával), alatta az **utoljára kijátszott lap** nagyban (ki, hányadik körben, Kánon eseménynél a választott mód; rákoppintva részletek). Rejtett (Sunyuló) ellenséges lap nem jelenik meg itt.
   - **Jobb oldalt:** az **élő napló** (az utolsó 8 kör, a legfrissebb felül).
 - A menük maradnak a középső oszlopban. Telefonon és álló tableten semmi nem változik. Egérrel húzva is pontosan oda kerül a lap, ahová húzod (tesztelve).
+- **Gyűjtemény, Paklik, pakliszerkesztő** (Laci kérése, 2026-10-13): ugyanilyen széles, fekvő képernyőn ezek is széles oszlopot kapnak (max. 1280 px, `body[data-scr=…]`): a gyűjteményben nagyobb lapok (136 px) és több oszlop, a pakli-lista 2–3 oszlopban, a szerkesztőben nagyobb lapok (118 px) és 360 px-es pakli-oszlop. A többi menü marad a középső oszlopban.
 - **Eszköz-mérés:** a nyilvános profilba (`pub`) bekerül, ki milyen eszközön játszik utoljára: `dev: 'phone' | 'tablet' | 'pc'` (`devKind()`), hogy lássuk, megéri-e a menüket is szélesre tenni.
 
 ## Meccs vége: napló gomb, Kánon esemény tovább látszik (2026-10-13)
