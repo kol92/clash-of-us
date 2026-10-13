@@ -2435,8 +2435,11 @@ function rankOnMatch(res) {
       let lose = true;
       if (r.t < 10) { if (!r.shield) { r.shield = true; lose = false; note = '🛡 Kitartás: ezt a vereséget nem számoltuk'; } else r.shield = false; }
       if (lose) {
+        // 2026-10-13, Tomi: az elért ligából nem lehet visszaesni – Ezüst 5 és Arany 5 alá sem, csak a ligán belüli számokban
+        const floor = r.t >= 10 ? 10 : 5;
         if (r.st > 0) r.st--;
-        else if (r.t > 5) { r.t--; r.st = rkNeed(r.t) - 1; note = 'Visszaestél egy fokozatot'; }
+        else if (r.t > floor) { r.t--; r.st = rkNeed(r.t) - 1; note = 'Visszaestél egy fokozatot'; }
+        else note = floor === 10 ? 'Arany 5 alá nem eshetsz vissza' : 'Ezüst 5 alá nem eshetsz vissza';
       }
     }
   } else note = 'Döntetlen: a rangod nem változott';
@@ -2574,11 +2577,12 @@ function renderRanked() {
       ${others.length ? '' : `<p class="q-note">${RKB.tab === 'fr' ? 'Még egy barátod sem játszott ranked meccset ebben a szezonban.' : RKB.busy ? 'Ranglista betöltése…' : 'Még senki más nem játszott ranked meccset ebben a szezonban.'}</p>`}
       ${RKB.tab !== 'fr' ? '<p class="q-note rk-tip">Koppints egy játékosra – innen is bejelölheted barátnak.</p>' : ''}</div>
     <details class="rk-rules"><summary>Hogyan működik?</summary><ul>
-      <li>Győzelem: +1 csillag. Sorozatban a 3. győzelemtől minden győzelem +1 bónusz csillagot ad.</li>
+      <li>Győzelem: +1 csillag. Sorozatban a 3. győzelemtől minden győzelem dupla, azaz 2 csillagot ér – Bronzban, Ezüstben és Aranyban is.</li>
+      <li>Az elért ligából nem esel vissza: Ezüst 5 és Arany 5 alá sem, csak a ligán belül.</li>
       <li>Bronzban 2, Ezüstben 3, Aranyban 4 csillag kell egy fokozathoz. Arany 1 után jön a Legenda.</li>
       <li>Bronzban és Ezüst 5-ön a vereség nem visz el csillagot, és Ezüst 5 alá már nem eshetsz vissza.</li>
       <li>Ezüst 4–1: csak minden második vereség vesz el csillagot (🛡 Kitartás), és egy győzelem után az első vereség mindig ingyenes.</li>
-      <li>Aranyban minden vereség −1 csillag, és 0 csillagnál visszaesel egy fokozatot.</li>
+      <li>Aranyban minden vereség −1 csillag, és 0 csillagnál visszaesel egy fokozatot – de Arany 5 alá már nem eshetsz vissza.</li>
       <li>Legendában Legenda-pontokat gyűjtesz, onnan már nem esel vissza.</li>
       <li>A szezon a Season Passsal együtt ér véget: akkor jár minden elért lépcső jutalma (Bronz 4, Ezüst 5, Arany 5, Legenda), és mindenki Bronz 5-ről kezd.</li></ul></details>`;
   $('#rkPlay').onclick = () => pvpPickDeck('Ranked pakli', dk => rankedSearch(dk), { ranked: true, btn: '🏆 Ranked meccs indítása', note: 'Válaszd ki, melyik paklival mész rankedbe.' });

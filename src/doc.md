@@ -437,6 +437,11 @@ Hősképesség-ötletek a táblázatban (még nem zöldek, nincsenek beépítve)
 - Az ellenfél körében (PvP-ben és bot ellen is) a kezedben lévő lapok elsötétülnek, mint a ki nem játszható lapok – korábban ilyenkor mind „aktívnak” látszott.
 - A variáns lapok szalagja: „✦ Variáns” (kicsiben) / „✦ Ritka variáns” (nagy lapon) – korábban „Változat”.
 
+## Ranked: liga-esésvédelem Aranyban is (2026-10-13)
+- Tomi kérése: az elért ligából nem lehet visszaesni. Ezüst 5 alá eddig sem, mostantól **Arany 5 alá sem** lehet esni (Arany 4–1-ből a vereség Arany 5-ig vihet vissza, csillagot a ligán belül továbbra is veszít). Üzenet: „Arany 5 alá nem eshetsz vissza”.
+- A győzelmi sorozat bónusza (a 3. egymás utáni győzelemtől +1, azaz 2 csillag/győzelem) Aranyban is jár – ez eddig is így volt, a szabályleírás most kimondja.
+- Szimuláció (`rksim`, 4000 futás): 55%-os játékos Arany 5 ~39 meccs, Legenda ~99; a Nehéz bot ellen 45%-ot hozó (Könnyű 85/Normál 65) játékos Legenda ~230 meccs. Az esésvédelem a Legendáig tartó utat kissé rövidíti (pl. 50%-nál 151 → 142 meccs).
+
 ## Ranked ranglista – mindenki (2026-10-12)
 - A ranked képernyőn a ranglistán **minden játékos** rajta van, aki az aktuális szezonban már játszott ranked meccset (nem csak a barátok). Fülek: **Mindenki** / **Barátok**. Az első 50 látszik, és ha te lejjebb vagy, a saját sorod a végén (a valódi helyezéseddel).
 - Forrás: a játékosok nyilvános `pub` profilja (`where('rank.season','==',szezon)`), percenként legfeljebb egyszer frissül. A `pub` rangadataiba bekerült a szezonbeli ranked meccsek száma (`rank.g`) – akinek 0 meccse és Bronz 5, 0★ rangja van, nem kerül fel. Szabálymódosítás nem kellett (a `pub` minden belépett játékosnak olvasható).
