@@ -465,6 +465,9 @@ Hősképesség-ötletek a táblázatban (még nem zöldek, nincsenek beépítve)
   - hős-képességek (`passive` esemény): „✨ Sasi képessége: legalább 2 karaktere áll a táblán → 1 sebzés az ellenfél hősének”, Milo (meghalt egy karaktere → 1 sebzés), Gabi (kör végi gyógyítás), Laci (extra húzás minden 3. körben), Barna (+1 támadás az első olcsó karakterének);
   - helyszínek kör végi hatása (`locfx`): „📍 Morrison's: minden karaktered 1 sebzést kap”, „📍 Siófoki Kórház: a karaktereid gyógyulnak”.
 
+## Javítás: rejtett lap villanása (2026-10-13, Laci)
+- Ha az ellenfél rejtett (Sunyuló) lapot tett le, a „lerakott egy rejtett lapot” animációban a lap eleje egy pillanatra benne volt az oldalban (csak a beúszás után törlődött), és a 3D-s fordításnál egy képkockára átlátszhatott. Most rejtett lapnál az eleje bele sem kerül az oldalba (`showPlayed`), csak a hátlap.
+
 ## Döntő csapás kiemelése (2026-10-13, Laci kérése)
 - Ha a meccs kiütéssel ér véget, a naplóban a halálos sebzés sora **piros kiemelést** kap, a kör végén pedig egy összefoglaló sor jelenik meg: „🏁 Döntő csapás: Pifti támad → a hősöd: −2” (az ok = az előtte álló kijátszás / támadás / képesség / helyszín sor; üres paklinál a kifáradás).
 - Ugyanez az **eredményképernyőn** is látszik a „A hősöd kiütve.” alatt, piros sávban (bot, ranked és PvP meccsnél is). `S.killShot`, a `logEvents` végén számolva.

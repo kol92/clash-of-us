@@ -1349,7 +1349,7 @@ async function showPlayed(id, tg, foil) {
   if (CARD[id].finisher) return;   // a kánon eseménynek saját, nagy bevonulása van (playIntro)
   const secret = !!CARD[id].sneak;
   const back = document.createElement('div'); back.className = 'played';
-  back.innerHTML = `<div class="wrap"><span class="tag">${S.pvp ? escH(S.names?.[BOT] || 'Az ellenfél') : HERO[S.players[BOT].heroId].name} ${secret ? 'lerakott egy rejtett lapot' : 'kijátszotta'}</span><span class="flip rev" style="${oppBackVars()}"><span class="flip-in"><span class="face back"></span><span class="face front">${cardHTML(id, { big: true, foil })}</span></span></span>${foil && !CARD[id].sneak ? '<span class="fa-flash">✨ Full Art ✨</span>' : ''}<span class="skip">Koppints a folytatáshoz</span></div>`;
+  back.innerHTML = `<div class="wrap"><span class="tag">${S.pvp ? escH(S.names?.[BOT] || 'Az ellenfél') : HERO[S.players[BOT].heroId].name} ${secret ? 'lerakott egy rejtett lapot' : 'kijátszotta'}</span><span class="flip rev" style="${oppBackVars()}"><span class="flip-in"><span class="face back"></span><span class="face front">${secret ? '' : cardHTML(id, { big: true, foil })}</span></span></span>${foil && !CARD[id].sneak ? '<span class="fa-flash">✨ Full Art ✨</span>' : ''}<span class="skip">Koppints a folytatáshoz</span></div>`;
   $('#layer').appendChild(back);
   const wrap = back.querySelector('.wrap');
   const eb = $('#eBar').getBoundingClientRect(), wr = wrap.getBoundingClientRect();
@@ -1357,7 +1357,6 @@ async function showPlayed(id, tg, foil) {
   back.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 220, fill: 'forwards' });
   await wrap.animate([{ transform: `translateY(${dy}px) scale(.3) rotate(-10deg)`, opacity: 0 },
                       { transform: 'none', opacity: 1 }], { duration: 420, easing: 'cubic-bezier(.2,1.3,.4,1)', fill: 'forwards' }).finished;
-  if (secret) back.querySelector('.face.front').innerHTML = '';
   if (!secret) await back.querySelector('.flip-in').animate([{ transform: 'rotateY(180deg)' }, { transform: 'rotateY(0deg)' }], { duration: 480, easing: 'cubic-bezier(.3,.1,.3,1.2)', fill: 'forwards' }).finished;
   await Promise.race([sleep(1500), new Promise(r => back.addEventListener('pointerdown', r, { once: true }))]);
   const aims = [flyTarget(id, tg)];
