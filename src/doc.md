@@ -437,6 +437,12 @@ Hősképesség-ötletek a táblázatban (még nem zöldek, nincsenek beépítve)
 - Az ellenfél körében (PvP-ben és bot ellen is) a kezedben lévő lapok elsötétülnek, mint a ki nem játszható lapok – korábban ilyenkor mind „aktívnak” látszott.
 - A variáns lapok szalagja: „✦ Variáns” (kicsiben) / „✦ Ritka variáns” (nagy lapon) – korábban „Változat”.
 
+## Meccs vége: napló gomb, Kánon esemény tovább látszik (2026-10-13)
+- Az eredményképernyőn (bot, ranked, PvP) **📜 Mi történt a meccsen?** gomb: megnyitja a meccsnaplót (az utolsó 12 kör), így látszik, mi ütötte ki a hőst.
+- A naplóban a választós Kánon eseménynél a választott mód is látszik, pl. „Gluténbomba (8 sebzés, de te is kapsz 8-at)”.
+- A Kánon esemény bevonulása után a lap tovább marad: az ellenfélé ~4,5 mp, a sajátod ~2,2 mp (koppintásra hamarabb továbbmegy, „Koppints a folytatáshoz” felirat).
+- Kivizsgálás (Laci panasza): a Gluténbomba pontosan 8 (vagy 5) sebzést okoz – egyetlen kivétel az Akácfa söröző (+1 minden sebzésre). A gyanús esetben a bomba után a kör végi támadás ütötte ki a hőst (reprodukálva: 9 → 1 a bombától → Pifti −2).
+
 ## Tablet és számítógép (2026-10-13)
 - A játék továbbra is egy telefonarányú oszlop (max. 480 px széles), de:
   - **Álló tableten** (érintőképernyő, rövidebb oldala ≥ 600 px) a böngésző felnagyítja a lapot (`fitViewport` a ui.js elején, viewport `width=<számolt>`), hogy a játék ~880 px-es telefonarányú magasságban kitöltse a képernyőt. Pl. iPad 820×1180 → 612 px széles lap, ~1,34× nagyítás. Mivel a skálázást a böngésző végzi, az érintés, húzás és az animációk koordinátái nem változnak.

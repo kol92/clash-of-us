@@ -578,7 +578,8 @@ function logEvents(evs, snap) {
       case 'play': {
         const secret = e.side !== ME && c.sneak;
         const tg = e.tg ? ' → ' + nm(e.tg.side, e.tg.i) : '';
-        L(secret ? `🃏 ${who(e.side)} lerakott egy rejtett lapot` : `▶ ${who(e.side)} kijátszotta: <b>${escH(c.name)}</b>${tg}`); break; }
+        const opt = c.opts && e.o != null && c.opts[e.o] ? ` (${escH(c.opts[e.o])})` : '';
+        L(secret ? `🃏 ${who(e.side)} lerakott egy rejtett lapot` : `▶ ${who(e.side)} kijátszotta: <b>${escH(c.name)}</b>${opt}${tg}`); break; }
       case 'attack': L(`⚔ ${unitName(e.side, e.i)} támad`); break;
       case 'heroatk': L(`⚔ ${who(e.side)} (Baszó) odacsap`); break;
       case 'dmg': L(`💥 ${nm(e.side, e.i)}: −${e.n}`); break;
@@ -837,7 +838,7 @@ async function finisherIntro(e) {
   const skip = () => new Promise(r => { const t0 = performance.now(); o.addEventListener('pointerdown', () => { if (performance.now() - t0 > 300) r(); }); });
   if (matchMedia('(prefers-reduced-motion: reduce)').matches) {   // csökkentett mozgás: rövid, álló kiemelés
     [dark, card, title, icon].forEach(x => x.style.opacity = 1);
-    await Promise.race([sleep(1400), skip()]); o.remove(); return;
+    await Promise.race([sleep(e.side === ME ? 2500 : 4500), skip()]); o.remove(); return;
   }
   // 1) sötétítés
   await dark.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 320, easing: 'ease-in', fill: 'forwards' }).finished;
@@ -864,7 +865,9 @@ async function finisherIntro(e) {
   }
   title.animate([{ opacity: 0, transform: 'translate(-50%,0) scale(1.6)', letterSpacing: '.4em' }, { opacity: 1, transform: 'translate(-50%,0) scale(1)', letterSpacing: '.02em' }],
                 { duration: 420, delay: 160, easing: 'cubic-bezier(.2,1.3,.4,1)', fill: 'forwards' });
-  await Promise.race([Promise.all([runDone, sleep(1150)]), skip()]);
+  // 2026-10-13: tovább marad, hogy el lehessen olvasni (az ellenfélé ~4,5 mp, a sajátod ~2,2 mp; koppintásra hamarabb továbbmegy)
+  const hint = document.createElement('small'); hint.className = 'fin-skip'; hint.textContent = 'Koppints a folytatáshoz'; o.appendChild(hint);
+  await Promise.race([Promise.all([runDone, sleep(e.side === ME ? 2200 : 4500)]), skip()]);
   // 4) vissza a pályára, jöhet a hatás
   card.animate([{ opacity: 1, transform: 'translate(-50%,-50%) scale(1)', filter: 'brightness(1)' }, { opacity: 0, transform: 'translate(-50%,-50%) scale(1.18)', filter: 'brightness(2.6)' }], { duration: 300, easing: 'ease-in', fill: 'forwards' });
   await o.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 340, delay: 80, fill: 'forwards' }).finished;
@@ -1522,9 +1525,10 @@ function endMatch() {
     + (px ? `<div class="sp-pop${px.up ? ' up' : ''}"><b>+${px.gain} XP</b> Season Pass${px.up ? ` · <em>Szintlépés! ${px.lv}. szint – vedd át a jutalmat</em>` : ` · ${px.lv}. szint (${px.inLv}/${PASS_XP.perLevel})`}</div>` : '') + (S.ranked ? rkResultHTML(S.rkRes) : '');
   const o = document.createElement('div'); o.className = 'overlay';
   o.innerHTML = `<div class="modal result${win ? '' : ' lose'}${draw ? '' : ' resart'}">${draw ? '<h2 class="banner-h"><img src="art/ui/banner-draw.webp" alt="Döntetlen"></h2>' : resultArt(win)}<p>${why}</p>${reward}
+    <button class="btn small ghost res-log" data-log>📜 Mi történt a meccsen?</button>
     <div class="row"><button class="btn" data-r="menu">Menü</button><button class="btn primary" data-r="again">${S.ranked ? 'Újabb ranked' : 'Új meccs'}</button></div></div>`;
   const wasRanked = !!S.ranked;
-  o.onclick = e => { const b = e.target.closest('[data-r]'); if (!b) return; o.remove();
+  o.onclick = e => { if (e.target.closest('[data-log]')) { openLog(); return; } const b = e.target.closest('[data-r]'); if (!b) return; o.remove();
     if (b.dataset.r === 'again' && wasRanked) { const d = allDecks().find(x => x.id === ui.deck); if (d && !deckIssue(d)) rankedSearch(d); else { renderRanked(); show('scr-ranked'); } return; }
     if (b.dataset.r === 'again') { const d = allDecks().find(x => x.id === ui.deck); if (d && !deckIssue(d)) startMatch(d.hero, ui.deck); else openBotPick(); } else { renderMenuFan(); renderProfileBar(); show('scr-menu'); } };
   setTimeout(() => $('#layer').appendChild(o), 700);
