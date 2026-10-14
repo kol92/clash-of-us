@@ -161,6 +161,7 @@ async function bootProfile() {
   if (Store.giftMsg) { const m = Store.giftMsg; Store.giftMsg = null; setTimeout(() => toast(m), 600); }
   if (Store.faMsg) { const m = Store.faMsg; Store.faMsg = null; setTimeout(() => toast(m), 4200); }
   if (Store.dupeMsg) { const m = Store.dupeMsg; Store.dupeMsg = null; setTimeout(() => toast(m), Store.giftMsg === null ? 2400 : 600); }
+  if (Store.p) document.querySelectorAll('#layer .overlay.create').forEach(o => o.remove());
   renderProfileBar(); if (Store.p && GOLD_HEROES.some(ownsHeroGold)) renderMenuFan();
   if (!Store.p) showCreate(); else if (Store.p.onboard) startOnboarding();
   pvpStart(); renderPvpBadge(); pvpRoomInit(); frStart(); frRefresh();
@@ -193,7 +194,14 @@ function migrate(p) {
 }
 
 // ---- fiók létrehozása ----
+// 2026-10-13: betöltés közben a menü nem nyomható, és az „Új játékos” ablak soha nem írhat felül egy betöltött profilt
+function needProfile() {
+  if (Store.p) return false;
+  if (Store.mode === 'loading') { toast('Pillanat, töltöm a profilod…'); return true; }
+  showCreate(); return true;
+}
 function showCreate() {
+  if (Store.p || Store.mode === 'loading' || $('#layer .overlay.create')) return;
   const o = document.createElement('div'); o.className = 'overlay create';
   o.innerHTML = `<form class="modal create-box" id="createForm" novalidate>
       <div class="cb-back" aria-hidden="true"></div>
@@ -226,6 +234,7 @@ function showCreate() {
     const err = o.querySelector('#perr');
     if (name.length < 2) { err.hidden = false; err.textContent = 'A név legalább 2 karakter legyen.'; return; }
     if (invIn) { const c = invIn.value.toUpperCase().replace(/[^A-Z0-9]/g, ''); try { c.length === 6 ? localStorage.setItem('bou_inv', c) : localStorage.removeItem('bou_inv'); } catch {} }
+    if (Store.p || Store.mode === 'loading') { o.remove(); renderProfileBar(); toast(Store.p ? 'Betöltöttem a profilodat' : 'Pillanat, töltöm a profilod…'); return; }   // közben betöltődött a meglévő profil: nem írjuk felül
     Store.p = newProfile(name); Store.p.onboard = true; await save(); o.remove();
     renderProfileBar(); startOnboarding();
     if (window.APP_MODE) frApplyInvite();
@@ -309,6 +318,7 @@ function importModal(done) {
 
 function renderProfileBar() {
   const el = $('#profileBar'); if (!el) return;
+  document.body.classList.toggle('pf-loading', !Store.p && Store.mode === 'loading');
   if (!Store.p) { el.innerHTML = `<span class="pb-name">${Store.mode === 'loading' ? 'Profil betöltése…' : 'Nincs profil'}</span>`; return; }
   const p = Store.p, e = earnedToday();
   el.innerHTML = `<div class="pb-who"><span class="pb-name"></span><small>${p.stats.w} győzelem</small></div>
@@ -1352,7 +1362,7 @@ function renderPass() {
   if (cur) requestAnimationFrame(() => cur.scrollIntoView({ block: 'center' }));
   renderPassBadge();
 }
-$('#goPass').onclick = () => { if (!Store.p) return showCreate(); renderPass(); show('scr-pass'); };
+$('#goPass').onclick = () => { if (needProfile()) return; renderPass(); show('scr-pass'); };
 
 // ---- oktató meccs: fix lapok, fix ellenfél-lépések, lépésről lépésre vezetve ----
 // A játékos (Tomi) mindig ugyanazokat a lapokat húzza, a bot (Dávid, 12 élet) az első 4 körében mindig ugyanazt rakja le.
@@ -1636,7 +1646,7 @@ function onboardDone(win) {
   setTimeout(() => $('#layer').appendChild(o), 700);
 }
 
-$('#goTut').onclick = () => { if (!Store.p) return showCreate(); lessonPicker(); };
+$('#goTut').onclick = () => { if (needProfile()) return; lessonPicker(); };
 
 // ======================= PvP (barátok egymás ellen) =======================
 // Egy meccs = egy közös dokumentum: pvp/<id>. Mindig az lép, akinek a köre van; ő számol, és a teljes állást visszaírja.
@@ -2053,13 +2063,13 @@ setInterval(() => {
 }, 500);
 $('#emoBtn').onclick = () => pvpEmoteMenu();
 
-$('#goPvp').onclick = () => { if (!Store.p) return showCreate(); pvpStart(); renderPvp(); show('scr-pvp'); pvpPresence(); };
+$('#goPvp').onclick = () => { if (needProfile()) return; pvpStart(); renderPvp(); show('scr-pvp'); pvpPresence(); };
 
 // ---- menü gombok ----
-$('#goShop').onclick = () => { if (!Store.p) return showCreate(); renderShop(); show('scr-shop'); };
-$('#goDecks').onclick = () => { if (!Store.p) return showCreate(); renderDecks(); show('scr-decks'); };
-$('#goWheel').onclick = () => { if (!Store.p) return showCreate(); openWheel(); };
-$('#goQuests').onclick = () => { if (!Store.p) return showCreate(); renderQuests(); show('scr-quests'); };
+$('#goShop').onclick = () => { if (needProfile()) return; renderShop(); show('scr-shop'); };
+$('#goDecks').onclick = () => { if (needProfile()) return; renderDecks(); show('scr-decks'); };
+$('#goWheel').onclick = () => { if (needProfile()) return; openWheel(); };
+$('#goQuests').onclick = () => { if (needProfile()) return; renderQuests(); show('scr-quests'); };
 
 bootProfile();
 
@@ -2348,7 +2358,7 @@ function renderFriends() {
     if (b.hasAttribute('data-histall')) { FR.histAll = true; renderFriends(); }
   };
 }
-$('#goFriends').onclick = () => { if (!Store.p) return showCreate(); frStart(); renderFriends(); show('scr-friends'); FR.list.filter(d => d.status === 'accepted').forEach(d => frFetchPub(frOther(d), true)); };
+$('#goFriends').onclick = () => { if (needProfile()) return; frStart(); renderFriends(); show('scr-friends'); FR.list.filter(d => d.status === 'accepted').forEach(d => frFetchPub(frOther(d), true)); };
 
 // ---- duplikátumok kézi beváltása (Gyűjtemény) ----
 function dupeList(p) {   // ami 2 példány fölött van (előbb a sima példányok mennek, a Full Art marad)
@@ -2678,4 +2688,4 @@ $('#rankBody').addEventListener('click', e => {
   const t = e.target.closest('[data-rkt]'); if (t) { RKB.tab = t.dataset.rkt; renderRanked(); return; }
   const r = e.target.closest('[data-rkp]'); if (r) rkPlayerCard(r.dataset.rkp);
 });
-$('#goRanked').onclick = () => { if (!Store.p) return showCreate(); if (!RANKED_ON) return toast('🏆 A ranked szezon hamarosan indul!'); if (typeof frStart === 'function' && frOn()) { frStart(); FR.list.filter(d => d.status === 'accepted').forEach(d => frFetchPub(frOther(d), true)); } renderRanked(); show('scr-ranked'); rkLoadBoard(); };
+$('#goRanked').onclick = () => { if (needProfile()) return; if (!RANKED_ON) return toast('🏆 A ranked szezon hamarosan indul!'); if (typeof frStart === 'function' && frOn()) { frStart(); FR.list.filter(d => d.status === 'accepted').forEach(d => frFetchPub(frOther(d), true)); } renderRanked(); show('scr-ranked'); rkLoadBoard(); };

@@ -339,7 +339,7 @@ function renderMenuFan() {
   $('#menuFan').innerHTML = pick.map(h => heroCardHTML(h, { foil: true, gold: gold.includes(h.id), port: pt(h) })).join('');
 }
 renderMenuFan();
-$('#goPlay').onclick = () => { if (!Store.p) return showCreate(); const P = Store.p;
+$('#goPlay').onclick = () => { if (needProfile()) return; const P = Store.p;
   if (!P.tutDone && !P.tutSkip && P.stats.w + P.stats.l + P.stats.d === 0) return startTutorial();   // első játék: vezetett oktató meccs
   openBotPick(); };
 $('#goColl').onclick = () => { renderColl(); show('scr-coll'); };

@@ -465,6 +465,10 @@ Hősképesség-ötletek a táblázatban (még nem zöldek, nincsenek beépítve)
   - hős-képességek (`passive` esemény): „✨ Sasi képessége: legalább 2 karaktere áll a táblán → 1 sebzés az ellenfél hősének”, Milo (meghalt egy karaktere → 1 sebzés), Gabi (kör végi gyógyítás), Laci (extra húzás minden 3. körben), Barna (+1 támadás az első olcsó karakterének);
   - helyszínek kör végi hatása (`locfx`): „📍 Morrison's: minden karaktered 1 sebzést kap”, „📍 Siófoki Kórház: a karaktereid gyógyulnak”.
 
+## Profil betöltése alatt a menü nem nyomható (2026-10-14)
+- Visszajelzés: „Profil betöltése alatt a főmenü elemei ne legyenek klikkelhetőek.” Eddig betöltés közben bármelyik menügomb az „Új játékos” ablakot hozta fel (mintha nem lenne profil) – ha közben betöltődött a valódi profil és valaki mégis létrehozott egy újat, az **felülírhatta a meglévőt** a felhőben.
+- Most: betöltés közben (`Store.mode === 'loading'`) a főmenü gombjai halványak és nem nyomhatók (`body.pf-loading`, a névnél pörgő jel); a gombok `needProfile()`-t hívnak („Pillanat, töltöm a profilod…”); az „Új játékos” ablak nem nyílik meg betöltés közben, és ha a profil közben megjött, a beküldés nem írja felül (és a nyitott ablak magától bezárul).
+
 ## Javítás: rejtett lap villanása (2026-10-13, Laci)
 - Ha az ellenfél rejtett (Sunyuló) lapot tett le, a „lerakott egy rejtett lapot” animációban a lap eleje egy pillanatra benne volt az oldalban (csak a beúszás után törlődött), és a 3D-s fordításnál egy képkockára átlátszhatott. Most rejtett lapnál az eleje bele sem kerül az oldalba (`showPlayed`), csak a hátlap.
 
