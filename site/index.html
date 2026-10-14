@@ -2242,7 +2242,7 @@ body.pf-loading #scr-menu .pb-name::after{content:'';display:inline-block;width:
 <script src="vendor/firebase-auth-compat.js"></script>
 <script src="vendor/firebase-firestore-compat.js"></script>
 <script src="vendor/firebase-database-compat.js"></script>
-<script>window.APP_VERSION = "2026.10.14-1338"; window.APP_BUILD = "2026.10.14-1359";</script>
+<script>window.APP_VERSION = "2026.10.14-1338"; window.APP_BUILD = "2026.10.14-1408";</script>
 <script>// ===== Best of Us – saját szerver (Firebase) =====
 // A játék eredetileg a Claude-os tárolót használta (window.claude.use('db' | 'user' | 'room')).
 // Ez a fájl ugyanazt a felületet adja Firebase-ből, így a játék kódja szinte változatlan maradhat:
@@ -5557,6 +5557,8 @@ function openPackRoll(setId, forceFoil = false, shiny = false) {
 // ---- Heti láda (2026-10-14): minden hétfőn 0:01-kor mindenki kap egyet ----
 // 10 lap: 1 biztos epikus vagy legendás, 1 biztos Full Art, 8 véletlen (mint a packban); 0,5% eséllyel egy hős-portré is (bolti vagy eseményes)
 const CHEST = { cards: 10, portChance: 0.005, price: 500 };
+// ha egy kép nem töltődik be (pl. kitétel közben rossz válasz ragadt a telefon gyorsítótárában), egyszer újrakérjük a netről, más címmel
+function imgRetry(el) { if (el.dataset.retry === el.src) return; const u = el.src + (el.src.includes('?') ? '&' : '?') + 'r=' + Date.now(); el.dataset.retry = u; el.src = u; }
 function rollCardSlot(p, rar, foil) {
   const pool = SETS.base.cards.filter(id => CARD[id].rarity === rar);
   let id = pool[Math.floor(Math.random() * pool.length)];
@@ -5593,7 +5595,7 @@ function chestWeeklyCheck() {
 function chestPopup() {
   const p = Store.p; if (!p || !(p.chestNew) || $('#layer .overlay') || (typeof S !== 'undefined' && S)) return;
   const o = document.createElement('div'); o.className = 'overlay';
-  o.innerHTML = `<div class="modal acct-box chest-pop"><h3>🧰 Megérkezett a heti ládád!</h3><img class="chest-pop-img" src="art/ui/chest-closed.webp?v=49695505" alt="Heti láda">
+  o.innerHTML = `<div class="modal acct-box chest-pop"><h3>🧰 Megérkezett a heti ládád!</h3><img class="chest-pop-img" src="art/ui/chest-closed.webp?v=49695505" alt="Heti láda" onerror="imgRetry(this)">
     <p class="live"><b>10 lap</b>, köztük egy <b>biztos epikus vagy legendás</b> és egy <b>biztos Full Art</b>. Kis szerencsével egy ritka hős-portré is lapulhat benne. Minden hétfőn jön egy új.</p>
     <button class="btn primary" data-open>Kinyitom!</button><button class="btn ghost" data-x>Később (a Boltban vár)</button></div>`;
   o.onclick = e => { if (e.target.closest('[data-open]')) { o.remove(); p.chestNew = false; save(); openChest(); } else if (e.target.closest('[data-x]')) { o.remove(); p.chestNew = false; save(); renderProfileBar(); } };
@@ -5611,7 +5613,7 @@ async function buyChest() {
   if (p.chests > 0) return openChest();
   if (p.coins < CHEST.price) return toast(`Nincs elég coinod (${p.coins}/${CHEST.price})`);
   const o = document.createElement('div'); o.className = 'overlay';
-  o.innerHTML = `<div class="modal acct-box chest-pop"><h3>🧰 Extra heti láda</h3><img class="chest-pop-img" src="art/ui/chest-closed.webp?v=49695505" alt="Heti láda">
+  o.innerHTML = `<div class="modal acct-box chest-pop"><h3>🧰 Extra heti láda</h3><img class="chest-pop-img" src="art/ui/chest-closed.webp?v=49695505" alt="Heti láda" onerror="imgRetry(this)">
     <p class="live">Az e heti ingyen ládádat már kinyitottad. Most vehetsz egy extrát: <b>10 lap</b>, köztük egy <b>biztos epikus vagy legendás</b> és egy <b>biztos Full Art</b>, kis eséllyel egy ritka hős-portré.</p>
     <div class="row2"><button class="btn" data-x>Mégse</button><button class="btn primary" data-ok><span class="coin sm" aria-hidden="true"></span> ${CHEST.price} · Megveszem</button></div></div>`;
   $('#layer').appendChild(o);
@@ -5625,7 +5627,7 @@ function chestPanelHTML() {
   const when = d <= 1 ? 'holnap 0:01-kor' : `hétfőn 0:01-kor (${d} nap múlva)`;
   const poor = !n && p.coins < CHEST.price;
   return `<button class="chest-card${n ? ' ready' : poor ? ' poor' : ''}" id="chestBtn" aria-label="Heti láda – ${n ? 'kinyitás' : CHEST.price + ' coin'}">
-    <img class="cc-img" src="art/ui/chest-${n ? 'closed' : 'open'}-sm.webp" alt="" aria-hidden="true">
+    <img class="cc-img" src="${n ? 'art/ui/chest-closed-sm.webp?v=e7fa5eb9' : 'art/ui/chest-open-sm.webp?v=b9059045'}" alt="" aria-hidden="true" onerror="imgRetry(this)">
     <span class="cc-txt"><b>Heti láda</b><small>10 lap · 1 biztos epikus+ · 1 biztos Full Art</small>
       <em>${n ? `${n > 1 ? `${n} láda vár rád!` : 'A heti ládád vár rád!'}` : `Következő ingyen láda: ${when}`}</em></span>
     <span class="cc-act">${n ? `Kinyitom${n > 1 ? ` <i>${n}</i>` : ''}` : `<span class="coin sm" aria-hidden="true"></span>${CHEST.price}`}</span>
@@ -5633,7 +5635,7 @@ function chestPanelHTML() {
 }
 async function chestOpening(cards, port) {
   const o = document.createElement('div'); o.className = 'overlay opening chest-op';
-  o.innerHTML = `<div class="op-stage"><div class="ch-wrap"><div class="ch-rays"></div><img class="ch-img" src="art/ui/chest-closed.webp?v=49695505" alt="Heti láda"></div><div class="op-hint">Koppints a ládára!</div></div>`;
+  o.innerHTML = `<div class="op-stage"><div class="ch-wrap"><div class="ch-rays"></div><img class="ch-img" src="art/ui/chest-closed.webp?v=49695505" alt="Heti láda" onerror="imgRetry(this)"></div><div class="op-hint">Koppints a ládára!</div></div>`;
   $('#layer').appendChild(o);
   const wrap = o.querySelector('.ch-wrap'), img = o.querySelector('.ch-img');
   wrap.animate([{ transform: 'translateY(60px) scale(.7)', opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: 480, easing: 'cubic-bezier(.2,1.3,.4,1)' });

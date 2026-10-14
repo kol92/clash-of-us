@@ -1,12 +1,15 @@
 // Best of Us – service worker
 // A képek (art/) és a Firebase-könyvtárak a telefonon maradnak (gyors indulás, kevesebb adatforgalom);
 // a játék maga (index.html, version.json) mindig a netről jön, ha van net – így a frissítés azonnal megérkezik.
-const V = '2026.10.14-1359';
+const V = '2026.10.14-1408';
 const ASSETS = 'bou-assets-0c85bafd73', PAGES = 'bou-pages-' + V;
 self.addEventListener('install', e => { self.skipWaiting(); });
 self.addEventListener('activate', e => {
   e.waitUntil((async () => {
-    for (const k of await caches.keys()) if (k.startsWith('bou-pages-') && k !== PAGES) await caches.delete(k);
+    for (const k of await caches.keys()) if ((k.startsWith('bou-pages-') && k !== PAGES) || (k.startsWith('bou-assets-') && k !== ASSETS)) await caches.delete(k);   // a régi képtárak is mennek (helyet foglalnak)
+    // takarítás: ha egy kép helyett HTML került a gyorsítótárba (kitétel közben a Cloudflare az index.html-t adta vissza), töröljük
+    try { const c = await caches.open(ASSETS);
+      for (const r of await c.keys()) { const h = await c.match(r); if (h && isHtml(h) && /\/(art|vendor|icons)\//.test(new URL(r.url).pathname)) await c.delete(r); } } catch (err) {}
     await self.clients.claim();
   })());
 });
@@ -23,10 +26,14 @@ self.addEventListener('fetch', e => {
   if (/\/(art|vendor|icons)\//.test(url.pathname)) { e.respondWith(cacheFirst(req, ASSETS)); return; }
   e.respondWith(networkFirst(req, PAGES));
 });
+const isHtml = res => (res.headers.get('content-type') || '').includes('text/html');
 async function cacheFirst(req, name) {
   const c = await caches.open(name), hit = await c.match(req);
-  if (hit) return hit;
-  const res = await fetch(req); if (res.ok || res.type === 'opaque') c.put(req, res.clone()); return res;
+  if (hit && !isHtml(hit)) return hit;
+  const res = await fetch(req);
+  // a hiányzó fájlra a Cloudflare 200-as index.html-t ad – azt nem tesszük el képként
+  if ((res.ok && !isHtml(res)) || res.type === 'opaque') c.put(req, res.clone());
+  return res;
 }
 async function networkFirst(req, name) {
   const c = await caches.open(name);
