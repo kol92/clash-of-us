@@ -327,9 +327,9 @@ function renderProfileBar() {
   const ss = $('#saveState'); if (ss) ss.textContent = window.APP_MODE ? '👤 Fiók' : Store.mode === 'cloud' ? '☁️ Felhőben mentve' : '📱 Ezen az eszközön mentve';
   el.querySelector('.pb-name').textContent = p.name;
   try { applyBack(); } catch (e) {}
-  renderQuestBadge(); renderPassBadge(); try { renderRankTile(); } catch (e) {} try { if (!$('#scr-menu').hidden) { dayGiftCheck(); backAwardCheck(); deckLinkCheck(); } } catch (e) {}
+  renderQuestBadge(); renderPassBadge(); try { renderRankTile(); } catch (e) {} try { if (chestWeeklyCheck()) Store.p.chestNew = true; } catch (e) {} try { if (!$('#scr-menu').hidden) { dayGiftCheck(); backAwardCheck(); deckLinkCheck(); chestPopup(); } } catch (e) {}
   const wb = $('#wheelBadge'); if (wb) wb.hidden = !wheelReady();
-  const badge = $('#shopBadge'); if (badge) badge.hidden = !freePackReady() && !(p.giftPacks > 0) && !(p.faPacks > 0) && !(p.shinyPacks > 0);
+  const badge = $('#shopBadge'); if (badge) badge.hidden = !freePackReady() && !(p.giftPacks > 0) && !(p.faPacks > 0) && !(p.shinyPacks > 0) && !(p.chests > 0);
 }
 
 // ---- jutalom meccs végén ----
@@ -382,6 +382,100 @@ function openPackRoll(setId, forceFoil = false, shiny = false) {
     if (foil) e.f++; else e.n++;
     return { id, foil, isNew };
   });
+}
+// ---- Heti láda (2026-10-14): minden hétfőn 0:01-kor mindenki kap egyet ----
+// 10 lap: 1 biztos epikus vagy legendás, 1 biztos Full Art, 8 véletlen (mint a packban); 0,5% eséllyel egy hős-portré is (bolti vagy eseményes)
+const CHEST = { cards: 10, portChance: 0.005 };
+function rollCardSlot(p, rar, foil) {
+  const pool = SETS.base.cards.filter(id => CARD[id].rarity === rar);
+  let id = pool[Math.floor(Math.random() * pool.length)];
+  const vars = CARDS.filter(v => v.variantOf === id && !v.passOnly && !v.shopOnly && !v.wheelOnly);
+  if (vars.length && Math.random() < VARIANT_CHANCE) id = vars[Math.floor(Math.random() * vars.length)].id;
+  foil = foil || Math.random() < ECON.foilChance;
+  const isNew = owned(id) === 0 || (foil && !ownsFoil(id));
+  const e = p.coll[id] || (p.coll[id] = { n: 0, f: 0 });
+  if (foil) e.f++; else e.n++;
+  return { id, foil, isNew };
+}
+const chestPorts = p => Object.keys(PORTRAITS).filter(k => (PORTRAITS[k].price || PORTRAITS[k].event) && ART[k] && !(p.portraits || []).includes(k));
+function chestRoll() {
+  const p = Store.p, out = [];
+  out.push(rollCardSlot(p, Math.random() < 1.5 / 8 ? 'l' : 'e', false));   // biztos epikus vagy jobb (a pack-esélyek arányában)
+  let fr = rollRarity(); out.push(rollCardSlot(p, fr, true));               // biztos Full Art
+  for (let k = 2; k < CHEST.cards; k++) out.push(rollCardSlot(p, rollRarity(), false));
+  p.sinceEpic = 0;
+  const order = { k: 0, r: 1, e: 2, l: 3 };
+  out.sort((a, b) => order[CARD[a.id].rarity] - order[CARD[b.id].rarity] || (a.foil ? 1 : 0) - (b.foil ? 1 : 0));
+  let port = null;
+  const pp = chestPorts(p);
+  if (pp.length && Math.random() < CHEST.portChance) { port = pp[Math.floor(Math.random() * pp.length)]; p.portraits = [...(p.portraits || []), port]; }
+  for (const c of out) if (!c.isNew) c.have = owned(c.id);
+  return { cards: out, port };
+}
+function chestWeeklyCheck() {
+  const p = Store.p; if (!p || p.onboard) return false;
+  const wk = weekKey();
+  if (p.chestWeek === wk) return false;
+  p.chestWeek = wk; p.chests = (p.chests || 0) + 1; save();
+  return true;
+}
+function chestPopup() {
+  const p = Store.p; if (!p || !(p.chestNew) || $('#layer .overlay') || (typeof S !== 'undefined' && S)) return;
+  const o = document.createElement('div'); o.className = 'overlay';
+  o.innerHTML = `<div class="modal acct-box chest-pop"><h3>🧰 Megérkezett a heti ládád!</h3><img class="chest-pop-img" src="art/ui/chest-closed.webp" alt="Heti láda">
+    <p class="live"><b>10 lap</b>, köztük egy <b>biztos epikus vagy legendás</b> és egy <b>biztos Full Art</b>. Kis szerencsével egy ritka hős-portré is lapulhat benne. Minden hétfőn jön egy új.</p>
+    <button class="btn primary" data-open>Kinyitom!</button><button class="btn ghost" data-x>Később (a Boltban vár)</button></div>`;
+  o.onclick = e => { if (e.target.closest('[data-open]')) { o.remove(); p.chestNew = false; save(); openChest(); } else if (e.target.closest('[data-x]')) { o.remove(); p.chestNew = false; save(); renderProfileBar(); } };
+  $('#layer').appendChild(o);
+}
+async function openChest() {
+  const p = Store.p; if (!p || !(p.chests > 0)) return;
+  p.chests--; p.chestsOpened = (p.chestsOpened || 0) + 1;
+  const res = chestRoll();
+  await save(); renderProfileBar(); try { renderShop(); } catch (e) {}
+  await chestOpening(res.cards, res.port);
+}
+async function chestOpening(cards, port) {
+  const o = document.createElement('div'); o.className = 'overlay opening chest-op';
+  o.innerHTML = `<div class="op-stage"><div class="ch-wrap"><div class="ch-rays"></div><img class="ch-img" src="art/ui/chest-closed.webp" alt="Heti láda"></div><div class="op-hint">Koppints a ládára!</div></div>`;
+  $('#layer').appendChild(o);
+  const wrap = o.querySelector('.ch-wrap'), img = o.querySelector('.ch-img');
+  wrap.animate([{ transform: 'translateY(60px) scale(.7)', opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: 480, easing: 'cubic-bezier(.2,1.3,.4,1)' });
+  wrap.classList.add('ready');
+  await new Promise(r => wrap.addEventListener('click', r, { once: true }));
+  wrap.classList.remove('ready'); o.querySelector('.op-hint').remove();
+  // megremeg, egyre erősebben, aztán kicsapódik a teteje
+  await wrap.animate(Array.from({ length: 14 }, (_, k) => { const j = 1 + k * .55; return { transform: `rotate(${(k % 2 ? 1 : -1) * j}deg) translateX(${(k % 2 ? -1 : 1) * j}px) scale(${1 + k * .006})` }; }),
+                     { duration: 900, easing: 'ease-in' }).finished;
+  const flash = document.createElement('div'); flash.className = 'op-flash gold'; o.appendChild(flash);
+  flash.animate([{ opacity: 0 }, { opacity: 1 }, { opacity: 0 }], { duration: 650 });
+  img.src = 'art/ui/chest-open.webp'; wrap.classList.add('open');
+  const rays = o.querySelector('.ch-rays');
+  rays.animate([{ opacity: 0, transform: 'translate(-50%,-55%) scale(.3) rotate(0deg)' }, { opacity: 1, transform: 'translate(-50%,-55%) scale(1.15) rotate(70deg)' }], { duration: 1400, easing: 'ease-out', fill: 'forwards' });
+  wrap.animate([{ transform: 'scale(1.08)' }, { transform: 'scale(1)' }], { duration: 420, easing: 'cubic-bezier(.2,1.4,.4,1)' });
+  const r = img.getBoundingClientRect(), cx = r.left + r.width / 2, cy = r.top + r.height * .45;
+  for (let k = 0; k < 46; k++) {
+    const c = document.createElement('i'), coin = k % 2 === 0; c.className = coin ? 'gold-coin' : 'rare-spark';
+    const a = -Math.PI / 2 + (Math.random() - .5) * 2.2, d = 140 + Math.random() * 240, sz = coin ? 12 + Math.random() * 8 : 4 + Math.random() * 7;
+    c.style.cssText = `left:${cx}px;top:${cy}px;width:${sz}px;height:${sz}px;${coin ? '' : 'background:#ffe07a;box-shadow:0 0 12px #ffc21a'}`;
+    o.appendChild(c);
+    c.animate([{ transform: 'translate(-50%,-50%) scale(1)', opacity: 1 }, { transform: `translate(calc(-50% + ${Math.cos(a) * d}px), calc(-50% + ${Math.sin(a) * d + 260}px)) scale(.5) rotateY(${coin ? 720 : 0}deg)`, opacity: 0 }],
+              { duration: 1100 + Math.random() * 700, easing: 'cubic-bezier(.15,.6,.4,1)', fill: 'forwards' });
+  }
+  await sleep(1300);
+  await wrap.animate([{ transform: 'none', opacity: 1 }, { transform: 'translateY(-40px) scale(.6)', opacity: 0 }], { duration: 380, easing: 'ease-in', fill: 'forwards' }).finished;
+  wrap.remove(); o.querySelectorAll('.gold-coin,.rare-spark').forEach(x => x.remove());
+  await cardReveal(o, cards, { ten: true });
+  o.remove();
+  if (port) {   // 0,5%: különleges hős-portré
+    const P = PORTRAITS[port], h = HERO[P.hero];
+    const m = document.createElement('div'); m.className = 'overlay';
+    m.innerHTML = `<div class="modal sp-reveal"><h3>✨ Különleges lelet a ládában!</h3>${heroCardHTML(h, { big: true, port })}
+      <p class="live"><b>${P.name}</b> – ${h.name} új hős-portréja, mindig Full Artban. A Gyűjteményben a hősre koppintva beállíthatod.</p><button class="btn primary" data-x>Szuper!</button></div>`;
+    m.onclick = e => { if (e.target.closest('[data-x]')) m.remove(); };
+    $('#layer').appendChild(m);
+  }
+  renderProfileBar(); try { renderShop(); } catch (e) {}
 }
 async function buyPack(setId, free) {
   const p = Store.p; if (!p) return;
@@ -542,6 +636,7 @@ function renderShop() {
     </section>` : '';
   const gifts = [
     p.faPacks > 0 ? `<button class="btn primary gift fa" id="faPack">✨ Full Art ajándék pack${p.faPacks > 1 ? ` (${p.faPacks})` : ''}</button>` : '',
+    p.chests > 0 ? `<button class="btn primary chest-btn" id="chestBtn"><img src="art/ui/chest-closed-sm.webp" alt="" aria-hidden="true">Heti láda kinyitása${p.chests > 1 ? ` (${p.chests})` : ''}</button>` : '',
     p.giftPacks > 0 ? `<button class="btn primary gift" id="giftPack">🎁 Ajándék pack bontása${p.giftPacks > 1 ? ` (${p.giftPacks})` : ''}</button>` : '',
     p.shinyPacks > 0 ? `<button class="btn primary shiny-btn" id="giftShiny">🎁 Ajándék Shiny pack${p.shinyPacks > 1 ? ` (${p.shinyPacks})` : ''}</button>` : '',
     `<button class="btn primary" id="freePack" ${free ? '' : 'disabled'}>${free ? '🎁 Napi ingyen pack' : 'Mai ingyen pack elhasználva'}</button>`].join('');
@@ -556,6 +651,7 @@ function renderShop() {
     </div>
     <details class="pack-info-more"><summary>Mi van a packokban?</summary>
       <p><b>${SETS.base.name}:</b> 3 véletlen lap a teljes alapkészletből, legalább egy ritka vagy jobb.</p>
+      <p><b>🧰 Heti láda:</b> minden hétfőn 0:01-kor jár egy ingyen. 10 lap: 1 biztos epikus vagy legendás, 1 biztos Full Art, a többi véletlen. 0,5% eséllyel egy ritka hős-portré is lehet benne.</p>
       <p><b>Shiny pack:</b> 3 lap, amiből egy biztosan különleges: Full Art lap, Full Art hős vagy ritka változat-lap. ${ECON.goldShiny * 100}% eséllyel ✦ Arany hős is lehet benne.</p></details>
     ${limited}
     <div class="odds"><div class="lbl">Esélyek laponként</div>
@@ -573,6 +669,7 @@ function renderShop() {
     buyPack('base', sh ? 'shiny' : false); });
   const jb = $('#shopBody').querySelector('[data-jump]'); if (jb) jb.onclick = () => $('#shopBody .shop-limited')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   $('#freePack').onclick = () => buyPack('base', true);
+  if ($('#chestBtn')) $('#chestBtn').onclick = () => openChest();
   if ($('#giftPack')) $('#giftPack').onclick = () => buyPack('base', 'gift');
   if ($('#faPack')) $('#faPack').onclick = () => buyPack('base', 'fa');
   if ($('#giftShiny')) $('#giftShiny').onclick = () => buyPack('base', 'shinyGift');
@@ -633,7 +730,12 @@ async function packOpening(setId, cards, po = {}) {
   flash.animate([{ opacity: 0 }, { opacity: 1 }, { opacity: 0 }], { duration: 600 });
   await packEl.animate([{ transform: 'none', opacity: 1 }, { transform: 'translateY(90px) scale(.9)', opacity: 0 }], { duration: 300, easing: 'ease-in', fill: 'forwards' }).finished;
   packEl.remove();
-  const row = document.createElement('div'); row.className = 'op-cards';
+  await cardReveal(o, cards);
+  o.remove(); o.classList.remove('gold-pack'); renderShop();
+}
+// a lapok felfordítása (pack és heti láda közös része); opt.ten: 10 lapos rács + „Mindet felfordítom”
+async function cardReveal(o, cards, opt = {}) {
+  const row = document.createElement('div'); row.className = 'op-cards' + (opt.ten ? ' ten' : '');
   row.innerHTML = cards.map((c, i) => `<button class="flip${c.gold ? ' goldback' : ''}" data-i="${i}" style="--rc:${RAR_COLOR[pcRar(c)]}" aria-label="Lap felfordítása">
       <span class="flip-in"><span class="face back"></span><span class="face front">${pcHTML(c, { big: true, foil: c.foil })}${c.dupe ? `<em class="newtag dupetag">+${c.dupe} coin</em>` : c.have > 2 ? `<em class="newtag dupetag">×${c.have}</em>` : c.isNew ? '<em class="newtag">Új!</em>' : ''}</span></span></button>`).join('');
   o.querySelector('.op-stage').appendChild(row);
@@ -641,24 +743,34 @@ async function packOpening(setId, cards, po = {}) {
   row.querySelectorAll('.flip').forEach((f, i) => f.animate([{ transform: 'translateY(60px) scale(.6)', opacity: 0 }, { transform: 'none', opacity: 1 }],
     { duration: 380, delay: 80 * i, easing: 'cubic-bezier(.2,1.3,.4,1)', fill: 'backwards' }));
   let left = cards.length;
+  if (opt.ten) {
+    const all = document.createElement('button'); all.className = 'btn small op-all'; all.textContent = 'Mindet felfordítom';
+    o.querySelector('.op-stage').appendChild(all);
+    all.onclick = async () => { all.disabled = true;
+      for (const f of row.querySelectorAll('.flip')) {
+        for (let k = 0; k < 600 && !f.classList.contains('open'); k++) { if (row.dataset.busy !== '1') f.click(); await sleep(50); }
+        while (row.dataset.busy === '1') await sleep(50);
+        await sleep(120); }
+      all.remove(); };
+  }
   await new Promise(done => {
     let busyFlip = false;
     row.addEventListener('click', async e => {
       const f = e.target.closest('.flip'); if (!f || f.classList.contains('open') || busyFlip) return;
       e.stopPropagation();
       const c = cards[+f.dataset.i], rar = pcRar(c);
-      if (c.gold) { busyFlip = true; await goldReveal(o, f, c); busyFlip = false; }
-      else if (rar === 'l' || c.foil || (!c.hero && CARD[c.id].variantOf)) { busyFlip = true; await rareReveal(o, f, c); busyFlip = false; }
+      if (c.gold) { busyFlip = true; row.dataset.busy = '1'; await goldReveal(o, f, c); busyFlip = false; row.dataset.busy = ''; }
+      else if (rar === 'l' || c.foil || (!c.hero && CARD[c.id].variantOf)) { busyFlip = true; row.dataset.busy = '1'; await rareReveal(o, f, c); busyFlip = false; row.dataset.busy = ''; }
       else { f.classList.add('open'); if (rar === 'e' || (!c.hero && CARD[c.id].variantOf)) f.classList.add('glow'); }
       if (--left === 0) done();
     });
   });
+  o.querySelector('.op-all')?.remove();
   hint.textContent = 'Koppints egy lapra a részletekhez';
   const btn = document.createElement('button'); btn.className = 'btn primary op-done'; btn.textContent = 'Tovább';
   o.querySelector('.op-stage').appendChild(btn);
   row.addEventListener('click', e => { const f = e.target.closest('.flip.open'); if (f) { const c = cards[+f.dataset.i]; if (c.hero) { openModal(heroCardHTML(HERO[c.hero], { big: true, foil: true, gold: c.gold }), c.gold ? '✦ Arany hős' : 'Full Art hős'); return; } openModal(cardHTML(c.id, { big: true, foil: c.foil }), `${RAR[CARD[c.id].rarity]}${c.foil ? ' · Full Art' : ''} · most ${owned(c.id)} db van belőle`, cardHelpHTML(c.id)); } });
   await new Promise(r => btn.addEventListener('click', r, { once: true }));
-  o.remove(); o.classList.remove('gold-pack'); renderShop();
 }
 
 // ---- ARANY bontás: a legritkább lap – hosszabb, nagyobb, aranyesős jelenet ----
@@ -2530,7 +2642,7 @@ function backAwardCheck() {
   o.onclick = e => {
     if (e.target.closest('[data-use]')) { p.cardBack = k; applyBack(); save(); toast(`${b.name} hátlap beállítva`); }
     else if (!e.target.closest('[data-x]')) return;
-    o.remove(); setTimeout(() => { try { backAwardCheck(); deckLinkCheck(); } catch (er) {} }, 200);
+    o.remove(); setTimeout(() => { try { backAwardCheck(); deckLinkCheck(); chestPopup(); } catch (er) {} }, 200);
   };
   $('#layer').appendChild(o);
 }
@@ -2566,7 +2678,7 @@ function dayGiftCheck() {
   const o = document.createElement('div'); o.className = 'overlay';
   o.innerHTML = `<div class="modal sp-reveal"><h3>🎉 Boldog Best of Us TCG napot!</h3>${heroCardHTML(h, { big: true, port: k })}
     <p class="live">Ma indul a játék – ezért ajándékba kapod <b>${P.name}</b> portrét: ${h.name} új kinézete, mindig Full Artban. Rögtön ezt viseli – a Gyűjteményben a hősre koppintva visszaválthatsz.</p><button class="btn primary" data-x>Köszi!</button></div>`;
-  o.onclick = e => { if (e.target.closest('[data-x]')) { o.remove(); setTimeout(() => { try { backAwardCheck(); deckLinkCheck(); } catch (er) {} }, 200); } };
+  o.onclick = e => { if (e.target.closest('[data-x]')) { o.remove(); setTimeout(() => { try { backAwardCheck(); deckLinkCheck(); chestPopup(); } catch (er) {} }, 200); } };
   $('#layer').appendChild(o);
 }
 function renderRankTile() {

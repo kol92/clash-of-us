@@ -290,7 +290,7 @@ const PORTRAITS = {
   p_milo_busz:    { hero: 'milo',  name: 'Milo, a 213-as utasa', passOnly: true },   // 1. szezon, 15. szint
   p_krisz_vip:    { hero: 'krisz', name: 'Krisz, a VIP', passOnly: true },           // 1. szezon, 25. szint
   p_laci_kave:    { hero: 'laci',  name: 'Laci, a reggeli feles', passOnly: true },   // 1. szezon, 10. szint
-  p_bence_kerites:{ hero: 'bence', name: 'Bence, a kerítésmászó', passOnly: true },   // ajándék: Best of Us TCG nap (2026-10-12)
+  p_bence_kerites:{ hero: 'bence', name: 'Bence, a kerítésmászó', passOnly: true, event: true },   // event: a heti ládából is jöhet   // ajándék: Best of Us TCG nap (2026-10-12)
 };
 const isPort = v => !!(v && PORTRAITS[v] && ART[v]);
 function heroCardHTML(h, o = {}) {

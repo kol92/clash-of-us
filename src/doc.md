@@ -437,6 +437,13 @@ Hősképesség-ötletek a táblázatban (még nem zöldek, nincsenek beépítve)
 - Az ellenfél körében (PvP-ben és bot ellen is) a kezedben lévő lapok elsötétülnek, mint a ki nem játszható lapok – korábban ilyenkor mind „aktívnak” látszott.
 - A variáns lapok szalagja: „✦ Variáns” (kicsiben) / „✦ Ritka variáns” (nagy lapon) – korábban „Változat”.
 
+## Heti láda (2026-10-14)
+- **Minden hétfőn 0:01-kor (helyi idő)** minden játékos kap egy ingyenes **heti ládát**. A hét kulcsa `weekKey()` (a hét hétfője, 1 perccel eltolva). A láda az első app-indításkor/profilbetöltéskor kerül jóvá (`chestWeeklyCheck()` → `p.chests++`, `p.chestWeek`). Ha valaki egy egész hetet kihagy, az a láda elmarad (nem gyűlik visszamenőleg), de a ki nem nyitott ládák megmaradnak és összeadódnak. Bevezető (onboard) alatt nem jár.
+- **Az első láda 2026-10-14-én (szerdán) jár mindenkinek** (a 2026-10-12-i hét ládája), a következő 2026-10-19 hétfőn.
+- **Tartalom (10 lap, `CHEST` a meta.js-ben):** 1 biztos **epikus vagy legendás** (legendás 1,5/8 eséllyel, a pack-arányok szerint), 1 biztos **Full Art** (a ritkasága a szokásos pack-esélyekkel), a többi 8 sima pack-esélyekkel (változat-esély, 4% Full Art esély is él). A lapokat ritkaság szerint rendezve mutatja. A láda nullázza a „biztos epikus” számlálót (`sinceEpic`). 2000 próbanyitásból mind a 10 lap, az epikus+ és a Full Art mindig megvolt; legendás a ládák ~30%-ában.
+- **Hős-portré: 0,5% eséllyel** pluszban egy hős-portré, a boltban valaha árult (`price`) vagy eseményen adott (`event`) portrék közül, amelyik még nincs meg (most: Pre-BOU Bence, Izmos Sasi, Utcai Krisz, Kerítésmászó Bence). Season Pass-portré nem jöhet.
+- **Felület:** a főmenüben felugró ablak („🧰 Megérkezett a heti ládád!” – Kinyitom! / Később), a Boltban „Heti láda kinyitása (n)” gomb, a Bolt fül jelvénye a ládát is számolja. Nyitás: zárt láda lebeg → koppintás → rázkódás, villanás, nyitott láda sugarakkal és coin-esővel → 10 lap 5×2 rácsban, egyenként fordítható, vagy **„Mindet felfordítom”** (a ritka/Full Art lapoknál megvárja a kiemelő animációt). Képek: art/ui/chest-closed.webp, chest-open.webp (+ -sm).
+
 ## Fekvő meccsképernyő tabletre és gépre (2026-10-13)
 - Ha a képernyő fekvő és nagy (`min-width:1000px`, `min-height:600px`, legalább 5:4 – pl. iPad fekve, laptop, monitor), a meccs saját elrendezést kap (`body.in-game` + media query a shell.html-ben, `renderWide()` a ui.js-ben):
   - **Középen** a megszokott meccs, de szélesebb (max. 760 px) táblával, így a lapok a táblán kb. másfélszer akkorák, mint telefonon; nagyobb kéz (98 px-es lapok). A hős- és helyszínsáv telefonos szélességű marad (különben a magasságot ennék el).
