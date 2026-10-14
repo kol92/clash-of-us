@@ -385,7 +385,7 @@ function openPackRoll(setId, forceFoil = false, shiny = false) {
 }
 // ---- Heti láda (2026-10-14): minden hétfőn 0:01-kor mindenki kap egyet ----
 // 10 lap: 1 biztos epikus vagy legendás, 1 biztos Full Art, 8 véletlen (mint a packban); 0,5% eséllyel egy hős-portré is (bolti vagy eseményes)
-const CHEST = { cards: 10, portChance: 0.005 };
+const CHEST = { cards: 10, portChance: 0.005, price: 500 };
 function rollCardSlot(p, rar, foil) {
   const pool = SETS.base.cards.filter(id => CARD[id].rarity === rar);
   let id = pool[Math.floor(Math.random() * pool.length)];
@@ -434,6 +434,31 @@ async function openChest() {
   const res = chestRoll();
   await save(); renderProfileBar(); try { renderShop(); } catch (e) {}
   await chestOpening(res.cards, res.port);
+}
+async function buyChest() {
+  const p = Store.p; if (!p) return;
+  if (p.chests > 0) return openChest();
+  if (p.coins < CHEST.price) return toast(`Nincs elég coinod (${p.coins}/${CHEST.price})`);
+  const o = document.createElement('div'); o.className = 'overlay';
+  o.innerHTML = `<div class="modal acct-box chest-pop"><h3>🧰 Extra heti láda</h3><img class="chest-pop-img" src="art/ui/chest-closed.webp" alt="Heti láda">
+    <p class="live">Az e heti ingyen ládádat már kinyitottad. Most vehetsz egy extrát: <b>10 lap</b>, köztük egy <b>biztos epikus vagy legendás</b> és egy <b>biztos Full Art</b>, kis eséllyel egy ritka hős-portré.</p>
+    <div class="row2"><button class="btn" data-x>Mégse</button><button class="btn primary" data-ok><span class="coin sm" aria-hidden="true"></span> ${CHEST.price} · Megveszem</button></div></div>`;
+  $('#layer').appendChild(o);
+  const ok = await new Promise(r => { o.onclick = e => { if (e.target.closest('[data-ok]')) r(true); else if (e.target.closest('[data-x]') || e.target === o) r(false); }; });
+  o.remove(); if (!ok || p.coins < CHEST.price) return;
+  p.coins -= CHEST.price; p.chests = (p.chests || 0) + 1; p.chestsBought = (p.chestsBought || 0) + 1;
+  await openChest();
+}
+function chestPanelHTML() {
+  const p = Store.p, n = p.chests || 0, nx = weekEnds(), d = Math.ceil((nx - new Date()) / 864e5);
+  const when = d <= 1 ? 'holnap 0:01-kor' : `hétfőn 0:01-kor (${d} nap múlva)`;
+  const poor = !n && p.coins < CHEST.price;
+  return `<button class="chest-card${n ? ' ready' : poor ? ' poor' : ''}" id="chestBtn" aria-label="Heti láda – ${n ? 'kinyitás' : CHEST.price + ' coin'}">
+    <img class="cc-img" src="art/ui/chest-${n ? 'closed' : 'open'}-sm.webp" alt="" aria-hidden="true">
+    <span class="cc-txt"><b>Heti láda</b><small>10 lap · 1 biztos epikus+ · 1 biztos Full Art</small>
+      <em>${n ? `${n > 1 ? `${n} láda vár rád!` : 'A heti ládád vár rád!'}` : `Következő ingyen láda: ${when}`}</em></span>
+    <span class="cc-act">${n ? `Kinyitom${n > 1 ? ` <i>${n}</i>` : ''}` : `<span class="coin sm" aria-hidden="true"></span>${CHEST.price}`}</span>
+  </button>`;
 }
 async function chestOpening(cards, port) {
   const o = document.createElement('div'); o.className = 'overlay opening chest-op';
@@ -636,7 +661,6 @@ function renderShop() {
     </section>` : '';
   const gifts = [
     p.faPacks > 0 ? `<button class="btn primary gift fa" id="faPack">✨ Full Art ajándék pack${p.faPacks > 1 ? ` (${p.faPacks})` : ''}</button>` : '',
-    p.chests > 0 ? `<button class="btn primary chest-btn" id="chestBtn"><img src="art/ui/chest-closed-sm.webp" alt="" aria-hidden="true">Heti láda kinyitása${p.chests > 1 ? ` (${p.chests})` : ''}</button>` : '',
     p.giftPacks > 0 ? `<button class="btn primary gift" id="giftPack">🎁 Ajándék pack bontása${p.giftPacks > 1 ? ` (${p.giftPacks})` : ''}</button>` : '',
     p.shinyPacks > 0 ? `<button class="btn primary shiny-btn" id="giftShiny">🎁 Ajándék Shiny pack${p.shinyPacks > 1 ? ` (${p.shinyPacks})` : ''}</button>` : '',
     `<button class="btn primary" id="freePack" ${free ? '' : 'disabled'}>${free ? '🎁 Napi ingyen pack' : 'Mai ingyen pack elhasználva'}</button>`].join('');
@@ -649,9 +673,10 @@ function renderShop() {
       ${shopPanelHTML({ attr: 'data-pack="base"', img: 'art/ui/pack-base.webp', contain: true, name: SETS.base.name, sub: '3 lap', price: ECON.packPrice, have: false })}
       ${shopPanelHTML({ attr: 'data-pack="shiny"', img: 'art/ui/pack-shiny.webp', contain: true, name: 'Shiny pack', sub: '1 biztos különleges', price: ECON.shinyPrice, have: false, holo: true })}
     </div>
+    ${chestPanelHTML()}
     <details class="pack-info-more"><summary>Mi van a packokban?</summary>
       <p><b>${SETS.base.name}:</b> 3 véletlen lap a teljes alapkészletből, legalább egy ritka vagy jobb.</p>
-      <p><b>🧰 Heti láda:</b> minden hétfőn 0:01-kor jár egy ingyen. 10 lap: 1 biztos epikus vagy legendás, 1 biztos Full Art, a többi véletlen. 0,5% eséllyel egy ritka hős-portré is lehet benne.</p>
+      <p><b>🧰 Heti láda:</b> minden hétfőn 0:01-kor jár egy ingyen; ha már kinyitottad, ${CHEST.price} coinért vehetsz még. 10 lap: 1 biztos epikus vagy legendás, 1 biztos Full Art, a többi véletlen. 0,5% eséllyel egy ritka hős-portré is lehet benne.</p>
       <p><b>Shiny pack:</b> 3 lap, amiből egy biztosan különleges: Full Art lap, Full Art hős vagy ritka változat-lap. ${ECON.goldShiny * 100}% eséllyel ✦ Arany hős is lehet benne.</p></details>
     ${limited}
     <div class="odds"><div class="lbl">Esélyek laponként</div>
@@ -669,7 +694,7 @@ function renderShop() {
     buyPack('base', sh ? 'shiny' : false); });
   const jb = $('#shopBody').querySelector('[data-jump]'); if (jb) jb.onclick = () => $('#shopBody .shop-limited')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   $('#freePack').onclick = () => buyPack('base', true);
-  if ($('#chestBtn')) $('#chestBtn').onclick = () => openChest();
+  if ($('#chestBtn')) $('#chestBtn').onclick = () => buyChest();
   if ($('#giftPack')) $('#giftPack').onclick = () => buyPack('base', 'gift');
   if ($('#faPack')) $('#faPack').onclick = () => buyPack('base', 'fa');
   if ($('#giftShiny')) $('#giftShiny').onclick = () => buyPack('base', 'shinyGift');

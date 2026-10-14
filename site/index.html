@@ -1619,6 +1619,24 @@ body.pf-loading #scr-menu .pb-name::after{content:'';display:inline-block;width:
 @keyframes pfSpin{to{transform:rotate(360deg)}}
 /* ---- heti láda ---- */
 .chest-btn{display:flex;align-items:center;justify-content:center;gap:10px;}
+.chest-card{position:relative;display:grid;grid-template-columns:92px 1fr auto;gap:10px;align-items:center;width:100%;margin:14px 0 4px;padding:10px 12px 10px 6px;border-radius:16px;cursor:pointer;color:#fff;font-family:var(--body);text-align:left;
+  background:radial-gradient(circle at 14% 50%,rgba(255,190,80,.28),transparent 45%),linear-gradient(160deg,#3a2a14,#1a1f30 60%,#101a2a);border:2px solid #c9952e;box-shadow:0 6px 16px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,230,160,.25);}
+.chest-card.ready{border-color:#ffd66b;box-shadow:0 0 18px rgba(255,201,74,.45),0 6px 16px rgba(0,0,0,.5);animation:ccGlow 1.8s ease-in-out infinite;}
+@keyframes ccGlow{50%{box-shadow:0 0 28px rgba(255,201,74,.75),0 6px 16px rgba(0,0,0,.5);}}
+.chest-card .cc-img{width:92px;height:auto;margin:-14px 0 -10px;filter:drop-shadow(0 4px 8px rgba(0,0,0,.6));}
+.chest-card.ready .cc-img{animation:ccBob 2.2s ease-in-out infinite;}
+@keyframes ccBob{50%{transform:translateY(-4px) rotate(-2deg);}}
+.cc-txt{min-width:0;}
+.cc-txt b{display:block;font-family:var(--display);font-size:20px;line-height:1.1;color:var(--gold);text-shadow:0 2px 0 #5a3a00;}
+.cc-txt small{display:block;margin-top:3px;font-size:11.5px;font-weight:800;color:#e9dcc0;line-height:1.25;}
+.cc-txt em{display:block;margin-top:4px;font-style:normal;font-size:11.5px;font-weight:800;color:#9fc6ff;line-height:1.25;}
+.chest-card.ready .cc-txt em{color:#8dffcf;}
+.cc-act{display:flex;align-items:center;gap:5px;padding:9px 12px;border-radius:12px;font-weight:900;font-size:17px;white-space:nowrap;color:#3a2600;background:linear-gradient(180deg,#ffe79a,#f0a400);box-shadow:inset 0 -3px 0 rgba(0,0,0,.2),0 2px 6px rgba(0,0,0,.4);}
+.chest-card.ready .cc-act{color:#00321f;background:linear-gradient(180deg,#8dffcf,#1fbf7f);font-size:15px;}
+.cc-act i{font-style:normal;display:grid;place-items:center;min-width:20px;height:20px;border-radius:10px;background:#00321f;color:#8dffcf;font-size:12px;}
+.chest-card.poor .cc-act{color:#ffd9cf;background:linear-gradient(180deg,#7a3030,#4a1818);}
+.chest-card:active{transform:scale(.985);}
+@media (max-width:360px){.chest-card{grid-template-columns:72px 1fr auto;}.chest-card .cc-img{width:72px;}.cc-txt b{font-size:17px;}}
 .chest-btn img{width:46px;height:auto;margin:-10px 0;filter:drop-shadow(0 2px 4px rgba(0,0,0,.6));}
 .chest-pop{text-align:center;justify-items:center;}
 .chest-pop-img{width:min(240px,62vw);height:auto;filter:drop-shadow(0 12px 22px rgba(0,0,0,.6)) drop-shadow(0 0 22px rgba(255,200,80,.35));animation:chestBob 2.4s ease-in-out infinite;}
@@ -2224,7 +2242,7 @@ body.pf-loading #scr-menu .pb-name::after{content:'';display:inline-block;width:
 <script src="vendor/firebase-auth-compat.js"></script>
 <script src="vendor/firebase-firestore-compat.js"></script>
 <script src="vendor/firebase-database-compat.js"></script>
-<script>window.APP_VERSION = "2026.10.14-1338"; window.APP_BUILD = "2026.10.14-1338";</script>
+<script>window.APP_VERSION = "2026.10.14-1338"; window.APP_BUILD = "2026.10.14-1359";</script>
 <script>// ===== Best of Us – saját szerver (Firebase) =====
 // A játék eredetileg a Claude-os tárolót használta (window.claude.use('db' | 'user' | 'room')).
 // Ez a fájl ugyanazt a felületet adja Firebase-ből, így a játék kódja szinte változatlan maradhat:
@@ -5538,7 +5556,7 @@ function openPackRoll(setId, forceFoil = false, shiny = false) {
 }
 // ---- Heti láda (2026-10-14): minden hétfőn 0:01-kor mindenki kap egyet ----
 // 10 lap: 1 biztos epikus vagy legendás, 1 biztos Full Art, 8 véletlen (mint a packban); 0,5% eséllyel egy hős-portré is (bolti vagy eseményes)
-const CHEST = { cards: 10, portChance: 0.005 };
+const CHEST = { cards: 10, portChance: 0.005, price: 500 };
 function rollCardSlot(p, rar, foil) {
   const pool = SETS.base.cards.filter(id => CARD[id].rarity === rar);
   let id = pool[Math.floor(Math.random() * pool.length)];
@@ -5587,6 +5605,31 @@ async function openChest() {
   const res = chestRoll();
   await save(); renderProfileBar(); try { renderShop(); } catch (e) {}
   await chestOpening(res.cards, res.port);
+}
+async function buyChest() {
+  const p = Store.p; if (!p) return;
+  if (p.chests > 0) return openChest();
+  if (p.coins < CHEST.price) return toast(`Nincs elég coinod (${p.coins}/${CHEST.price})`);
+  const o = document.createElement('div'); o.className = 'overlay';
+  o.innerHTML = `<div class="modal acct-box chest-pop"><h3>🧰 Extra heti láda</h3><img class="chest-pop-img" src="art/ui/chest-closed.webp?v=49695505" alt="Heti láda">
+    <p class="live">Az e heti ingyen ládádat már kinyitottad. Most vehetsz egy extrát: <b>10 lap</b>, köztük egy <b>biztos epikus vagy legendás</b> és egy <b>biztos Full Art</b>, kis eséllyel egy ritka hős-portré.</p>
+    <div class="row2"><button class="btn" data-x>Mégse</button><button class="btn primary" data-ok><span class="coin sm" aria-hidden="true"></span> ${CHEST.price} · Megveszem</button></div></div>`;
+  $('#layer').appendChild(o);
+  const ok = await new Promise(r => { o.onclick = e => { if (e.target.closest('[data-ok]')) r(true); else if (e.target.closest('[data-x]') || e.target === o) r(false); }; });
+  o.remove(); if (!ok || p.coins < CHEST.price) return;
+  p.coins -= CHEST.price; p.chests = (p.chests || 0) + 1; p.chestsBought = (p.chestsBought || 0) + 1;
+  await openChest();
+}
+function chestPanelHTML() {
+  const p = Store.p, n = p.chests || 0, nx = weekEnds(), d = Math.ceil((nx - new Date()) / 864e5);
+  const when = d <= 1 ? 'holnap 0:01-kor' : `hétfőn 0:01-kor (${d} nap múlva)`;
+  const poor = !n && p.coins < CHEST.price;
+  return `<button class="chest-card${n ? ' ready' : poor ? ' poor' : ''}" id="chestBtn" aria-label="Heti láda – ${n ? 'kinyitás' : CHEST.price + ' coin'}">
+    <img class="cc-img" src="art/ui/chest-${n ? 'closed' : 'open'}-sm.webp" alt="" aria-hidden="true">
+    <span class="cc-txt"><b>Heti láda</b><small>10 lap · 1 biztos epikus+ · 1 biztos Full Art</small>
+      <em>${n ? `${n > 1 ? `${n} láda vár rád!` : 'A heti ládád vár rád!'}` : `Következő ingyen láda: ${when}`}</em></span>
+    <span class="cc-act">${n ? `Kinyitom${n > 1 ? ` <i>${n}</i>` : ''}` : `<span class="coin sm" aria-hidden="true"></span>${CHEST.price}`}</span>
+  </button>`;
 }
 async function chestOpening(cards, port) {
   const o = document.createElement('div'); o.className = 'overlay opening chest-op';
@@ -5789,7 +5832,6 @@ function renderShop() {
     </section>` : '';
   const gifts = [
     p.faPacks > 0 ? `<button class="btn primary gift fa" id="faPack">✨ Full Art ajándék pack${p.faPacks > 1 ? ` (${p.faPacks})` : ''}</button>` : '',
-    p.chests > 0 ? `<button class="btn primary chest-btn" id="chestBtn"><img src="art/ui/chest-closed-sm.webp?v=e7fa5eb9" alt="" aria-hidden="true">Heti láda kinyitása${p.chests > 1 ? ` (${p.chests})` : ''}</button>` : '',
     p.giftPacks > 0 ? `<button class="btn primary gift" id="giftPack">🎁 Ajándék pack bontása${p.giftPacks > 1 ? ` (${p.giftPacks})` : ''}</button>` : '',
     p.shinyPacks > 0 ? `<button class="btn primary shiny-btn" id="giftShiny">🎁 Ajándék Shiny pack${p.shinyPacks > 1 ? ` (${p.shinyPacks})` : ''}</button>` : '',
     `<button class="btn primary" id="freePack" ${free ? '' : 'disabled'}>${free ? '🎁 Napi ingyen pack' : 'Mai ingyen pack elhasználva'}</button>`].join('');
@@ -5802,9 +5844,10 @@ function renderShop() {
       ${shopPanelHTML({ attr: 'data-pack="base"', img: 'art/ui/pack-base.webp?v=d38f1f0c', contain: true, name: SETS.base.name, sub: '3 lap', price: ECON.packPrice, have: false })}
       ${shopPanelHTML({ attr: 'data-pack="shiny"', img: 'art/ui/pack-shiny.webp?v=ca07ac74', contain: true, name: 'Shiny pack', sub: '1 biztos különleges', price: ECON.shinyPrice, have: false, holo: true })}
     </div>
+    ${chestPanelHTML()}
     <details class="pack-info-more"><summary>Mi van a packokban?</summary>
       <p><b>${SETS.base.name}:</b> 3 véletlen lap a teljes alapkészletből, legalább egy ritka vagy jobb.</p>
-      <p><b>🧰 Heti láda:</b> minden hétfőn 0:01-kor jár egy ingyen. 10 lap: 1 biztos epikus vagy legendás, 1 biztos Full Art, a többi véletlen. 0,5% eséllyel egy ritka hős-portré is lehet benne.</p>
+      <p><b>🧰 Heti láda:</b> minden hétfőn 0:01-kor jár egy ingyen; ha már kinyitottad, ${CHEST.price} coinért vehetsz még. 10 lap: 1 biztos epikus vagy legendás, 1 biztos Full Art, a többi véletlen. 0,5% eséllyel egy ritka hős-portré is lehet benne.</p>
       <p><b>Shiny pack:</b> 3 lap, amiből egy biztosan különleges: Full Art lap, Full Art hős vagy ritka változat-lap. ${ECON.goldShiny * 100}% eséllyel ✦ Arany hős is lehet benne.</p></details>
     ${limited}
     <div class="odds"><div class="lbl">Esélyek laponként</div>
@@ -5822,7 +5865,7 @@ function renderShop() {
     buyPack('base', sh ? 'shiny' : false); });
   const jb = $('#shopBody').querySelector('[data-jump]'); if (jb) jb.onclick = () => $('#shopBody .shop-limited')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   $('#freePack').onclick = () => buyPack('base', true);
-  if ($('#chestBtn')) $('#chestBtn').onclick = () => openChest();
+  if ($('#chestBtn')) $('#chestBtn').onclick = () => buyChest();
   if ($('#giftPack')) $('#giftPack').onclick = () => buyPack('base', 'gift');
   if ($('#faPack')) $('#faPack').onclick = () => buyPack('base', 'fa');
   if ($('#giftShiny')) $('#giftShiny').onclick = () => buyPack('base', 'shinyGift');
