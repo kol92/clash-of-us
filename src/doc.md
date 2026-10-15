@@ -437,6 +437,9 @@ Hősképesség-ötletek a táblázatban (még nem zöldek, nincsenek beépítve)
 - Az ellenfél körében (PvP-ben és bot ellen is) a kezedben lévő lapok elsötétülnek, mint a ki nem játszható lapok – korábban ilyenkor mind „aktívnak” látszott.
 - A variáns lapok szalagja: „✦ Variáns” (kicsiben) / „✦ Ritka variáns” (nagy lapon) – korábban „Változat”.
 
+## Sasi, a mágus – bolti skin (2026-10-15)
+- Új hős-portré Sasinak (p_sasi_mage), a Boltban **250 coin**. Mint a többi bolti portré, a heti láda 0,5%-os portré-esélyében is benne van.
+
 ## Eventek – első: Halloween (keret: 2026-10-15, élesítés: a skinek és lapok megérkezése után)
 - **Keret (`EVENTS` a meta.js-ben):** minden event = kezdet/vég + pontcsík (`goal`, most 100) + napi event-küldetések + egyszeri event-kihívások + jutalmak pontküszöbökön. A pontot meccs végén számolja (bot, ranked, PvP): `eventOnMatch()`. Állapot: `p.evs[id]` (`pts`, napi és egyszeri haladás, `claimed`).
 - **Főmenü:** saját narancs-lila „🎃 Halloween event” gomb a Ranked alatt, pontszámmal (pl. 37/100), zöldül, ha van átvehető jutalom. Képernyő: fejléc visszaszámlálóval, nagy pontszám, csík a jutalom-jelölőkkel, napi küldetések, kihívások, jutalomlista „Átvesz” gombbal (+ „Mind átveszem”). A meccs végi ablak is mutatja: „🎃 +10 tökpont · 47/100”.
