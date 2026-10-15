@@ -1528,8 +1528,8 @@ const EVENTS = [
     ],
     // a jutalmak: Tomi küldi (5 skin + 3 új lap); amíg nincs meg, „?” helykitöltő
     rewards: [
-      { at: 10, tbd: 'Halloween skin' }, { at: 20, tbd: 'Új Halloween lap' }, { at: 30, back: 'halloween' }, { at: 40, tbd: 'Halloween skin' }, { at: 50, tbd: 'Új Halloween lap' },
-      { at: 60, tbd: 'Halloween skin' }, { at: 75, tbd: 'Halloween skin' }, { at: 90, tbd: 'Új Halloween lap' }, { at: 100, tbd: 'Halloween skin' },
+      { at: 10, port: 'p_gabi_hw' }, { at: 20, tbd: 'Új Halloween lap' }, { at: 30, back: 'halloween' }, { at: 40, port: 'p_david_hw' }, { at: 50, tbd: 'Új Halloween lap' },
+      { at: 60, port: 'p_bence_hw' }, { at: 75, port: 'p_tomi_hw' }, { at: 90, tbd: 'Új Halloween lap' }, { at: 100, tbd: 'Halloween skin' },
     ] },
 ];
 // a futó (vagy még átvehető) event; teszt módban a még el nem indult is látszik
@@ -1602,7 +1602,7 @@ function evClaim(i) {
   const got = evGrant(p, r); st.claimed.push(i); save(); renderEvent(); renderProfileBar();
   if (got) evShowGot(got, e); else toast(`+${rewLabel(r)}`);
 }
-function evRewLabel(r) { if (r.tbd) return r.tbd; if (r.back) return `${BACKS[r.back].name} hátlap`; if (r.port) return `${PORTRAITS[r.port].name} – hős skin`; if (r.card) return `${CARD[r.card].name} – új lap`; return rewLabel(r); }
+function evRewLabel(r) { if (r.tbd) return r.tbd; if (r.back) return `${BACKS[r.back].name} hátlap`; if (r.port) return PORTRAITS[r.port].name; if (r.card) return CARD[r.card].name; return rewLabel(r); }
 function evRewIcon(r) {
   if (r.tbd) return '<span class="ev-myst" aria-hidden="true"></span>';
   if (r.back) return `<span class="ev-back" aria-hidden="true" style="background-image:url('${BACKS[r.back].sm}')"></span>`;
@@ -1622,7 +1622,7 @@ function renderEvent() {
   const mid = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1), hl = Math.floor((mid - now) / 36e5), ml = Math.floor((mid - now) % 36e5 / 6e4);
   const rrow = (r, i) => { const stt = st.claimed.includes(i) ? 'claimed' : st.pts >= r.at && !r.tbd ? 'ready' : 'locked';
     return `<div class="sp-row ev-row big ${stt}"><div class="sp-lv ev-at"><b>${r.at}</b></div><div class="sp-ic">${evRewIcon(r)}</div>
-      <div class="sp-name"><b>${evRewLabel(r)}</b><small>${r.tbd ? 'Hamarosan kiderül…' : r.back ? 'Csak ebből az eventből · az ellenfeleid is látják' : r.port ? 'Csak ebből az eventből · mindig Full Art' : r.card ? `${RAR[CARD[r.card].rarity]} · csak ebből az eventből` : ''}</small></div>
+      <div class="sp-name"><b>${evRewLabel(r)}</b><small>${r.tbd ? 'Hamarosan kiderül…' : r.back ? 'Csak ebből az eventből · az ellenfeleid is látják' : r.port ? `${HERO[PORTRAITS[r.port].hero].name} skin · csak ebből az eventből` : r.card ? `Új lap · ${RAR[CARD[r.card].rarity]} · csak ebből az eventből` : ''}</small></div>
       <div class="sp-act">${stt === 'claimed' ? '<span class="q-ok">✓</span>' : stt === 'ready' ? `<button class="btn primary sp-claim" data-ec="${i}">Átvesz</button>` : '<span class="sp-lock" aria-label="Zárolva">🔒</span>'}</div></div>`; };
   body.dataset.theme = e.theme || ''; $('#scr-event h2').textContent = `${e.name} event`;
   body.innerHTML = `

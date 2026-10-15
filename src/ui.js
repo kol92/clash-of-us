@@ -142,6 +142,11 @@ const ART = {
   p_krisz_vip:    { src:'art/p_krisz_vip.webp', av:'42% 20%', pos:'44% 20%', port:'42% 18%' },
   p_laci_kave:    { src:'art/p_laci_kave.webp', av:'60% 28%', pos:'60% 26%', port:'60% 24%' },
   p_bence_kerites:{ src:'art/p_bence_kerites.webp', av:'52% 21%', pos:'52% 22%', port:'52% 20%' },
+  // Halloween event (2026-10-15)
+  p_bence_hw:     { src:'art/p_bence_hw.webp', av:'59% 25%', pos:'58% 24%', port:'59% 22%' },
+  p_gabi_hw:      { src:'art/p_gabi_hw.webp', av:'74% 25%', pos:'66% 26%', port:'74% 22%' },
+  p_david_hw:     { src:'art/p_david_hw.webp', av:'38% 17%', pos:'40% 18%', port:'38% 15%' },
+  p_tomi_hw:      { src:'art/p_tomi_hw.webp', av:'52% 19%', pos:'52% 20%', port:'52% 17%' },
   c_nyitinap:     { src:'art/nyitinap.webp', av:'72% 34%', pos:'66% 36%' },
   g_barna: { src:'art/g_barna.webp', av:'64% 20%', pos:'62% 20%', port:'64% 16%' },
   g_laci:  { src:'art/g_laci.webp',  av:'46% 20%', pos:'46% 20%', port:'46% 16%' },
@@ -290,7 +295,12 @@ const PORTRAITS = {
   p_milo_busz:    { hero: 'milo',  name: 'Milo, a 213-as utasa', passOnly: true },   // 1. szezon, 15. szint
   p_krisz_vip:    { hero: 'krisz', name: 'Krisz, a VIP', passOnly: true },           // 1. szezon, 25. szint
   p_laci_kave:    { hero: 'laci',  name: 'Laci, a reggeli feles', passOnly: true },   // 1. szezon, 10. szint
-  p_bence_kerites:{ hero: 'bence', name: 'Bence, a kerítésmászó', passOnly: true, event: true },   // event: a heti ládából is jöhet   // ajándék: Best of Us TCG nap (2026-10-12)
+  p_bence_kerites:{ hero: 'bence', name: 'Bence, a kerítésmászó', passOnly: true, event: true },
+  // Halloween event jutalmak (csak az eventből; passOnly: nincs a boltban; a heti ládába nem kerülnek)
+  p_bence_hw:     { hero: 'bence', name: 'Bence, a rémkonyha ura', passOnly: true, ev: 'hw26' },
+  p_gabi_hw:      { hero: 'gabi',  name: 'Gabi, a szemgolyós koktél', passOnly: true, ev: 'hw26' },
+  p_david_hw:     { hero: 'david', name: 'Dávid, a rémbolt előtt', passOnly: true, ev: 'hw26' },
+  p_tomi_hw:      { hero: 'tomi',  name: 'Tomi, a holdfény fotósa', passOnly: true, ev: 'hw26' },   // event: a heti ládából is jöhet   // ajándék: Best of Us TCG nap (2026-10-12)
 };
 const isPort = v => !!(v && PORTRAITS[v] && ART[v]);
 function heroCardHTML(h, o = {}) {

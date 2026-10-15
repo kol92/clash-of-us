@@ -2293,7 +2293,7 @@ body.pf-loading #scr-menu .pb-name::after{content:'';display:inline-block;width:
 <script src="vendor/firebase-auth-compat.js"></script>
 <script src="vendor/firebase-firestore-compat.js"></script>
 <script src="vendor/firebase-database-compat.js"></script>
-<script>window.APP_VERSION = "2026.10.15-1032"; window.APP_BUILD = "2026.10.15-1209";</script>
+<script>window.APP_VERSION = "2026.10.15-1032"; window.APP_BUILD = "2026.10.15-1246";</script>
 <script>// ===== Best of Us – saját szerver (Firebase) =====
 // A játék eredetileg a Claude-os tárolót használta (window.claude.use('db' | 'user' | 'room')).
 // Ez a fájl ugyanazt a felületet adja Firebase-ből, így a játék kódja szinte változatlan maradhat:
@@ -3657,6 +3657,11 @@ const ART = {
   p_krisz_vip:    { src:'art/p_krisz_vip.webp?v=920e6ea62ac1f89c', av:'42% 20%', pos:'44% 20%', port:'42% 18%' },
   p_laci_kave:    { src:'art/p_laci_kave.webp?v=c7b0ef65385c49f8', av:'60% 28%', pos:'60% 26%', port:'60% 24%' },
   p_bence_kerites:{ src:'art/p_bence_kerites.webp?v=b7587cf80f59c397', av:'52% 21%', pos:'52% 22%', port:'52% 20%' },
+  // Halloween event (2026-10-15)
+  p_bence_hw:     { src:'art/p_bence_hw.webp?v=2296a9f763be6d35', av:'59% 25%', pos:'58% 24%', port:'59% 22%' },
+  p_gabi_hw:      { src:'art/p_gabi_hw.webp?v=d9b78a3dacbad942', av:'74% 25%', pos:'66% 26%', port:'74% 22%' },
+  p_david_hw:     { src:'art/p_david_hw.webp?v=646142ae7239cc9b', av:'38% 17%', pos:'40% 18%', port:'38% 15%' },
+  p_tomi_hw:      { src:'art/p_tomi_hw.webp?v=27bdc69fbb97bdd6', av:'52% 19%', pos:'52% 20%', port:'52% 17%' },
   c_nyitinap:     { src:'art/nyitinap.webp?v=cdbcc561b41ba1d1', av:'72% 34%', pos:'66% 36%' },
   g_barna: { src:'art/g_barna.webp?v=2687c5a371343d73', av:'64% 20%', pos:'62% 20%', port:'64% 16%' },
   g_laci:  { src:'art/g_laci.webp?v=a6809a5542dbbb5b',  av:'46% 20%', pos:'46% 20%', port:'46% 16%' },
@@ -3805,7 +3810,12 @@ const PORTRAITS = {
   p_milo_busz:    { hero: 'milo',  name: 'Milo, a 213-as utasa', passOnly: true },   // 1. szezon, 15. szint
   p_krisz_vip:    { hero: 'krisz', name: 'Krisz, a VIP', passOnly: true },           // 1. szezon, 25. szint
   p_laci_kave:    { hero: 'laci',  name: 'Laci, a reggeli feles', passOnly: true },   // 1. szezon, 10. szint
-  p_bence_kerites:{ hero: 'bence', name: 'Bence, a kerítésmászó', passOnly: true, event: true },   // event: a heti ládából is jöhet   // ajándék: Best of Us TCG nap (2026-10-12)
+  p_bence_kerites:{ hero: 'bence', name: 'Bence, a kerítésmászó', passOnly: true, event: true },
+  // Halloween event jutalmak (csak az eventből; passOnly: nincs a boltban; a heti ládába nem kerülnek)
+  p_bence_hw:     { hero: 'bence', name: 'Bence, a rémkonyha ura', passOnly: true, ev: 'hw26' },
+  p_gabi_hw:      { hero: 'gabi',  name: 'Gabi, a szemgolyós koktél', passOnly: true, ev: 'hw26' },
+  p_david_hw:     { hero: 'david', name: 'Dávid, a rémbolt előtt', passOnly: true, ev: 'hw26' },
+  p_tomi_hw:      { hero: 'tomi',  name: 'Tomi, a holdfény fotósa', passOnly: true, ev: 'hw26' },   // event: a heti ládából is jöhet   // ajándék: Best of Us TCG nap (2026-10-12)
 };
 const isPort = v => !!(v && PORTRAITS[v] && ART[v]);
 function heroCardHTML(h, o = {}) {
@@ -6753,8 +6763,8 @@ const EVENTS = [
     ],
     // a jutalmak: Tomi küldi (5 skin + 3 új lap); amíg nincs meg, „?” helykitöltő
     rewards: [
-      { at: 10, tbd: 'Halloween skin' }, { at: 20, tbd: 'Új Halloween lap' }, { at: 30, back: 'halloween' }, { at: 40, tbd: 'Halloween skin' }, { at: 50, tbd: 'Új Halloween lap' },
-      { at: 60, tbd: 'Halloween skin' }, { at: 75, tbd: 'Halloween skin' }, { at: 90, tbd: 'Új Halloween lap' }, { at: 100, tbd: 'Halloween skin' },
+      { at: 10, port: 'p_gabi_hw' }, { at: 20, tbd: 'Új Halloween lap' }, { at: 30, back: 'halloween' }, { at: 40, port: 'p_david_hw' }, { at: 50, tbd: 'Új Halloween lap' },
+      { at: 60, port: 'p_bence_hw' }, { at: 75, port: 'p_tomi_hw' }, { at: 90, tbd: 'Új Halloween lap' }, { at: 100, tbd: 'Halloween skin' },
     ] },
 ];
 // a futó (vagy még átvehető) event; teszt módban a még el nem indult is látszik
@@ -6827,7 +6837,7 @@ function evClaim(i) {
   const got = evGrant(p, r); st.claimed.push(i); save(); renderEvent(); renderProfileBar();
   if (got) evShowGot(got, e); else toast(`+${rewLabel(r)}`);
 }
-function evRewLabel(r) { if (r.tbd) return r.tbd; if (r.back) return `${BACKS[r.back].name} hátlap`; if (r.port) return `${PORTRAITS[r.port].name} – hős skin`; if (r.card) return `${CARD[r.card].name} – új lap`; return rewLabel(r); }
+function evRewLabel(r) { if (r.tbd) return r.tbd; if (r.back) return `${BACKS[r.back].name} hátlap`; if (r.port) return PORTRAITS[r.port].name; if (r.card) return CARD[r.card].name; return rewLabel(r); }
 function evRewIcon(r) {
   if (r.tbd) return '<span class="ev-myst" aria-hidden="true"></span>';
   if (r.back) return `<span class="ev-back" aria-hidden="true" style="background-image:url('${BACKS[r.back].sm}')"></span>`;
@@ -6847,7 +6857,7 @@ function renderEvent() {
   const mid = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1), hl = Math.floor((mid - now) / 36e5), ml = Math.floor((mid - now) % 36e5 / 6e4);
   const rrow = (r, i) => { const stt = st.claimed.includes(i) ? 'claimed' : st.pts >= r.at && !r.tbd ? 'ready' : 'locked';
     return `<div class="sp-row ev-row big ${stt}"><div class="sp-lv ev-at"><b>${r.at}</b></div><div class="sp-ic">${evRewIcon(r)}</div>
-      <div class="sp-name"><b>${evRewLabel(r)}</b><small>${r.tbd ? 'Hamarosan kiderül…' : r.back ? 'Csak ebből az eventből · az ellenfeleid is látják' : r.port ? 'Csak ebből az eventből · mindig Full Art' : r.card ? `${RAR[CARD[r.card].rarity]} · csak ebből az eventből` : ''}</small></div>
+      <div class="sp-name"><b>${evRewLabel(r)}</b><small>${r.tbd ? 'Hamarosan kiderül…' : r.back ? 'Csak ebből az eventből · az ellenfeleid is látják' : r.port ? `${HERO[PORTRAITS[r.port].hero].name} skin · csak ebből az eventből` : r.card ? `Új lap · ${RAR[CARD[r.card].rarity]} · csak ebből az eventből` : ''}</small></div>
       <div class="sp-act">${stt === 'claimed' ? '<span class="q-ok">✓</span>' : stt === 'ready' ? `<button class="btn primary sp-claim" data-ec="${i}">Átvesz</button>` : '<span class="sp-lock" aria-label="Zárolva">🔒</span>'}</div></div>`; };
   body.dataset.theme = e.theme || ''; $('#scr-event h2').textContent = `${e.name} event`;
   body.innerHTML = `
