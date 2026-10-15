@@ -327,7 +327,7 @@ function renderProfileBar() {
   const ss = $('#saveState'); if (ss) ss.textContent = window.APP_MODE ? '👤 Fiók' : Store.mode === 'cloud' ? '☁️ Felhőben mentve' : '📱 Ezen az eszközön mentve';
   el.querySelector('.pb-name').textContent = p.name;
   try { applyBack(); } catch (e) {}
-  renderQuestBadge(); renderPassBadge(); try { renderRankTile(); } catch (e) {} try { renderEventTile(); } catch (e) {} try { if (chestWeeklyCheck()) Store.p.chestNew = true; } catch (e) {} try { if (!$('#scr-menu').hidden) { dayGiftCheck(); backAwardCheck(); deckLinkCheck(); chestPopup(); } } catch (e) {}
+  renderQuestBadge(); renderPassBadge(); try { renderRankTile(); } catch (e) {} try { renderEventTile(); } catch (e) {} try { if (chestWeeklyCheck()) Store.p.chestNew = true; } catch (e) {} try { if (!$('#scr-menu').hidden) { dayGiftCheck(); backAwardCheck(); deckLinkCheck(); evGiftCheck(); chestPopup(); } } catch (e) {}
   const wb = $('#wheelBadge'); if (wb) wb.hidden = !wheelReady();
   const badge = $('#shopBadge'); if (badge) badge.hidden = !freePackReady() && !(p.giftPacks > 0) && !(p.faPacks > 0) && !(p.shinyPacks > 0) && !(p.chests > 0);
 }
@@ -1511,7 +1511,7 @@ try { const q = new URLSearchParams(location.search); if (q.has('ev')) { localSt
 const evTest = () => { try { return localStorage.getItem('bou_evtest') === '1'; } catch { return false; } };
 const EVENTS = [
   // draft: true → csak teszt módban látszik (?ev=test). Élesítve: 2026-10-15 19:00 (Tomi)
-  { id: 'hw26', name: 'Halloween', icon: '🎃', theme: 'hw', music: 'art/snd/halloween.m4a', img: { btn: 'art/ui/ev-hw-btn.webp', banner: 'art/ui/ev-hw-banner.webp', pt: 'art/ui/ev-pumpkin.webp' }, start: new Date(2026, 9, 15, 19, 0), end: new Date(2026, 10, 3, 0, 0), claimUntil: new Date(2026, 10, 10, 0, 0), goal: 100,
+  { id: 'hw26', name: 'Halloween', icon: '🎃', theme: 'hw', music: 'art/snd/halloween.m4a', img: { btn: 'art/ui/ev-hw-btn.webp', banner: 'art/ui/ev-hw-banner.webp', pt: 'art/ui/ev-pumpkin.webp' }, teaser: new Date(2026, 9, 15, 0, 0), start: new Date(2026, 9, 15, 19, 0), end: new Date(2026, 10, 3, 0, 0), claimUntil: new Date(2026, 10, 10, 0, 0), goal: 100,
     sub: 'Gyűjts tökpontokat, és vidd haza a Halloween skineket és lapokat!',
     pts: 'tökpont',
     daily: [
@@ -1535,8 +1535,10 @@ const EVENTS = [
 ];
 // a futó (vagy még átvehető) event; teszt módban a még el nem indult is látszik
 function curEvent(d = new Date()) {
-  return EVENTS.find(e => !e.draft && d >= e.start && d < (e.claimUntil || e.end)) || (evTest() ? EVENTS.find(e => d < (e.claimUntil || e.end)) : null) || null;
+  return EVENTS.find(e => !e.draft && d >= (e.teaser || e.start) && d < (e.claimUntil || e.end)) || (evTest() ? EVENTS.find(e => d < (e.claimUntil || e.end)) : null) || null;
 }
+const evPre = (e, d = new Date()) => !!e && d < e.start && !evTest();   // előzetes: a gomb szürke, pont még nem jár
+const evMood = (e, d = new Date()) => !!e && !e.draft && d < e.end && d >= (e.teaser || e.start) || (!!e && evTest() && d < e.end);   // háttér + zene
 const evLive = (e, d = new Date()) => !!e && d < e.end && ((d >= e.start && !e.draft) || evTest());
 function ensureEv(p) {
   const e = curEvent(); p.evs = p.evs || {};
@@ -1576,7 +1578,7 @@ function evClaimable(p, e) { const st = p.evs?.[e.id]; if (!st) return 0; return
 function renderEventTile() {
   const t = $('#goEvent'); if (!t) return;
   const p = Store.p, e = curEvent();
-  document.body.classList.toggle('ev-hw', !!(e && evLive(e) && e.theme === 'hw'));   // eseményes menü-háttér
+  document.body.classList.toggle('ev-hw', !!(e && evMood(e) && e.theme === 'hw'));   // eseményes menü-háttér (már az előzetes alatt is)
   try { Music.sync(); } catch (err) {}
   t.hidden = !p || !e || p.onboard; if (t.hidden) return;
   const st = ensureEv(p), c = evClaimable(p, e), now = new Date();
@@ -1584,7 +1586,8 @@ function renderEventTile() {
   if (e.img) $('#evImg').src = e.img.btn;
   const left = e.end - now, d = Math.floor(left / 864e5), h = Math.floor(left % 864e5 / 36e5);
   const tag = $('#evSub');
-  tag.textContent = now < e.start || e.draft ? 'Teszt mód' : now >= e.end ? (c ? 'Vedd át a jutalmakat!' : 'Véget ért') : c ? `${c} jutalom vár!` : `Még ${d ? `${d} nap` : `${h} óra`}`;
+  const pre = evPre(e, now); t.classList.toggle('ev-pre', pre);
+  tag.textContent = pre ? `${now.toDateString() === e.start.toDateString() ? 'Ma' : huDay(e.start)} ${e.start.getHours()}:${String(e.start.getMinutes()).padStart(2, '0')}-kor indul` : now < e.start || e.draft ? 'Teszt mód' : now >= e.end ? (c ? 'Vedd át a jutalmakat!' : 'Véget ért') : c ? `${c} jutalom vár!` : `Még ${d ? `${d} nap` : `${h} óra`}`;
   tag.classList.toggle('hot', c > 0);
   $('#evBadge').innerHTML = `<span>${st.pts}<small>/${e.goal}</small></span>`; $('#evBadge').classList.toggle('hot', c > 0);
 }
@@ -1663,21 +1666,45 @@ function renderEvent() {
 const Music = { el: null, src: null,
   pref() { try { return localStorage.getItem('bou_music') !== '0'; } catch { return true; } },
   set(v) { try { localStorage.setItem('bou_music', v ? '1' : '0'); } catch {} this.sync(); },
-  want() { const e = curEvent(); return e && e.music && evLive(e) ? e.music : null; },
+  want() { const e = curEvent(); return e && e.music && evMood(e) ? e.music : null; },
   sync() {
     const src = this.want(), btn = $('#musicBtn'), sep = $('#musicSep');
     if (btn) { btn.hidden = !src; btn.textContent = this.pref() ? '🔊 Zene' : '🔇 Zene'; } if (sep) sep.hidden = !src;
     const inGame = document.body.classList.contains('in-game');
     const on = src && this.pref() && !document.hidden && !inGame;
     if (!on) { if (this.el && !this.el.paused) this.el.pause(); return; }
-    if (!this.el || this.src !== src) { if (this.el) this.el.pause(); this.el = new Audio(src); this.el.loop = true; this.el.volume = 1;   // a hangerő a fájlba van „sütve” (iPhone-on a volume nem állítható) this.el.preload = 'auto'; this.src = src; }
+    if (!this.el || this.src !== src) { if (this.el) this.el.pause(); this.el = new Audio(src); this.el.loop = true; this.el.volume = 1; /* a hangerő a fájlba van „sütve” (iPhone-on a volume nem állítható) */ this.el.preload = 'auto'; this.src = src; }
     if (this.el.paused) this.el.play().catch(() => {});   // ha a böngésző még nem engedi, a következő koppintás elindítja
   } };
 document.addEventListener('pointerdown', () => { try { Music.sync(); } catch (e) {} }, { capture: true, passive: true });
 document.addEventListener('visibilitychange', () => { try { Music.sync(); } catch (e) {} });
 { const _sh = show; show = function (id) { _sh(id); try { Music.sync(); } catch (e) {} }; }
 $('#musicBtn').onclick = () => { Music.set(!Music.pref()); toast(Music.pref() ? '🔊 Zene bekapcsolva' : '🔇 Zene kikapcsolva'); };
-$('#goEvent').onclick = () => { if (needProfile()) return; renderEvent(); show('scr-event'); };
+$('#goEvent').onclick = () => { if (needProfile()) return; const e = curEvent();
+  if (evPre(e)) return evTeaserModal(e, false);
+  renderEvent(); show('scr-event'); };
+const evStartTxt = e => `${huDay(e.start)}-én ${e.start.getHours()}:${String(e.start.getMinutes()).padStart(2, '0')}-tól`;
+// előzetes ablak: a szürke gombra koppintva, illetve az indulás előtti ajándéknál
+function evTeaserModal(e, gift) {
+  const o = document.createElement('div'); o.className = 'overlay';
+  const started = new Date() >= e.start;
+  o.innerHTML = `<div class="modal acct-box ev-teaser"><img class="evt-ban" src="${e.img.banner}" alt="${e.name}">
+    <h3>${started ? `${e.icon} Elindult a ${e.name} event!` : `${e.icon} A ${e.name} event ${evStartTxt(e)} indul!`}</h3>
+    <p class="live">Gyűjts tökpontokat napi küldetésekkel és kihívásokkal: <b>3 új lap</b>, a <b>Halloween hátlap</b> és <b>5 Halloween skin</b> vár rád.</p>
+    ${gift ? `<p class="evt-gift"><span class="q-pack shiny" aria-hidden="true"></span><span>${started ? 'Az indulás' : 'Az event'} örömére ajándékba kapsz <b>1 Shiny boostert</b> – már a Boltban vár!</span></p>
+    <button class="btn primary" data-open>Kinyitom most</button><button class="btn ghost" data-x>Később</button>` : '<button class="btn primary" data-x>Rendben</button>'}</div>`;
+  o.onclick = ev => { if (ev.target.closest('[data-open]')) { o.remove(); buyPack('base', 'shinyGift'); return; }
+    if (ev.target.closest('[data-x]') || ev.target === o) { o.remove(); renderProfileBar(); setTimeout(() => { try { chestPopup(); } catch (er) {} }, 200); } };
+  $('#layer').appendChild(o);
+}
+// egyszeri ajándék az event előzetesekor / alatt: 1 Shiny pack (Tomi, 2026-10-15)
+function evGiftCheck() {
+  const p = Store.p, e = curEvent(); if (!p || p.onboard || !e || e.draft || (typeof S !== 'undefined' && S) || $('#layer .overlay')) return;
+  if (new Date() >= e.end) return;
+  const id = `${e.id}-gift`; p.gifts = p.gifts || []; if (p.gifts.includes(id)) return;
+  p.gifts.push(id); p.shinyPacks = (p.shinyPacks || 0) + 1; save(); renderProfileBar();
+  evTeaserModal(e, true);
+}
 
 // ---- oktató meccs: fix lapok, fix ellenfél-lépések, lépésről lépésre vezetve ----
 // A játékos (Tomi) mindig ugyanazokat a lapokat húzza, a bot (Dávid, 12 élet) az első 4 körében mindig ugyanazt rakja le.
