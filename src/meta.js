@@ -1511,7 +1511,7 @@ try { const q = new URLSearchParams(location.search); if (q.has('ev')) { localSt
 const evTest = () => { try { return localStorage.getItem('bou_evtest') === '1'; } catch { return false; } };
 const EVENTS = [
   // draft: true → még csak teszt módban látszik (?ev=test); élesítéskor töröld
-  { id: 'hw26', draft: true, name: 'Halloween', icon: '🎃', theme: 'hw', start: new Date(2026, 9, 16, 0, 0), end: new Date(2026, 10, 3, 0, 0), claimUntil: new Date(2026, 10, 10, 0, 0), goal: 100,
+  { id: 'hw26', draft: true, name: 'Halloween', icon: '🎃', theme: 'hw', img: { btn: 'art/ui/ev-hw-btn.webp', banner: 'art/ui/ev-hw-banner.webp', pt: 'art/ui/ev-pumpkin.webp' }, start: new Date(2026, 9, 16, 0, 0), end: new Date(2026, 10, 3, 0, 0), claimUntil: new Date(2026, 10, 10, 0, 0), goal: 100,
     sub: 'Gyűjts tökpontokat, és vidd haza a Halloween skineket és lapokat!',
     pts: 'tökpont',
     daily: [
@@ -1528,7 +1528,7 @@ const EVENTS = [
     ],
     // a jutalmak: Tomi küldi (5 skin + 3 új lap); amíg nincs meg, „?” helykitöltő
     rewards: [
-      { at: 10, tbd: 'Halloween skin' }, { at: 20, tbd: 'Új Halloween lap' }, { at: 35, tbd: 'Halloween skin' }, { at: 50, tbd: 'Új Halloween lap' },
+      { at: 10, tbd: 'Halloween skin' }, { at: 20, tbd: 'Új Halloween lap' }, { at: 30, back: 'halloween' }, { at: 40, tbd: 'Halloween skin' }, { at: 50, tbd: 'Új Halloween lap' },
       { at: 60, tbd: 'Halloween skin' }, { at: 75, tbd: 'Halloween skin' }, { at: 90, tbd: 'Új Halloween lap' }, { at: 100, tbd: 'Halloween skin' },
     ] },
 ];
@@ -1549,6 +1549,7 @@ function ensureEv(p) {
   return st;
 }
 function evGrant(p, r) {
+  if (r.back) { if (!(p.backs || []).includes(r.back)) p.backs = [...(p.backs || []), r.back]; p.cardBack = r.back; try { applyBack(); } catch (e) {} return { back: r.back }; }
   if (r.port) { if (!(p.portraits || []).includes(r.port)) p.portraits = [...(p.portraits || []), r.port]; p.heroSkin = { ...(p.heroSkin || {}), [PORTRAITS[r.port].hero]: r.port }; return { port: r.port }; }
   if (r.card) { const e = p.coll[r.card] || (p.coll[r.card] = { n: 0, f: 0 }); const n = r.n || (CARD[r.card].rarity === 'l' ? 1 : 2); if (r.foil) e.f += n; else e.n += n; return { id: r.card, foil: !!r.foil, n }; }
   return grantRew(p, r);
@@ -1568,7 +1569,7 @@ function eventOnMatch(m) {
 }
 function evResultHTML(r) {
   if (!r || !r.got.length) return '';
-  return `<div class="ev-pop">${r.e.icon} <b>+${r.gain} ${r.e.pts}</b> · ${r.pts}/${r.e.goal}${r.newRew ? ` · <em>Új jutalom vár!</em>` : ''}<small>${r.got.map(g => `✓ ${g.txt}`).join(' · ')}</small></div>`;
+  return `<div class="ev-pop">${r.e.img ? `<img src="${r.e.img.pt}" alt="" aria-hidden="true">` : r.e.icon} <b>+${r.gain} ${r.e.pts}</b> · ${r.pts}/${r.e.goal}${r.newRew ? ` · <em>Új jutalom vár!</em>` : ''}<small>${r.got.map(g => `✓ ${g.txt}`).join(' · ')}</small></div>`;
 }
 function evClaimable(p, e) { const st = p.evs?.[e.id]; if (!st) return 0; return e.rewards.filter((r, i) => st.pts >= r.at && !st.claimed.includes(i) && !r.tbd).length; }
 function renderEventTile() {
@@ -1576,14 +1577,20 @@ function renderEventTile() {
   const p = Store.p, e = curEvent();
   t.hidden = !p || !e || p.onboard; if (t.hidden) return;
   const st = ensureEv(p), c = evClaimable(p, e), now = new Date();
-  t.dataset.theme = e.theme || '';
-  $('#evIcon').textContent = e.icon; $('#evName').textContent = `${e.name} event`;
+  t.dataset.theme = e.theme || ''; t.setAttribute('aria-label', `${e.name} event – ${st.pts}/${e.goal} pont`);
+  if (e.img) $('#evImg').src = e.img.btn;
   const left = e.end - now, d = Math.floor(left / 864e5), h = Math.floor(left % 864e5 / 36e5);
-  $('#evSub').textContent = now < e.start || e.draft ? 'Teszt mód – még nem indult el' : now >= e.end ? (c ? 'Véget ért – vedd át a jutalmakat!' : 'Véget ért') : c ? `${c} átvehető jutalom!` : `Még ${d ? `${d} nap ${h} óra` : `${h} óra`}`;
-  $('#evBadge').textContent = `${st.pts}/${e.goal}`; $('#evBadge').classList.toggle('hot', c > 0);
+  const tag = $('#evSub');
+  tag.textContent = now < e.start || e.draft ? 'Teszt mód' : now >= e.end ? (c ? 'Vedd át a jutalmakat!' : 'Véget ért') : c ? `${c} jutalom vár!` : `Még ${d ? `${d} nap` : `${h} óra`}`;
+  tag.classList.toggle('hot', c > 0);
+  $('#evBadge').innerHTML = `${st.pts}<small>/${e.goal}</small>`; $('#evBadge').classList.toggle('hot', c > 0);
 }
 function evShowGot(got, e) {
   if (!got) return;
+  if (got.back) { const b = BACKS[got.back], o = document.createElement('div'); o.className = 'overlay';
+    o.innerHTML = `<div class="modal acct-box bk-new"><h3>${e.icon} Új hátlap: ${b.name}</h3><img src="${b.src}" alt="${b.name} hátlap" style="width:min(60vw,240px);border-radius:12px;display:block;margin:6px auto 10px;box-shadow:0 0 24px rgba(255,140,30,.5)">
+      <p class="live">Már ezt használod – az ellenfeleid is ezt látják. A Gyűjteményben a 🃏 Hátlap gombbal bármikor válthatsz.</p><button class="btn primary" data-x>Szuper!</button></div>`;
+    o.onclick = ev => { if (ev.target.closest('[data-x]')) o.remove(); }; $('#layer').appendChild(o); return; }
   if (got.port) { const h = HERO[PORTRAITS[got.port].hero];
     openModal(heroCardHTML(h, { big: true, port: got.port }), `${e.icon} ${PORTRAITS[got.port].name} – ${h.name} új skinje, mindig Full Artban. Rögtön ezt viseli – a Gyűjteményben a hősre koppintva visszaválthatsz.`, ''); renderMenuFan(); return; }
   if (got.id) { openModal(cardHTML(got.id, { big: true, foil: got.foil }), `${e.icon} ${CARD[got.id].name} – ${got.n} példány bekerült a gyűjteményedbe.`, cardHelpHTML(got.id)); return; }
@@ -1595,9 +1602,10 @@ function evClaim(i) {
   const got = evGrant(p, r); st.claimed.push(i); save(); renderEvent(); renderProfileBar();
   if (got) evShowGot(got, e); else toast(`+${rewLabel(r)}`);
 }
-function evRewLabel(r) { if (r.tbd) return r.tbd; if (r.port) return `${PORTRAITS[r.port].name} – hős skin`; if (r.card) return `${CARD[r.card].name} – új lap`; return rewLabel(r); }
+function evRewLabel(r) { if (r.tbd) return r.tbd; if (r.back) return `${BACKS[r.back].name} hátlap`; if (r.port) return `${PORTRAITS[r.port].name} – hős skin`; if (r.card) return `${CARD[r.card].name} – új lap`; return rewLabel(r); }
 function evRewIcon(r) {
-  if (r.tbd) return '<span class="sp-mystery ev-myst" aria-hidden="true"><b>?</b></span>';
+  if (r.tbd) return '<span class="ev-myst" aria-hidden="true"></span>';
+  if (r.back) return `<span class="ev-back" aria-hidden="true" style="background-image:url('${BACKS[r.back].sm}')"></span>`;
   if (r.card) return ART[r.card] ? `<span class="sp-thumb" aria-hidden="true" style="background-image:url('${artSrc(r.card)}')"></span>` : '<span class="sp-mystery" aria-hidden="true"><b>★</b></span>';
   return rewIcon(r);
 }
@@ -1610,19 +1618,19 @@ function renderEvent() {
   const marks = e.rewards.map((r, i) => `<span class="ev-mark${st.pts >= r.at ? ' on' : ''}${st.claimed.includes(i) ? ' got' : ''}" style="left:${r.at / e.goal * 100}%"><i></i><b>${r.at}</b></span>`).join('');
   const qrow = (d, q) => { q = q || { prog: 0, done: false };
     return `<div class="q-row ev-q${q.done ? ' done' : ''}"><div class="q-main"><b>${d.txt}</b><div class="q-bar"><i style="width:${q.prog / d.goal * 100}%"></i><span>${q.prog}/${d.goal}</span></div></div>
-      <div class="q-rew">${q.done ? '<span class="q-ok">✓</span>' : `<em class="ev-pts">+${d.pts}</em>`}</div></div>`; };
+      <div class="q-rew">${q.done ? '<span class="q-ok">✓</span>' : `<em class="ev-pts">+${d.pts}<img src="${e.img.pt}" alt="tökpont"></em>`}</div></div>`; };
   const mid = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1), hl = Math.floor((mid - now) / 36e5), ml = Math.floor((mid - now) % 36e5 / 6e4);
   const rrow = (r, i) => { const stt = st.claimed.includes(i) ? 'claimed' : st.pts >= r.at && !r.tbd ? 'ready' : 'locked';
     return `<div class="sp-row ev-row big ${stt}"><div class="sp-lv ev-at"><b>${r.at}</b></div><div class="sp-ic">${evRewIcon(r)}</div>
-      <div class="sp-name"><b>${evRewLabel(r)}</b><small>${r.tbd ? 'Hamarosan kiderül…' : r.port ? 'Csak ebből az eventből · mindig Full Art' : r.card ? `${RAR[CARD[r.card].rarity]} · csak ebből az eventből` : ''}</small></div>
+      <div class="sp-name"><b>${evRewLabel(r)}</b><small>${r.tbd ? 'Hamarosan kiderül…' : r.back ? 'Csak ebből az eventből · az ellenfeleid is látják' : r.port ? 'Csak ebből az eventből · mindig Full Art' : r.card ? `${RAR[CARD[r.card].rarity]} · csak ebből az eventből` : ''}</small></div>
       <div class="sp-act">${stt === 'claimed' ? '<span class="q-ok">✓</span>' : stt === 'ready' ? `<button class="btn primary sp-claim" data-ec="${i}">Átvesz</button>` : '<span class="sp-lock" aria-label="Zárolva">🔒</span>'}</div></div>`; };
-  body.dataset.theme = e.theme || ''; $('#scr-event h2').textContent = `${e.icon} ${e.name}`;
+  body.dataset.theme = e.theme || ''; $('#scr-event h2').textContent = `${e.name} event`;
   body.innerHTML = `
     <div class="ev-head">
-      <div class="ev-hero"><span class="ev-big" aria-hidden="true">${e.icon}</span><div><b>${e.name}</b><small>${now < e.start || e.draft ? 'Teszt mód – a játékosok még nem látják' : live ? `Még ${d ? `${d} nap ${h} óra` : `${h} óra`} · ${e.end.getMonth() + 1}. ${e.end.getDate() - 1}-ig` : `Véget ért · jutalmak átvehetők ${e.claimUntil.getMonth() + 1}. ${e.claimUntil.getDate() - 1}-ig`}</small></div></div>
+      <div class="ev-ban"><img src="${e.img.banner}" alt="${e.name}"><div class="ev-when">${now < e.start || e.draft ? 'Teszt mód<br><small>a játékosok még nem látják</small>' : live ? `Még ${d ? `${d} nap ${h} óra` : `${h} óra`}<br><small>${e.end.getMonth() + 1}. ${new Date(e.end - 1).getDate()}-ig tart</small>` : `Véget ért<br><small>a jutalmak ${e.claimUntil.getMonth() + 1}. ${new Date(e.claimUntil - 1).getDate()}-ig átvehetők</small>`}</div></div>
       <p class="ev-sub">${e.sub}</p>
-      <div class="ev-score"><span class="ev-num">${st.pts}</span><small>/ ${e.goal} ${e.pts}</small></div>
-      <div class="ev-track"><div class="ev-fill" style="width:${pct}%"></div>${marks}</div>
+      <div class="ev-score"><img src="${e.img.pt}" alt="" aria-hidden="true"><span class="ev-num">${st.pts}</span><small>/ ${e.goal} ${e.pts}</small></div>
+      <div class="ev-track"><div class="ev-in"><div class="ev-fill" style="clip-path:inset(0 ${100 - pct}% 0 0 round 999px)"></div>${marks}</div></div>
       ${c > 1 ? `<button class="btn primary sp-all" id="evAll">Mind átveszem (${c})</button>` : ''}
     </div>
     <div class="lbl">Napi event-küldetések <small>· újak ${hl} óra ${ml} perc múlva</small></div>
@@ -2784,6 +2792,7 @@ const BACKS = {
   // 2026-10-12: gyűjtő- és győzelmi hátlap (automatikusan jár, ha teljesül)
   collector: { name: 'Ametiszt', src: 'art/back_collector.webp', sm: 'art/sm/back_collector.webp', how: 'Gyűjtsd össze a Base set összes lapját (sima is elég)',
     prog: p => { const [a, b] = backCollProg(p); return `${a}/${b} lap megvan`; }, earned: p => { const [a, b] = backCollProg(p); return a >= b; } },
+  halloween: { name: 'Halloween', src: 'art/back_halloween.webp', sm: 'art/sm/back_halloween.webp', how: 'Halloween event jutalom (2026. október–november)' },
   champion: { name: 'Rubin', src: 'art/back_champion.webp', sm: 'art/sm/back_champion.webp', how: 'Nyerj meg 50 meccset',
     prog: p => `${Math.min(50, p.stats?.w || 0)}/50 győzelem`, earned: p => (p.stats?.w || 0) >= 50 },
 };

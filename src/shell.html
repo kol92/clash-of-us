@@ -1082,45 +1082,47 @@ h1,h2,h3{font-family:var(--display);font-weight:400;letter-spacing:.01em;text-wr
 
 /* ---- Season Pass ---- */
 .m-pass{grid-template-columns:48px 1fr auto auto;min-height:70px;}
-/* ---- időszakos eventek (Halloween 2026-10-15) – amíg nincs Astra-grafika, CSS-ből ---- */
-.m-event{grid-template-columns:52px 1fr auto auto;min-height:78px;border-radius:16px;border:2px solid #ff9a2e;
-  background:radial-gradient(circle at 12% 50%,rgba(255,140,30,.45),transparent 42%),linear-gradient(135deg,#3b1452,#1d0b2b 55%,#2a1206);
-  box-shadow:0 0 18px rgba(255,140,30,.35),inset 0 1px 0 rgba(255,200,120,.25);}
-.m-event .ev-ic{font-size:40px;line-height:1;text-align:center;filter:drop-shadow(0 0 8px rgba(255,140,30,.8));animation:evBob 2.4s ease-in-out infinite;}
-@keyframes evBob{50%{transform:translateY(-3px) rotate(-6deg);}}
-.m-event b{color:#ffb347 !important;text-shadow:0 2px 0 #4a1a00;}
-.m-event small{color:#e6c8ff !important;}
-.m-event .chev{border-color:#ffb347 !important;}
-.ev-badge{background:linear-gradient(180deg,#ffb347,#e2650a) !important;color:#2a0e00 !important;}
-.ev-badge.hot{animation:spPulse 1.4s ease-in-out infinite;background:linear-gradient(180deg,#8dffcf,#1fbf7f) !important;color:#00321f !important;}
+/* ---- időszakos eventek (Halloween 2026-10-15, grafika: Astra) ---- */
+.m-event{position:relative;display:block;width:100%;padding:0;margin:2px 0 0;border:0;background:none;cursor:pointer;}
+.m-event img{display:block;width:calc(100% + 16px);margin:0 -8px;height:auto;filter:drop-shadow(0 6px 14px rgba(255,120,20,.35)) drop-shadow(0 6px 10px rgba(0,0,0,.55));}
+.m-event:active img{transform:scale(.98);}
+.ev-circ{position:absolute;left:84.1%;top:56%;transform:translate(-50%,-50%);width:12.5%;aspect-ratio:1;display:grid;place-items:center;font-family:var(--display);font-weight:900;font-size:min(20px,5vw);line-height:1;color:#ffb347;text-shadow:0 2px 0 #4a1a00,0 0 10px rgba(255,150,40,.6);}
+.ev-ban .ev-when small{display:block;font-size:.8em;font-weight:800;color:#d9c2ef;}
+.ev-circ small{display:block;font-size:.45em;color:#e6c8ff;text-shadow:none;margin-top:1px;}
+.ev-circ.hot{color:#8dffcf;animation:spPulse 1.4s ease-in-out infinite;}
+.m-event .ev-tag{position:absolute;top:2%;right:20%;font-weight:900;font-size:11px;letter-spacing:.05em;text-transform:uppercase;padding:4px 10px;border-radius:999px;background:linear-gradient(180deg,#ffb347,#e2650a);color:#2a0e00;box-shadow:0 2px 6px rgba(0,0,0,.5);white-space:nowrap;}
+.m-event .ev-tag.hot{background:linear-gradient(180deg,#8dffcf,#1fbf7f);color:#00321f;}
+.m-event .ev-tag:empty{display:none;}
 #evBody{display:grid;gap:10px;padding-bottom:24px;}
-.ev-head{position:relative;display:grid;gap:10px;padding:16px;border-radius:18px;border:2px solid #ff9a2e;overflow:hidden;
-  background:radial-gradient(circle at 85% 0%,rgba(255,140,30,.35),transparent 50%),linear-gradient(160deg,#3b1452,#1a0a26 60%,#120818);box-shadow:0 0 22px rgba(255,140,30,.25);}
-.ev-hero{display:flex;align-items:center;gap:12px;}
-.ev-big{font-size:52px;line-height:1;filter:drop-shadow(0 0 12px rgba(255,140,30,.8));}
-.ev-hero b{display:block;font-family:var(--display);font-size:28px;color:#ffb347;text-shadow:0 2px 0 #4a1a00;}
-.ev-hero small{display:block;font-size:12px;font-weight:800;color:#e6c8ff;margin-top:2px;}
-.ev-sub{margin:0;font-size:13px;font-weight:700;color:#f3e6ff;line-height:1.35;}
-.ev-score{display:flex;align-items:baseline;gap:6px;}
+.ev-head{position:relative;display:grid;gap:8px;padding:0 0 14px;border-radius:18px;
+  background:radial-gradient(circle at 50% 0%,rgba(255,140,30,.22),transparent 60%),linear-gradient(180deg,rgba(59,20,82,.55),rgba(18,8,24,.6));}
+.ev-ban{position:relative;margin:0 -6px;}
+.ev-ban img{display:block;width:100%;height:auto;filter:drop-shadow(0 6px 14px rgba(0,0,0,.6));}
+.ev-ban .ev-when{position:absolute;left:27%;right:27%;top:60%;text-align:center;font-size:clamp(11px,3.2vw,14px);font-weight:900;color:#f3e6ff;text-shadow:0 2px 4px #000;line-height:1.25;}
+.ev-sub{margin:0 14px;font-size:13px;font-weight:700;color:#f3e6ff;line-height:1.35;text-align:center;}
+.ev-score{display:flex;align-items:center;justify-content:center;gap:8px;}
+.ev-score img{width:44px;height:auto;filter:drop-shadow(0 0 10px rgba(255,140,30,.7));}
 .ev-num{font-family:var(--display);font-size:40px;line-height:1;color:#ffb347;text-shadow:0 2px 0 #7a3500,0 0 14px rgba(255,150,40,.5);}
 .ev-score small{font-weight:900;color:#e6c8ff;}
-.ev-track{position:relative;height:18px;margin:4px 6px 22px;border-radius:9px;background:#12061c;border:2px solid rgba(255,154,46,.55);box-shadow:inset 0 2px 4px rgba(0,0,0,.6);}
-.ev-fill{position:absolute;left:0;top:0;bottom:0;border-radius:7px;background:linear-gradient(90deg,#ff7a00,#ffb347 70%,#ffe08a);box-shadow:0 0 10px rgba(255,150,40,.7);transition:width .6s;}
-.ev-mark{position:absolute;top:-4px;transform:translateX(-50%);display:grid;justify-items:center;pointer-events:none;}
-.ev-mark i{width:10px;height:22px;border-radius:3px;background:#3a1f4a;border:2px solid #7d5a96;}
-.ev-mark.on i{background:#ffb347;border-color:#fff1c9;box-shadow:0 0 8px rgba(255,180,70,.9);}
+.ev-track{position:relative;margin:2px 4px 18px;aspect-ratio:1000/118;background:url('art/ui/ev-hw-bar.webp') center/100% 100% no-repeat;}
+.ev-in{position:absolute;left:11.2%;right:10.9%;top:22%;bottom:20%;}
+.ev-fill{position:absolute;inset:-6% 0;background:url('art/ui/ev-hw-fill.webp') center/100% 100% no-repeat;filter:drop-shadow(0 0 6px rgba(255,150,40,.7));transition:clip-path .6s;}
+.ev-mark{position:absolute;top:50%;transform:translate(-50%,-50%);display:grid;justify-items:center;pointer-events:none;}
+.ev-mark i{width:7px;height:150%;min-height:16px;border-radius:3px;background:#3a1f4a;border:2px solid #9b7ab3;box-shadow:0 0 4px #000;}
+.ev-mark.on i{background:#ffe08a;border-color:#fff1c9;box-shadow:0 0 8px rgba(255,200,90,.95);}
 .ev-mark.got i{background:#1fbf7f;border-color:#bfffe6;}
-.ev-mark b{margin-top:2px;font-size:10px;font-weight:900;color:#c9a9e0;}
+.ev-mark b{position:absolute;top:calc(100% + 14px);font-size:10px;font-weight:900;color:#c9a9e0;}
 .ev-mark.on b{color:#ffb347;}
-.ev-pts{font-style:normal;font-weight:900;color:#ffb347;font-size:15px;}
-.ev-q.done .ev-pts{color:#8dffcf;}
+.ev-pts{display:inline-flex;align-items:center;gap:3px;font-style:normal;font-weight:900;color:#ffb347;font-size:15px;}
+.ev-pts img,.ev-pop img{width:20px;height:auto;}
 .ev-row .ev-at{background:#2a1238;border-color:#ff9a2e;}
 .ev-row .ev-at b{color:#ffb347;font-size:14px;}
 .ev-row.ready .ev-at,.ev-row.claimed .ev-at{background:linear-gradient(180deg,#ffd27a,#e2650a);}
 .ev-row.ready .ev-at b,.ev-row.claimed .ev-at b{color:#2a0e00;}
 .ev-row.big{border-color:rgba(255,154,46,.5);background:linear-gradient(160deg,#2a1238,#151028 70%);}
-.ev-myst{background:linear-gradient(160deg,#3b1452,#1a0a26) !important;border-color:#ff9a2e !important;color:#ffb347;}
-.ev-pop{margin:6px 0;padding:8px 10px;border-radius:12px;background:linear-gradient(160deg,#3b1452,#1d0b2b);border:1px solid #ff9a2e;color:#fff;font-size:14px;}
+.ev-myst{display:block;width:42px;height:58px;background:url('art/ui/ev-hw-myst.webp') center/contain no-repeat;filter:drop-shadow(0 0 8px rgba(255,150,40,.5));}
+.ev-back{display:block;width:40px;height:54px;border-radius:5px;background:center/cover no-repeat;border:1px solid #ffb347;box-shadow:0 0 12px rgba(255,140,30,.55);}
+.ev-pop{display:block;margin:6px 0;padding:8px 10px;border-radius:12px;background:linear-gradient(160deg,#3b1452,#1d0b2b);border:1px solid #ff9a2e;color:#fff;font-size:14px;}
 .ev-pop b{color:#ffb347;} .ev-pop em{font-style:normal;color:#8dffcf;font-weight:900;}
 .ev-pop small{display:block;margin-top:3px;font-size:11.5px;color:#e6c8ff;}
 .m-ic.pass{font-size:32px;line-height:1;text-align:center;filter:drop-shadow(0 2px 4px rgba(0,0,0,.6));}
@@ -2108,7 +2110,7 @@ body.pf-loading #scr-menu .pb-name::after{content:'';display:inline-block;width:
     <div class="menu-btns">
       <button class="m-play" id="goPlay"><i class="m-ic swords" aria-hidden="true"></i><span><b>Játék indítása</b><small>Bot elleni csata</small></span></button>
       <button class="m-play m-rank" id="goRanked"><span class="m-ic rk-ic" id="rankEmb" aria-hidden="true"></span><span><b>Ranked</b><small id="rankSub">Bronz 5</small></span><span class="rk-lock" aria-hidden="true">🔒 Hamarosan</span></button>
-      <button class="m-tile m-event" id="goEvent" hidden><span class="m-ic ev-ic" id="evIcon" aria-hidden="true">🎃</span><span class="m-txt"><b id="evName">Event</b><small id="evSub"></small></span><span class="q-badge ev-badge" id="evBadge">0/100</span><i class="chev" aria-hidden="true"></i></button>
+      <button class="m-event" id="goEvent" hidden aria-label="Halloween event"><img id="evImg" src="art/ui/ev-hw-btn.webp" alt="" aria-hidden="true"><span class="ev-circ" id="evBadge">0</span><span class="badge ev-tag" id="evSub"></span><span id="evIcon" hidden></span><span id="evName" hidden></span></button>
       <button class="m-tile orn m-pvp" id="goPvp"><span class="m-ic ic-img ic-pvp" aria-hidden="true"></span><span class="m-txt"><b>PvP</b><small id="pvpSub">Játssz a barátaid ellen</small></span><span class="q-badge sp-badge" id="pvpBadge" hidden></span><i class="chev" aria-hidden="true"></i></button>
       <button class="m-tile orn m-friends" id="goFriends" hidden><span class="m-ic ic-img ic-friends" aria-hidden="true"></span><span class="m-txt"><b>Barátok</b><small>Kihívás és lapcsere</small></span><span class="q-badge" id="friendBadge" hidden></span><i class="chev" aria-hidden="true"></i></button>
       <button class="m-shop-img" id="goShop" aria-label="Bolt – boosterek, változatok, portrék"><img src="art/ui/shop-btn.webp" alt="" aria-hidden="true"><span class="badge" id="shopBadge" hidden>Ingyen pack!</span><i class="chev" aria-hidden="true"></i></button>

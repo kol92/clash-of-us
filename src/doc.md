@@ -444,7 +444,8 @@ Hősképesség-ötletek a táblázatban (még nem zöldek, nincsenek beépítve)
   - Napi (minden nap újra, 3 × 5 pont): Játssz le 2 meccset · Nyerj 1 meccset · Pusztíts el 5 ellenséges karaktert.
   - Egyszeri kihívások (40 pont): Nyerj 5 meccset (10) · Nyerj a Nehéz bot ellen / rankedben Aranytól (10) · Nyerj 2 ranked meccset (5) · Játssz egy PvP meccset (5) · Okozz összesen 100 sebzést az ellenfél hősének (10).
   - 100 pont kb. 4 aktív nap (napi 15 + kihívások), lazábban ~1 hét.
-  - Jutalmak (helykitöltők, amíg Tomi küldi): 10 skin · 20 új lap · 35 skin · 50 új lap · 60 skin · 75 skin · 90 új lap · 100 skin.
+  - Jutalmak: 10 skin · 20 új lap · **30 Halloween hátlap** (`BACKS.halloween`, megkapáskor rögtön ezt használja) · 40 skin · 50 új lap · 60 skin · 75 skin · 90 új lap · 100 skin. A skinek és lapok helyén „?” kártya, amíg Tomi küldi őket.
+- **Grafika (Astra, 2026-10-15):** menügomb (art/ui/ev-hw-btn.webp, a jobb oldali körben a pontszám, felette címke: hátralévő idő / „N jutalom vár!”), fejléc-banner (ev-hw-banner.webp, alatta a visszaszámláló), tökpont ikon (ev-pumpkin.webp), csík-keret és narancs töltés (ev-hw-bar.webp, ev-hw-fill.webp – a töltés `clip-path`-szal vágva, így a lekerekítés nem torzul), „?” rejtett jutalom (ev-hw-myst.webp), Halloween hátlap (back_halloween.webp + sm).
 - **Tesztelés élesítés előtt:** az event `draft: true` – csak az a telefon látja, ahol egyszer megnyitották a …/?ev=test linket (kikapcsolás: ?ev=off). Élesítés: a `draft` törlése.
 - **Event-lapok:** `eventOnly: true` – nincs packban, nem cserélhető, a paklisegéd Mester-paklijába sem kerül; a gyűjteményben „csak eventből szerezhető”. Jutalomként alapból 2 példány jár (legendásból 1).
 
