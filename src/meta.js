@@ -1511,7 +1511,7 @@ try { const q = new URLSearchParams(location.search); if (q.has('ev')) { localSt
 const evTest = () => { try { return localStorage.getItem('bou_evtest') === '1'; } catch { return false; } };
 const EVENTS = [
   // draft: true → csak teszt módban látszik (?ev=test). Élesítve: 2026-10-15 19:00 (Tomi)
-  { id: 'hw26', name: 'Halloween', icon: '🎃', theme: 'hw', img: { btn: 'art/ui/ev-hw-btn.webp', banner: 'art/ui/ev-hw-banner.webp', pt: 'art/ui/ev-pumpkin.webp' }, start: new Date(2026, 9, 15, 19, 0), end: new Date(2026, 10, 3, 0, 0), claimUntil: new Date(2026, 10, 10, 0, 0), goal: 100,
+  { id: 'hw26', name: 'Halloween', icon: '🎃', theme: 'hw', music: 'art/snd/halloween.m4a', img: { btn: 'art/ui/ev-hw-btn.webp', banner: 'art/ui/ev-hw-banner.webp', pt: 'art/ui/ev-pumpkin.webp' }, start: new Date(2026, 9, 15, 19, 0), end: new Date(2026, 10, 3, 0, 0), claimUntil: new Date(2026, 10, 10, 0, 0), goal: 100,
     sub: 'Gyűjts tökpontokat, és vidd haza a Halloween skineket és lapokat!',
     pts: 'tökpont',
     daily: [
@@ -1577,6 +1577,7 @@ function renderEventTile() {
   const t = $('#goEvent'); if (!t) return;
   const p = Store.p, e = curEvent();
   document.body.classList.toggle('ev-hw', !!(e && evLive(e) && e.theme === 'hw'));   // eseményes menü-háttér
+  try { Music.sync(); } catch (err) {}
   t.hidden = !p || !e || p.onboard; if (t.hidden) return;
   const st = ensureEv(p), c = evClaimable(p, e), now = new Date();
   t.dataset.theme = e.theme || ''; t.setAttribute('aria-label', `${e.name} event – ${st.pts}/${e.goal} pont`);
@@ -1658,6 +1659,24 @@ function renderEvent() {
     if (ev.target.closest('#evAll')) { e.rewards.forEach((r, i) => { if (st.pts >= r.at && !st.claimed.includes(i) && !r.tbd) { evGrant(p, r); st.claimed.push(i); } }); save(); renderEvent(); renderProfileBar(); renderMenuFan(); toast('Jutalmak átvéve'); } };
   renderEventTile();
 }
+// ---- event-zene (2026-10-15): csak a menükben szól, meccs közben nem; az első koppintás indítja (iPhone) ----
+const Music = { el: null, src: null,
+  pref() { try { return localStorage.getItem('bou_music') !== '0'; } catch { return true; } },
+  set(v) { try { localStorage.setItem('bou_music', v ? '1' : '0'); } catch {} this.sync(); },
+  want() { const e = curEvent(); return e && e.music && evLive(e) ? e.music : null; },
+  sync() {
+    const src = this.want(), btn = $('#musicBtn'), sep = $('#musicSep');
+    if (btn) { btn.hidden = !src; btn.textContent = this.pref() ? '🔊 Zene' : '🔇 Zene'; } if (sep) sep.hidden = !src;
+    const inGame = document.body.classList.contains('in-game');
+    const on = src && this.pref() && !document.hidden && !inGame;
+    if (!on) { if (this.el && !this.el.paused) this.el.pause(); return; }
+    if (!this.el || this.src !== src) { if (this.el) this.el.pause(); this.el = new Audio(src); this.el.loop = true; this.el.volume = 0.4; this.el.preload = 'auto'; this.src = src; }
+    if (this.el.paused) this.el.play().catch(() => {});   // ha a böngésző még nem engedi, a következő koppintás elindítja
+  } };
+document.addEventListener('pointerdown', () => { try { Music.sync(); } catch (e) {} }, { capture: true, passive: true });
+document.addEventListener('visibilitychange', () => { try { Music.sync(); } catch (e) {} });
+{ const _sh = show; show = function (id) { _sh(id); try { Music.sync(); } catch (e) {} }; }
+$('#musicBtn').onclick = () => { Music.set(!Music.pref()); toast(Music.pref() ? '🔊 Zene bekapcsolva' : '🔇 Zene kikapcsolva'); };
 $('#goEvent').onclick = () => { if (needProfile()) return; renderEvent(); show('scr-event'); };
 
 // ---- oktató meccs: fix lapok, fix ellenfél-lépések, lépésről lépésre vezetve ----

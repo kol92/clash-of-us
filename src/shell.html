@@ -912,7 +912,7 @@ body.ev-hw #scr-menu .fan{filter:drop-shadow(0 0 22px rgba(255,140,40,.35));}
 .m-ic.decks i{position:absolute;left:12px;top:4px;width:28px;height:40px;border-radius:3px;background:url('art/sm/back.webp') center/cover;border:1px solid var(--gl);box-shadow:0 2px 6px rgba(0,0,0,.6);transform-origin:50% 100%;}
 .m-ic.decks i:nth-child(1){transform:rotate(-18deg) translateX(-6px);} .m-ic.decks i:nth-child(3){transform:rotate(14deg) translateX(6px);}
 .m-ic.coll{width:44px;height:58px;background:url('art/ui/ic-coll.webp') center/contain no-repeat;}
-.m-foot{display:flex;justify-content:center;align-items:center;gap:16px;margin-top:4px;font-family:'Cinzel',Georgia,serif;font-weight:700;font-size:13px;color:#9fb8c8;}
+.m-foot{display:flex;justify-content:center;align-items:center;gap:clamp(6px,3vw,16px);flex-wrap:wrap;margin-top:4px;font-family:'Cinzel',Georgia,serif;font-weight:700;font-size:13px;color:#9fb8c8;}
 .m-foot button{font:inherit;color:inherit;background:none;border:0;padding:6px 4px;cursor:pointer;}
 .m-foot .sep{width:1px;height:22px;background:var(--gl);opacity:.6;}
 #scr-menu .foot{display:none;}
@@ -2130,7 +2130,7 @@ body.pf-loading #scr-menu .pb-name::after{content:'';display:inline-block;width:
       </div>
       <button class="m-tile orn m-install" id="installBtn" hidden><span class="m-ic" aria-hidden="true">📲</span><span class="m-txt"><b>Telepítsd a telefonodra</b><small>Saját ikon, teljes képernyő</small></span></button>
     </div>
-    <div class="m-foot"><button id="goTut"><span aria-hidden="true">🎓</span> Oktató</button><span class="sep"></span><button id="goRules"><span aria-hidden="true">📖</span> Szabályok</button><span class="sep"></span><button id="saveState">☁️ Betöltés…</button></div>
+    <div class="m-foot"><button id="goTut"><span aria-hidden="true">🎓</span> Oktató</button><span class="sep"></span><button id="goRules"><span aria-hidden="true">📖</span> Szabályok</button><span class="sep" id="musicSep" hidden></span><button id="musicBtn" hidden aria-label="Zene be/ki">🔊 Zene</button><span class="sep"></span><button id="saveState">☁️ Betöltés…</button></div>
   </section>
 
   <section class="screen" id="scr-pick" hidden>

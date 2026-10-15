@@ -90,7 +90,7 @@ def _ver(m):
     if not h: return rel
     sm = rel.replace('art/', 'art/sm/', 1); hs = _vh(sm)   # a kis változatot az app a nagy útvonalából képzi
     return f'{rel}?v={h}{hs or ""}'
-html = re.sub(r'art/[\w/.-]+\.(?:webp|mp4)(?![?\w])', _ver, html)   # a videók (art/vid/*.mp4) is verziózva
+html = re.sub(r'art/[\w/.-]+\.(?:webp|mp4|m4a)(?![?\w])', _ver, html)   # a videók (art/vid/*.mp4) is verziózva
 open(os.path.join(DIST, 'index.html'), 'w', encoding='utf-8').write(html)
 
 # 3) manifest, service worker, verzió, Cloudflare fejlécek

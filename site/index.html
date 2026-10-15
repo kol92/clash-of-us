@@ -927,7 +927,7 @@ body.ev-hw #scr-menu .fan{filter:drop-shadow(0 0 22px rgba(255,140,40,.35));}
 .m-ic.decks i{position:absolute;left:12px;top:4px;width:28px;height:40px;border-radius:3px;background:url('art/sm/back.webp?v=38549753') center/cover;border:1px solid var(--gl);box-shadow:0 2px 6px rgba(0,0,0,.6);transform-origin:50% 100%;}
 .m-ic.decks i:nth-child(1){transform:rotate(-18deg) translateX(-6px);} .m-ic.decks i:nth-child(3){transform:rotate(14deg) translateX(6px);}
 .m-ic.coll{width:44px;height:58px;background:url('art/ui/ic-coll.webp?v=dd7b55fd') center/contain no-repeat;}
-.m-foot{display:flex;justify-content:center;align-items:center;gap:16px;margin-top:4px;font-family:'Cinzel',Georgia,serif;font-weight:700;font-size:13px;color:#9fb8c8;}
+.m-foot{display:flex;justify-content:center;align-items:center;gap:clamp(6px,3vw,16px);flex-wrap:wrap;margin-top:4px;font-family:'Cinzel',Georgia,serif;font-weight:700;font-size:13px;color:#9fb8c8;}
 .m-foot button{font:inherit;color:inherit;background:none;border:0;padding:6px 4px;cursor:pointer;}
 .m-foot .sep{width:1px;height:22px;background:var(--gl);opacity:.6;}
 #scr-menu .foot{display:none;}
@@ -2148,7 +2148,7 @@ body.pf-loading #scr-menu .pb-name::after{content:'';display:inline-block;width:
       </div>
       <button class="m-tile orn m-install" id="installBtn" hidden><span class="m-ic" aria-hidden="true">📲</span><span class="m-txt"><b>Telepítsd a telefonodra</b><small>Saját ikon, teljes képernyő</small></span></button>
     </div>
-    <div class="m-foot"><button id="goTut"><span aria-hidden="true">🎓</span> Oktató</button><span class="sep"></span><button id="goRules"><span aria-hidden="true">📖</span> Szabályok</button><span class="sep"></span><button id="saveState">☁️ Betöltés…</button></div>
+    <div class="m-foot"><button id="goTut"><span aria-hidden="true">🎓</span> Oktató</button><span class="sep"></span><button id="goRules"><span aria-hidden="true">📖</span> Szabályok</button><span class="sep" id="musicSep" hidden></span><button id="musicBtn" hidden aria-label="Zene be/ki">🔊 Zene</button><span class="sep"></span><button id="saveState">☁️ Betöltés…</button></div>
   </section>
 
   <section class="screen" id="scr-pick" hidden>
@@ -2298,7 +2298,7 @@ body.pf-loading #scr-menu .pb-name::after{content:'';display:inline-block;width:
 <script src="vendor/firebase-auth-compat.js"></script>
 <script src="vendor/firebase-firestore-compat.js"></script>
 <script src="vendor/firebase-database-compat.js"></script>
-<script>window.APP_VERSION = "2026.10.15-1328"; window.APP_BUILD = "2026.10.15-1335";</script>
+<script>window.APP_VERSION = "2026.10.15-1328"; window.APP_BUILD = "2026.10.15-1342";</script>
 <script>// ===== Best of Us – saját szerver (Firebase) =====
 // A játék eredetileg a Claude-os tárolót használta (window.claude.use('db' | 'user' | 'room')).
 // Ez a fájl ugyanazt a felületet adja Firebase-ből, így a játék kódja szinte változatlan maradhat:
@@ -6793,7 +6793,7 @@ try { const q = new URLSearchParams(location.search); if (q.has('ev')) { localSt
 const evTest = () => { try { return localStorage.getItem('bou_evtest') === '1'; } catch { return false; } };
 const EVENTS = [
   // draft: true → csak teszt módban látszik (?ev=test). Élesítve: 2026-10-15 19:00 (Tomi)
-  { id: 'hw26', name: 'Halloween', icon: '🎃', theme: 'hw', img: { btn: 'art/ui/ev-hw-btn.webp?v=064d679b', banner: 'art/ui/ev-hw-banner.webp?v=9e08ed2d', pt: 'art/ui/ev-pumpkin.webp?v=c392824b' }, start: new Date(2026, 9, 15, 19, 0), end: new Date(2026, 10, 3, 0, 0), claimUntil: new Date(2026, 10, 10, 0, 0), goal: 100,
+  { id: 'hw26', name: 'Halloween', icon: '🎃', theme: 'hw', music: 'art/snd/halloween.m4a?v=8b143503', img: { btn: 'art/ui/ev-hw-btn.webp?v=064d679b', banner: 'art/ui/ev-hw-banner.webp?v=9e08ed2d', pt: 'art/ui/ev-pumpkin.webp?v=c392824b' }, start: new Date(2026, 9, 15, 19, 0), end: new Date(2026, 10, 3, 0, 0), claimUntil: new Date(2026, 10, 10, 0, 0), goal: 100,
     sub: 'Gyűjts tökpontokat, és vidd haza a Halloween skineket és lapokat!',
     pts: 'tökpont',
     daily: [
@@ -6859,6 +6859,7 @@ function renderEventTile() {
   const t = $('#goEvent'); if (!t) return;
   const p = Store.p, e = curEvent();
   document.body.classList.toggle('ev-hw', !!(e && evLive(e) && e.theme === 'hw'));   // eseményes menü-háttér
+  try { Music.sync(); } catch (err) {}
   t.hidden = !p || !e || p.onboard; if (t.hidden) return;
   const st = ensureEv(p), c = evClaimable(p, e), now = new Date();
   t.dataset.theme = e.theme || ''; t.setAttribute('aria-label', `${e.name} event – ${st.pts}/${e.goal} pont`);
@@ -6940,6 +6941,24 @@ function renderEvent() {
     if (ev.target.closest('#evAll')) { e.rewards.forEach((r, i) => { if (st.pts >= r.at && !st.claimed.includes(i) && !r.tbd) { evGrant(p, r); st.claimed.push(i); } }); save(); renderEvent(); renderProfileBar(); renderMenuFan(); toast('Jutalmak átvéve'); } };
   renderEventTile();
 }
+// ---- event-zene (2026-10-15): csak a menükben szól, meccs közben nem; az első koppintás indítja (iPhone) ----
+const Music = { el: null, src: null,
+  pref() { try { return localStorage.getItem('bou_music') !== '0'; } catch { return true; } },
+  set(v) { try { localStorage.setItem('bou_music', v ? '1' : '0'); } catch {} this.sync(); },
+  want() { const e = curEvent(); return e && e.music && evLive(e) ? e.music : null; },
+  sync() {
+    const src = this.want(), btn = $('#musicBtn'), sep = $('#musicSep');
+    if (btn) { btn.hidden = !src; btn.textContent = this.pref() ? '🔊 Zene' : '🔇 Zene'; } if (sep) sep.hidden = !src;
+    const inGame = document.body.classList.contains('in-game');
+    const on = src && this.pref() && !document.hidden && !inGame;
+    if (!on) { if (this.el && !this.el.paused) this.el.pause(); return; }
+    if (!this.el || this.src !== src) { if (this.el) this.el.pause(); this.el = new Audio(src); this.el.loop = true; this.el.volume = 0.4; this.el.preload = 'auto'; this.src = src; }
+    if (this.el.paused) this.el.play().catch(() => {});   // ha a böngésző még nem engedi, a következő koppintás elindítja
+  } };
+document.addEventListener('pointerdown', () => { try { Music.sync(); } catch (e) {} }, { capture: true, passive: true });
+document.addEventListener('visibilitychange', () => { try { Music.sync(); } catch (e) {} });
+{ const _sh = show; show = function (id) { _sh(id); try { Music.sync(); } catch (e) {} }; }
+$('#musicBtn').onclick = () => { Music.set(!Music.pref()); toast(Music.pref() ? '🔊 Zene bekapcsolva' : '🔇 Zene kikapcsolva'); };
 $('#goEvent').onclick = () => { if (needProfile()) return; renderEvent(); show('scr-event'); };
 
 // ---- oktató meccs: fix lapok, fix ellenfél-lépések, lépésről lépésre vezetve ----

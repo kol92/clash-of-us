@@ -1,8 +1,8 @@
 // Best of Us – service worker
 // A képek (art/) és a Firebase-könyvtárak a telefonon maradnak (gyors indulás, kevesebb adatforgalom);
 // a játék maga (index.html, version.json) mindig a netről jön, ha van net – így a frissítés azonnal megérkezik.
-const V = '2026.10.15-1335';
-const ASSETS = 'bou-assets-5c6e6602a7', PAGES = 'bou-pages-' + V;
+const V = '2026.10.15-1342';
+const ASSETS = 'bou-assets-0372e6a3c5', PAGES = 'bou-pages-' + V;
 self.addEventListener('install', e => { self.skipWaiting(); });
 self.addEventListener('activate', e => {
   e.waitUntil((async () => {
@@ -22,7 +22,7 @@ self.addEventListener('fetch', e => {
     return;   // Firebase-hívások: mindig élőben
   }
   if (url.pathname.endsWith('version.json')) return;   // mindig élőben
-  if (url.pathname.endsWith('.mp4')) return;   // videók: a böngésző kezeli (iPhone-on darabokban kéri le, a gyorsítótárból nem indulna el)
+  if (/\.(mp4|m4a|mp3)$/.test(url.pathname)) return;   // videók: a böngésző kezeli (iPhone-on darabokban kéri le, a gyorsítótárból nem indulna el)
   if (/\/(art|vendor|icons)\//.test(url.pathname)) { e.respondWith(cacheFirst(req, ASSETS)); return; }
   e.respondWith(networkFirst(req, PAGES));
 });
