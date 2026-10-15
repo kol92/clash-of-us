@@ -1529,7 +1529,7 @@ const EVENTS = [
     // a jutalmak: Tomi küldi (5 skin + 3 új lap); amíg nincs meg, „?” helykitöltő
     rewards: [
       { at: 10, port: 'p_gabi_hw' }, { at: 20, tbd: 'Új Halloween lap' }, { at: 30, back: 'halloween' }, { at: 40, port: 'p_david_hw' }, { at: 50, tbd: 'Új Halloween lap' },
-      { at: 60, port: 'p_bence_hw' }, { at: 75, port: 'p_tomi_hw' }, { at: 90, tbd: 'Új Halloween lap' }, { at: 100, tbd: 'Halloween skin' },
+      { at: 60, port: 'p_bence_hw' }, { at: 75, port: 'p_tomi_hw' }, { at: 90, tbd: 'Új Halloween lap' }, { at: 100, port: 'p_laci_hw' },
     ] },
 ];
 // a futó (vagy még átvehető) event; teszt módban a még el nem indult is látszik

@@ -2293,7 +2293,7 @@ body.pf-loading #scr-menu .pb-name::after{content:'';display:inline-block;width:
 <script src="vendor/firebase-auth-compat.js"></script>
 <script src="vendor/firebase-firestore-compat.js"></script>
 <script src="vendor/firebase-database-compat.js"></script>
-<script>window.APP_VERSION = "2026.10.15-1032"; window.APP_BUILD = "2026.10.15-1246";</script>
+<script>window.APP_VERSION = "2026.10.15-1032"; window.APP_BUILD = "2026.10.15-1300";</script>
 <script>// ===== Best of Us – saját szerver (Firebase) =====
 // A játék eredetileg a Claude-os tárolót használta (window.claude.use('db' | 'user' | 'room')).
 // Ez a fájl ugyanazt a felületet adja Firebase-ből, így a játék kódja szinte változatlan maradhat:
@@ -3662,6 +3662,7 @@ const ART = {
   p_gabi_hw:      { src:'art/p_gabi_hw.webp?v=d9b78a3dacbad942', av:'74% 25%', pos:'66% 26%', port:'74% 22%' },
   p_david_hw:     { src:'art/p_david_hw.webp?v=646142ae7239cc9b', av:'38% 17%', pos:'40% 18%', port:'38% 15%' },
   p_tomi_hw:      { src:'art/p_tomi_hw.webp?v=27bdc69fbb97bdd6', av:'52% 19%', pos:'52% 20%', port:'52% 17%' },
+  p_laci_hw:      { src:'art/p_laci_hw.webp?v=527c7a858048bb7b', av:'72% 25%', pos:'66% 24%', port:'72% 22%' },
   c_nyitinap:     { src:'art/nyitinap.webp?v=cdbcc561b41ba1d1', av:'72% 34%', pos:'66% 36%' },
   g_barna: { src:'art/g_barna.webp?v=2687c5a371343d73', av:'64% 20%', pos:'62% 20%', port:'64% 16%' },
   g_laci:  { src:'art/g_laci.webp?v=a6809a5542dbbb5b',  av:'46% 20%', pos:'46% 20%', port:'46% 16%' },
@@ -3815,7 +3816,8 @@ const PORTRAITS = {
   p_bence_hw:     { hero: 'bence', name: 'Bence, a rémkonyha ura', passOnly: true, ev: 'hw26' },
   p_gabi_hw:      { hero: 'gabi',  name: 'Gabi, a szemgolyós koktél', passOnly: true, ev: 'hw26' },
   p_david_hw:     { hero: 'david', name: 'Dávid, a rémbolt előtt', passOnly: true, ev: 'hw26' },
-  p_tomi_hw:      { hero: 'tomi',  name: 'Tomi, a holdfény fotósa', passOnly: true, ev: 'hw26' },   // event: a heti ládából is jöhet   // ajándék: Best of Us TCG nap (2026-10-12)
+  p_tomi_hw:      { hero: 'tomi',  name: 'Tomi, a holdfény fotósa', passOnly: true, ev: 'hw26' },
+  p_laci_hw:      { hero: 'laci',  name: 'Laci, az éjféli úriember', passOnly: true, ev: 'hw26' },   // event: a heti ládából is jöhet   // ajándék: Best of Us TCG nap (2026-10-12)
 };
 const isPort = v => !!(v && PORTRAITS[v] && ART[v]);
 function heroCardHTML(h, o = {}) {
@@ -6764,7 +6766,7 @@ const EVENTS = [
     // a jutalmak: Tomi küldi (5 skin + 3 új lap); amíg nincs meg, „?” helykitöltő
     rewards: [
       { at: 10, port: 'p_gabi_hw' }, { at: 20, tbd: 'Új Halloween lap' }, { at: 30, back: 'halloween' }, { at: 40, port: 'p_david_hw' }, { at: 50, tbd: 'Új Halloween lap' },
-      { at: 60, port: 'p_bence_hw' }, { at: 75, port: 'p_tomi_hw' }, { at: 90, tbd: 'Új Halloween lap' }, { at: 100, tbd: 'Halloween skin' },
+      { at: 60, port: 'p_bence_hw' }, { at: 75, port: 'p_tomi_hw' }, { at: 90, tbd: 'Új Halloween lap' }, { at: 100, port: 'p_laci_hw' },
     ] },
 ];
 // a futó (vagy még átvehető) event; teszt módban a még el nem indult is látszik
