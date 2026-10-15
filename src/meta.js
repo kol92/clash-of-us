@@ -1664,18 +1664,29 @@ function renderEvent() {
   renderEventTile();
 }
 // ---- event-zene (2026-10-15): csak a menükben szól, meccs közben nem; az első koppintás indítja (iPhone) ----
-const Music = { el: null, src: null,
+const Music = { el: null, src: null, ctx: null, gain: null,
+  VOL: { menu: 1, game: 0.45 },   // meccs közben halkabban (Tomi, 2026-10-15)
   pref() { try { return localStorage.getItem('bou_music') !== '0'; } catch { return true; } },
   set(v) { try { localStorage.setItem('bou_music', v ? '1' : '0'); } catch {} this.sync(); },
   want() { const e = curEvent(); return e && e.music && evMood(e) ? e.music : null; },
   sync() {
     const src = this.want(), btn = $('#musicBtn'), sep = $('#musicSep');
     if (btn) { btn.hidden = !src; btn.textContent = this.pref() ? '🔊 Zene' : '🔇 Zene'; } if (sep) sep.hidden = !src;
-    const inGame = document.body.classList.contains('in-game');
-    const on = src && this.pref() && !document.hidden && !inGame;
+    const on = src && this.pref() && !document.hidden;
     if (!on) { if (this.el && !this.el.paused) this.el.pause(); return; }
-    if (!this.el || this.src !== src) { if (this.el) this.el.pause(); this.el = new Audio(src); this.el.loop = true; this.el.volume = 1; /* a hangerő a fájlba van „sütve” (iPhone-on a volume nem állítható) */ this.el.preload = 'auto'; this.src = src; }
-    if (this.el.paused) this.el.play().catch(() => {});   // ha a böngésző még nem engedi, a következő koppintás elindítja
+    if (!this.el || this.src !== src) {
+      if (this.el) this.el.pause();
+      this.el = new Audio(src); this.el.loop = true; this.el.preload = 'auto'; this.src = src;
+      /* iPhone-on az <audio> hangereje kódból nem állítható, ezért Web Audio erősítőn (GainNode) át megy */
+      try { const AC = window.AudioContext || window.webkitAudioContext;
+        if (AC) { this.ctx = this.ctx || new AC(); const n = this.ctx.createMediaElementSource(this.el); this.gain = this.ctx.createGain(); n.connect(this.gain); this.gain.connect(this.ctx.destination); }
+      } catch (e) { this.gain = null; }
+    }
+    const vol = document.body.classList.contains('in-game') ? this.VOL.game : this.VOL.menu;
+    if (this.gain && this.ctx) { try { this.gain.gain.setTargetAtTime(vol, this.ctx.currentTime, 0.35); } catch (e) { this.gain.gain.value = vol; }
+      if (this.ctx.state !== 'running') this.ctx.resume().catch(() => {}); }
+    else this.el.volume = vol;
+    if (this.el.paused) this.el.play().catch(() => {});   /* ha a böngésző még nem engedi, a következő koppintás elindítja */
   } };
 document.addEventListener('pointerdown', () => { try { Music.sync(); } catch (e) {} }, { capture: true, passive: true });
 document.addEventListener('visibilitychange', () => { try { Music.sync(); } catch (e) {} });
