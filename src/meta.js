@@ -1528,7 +1528,7 @@ const EVENTS = [
     ],
     // a jutalmak: Tomi küldi (5 skin + 3 új lap); amíg nincs meg, „?” helykitöltő
     rewards: [
-      { at: 10, port: 'p_gabi_hw' }, { at: 20, card: 'a_polaroid', foil: true }, { at: 30, back: 'halloween' }, { at: 40, port: 'p_david_hw' }, { at: 50, tbd: 'Új Halloween lap' },
+      { at: 10, port: 'p_gabi_hw' }, { at: 20, card: 'a_polaroid', foil: true }, { at: 30, back: 'halloween' }, { at: 40, port: 'p_david_hw' }, { at: 50, card: 'a_alarc', foil: true },
       { at: 60, port: 'p_bence_hw' }, { at: 75, port: 'p_tomi_hw' }, { at: 90, card: 'a_hwparty', foil: true }, { at: 100, port: 'p_laci_hw' },
     ] },
 ];

@@ -30,3 +30,15 @@ let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('HIBA:', m)
   ok(!p.board[0] && !p.board[2], 'üres sávba nem kerül semmi');
 }
 console.log(fails ? 'HIBÁK: ' + fails : 'HALLOWEEN OK');
+{ // Álarcos bál: kézcsere, a Kánon esemény marad
+  const E2 = E; let f2 = 0; const ok2 = (c, m) => { if (!c) { f2++; console.log('HIBA:', m); } else console.log('ok  ', m); };
+  const s = E2.newGame('bence', E2.DECK_OF('bence'), 'gabi', E2.DECK_OF('gabi'), 0); s.active = 0;
+  const p = s.players[0], o = s.players[1]; p.energy = p.maxEnergy = 6;
+  const fin = E2.CARDS.find(c => c.finisher && c.hero === 'bence') || E2.CARDS.find(c => c.finisher);
+  p.hand = [{ uid: 1, id: 'c_pifti' }, { uid: 2, id: fin.id }, { uid: 3, id: 'a_alarc' }];
+  o.hand = [{ uid: 11, id: 'c_tzs' }, { uid: 12, id: 'c_vera' }, { uid: 13, id: 'a_cheddar' }, { uid: 14, id: 'c_rebi' }];
+  E2.playCard(s, 0, 2, { k: 'none' });
+  ok2(p.hand.length === 5 && p.hand.some(c => c.id === fin.id) && p.hand.some(c => c.id === 'c_rebi'), `nálam: a Kánon + az ellenfél 4 lapja (${p.hand.map(c => c.id)})`);
+  ok2(o.hand.length === 1 && o.hand[0].id === 'c_pifti', 'az ellenfélnél: az én 1 maradék lapom');
+  if (f2) console.log('HIBÁK: ' + f2);
+}

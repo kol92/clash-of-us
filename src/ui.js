@@ -246,6 +246,7 @@ const ART = {
   a_haver: { src:'art/haver.webp', pos:'50% 22%' },
   a_moshpit: { src:'art/moshpit.webp', pos:'50% 42%' },
   a_polaroid: { src:'art/polaroid.webp', pos:'48% 34%' },
+  a_alarc: { src:'art/alarc.webp', pos:'50% 34%' },
   a_hwparty: { src:'art/hwparty.webp', pos:'50% 34%' },
   c_miloivo: { src:'art/miloivo.webp', pos:'62% 18%' },
   c_laczko: { src:'art/laczko.webp', pos:'55% 25%' },
@@ -651,6 +652,7 @@ function logEvents(evs, snap) {
       case 'lock': L(`🔒 ${e.side === ME ? 'Le vagy bénítva' : 'Az ellenfél le van bénítva'}: a következő körben nem játszhat ki lapot`); break;
       case 'locgone': L(`🚫 Kitiltva: ${CARD[e.id].name}`); break;
       case 'locreplaced': L(`🏚 ${who(e.side)} Munkahelye eltűnt (${e.how === 'banned' ? 'kitiltották' : 'új helyszín váltotta'}) – cserébe 5 életet gyógyul`); break;
+      case 'handswap': L(`🎭 Álarcos bál: ${e.side === ME ? `kicserélted a kezed az ellenfélével – kaptál ${e.got} lapot, ő ${e.gave}-t` : `az ellenfél kicserélte a kezét a tiéddel – kaptál ${e.gave} lapot, ő ${e.got}-t`}`); break;
       case 'polaroid': L(`📸 Polaroid emlékek: ${e.n ? `${e.n} lap visszakeveredett ${e.side === ME ? 'a paklidba' : 'az ellenfél paklijába'} a temetőből` : 'a temető üres volt, nem keveredett vissza semmi'}`); break;
       case 'hwparty': { const ln = id => `<b class="lc" data-lc="${id}">${escH(CARD[id].name)}</b>`;
         L(`🎃 Tomi Halloweeni bulija: ${e.ch.length ? 'minden karakter kicserélődött – ' + e.ch.map(c => `${ln(c.from)} → ${ln(c.id)} (${c.side === ME ? 'nálad' : 'ellenfél'})`).join(', ') : 'nem volt karakter a pályán'}`); break; }
@@ -831,6 +833,7 @@ async function animateEvents(evs) {
       case 'push': floatAt(anchor, 'Arrébb tolva!', 'info'); hold = Math.max(hold, 300); break;
       case 'stolen': fx(el, e.side === ME ? 'fx-bounce-up' : 'fx-bounce-down'); floatAt(anchor, '🫳 Ellopták!', 'dmg'); hold = Math.max(hold, 650); break;
       case 'steal': floatAt(anchor, `🫳 ${CARD[e.id].name} átállt!`, 'buff'); hold = Math.max(hold, 700); break;
+      case 'handswap': fx($('#app'), 'fx-quake'); floatAt(anchor, '🎭 Álarcos bál! Kézcsere!', 'info'); hold = Math.max(hold, 1000); break;
       case 'polaroid': floatAt(anchor, `📸 ${e.n} lap vissza a pakliba`, 'buff'); hold = Math.max(hold, 800); break;
       case 'hwparty': fx($('#app'), 'fx-quake'); floatAt(anchor, '🎃 Halloweeni buli! Mindenki átváltozik!', 'info'); hold = Math.max(hold, 900); break;
       case 'mosh': fx($('#app'), 'fx-quake'); floatAt(anchor, '🤘 Mosh Pit! Mindenki arrébb, −1', 'dmg'); hold = Math.max(hold, 600); break;

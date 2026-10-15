@@ -74,6 +74,7 @@ const CARDS = [
   // Halloween event lapok (2026-10-15) – csak az eventből szerezhetők (eventOnly)
   { id:'a_polaroid', type:'action', name:'Polaroid emlékek', cost:6, tgt:'none', rarity:'e', eventOnly:true, text:'Keverd vissza a temetődben lévő lapjaid felét a paklidba.' },
   { id:'a_hwparty', type:'action', name:'Tomi Halloweeni bulija', cost:5, tgt:'none', rarity:'l', eventOnly:true, text:'Minden karakter (mindkét oldalon) kicserélődik egy véletlen karakterre.' },
+  { id:'a_alarc', type:'action', name:'Álarcos bál', cost:3, tgt:'none', rarity:'e', eventOnly:true, text:'Te és az ellenfeled kicserélitek a kezetekben lévő lapokat. A Kánon eseményeket mindenki megtartja.' },
   { id:'a_moshpit', type:'action', name:'Mosh Pit', cost:3, tgt:'none', rarity:'e', dmg:1, text:'Az ellenfél összes karaktere egy sávval jobbra csúszik (a jobb szélső a bal szélre kerül), majd mindegyik 1 sebzést kap.' },
   { id:'a_delfin', type:'action', name:'Delfin póz', cost:1, tgt:'none', rarity:'k', text:'A hősöd 2 sebzést kap, és húzol 2 lapot.' },
   { id:'a_rehab', drink:true, type:'action', name:'Rehab', cost:3, tgt:'ownOrHero', rarity:'k', text:'Egy saját karaktered 3 életet gyógyul, és megszűnik a bénulása. A hősödre is kijátszhatod (3 élet).' },
@@ -477,6 +478,12 @@ function playCard(s, pi, hi, t) {
         if (CARD.a_moshpit.dmg) for (let j = 0; j < LANES; j++) if (e.board[j]) damageUnit(s, ei, j, CARD.a_moshpit.dmg); }
         if (CARD.a_moshpit.draw) draw(s, pi); break;
       case 'a_cheddar': draw(s, pi); draw(s, pi); break;
+      case 'a_alarc': {   // kézcsere; a Kánon esemény (hősfüggő) a gazdájánál marad; ami a kézlimit fölé kerül, elég
+        const fin = c => CARD[c.id].finisher, mine = p.hand.filter(c => !fin(c)), theirs = e.hand.filter(c => !fin(c));
+        p.hand = [...p.hand.filter(fin), ...theirs]; e.hand = [...e.hand.filter(fin), ...mine];
+        ev(s, { t:'handswap', side:pi, i:-1, got:theirs.length, gave:mine.length });
+        for (const [k, P] of [[pi, p], [ei, e]]) while (P.hand.length > HAND_LIMIT) { const x = P.hand.pop(); ev(s, { t:'burn', side:k, id:x.id }); bury(s, k, x.id, 'burn', !!x.foil); }
+        break; }
       case 'a_polaroid': {   // a temető felét (felfelé kerekítve, véletlenszerűen) visszakeveri a pakliba; tokenek nem mennek vissza
         const idx = p.grave.map((g, k) => k).filter(k => CARD[p.grave[k].id] && !CARD[p.grave[k].id].token);
         const n = Math.ceil(idx.length / 2), pick = [];
