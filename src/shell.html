@@ -875,6 +875,9 @@ h1,h2,h3{font-family:var(--display);font-weight:400;letter-spacing:.01em;text-wr
 .m-logo img{width:100%;height:auto;display:block;
   -webkit-mask:linear-gradient(180deg,#000 72%,transparent 100%),linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent);-webkit-mask-composite:source-in;
   mask:linear-gradient(180deg,#000 72%,transparent 100%) intersect,linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent);}
+/* Halloween event alatt: Astra háttere a főmenüben és az event-képernyőn (2026-10-15) */
+body.ev-hw #scr-menu,body.ev-hw #scr-event{background:linear-gradient(180deg,rgba(8,4,16,.15),rgba(8,4,16,.35) 40%,rgba(8,4,16,.25)),url('art/ui/ev-hw-bg.webp') center top/cover no-repeat #0b0614;}
+body.ev-hw #scr-menu .fan{filter:drop-shadow(0 0 22px rgba(255,140,40,.35));}
 #scr-menu .fan{height:196px;margin-top:0;filter:drop-shadow(0 0 22px rgba(90,180,255,.35));}
 #scr-menu .fan .card{--cw:124px;margin:0 -12px;}
 .orn{position:relative;border:1.5px solid var(--gl);border-radius:12px;background:linear-gradient(180deg,rgba(9,30,46,.94),rgba(4,16,27,.94));

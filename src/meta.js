@@ -1576,6 +1576,7 @@ function evClaimable(p, e) { const st = p.evs?.[e.id]; if (!st) return 0; return
 function renderEventTile() {
   const t = $('#goEvent'); if (!t) return;
   const p = Store.p, e = curEvent();
+  document.body.classList.toggle('ev-hw', !!(e && evLive(e) && e.theme === 'hw'));   // eseményes menü-háttér
   t.hidden = !p || !e || p.onboard; if (t.hidden) return;
   const st = ensureEv(p), c = evClaimable(p, e), now = new Date();
   t.dataset.theme = e.theme || ''; t.setAttribute('aria-label', `${e.name} event – ${st.pts}/${e.goal} pont`);
@@ -1604,6 +1605,7 @@ function evClaim(i) {
   if (got) evShowGot(got, e); else toast(`+${rewLabel(r)}`);
 }
 // jutalom megtekintése (a lap mit tud, a skin hogy néz ki)
+const huDay = d => `${['jan.', 'febr.', 'márc.', 'ápr.', 'máj.', 'jún.', 'júl.', 'aug.', 'szept.', 'okt.', 'nov.', 'dec.'][d.getMonth()]} ${d.getDate()}`;
 function evPreview(r, reached) {
   if (!r || r.tbd) return toast('Hamarosan kiderül…');
   const when = `${reached ? 'Elérted' : 'Megszerezheted'}: ${r.at} tökpont`;
@@ -1638,7 +1640,7 @@ function renderEvent() {
   body.dataset.theme = e.theme || ''; $('#scr-event h2').textContent = `${e.name} event`;
   body.innerHTML = `
     <div class="ev-head">
-      <div class="ev-ban"><img src="${e.img.banner}" alt="${e.name}"><div class="ev-when">${now < e.start || e.draft ? 'Teszt mód<br><small>a játékosok még nem látják</small>' : live ? `Még ${d ? `${d} nap ${h} óra` : `${h} óra`}<br><small>${e.end.getMonth() + 1}. ${new Date(e.end - 1).getDate()}-ig tart</small>` : `Véget ért<br><small>a jutalmak ${e.claimUntil.getMonth() + 1}. ${new Date(e.claimUntil - 1).getDate()}-ig átvehetők</small>`}</div></div>
+      <div class="ev-ban"><img src="${e.img.banner}" alt="${e.name}"><div class="ev-when">${now < e.start || e.draft ? 'Teszt mód<br><small>a játékosok még nem látják</small>' : live ? `Még ${d ? `${d} nap ${h} óra` : `${h} óra`}<br><small>${huDay(new Date(e.end - 1))}-ig tart</small>` : `Véget ért<br><small>a jutalmak ${huDay(new Date(e.claimUntil - 1))}-ig átvehetők</small>`}</div></div>
       <p class="ev-sub">${e.sub}</p>
       <div class="ev-score"><img src="${e.img.pt}" alt="" aria-hidden="true"><span class="ev-num">${st.pts}</span><small>/ ${e.goal} ${e.pts}</small></div>
       <div class="ev-track"><div class="ev-in"><div class="ev-fill" style="clip-path:inset(0 ${100 - pct}% 0 0 round 999px)"></div>${marks}</div></div>
