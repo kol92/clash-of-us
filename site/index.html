@@ -1136,6 +1136,8 @@ h1,h2,h3{font-family:var(--display);font-weight:400;letter-spacing:.01em;text-wr
 .ev-row .ev-at b{color:#ffb347;font-size:14px;}
 .ev-row.ready .ev-at,.ev-row.claimed .ev-at{background:linear-gradient(180deg,#ffd27a,#e2650a);}
 .ev-row.ready .ev-at b,.ev-row.claimed .ev-at b{color:#2a0e00;}
+.ev-row{cursor:pointer;}
+.ev-row:active{transform:scale(.99);}
 .ev-row.big{border-color:rgba(255,154,46,.5);background:linear-gradient(160deg,#2a1238,#151028 70%);}
 .ev-myst{display:block;width:42px;height:58px;background:url('art/ui/ev-hw-myst.webp?v=5cea4294') center/contain no-repeat;}
 .ev-back{display:block;width:40px;height:54px;border-radius:5px;background:center/cover no-repeat;border:1px solid #ffb347;box-shadow:0 0 12px rgba(255,140,30,.55);}
@@ -2293,7 +2295,7 @@ body.pf-loading #scr-menu .pb-name::after{content:'';display:inline-block;width:
 <script src="vendor/firebase-auth-compat.js"></script>
 <script src="vendor/firebase-firestore-compat.js"></script>
 <script src="vendor/firebase-database-compat.js"></script>
-<script>window.APP_VERSION = "2026.10.15-1320"; window.APP_BUILD = "2026.10.15-1326";</script>
+<script>window.APP_VERSION = "2026.10.15-1328"; window.APP_BUILD = "2026.10.15-1328";</script>
 <script>// ===== Best of Us – saját szerver (Firebase) =====
 // A játék eredetileg a Claude-os tárolót használta (window.claude.use('db' | 'user' | 'room')).
 // Ez a fájl ugyanazt a felületet adja Firebase-ből, így a játék kódja szinte változatlan maradhat:
@@ -6787,8 +6789,8 @@ $('#goPass').onclick = () => { if (needProfile()) return; renderPass(); show('sc
 try { const q = new URLSearchParams(location.search); if (q.has('ev')) { localStorage.setItem('bou_evtest', q.get('ev') === 'off' ? '' : '1'); history.replaceState(null, '', location.pathname + location.hash); } } catch (e) {}
 const evTest = () => { try { return localStorage.getItem('bou_evtest') === '1'; } catch { return false; } };
 const EVENTS = [
-  // draft: true → még csak teszt módban látszik (?ev=test); élesítéskor töröld
-  { id: 'hw26', draft: true, name: 'Halloween', icon: '🎃', theme: 'hw', img: { btn: 'art/ui/ev-hw-btn.webp?v=064d679b', banner: 'art/ui/ev-hw-banner.webp?v=9e08ed2d', pt: 'art/ui/ev-pumpkin.webp?v=c392824b' }, start: new Date(2026, 9, 16, 0, 0), end: new Date(2026, 10, 3, 0, 0), claimUntil: new Date(2026, 10, 10, 0, 0), goal: 100,
+  // draft: true → csak teszt módban látszik (?ev=test). Élesítve: 2026-10-15 19:00 (Tomi)
+  { id: 'hw26', name: 'Halloween', icon: '🎃', theme: 'hw', img: { btn: 'art/ui/ev-hw-btn.webp?v=064d679b', banner: 'art/ui/ev-hw-banner.webp?v=9e08ed2d', pt: 'art/ui/ev-pumpkin.webp?v=c392824b' }, start: new Date(2026, 9, 15, 19, 0), end: new Date(2026, 10, 3, 0, 0), claimUntil: new Date(2026, 10, 10, 0, 0), goal: 100,
     sub: 'Gyűjts tökpontokat, és vidd haza a Halloween skineket és lapokat!',
     pts: 'tökpont',
     daily: [
@@ -6880,6 +6882,16 @@ function evClaim(i) {
   const got = evGrant(p, r); st.claimed.push(i); save(); renderEvent(); renderProfileBar();
   if (got) evShowGot(got, e); else toast(`+${rewLabel(r)}`);
 }
+// jutalom megtekintése (a lap mit tud, a skin hogy néz ki)
+function evPreview(r, reached) {
+  if (!r || r.tbd) return toast('Hamarosan kiderül…');
+  const when = `${reached ? 'Elérted' : 'Megszerezheted'}: ${r.at} tökpont`;
+  if (r.card) return openModal(cardHTML(r.card, { big: true, foil: r.foil }), `${when} · ${r.foil ? 'Full Art, ' : ''}${CARD[r.card].rarity === 'l' ? '1 példány' : '2 példány'}`, cardHelpHTML(r.card));
+  if (r.port) { const P = PORTRAITS[r.port]; return openModal(heroCardHTML(HERO[P.hero], { big: true, port: r.port }), `${P.name} – ${HERO[P.hero].name} Halloween skinje, mindig Full Art · ${when}`, ''); }
+  if (r.back) { const b = BACKS[r.back], o = document.createElement('div'); o.className = 'overlay';
+    o.innerHTML = `<div class="modal acct-box"><h3>${b.name} hátlap</h3><img src="${b.src}" alt="${b.name} hátlap" style="width:min(60vw,240px);border-radius:12px;display:block;margin:6px auto 10px;box-shadow:0 0 24px rgba(255,140,30,.5)"><p class="live">A pakli hátoldala – az ellenfeleid is ezt látják. ${when}.</p><button class="btn primary" data-x>Rendben</button></div>`;
+    o.onclick = ev => { if (ev.target.closest('[data-x]') || ev.target === o) o.remove(); }; $('#layer').appendChild(o); return; }
+}
 function evRewLabel(r) { if (r.tbd) return r.tbd; if (r.back) return `${BACKS[r.back].name} hátlap`; if (r.port) return PORTRAITS[r.port].name; if (r.card) return CARD[r.card].name; return rewLabel(r); }
 function evRewIcon(r) {
   if (r.tbd) return '<span class="ev-myst" aria-hidden="true"></span>';
@@ -6899,7 +6911,7 @@ function renderEvent() {
       <div class="q-rew">${q.done ? '<span class="q-ok">✓</span>' : `<em class="ev-pts">+${d.pts}<img src="${e.img.pt}" alt="tökpont"></em>`}</div></div>`; };
   const mid = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1), hl = Math.floor((mid - now) / 36e5), ml = Math.floor((mid - now) % 36e5 / 6e4);
   const rrow = (r, i) => { const stt = st.claimed.includes(i) ? 'claimed' : st.pts >= r.at && !r.tbd ? 'ready' : 'locked';
-    return `<div class="sp-row ev-row big ${stt}"><div class="sp-lv ev-at"><b>${r.at}</b></div><div class="sp-ic">${evRewIcon(r)}</div>
+    return `<div class="sp-row ev-row big ${stt}" data-ev="${i}" role="button" tabindex="0" aria-label="${escH(evRewLabel(r))} – megnézem"><div class="sp-lv ev-at"><b>${r.at}</b></div><div class="sp-ic">${evRewIcon(r)}</div>
       <div class="sp-name"><b>${evRewLabel(r)}</b><small>${r.tbd ? 'Hamarosan kiderül…' : r.back ? 'Csak ebből az eventből · az ellenfeleid is látják' : r.port ? `${HERO[PORTRAITS[r.port].hero].name} skin · csak ebből az eventből` : r.card ? `Új lap · ${RAR[CARD[r.card].rarity]} · csak ebből az eventből` : ''}</small></div>
       <div class="sp-act">${stt === 'claimed' ? '<span class="q-ok">✓</span>' : stt === 'ready' ? `<button class="btn primary sp-claim" data-ec="${i}">Átvesz</button>` : '<span class="sp-lock" aria-label="Zárolva">🔒</span>'}</div></div>`; };
   body.dataset.theme = e.theme || ''; $('#scr-event h2').textContent = `${e.name} event`;
@@ -6915,10 +6927,11 @@ function renderEvent() {
     ${e.daily.map(d => qrow(d, st.daily[d.id])).join('')}
     <div class="lbl">Event-kihívások <small>· egyszer teljesíthetők</small></div>
     ${e.quests.map(d => qrow(d, st.q[d.id])).join('')}
-    <div class="lbl">Jutalmak</div>
+    <div class="lbl">Jutalmak <small>· koppints rájuk a részletekhez</small></div>
     <div class="sp-list ev-list">${e.rewards.map(rrow).join('')}</div>
     <p class="q-note">A ${e.pts} meccs végén számít (bot, ranked és PvP meccsen is). ${e.goal} ponttal minden jutalom a tiéd. Ha az event végéig valamit nem veszel át, az még egy hétig itt vár, utána magától jóváíródik.</p>`;
   body.onclick = ev => { const b = ev.target.closest('[data-ec]'); if (b) return evClaim(+b.dataset.ec);
+    const rv = ev.target.closest('[data-ev]'); if (rv) return evPreview(e.rewards[+rv.dataset.ev], st.pts >= e.rewards[+rv.dataset.ev].at);
     if (ev.target.closest('#evAll')) { e.rewards.forEach((r, i) => { if (st.pts >= r.at && !st.claimed.includes(i) && !r.tbd) { evGrant(p, r); st.claimed.push(i); } }); save(); renderEvent(); renderProfileBar(); renderMenuFan(); toast('Jutalmak átvéve'); } };
   renderEventTile();
 }

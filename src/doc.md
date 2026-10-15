@@ -440,7 +440,7 @@ Hősképesség-ötletek a táblázatban (még nem zöldek, nincsenek beépítve)
 ## Eventek – első: Halloween (keret: 2026-10-15, élesítés: a skinek és lapok megérkezése után)
 - **Keret (`EVENTS` a meta.js-ben):** minden event = kezdet/vég + pontcsík (`goal`, most 100) + napi event-küldetések + egyszeri event-kihívások + jutalmak pontküszöbökön. A pontot meccs végén számolja (bot, ranked, PvP): `eventOnMatch()`. Állapot: `p.evs[id]` (`pts`, napi és egyszeri haladás, `claimed`).
 - **Főmenü:** saját narancs-lila „🎃 Halloween event” gomb a Ranked alatt, pontszámmal (pl. 37/100), zöldül, ha van átvehető jutalom. Képernyő: fejléc visszaszámlálóval, nagy pontszám, csík a jutalom-jelölőkkel, napi küldetések, kihívások, jutalomlista „Átvesz” gombbal (+ „Mind átveszem”). A meccs végi ablak is mutatja: „🎃 +10 tökpont · 47/100”.
-- **Halloween (hw26), tervezet:** 2026-10-16 – 11-02 (vége 11-03 0:00), jutalmak átvehetők 11-09-ig, utána ami elérve, de átvétlen, magától jóváíródik.
+- **Halloween (hw26): indul 2026-10-15 19:00** (Tomi), tart 11-02-ig (vége 11-03 0:00), jutalmak átvehetők 11-09-ig, utána ami elérve, de átvétlen, magától jóváíródik.
   - Napi (minden nap újra, 3 × 5 pont): Játssz le 2 meccset · Nyerj 1 meccset · Pusztíts el 5 ellenséges karaktert.
   - Egyszeri kihívások (40 pont): Nyerj 5 meccset (10) · Nyerj a Nehéz bot ellen / rankedben Aranytól (10) · Nyerj 2 ranked meccset (5) · Játssz egy PvP meccset (5) · Okozz összesen 100 sebzést az ellenfél hősének (10).
   - 100 pont kb. 4 aktív nap (napi 15 + kihívások), lazábban ~1 hét.
@@ -453,6 +453,7 @@ Hősképesség-ötletek a táblázatban (még nem zöldek, nincsenek beépítve)
   - **Jutalmak sorrendje (2026-10-15, Tomi: a lapok legyenek hamar meg, mert befolyásolják a játékot):** 10 Álarcos bál · 20 Polaroid emlékek · 30 Tomi Halloweeni bulija · 40 Halloween hátlap · 50 Gabi skin · 60 Dávid skin · 75 Bence skin · 90 Tomi skin · 100 Laci skin. (Napi 15 pont + kihívások → a 3 lap 1–2 nap alatt megvan.)
   - Korábbi terv: 10 skin · 20 új lap · **30 Halloween hátlap** (`BACKS.halloween`, megkapáskor rögtön ezt használja) · 40 skin · 50 új lap · 60 skin · 75 skin · 90 új lap · 100 skin. A skinek és lapok helyén „?” kártya, amíg Tomi küldi őket.
 - **Grafika (Astra, 2026-10-15):** menügomb (art/ui/ev-hw-btn.webp, a jobb oldali körben a pontszám, felette címke: hátralévő idő / „N jutalom vár!”), fejléc-banner (ev-hw-banner.webp, alatta a visszaszámláló), tökpont ikon (ev-pumpkin.webp), csík-keret és narancs töltés (ev-hw-bar.webp, ev-hw-fill.webp – a töltés `clip-path`-szal vágva, így a lekerekítés nem torzul), „?” rejtett jutalom (ev-hw-myst.webp), Halloween hátlap (back_halloween.webp + sm).
+- **Jutalmak megtekintése:** a jutalomlistában bármelyik sorra koppintva megnyílik a lap (hatással), a skin (hőskártyán) vagy a hátlap (`evPreview`).
 - **Tesztelés élesítés előtt:** az event `draft: true` – csak az a telefon látja, ahol egyszer megnyitották a …/?ev=test linket (kikapcsolás: ?ev=off). Élesítés: a `draft` törlése.
 - **Event-lapok:** `eventOnly: true` – nincs packban, nem cserélhető, a paklisegéd Mester-paklijába sem kerül; a gyűjteményben „csak eventből szerezhető”. Jutalomként alapból 2 példány jár (legendásból 1).
 
