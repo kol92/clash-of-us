@@ -1583,7 +1583,7 @@ function renderEventTile() {
   const tag = $('#evSub');
   tag.textContent = now < e.start || e.draft ? 'Teszt mód' : now >= e.end ? (c ? 'Vedd át a jutalmakat!' : 'Véget ért') : c ? `${c} jutalom vár!` : `Még ${d ? `${d} nap` : `${h} óra`}`;
   tag.classList.toggle('hot', c > 0);
-  $('#evBadge').innerHTML = `${st.pts}<small>/${e.goal}</small>`; $('#evBadge').classList.toggle('hot', c > 0);
+  $('#evBadge').innerHTML = `<span>${st.pts}<small>/${e.goal}</small></span>`; $('#evBadge').classList.toggle('hot', c > 0);
 }
 function evShowGot(got, e) {
   if (!got) return;
