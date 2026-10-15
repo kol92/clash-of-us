@@ -1670,7 +1670,7 @@ const Music = { el: null, src: null,
     const inGame = document.body.classList.contains('in-game');
     const on = src && this.pref() && !document.hidden && !inGame;
     if (!on) { if (this.el && !this.el.paused) this.el.pause(); return; }
-    if (!this.el || this.src !== src) { if (this.el) this.el.pause(); this.el = new Audio(src); this.el.loop = true; this.el.volume = 0.4; this.el.preload = 'auto'; this.src = src; }
+    if (!this.el || this.src !== src) { if (this.el) this.el.pause(); this.el = new Audio(src); this.el.loop = true; this.el.volume = 1;   // a hangerő a fájlba van „sütve” (iPhone-on a volume nem állítható) this.el.preload = 'auto'; this.src = src; }
     if (this.el.paused) this.el.play().catch(() => {});   // ha a böngésző még nem engedi, a következő koppintás elindítja
   } };
 document.addEventListener('pointerdown', () => { try { Music.sync(); } catch (e) {} }, { capture: true, passive: true });
