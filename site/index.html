@@ -2293,7 +2293,7 @@ body.pf-loading #scr-menu .pb-name::after{content:'';display:inline-block;width:
 <script src="vendor/firebase-auth-compat.js"></script>
 <script src="vendor/firebase-firestore-compat.js"></script>
 <script src="vendor/firebase-database-compat.js"></script>
-<script>window.APP_VERSION = "2026.10.15-1320"; window.APP_BUILD = "2026.10.15-1320";</script>
+<script>window.APP_VERSION = "2026.10.15-1320"; window.APP_BUILD = "2026.10.15-1324";</script>
 <script>// ===== Best of Us – saját szerver (Firebase) =====
 // A játék eredetileg a Claude-os tárolót használta (window.claude.use('db' | 'user' | 'room')).
 // Ez a fájl ugyanazt a felületet adja Firebase-ből, így a játék kódja szinte változatlan maradhat:
@@ -6805,8 +6805,9 @@ const EVENTS = [
     ],
     // a jutalmak: Tomi küldi (5 skin + 3 új lap); amíg nincs meg, „?” helykitöltő
     rewards: [
-      { at: 10, port: 'p_gabi_hw' }, { at: 20, card: 'a_polaroid', foil: true }, { at: 30, back: 'halloween' }, { at: 40, port: 'p_david_hw' }, { at: 50, card: 'a_alarc', foil: true },
-      { at: 60, port: 'p_bence_hw' }, { at: 75, port: 'p_tomi_hw' }, { at: 90, card: 'a_hwparty', foil: true }, { at: 100, port: 'p_laci_hw' },
+      // a 3 új lap korán jár (befolyásolja a játékot), a skinek és a hátlap később (Tomi kérése, 2026-10-15)
+      { at: 10, card: 'a_alarc', foil: true }, { at: 20, card: 'a_polaroid', foil: true }, { at: 30, card: 'a_hwparty', foil: true }, { at: 40, back: 'halloween' }, { at: 50, port: 'p_gabi_hw' },
+      { at: 60, port: 'p_david_hw' }, { at: 75, port: 'p_bence_hw' }, { at: 90, port: 'p_tomi_hw' }, { at: 100, port: 'p_laci_hw' },
     ] },
 ];
 // a futó (vagy még átvehető) event; teszt módban a még el nem indult is látszik
