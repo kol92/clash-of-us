@@ -78,6 +78,7 @@ Csak build (kitétel nélkül): `cd src && python3 build-app.py ""` → `src/dis
 - A bot sosem cseréli le a saját Munkahelyét helyszínre.
 - Animált lapok: `ART[id].vid = 'art/vid/NEV.mp4'` (H.264 600×800, ~1 MB, `-crf 29 -movflags +faststart -an`); csak nagy lapnézetben fut, a service worker kihagyja az .mp4-et. Részletek: doc.md „Animált lapok”.
 - Heti láda (meta.js): `CHEST`, `weekKey()`, `chestWeeklyCheck()` (hétfő 0:01, `p.chests` / `p.chestWeek`), `chestRoll()` (10 lap: 1 epikus+, 1 Full Art, 0,5% portré a `price`/`event` portrékból), `openChest()` → `chestOpening()` → közös `cardReveal()` (a packnyitás is ezt használja).
+- Eventek (meta.js `EVENTS`): pontcsík + napi/egyszeri event-küldetések + jutalmak (`rewards: [{at, port|card|coins…}]`), `eventOnMatch()` a meccs végén, állapot `p.evs[id]`. `draft:true` = csak teszt módban látszik (`?ev=test` link, `?ev=off`). Event-lap: `eventOnly:true` (nincs packban, nem cserélhető).
 - Bot-szintek: `BOT_LV` (engine.js) 1 Könnyű / 2 Normál / 3 Nehéz; `S.botLv`, `botLvPref()` és `rkBotLv()` (meta.js). Mérés: `node tools/botlv.js A B N`.
 - Paklik: megosztás kóddal/linkkel (`deckCode` / `parseDeckCode` / `deckImportModal`, link: `?deck=KÓD`), paklisegéd 🪄 (`deckHelperFill`, a `[DECKHELP-START]` jelölők között – így Node-ból szimulálható).
 - Ranked 2. szezontól (`rkHard()`, a `s2` vége, 2026-11-11 után): Aranyban nincs dupla csillag, Aranytól Mester bot (`BOT_LV[4]`, erős pakli + 6 élet). A következő szezon felvételekor ez magától él.

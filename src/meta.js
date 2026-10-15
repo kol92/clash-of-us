@@ -3,7 +3,7 @@ const ECON = { goldPlain: 0.005, goldShiny: 0.05, goldDupe: 100, heroFaChance: 0
                odds: [['l', 1.5], ['e', 6.5], ['r', 22], ['k', 70]] };
 // a „token” lapok (pl. Query) csak más lap hatására kerülnek játékba: nincsenek packban, gyűjteményben, pakliban
 const PLAYABLE = CARDS.filter(c => !c.token && !c.off);   // off: kánon esemény lap, amíg nincs hozzá grafika – sehol nem látszik
-const SETS = { base: { name: 'Base set', cards: PLAYABLE.filter(c => !c.variantOf && !c.passOnly).map(c => c.id) } };   // passOnly: csak a Season Passból
+const SETS = { base: { name: 'Base set', cards: PLAYABLE.filter(c => !c.variantOf && !c.passOnly && !c.eventOnly).map(c => c.id) } };   // passOnly: csak a Season Passból; eventOnly: csak eventből
 const VARIANT_CHANCE = 0.2;   // ha az alaplap jön, 1 az 5-höz eséllyel a ritkább változata lesz belőle
 const DECK_SIZE = 20;
 const maxCopies = id => CARD[id].rarity === 'l' ? 1 : 2;
@@ -327,7 +327,7 @@ function renderProfileBar() {
   const ss = $('#saveState'); if (ss) ss.textContent = window.APP_MODE ? '👤 Fiók' : Store.mode === 'cloud' ? '☁️ Felhőben mentve' : '📱 Ezen az eszközön mentve';
   el.querySelector('.pb-name').textContent = p.name;
   try { applyBack(); } catch (e) {}
-  renderQuestBadge(); renderPassBadge(); try { renderRankTile(); } catch (e) {} try { if (chestWeeklyCheck()) Store.p.chestNew = true; } catch (e) {} try { if (!$('#scr-menu').hidden) { dayGiftCheck(); backAwardCheck(); deckLinkCheck(); chestPopup(); } } catch (e) {}
+  renderQuestBadge(); renderPassBadge(); try { renderRankTile(); } catch (e) {} try { renderEventTile(); } catch (e) {} try { if (chestWeeklyCheck()) Store.p.chestNew = true; } catch (e) {} try { if (!$('#scr-menu').hidden) { dayGiftCheck(); backAwardCheck(); deckLinkCheck(); chestPopup(); } } catch (e) {}
   const wb = $('#wheelBadge'); if (wb) wb.hidden = !wheelReady();
   const badge = $('#shopBadge'); if (badge) badge.hidden = !freePackReady() && !(p.giftPacks > 0) && !(p.faPacks > 0) && !(p.shinyPacks > 0) && !(p.chests > 0);
 }
@@ -1503,6 +1503,141 @@ function renderPass() {
 }
 $('#goPass').onclick = () => { if (needProfile()) return; renderPass(); show('scr-pass'); };
 
+// ---- időszakos eventek (2026-10-15: első a Halloween) ----
+// Egy event = kezdet/vég + pontcsík (goal) + napi és egyszeri event-küldetések + jutalmak pontküszöbökön.
+// A jutalmakat kézzel kell átvenni („Átvesz”); a vége után még claimUntil-ig átvehetők, utána ami elérve, de átvétlen, magától jóváíródik.
+// Tesztelés élesítés előtt: …/?ev=test (csak az adott telefonon látszik), kikapcsolás: ?ev=off
+try { const q = new URLSearchParams(location.search); if (q.has('ev')) { localStorage.setItem('bou_evtest', q.get('ev') === 'off' ? '' : '1'); history.replaceState(null, '', location.pathname + location.hash); } } catch (e) {}
+const evTest = () => { try { return localStorage.getItem('bou_evtest') === '1'; } catch { return false; } };
+const EVENTS = [
+  // draft: true → még csak teszt módban látszik (?ev=test); élesítéskor töröld
+  { id: 'hw26', draft: true, name: 'Halloween', icon: '🎃', theme: 'hw', start: new Date(2026, 9, 16, 0, 0), end: new Date(2026, 10, 3, 0, 0), claimUntil: new Date(2026, 10, 10, 0, 0), goal: 100,
+    sub: 'Gyűjts tökpontokat, és vidd haza a Halloween skineket és lapokat!',
+    pts: 'tökpont',
+    daily: [
+      { id: 'd_play2', goal: 2, pts: 5, txt: 'Játssz le 2 meccset', f: m => 1 },
+      { id: 'd_win1',  goal: 1, pts: 5, txt: 'Nyerj 1 meccset', f: m => m.win ? 1 : 0 },
+      { id: 'd_kill5', goal: 5, pts: 5, txt: 'Pusztíts el 5 ellenséges karaktert', f: m => m.kills },
+    ],
+    quests: [
+      { id: 'q_win5', goal: 5,   pts: 10, txt: 'Nyerj 5 meccset', f: m => m.win ? 1 : 0 },
+      { id: 'q_hard', goal: 1,   pts: 10, txt: 'Nyerj a Nehéz bot ellen (rankedben Aranytól is számít)', f: m => m.win && (m.lv || 0) >= 3 ? 1 : 0 },
+      { id: 'q_rk2',  goal: 2,   pts: 5,  txt: 'Nyerj 2 ranked meccset', f: m => m.win && m.ranked ? 1 : 0 },
+      { id: 'q_pvp',  goal: 1,   pts: 5,  txt: 'Játssz egy PvP meccset egy barátod ellen', f: m => m.pvp ? 1 : 0 },
+      { id: 'q_dmg',  goal: 100, pts: 10, txt: 'Okozz összesen 100 sebzést az ellenfél hősének', f: m => m.heroDmg },
+    ],
+    // a jutalmak: Tomi küldi (5 skin + 3 új lap); amíg nincs meg, „?” helykitöltő
+    rewards: [
+      { at: 10, tbd: 'Halloween skin' }, { at: 20, tbd: 'Új Halloween lap' }, { at: 35, tbd: 'Halloween skin' }, { at: 50, tbd: 'Új Halloween lap' },
+      { at: 60, tbd: 'Halloween skin' }, { at: 75, tbd: 'Halloween skin' }, { at: 90, tbd: 'Új Halloween lap' }, { at: 100, tbd: 'Halloween skin' },
+    ] },
+];
+// a futó (vagy még átvehető) event; teszt módban a még el nem indult is látszik
+function curEvent(d = new Date()) {
+  return EVENTS.find(e => !e.draft && d >= e.start && d < (e.claimUntil || e.end)) || (evTest() ? EVENTS.find(e => d < (e.claimUntil || e.end)) : null) || null;
+}
+const evLive = (e, d = new Date()) => !!e && d < e.end && ((d >= e.start && !e.draft) || evTest());
+function ensureEv(p) {
+  const e = curEvent(); p.evs = p.evs || {};
+  // lejárt eventek elért, de át nem vett jutalmai magától
+  for (const old of EVENTS) { const st = p.evs[old.id]; if (!st || st.closed || new Date() < (old.claimUntil || old.end)) continue;
+    for (const [i, r] of old.rewards.entries()) if (st.pts >= r.at && !st.claimed.includes(i) && !r.tbd) evGrant(p, r);
+    st.closed = true; p._dirty = true; }
+  if (!e) return null;
+  const st = p.evs[e.id] || (p.evs[e.id] = { pts: 0, day: '', daily: {}, q: {}, claimed: [] });
+  if (st.day !== today()) { st.day = today(); st.daily = {}; }
+  return st;
+}
+function evGrant(p, r) {
+  if (r.port) { if (!(p.portraits || []).includes(r.port)) p.portraits = [...(p.portraits || []), r.port]; p.heroSkin = { ...(p.heroSkin || {}), [PORTRAITS[r.port].hero]: r.port }; return { port: r.port }; }
+  if (r.card) { const e = p.coll[r.card] || (p.coll[r.card] = { n: 0, f: 0 }); const n = r.n || (CARD[r.card].rarity === 'l' ? 1 : 2); if (r.foil) e.f += n; else e.n += n; return { id: r.card, foil: !!r.foil, n }; }
+  return grantRew(p, r);
+}
+// meccs végén: event-pontok; visszaadja a teljesített event-küldetéseket
+function eventOnMatch(m) {
+  const p = Store.p; if (!p) return null; const e = curEvent(); if (!evLive(e)) return null;
+  const st = ensureEv(p), got = []; let gain = 0;
+  const step = (d, rec, key) => { const q = rec[key] || (rec[key] = { prog: 0, done: false }); if (q.done) return;
+    q.prog = Math.min(d.goal, q.prog + (d.f(m) || 0));
+    if (q.prog >= d.goal) { q.done = true; gain += d.pts; got.push({ txt: d.txt, pts: d.pts }); } };
+  for (const d of e.daily) step(d, st.daily, d.id);
+  for (const d of e.quests) step(d, st.q, d.id);
+  const before = st.pts; st.pts = Math.min(e.goal, st.pts + gain);
+  save(); renderEventTile();
+  return { e, got, gain: st.pts - before, pts: st.pts, newRew: e.rewards.filter(r => before < r.at && st.pts >= r.at).length };
+}
+function evResultHTML(r) {
+  if (!r || !r.got.length) return '';
+  return `<div class="ev-pop">${r.e.icon} <b>+${r.gain} ${r.e.pts}</b> · ${r.pts}/${r.e.goal}${r.newRew ? ` · <em>Új jutalom vár!</em>` : ''}<small>${r.got.map(g => `✓ ${g.txt}`).join(' · ')}</small></div>`;
+}
+function evClaimable(p, e) { const st = p.evs?.[e.id]; if (!st) return 0; return e.rewards.filter((r, i) => st.pts >= r.at && !st.claimed.includes(i) && !r.tbd).length; }
+function renderEventTile() {
+  const t = $('#goEvent'); if (!t) return;
+  const p = Store.p, e = curEvent();
+  t.hidden = !p || !e || p.onboard; if (t.hidden) return;
+  const st = ensureEv(p), c = evClaimable(p, e), now = new Date();
+  t.dataset.theme = e.theme || '';
+  $('#evIcon').textContent = e.icon; $('#evName').textContent = `${e.name} event`;
+  const left = e.end - now, d = Math.floor(left / 864e5), h = Math.floor(left % 864e5 / 36e5);
+  $('#evSub').textContent = now < e.start || e.draft ? 'Teszt mód – még nem indult el' : now >= e.end ? (c ? 'Véget ért – vedd át a jutalmakat!' : 'Véget ért') : c ? `${c} átvehető jutalom!` : `Még ${d ? `${d} nap ${h} óra` : `${h} óra`}`;
+  $('#evBadge').textContent = `${st.pts}/${e.goal}`; $('#evBadge').classList.toggle('hot', c > 0);
+}
+function evShowGot(got, e) {
+  if (!got) return;
+  if (got.port) { const h = HERO[PORTRAITS[got.port].hero];
+    openModal(heroCardHTML(h, { big: true, port: got.port }), `${e.icon} ${PORTRAITS[got.port].name} – ${h.name} új skinje, mindig Full Artban. Rögtön ezt viseli – a Gyűjteményben a hősre koppintva visszaválthatsz.`, ''); renderMenuFan(); return; }
+  if (got.id) { openModal(cardHTML(got.id, { big: true, foil: got.foil }), `${e.icon} ${CARD[got.id].name} – ${got.n} példány bekerült a gyűjteményedbe.`, cardHelpHTML(got.id)); return; }
+  showPassReveal(got);
+}
+function evClaim(i) {
+  const p = Store.p, e = curEvent(); if (!e) return; const st = ensureEv(p), r = e.rewards[i];
+  if (!r || r.tbd || st.claimed.includes(i) || st.pts < r.at) return;
+  const got = evGrant(p, r); st.claimed.push(i); save(); renderEvent(); renderProfileBar();
+  if (got) evShowGot(got, e); else toast(`+${rewLabel(r)}`);
+}
+function evRewLabel(r) { if (r.tbd) return r.tbd; if (r.port) return `${PORTRAITS[r.port].name} – hős skin`; if (r.card) return `${CARD[r.card].name} – új lap`; return rewLabel(r); }
+function evRewIcon(r) {
+  if (r.tbd) return '<span class="sp-mystery ev-myst" aria-hidden="true"><b>?</b></span>';
+  if (r.card) return ART[r.card] ? `<span class="sp-thumb" aria-hidden="true" style="background-image:url('${artSrc(r.card)}')"></span>` : '<span class="sp-mystery" aria-hidden="true"><b>★</b></span>';
+  return rewIcon(r);
+}
+function renderEvent() {
+  const p = Store.p, e = curEvent(), body = $('#evBody'); if (!p || !body) return;
+  if (!e) { body.innerHTML = '<p class="q-note">Most nincs futó event. Figyeld a főmenüt!</p>'; return; }
+  const st = ensureEv(p), now = new Date(), live = evLive(e), c = evClaimable(p, e);
+  const left = e.end - now, d = Math.floor(left / 864e5), h = Math.floor(left % 864e5 / 36e5);
+  const pct = st.pts / e.goal * 100;
+  const marks = e.rewards.map((r, i) => `<span class="ev-mark${st.pts >= r.at ? ' on' : ''}${st.claimed.includes(i) ? ' got' : ''}" style="left:${r.at / e.goal * 100}%"><i></i><b>${r.at}</b></span>`).join('');
+  const qrow = (d, q) => { q = q || { prog: 0, done: false };
+    return `<div class="q-row ev-q${q.done ? ' done' : ''}"><div class="q-main"><b>${d.txt}</b><div class="q-bar"><i style="width:${q.prog / d.goal * 100}%"></i><span>${q.prog}/${d.goal}</span></div></div>
+      <div class="q-rew">${q.done ? '<span class="q-ok">✓</span>' : `<em class="ev-pts">+${d.pts}</em>`}</div></div>`; };
+  const mid = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1), hl = Math.floor((mid - now) / 36e5), ml = Math.floor((mid - now) % 36e5 / 6e4);
+  const rrow = (r, i) => { const stt = st.claimed.includes(i) ? 'claimed' : st.pts >= r.at && !r.tbd ? 'ready' : 'locked';
+    return `<div class="sp-row ev-row big ${stt}"><div class="sp-lv ev-at"><b>${r.at}</b></div><div class="sp-ic">${evRewIcon(r)}</div>
+      <div class="sp-name"><b>${evRewLabel(r)}</b><small>${r.tbd ? 'Hamarosan kiderül…' : r.port ? 'Csak ebből az eventből · mindig Full Art' : r.card ? `${RAR[CARD[r.card].rarity]} · csak ebből az eventből` : ''}</small></div>
+      <div class="sp-act">${stt === 'claimed' ? '<span class="q-ok">✓</span>' : stt === 'ready' ? `<button class="btn primary sp-claim" data-ec="${i}">Átvesz</button>` : '<span class="sp-lock" aria-label="Zárolva">🔒</span>'}</div></div>`; };
+  body.dataset.theme = e.theme || ''; $('#scr-event h2').textContent = `${e.icon} ${e.name}`;
+  body.innerHTML = `
+    <div class="ev-head">
+      <div class="ev-hero"><span class="ev-big" aria-hidden="true">${e.icon}</span><div><b>${e.name}</b><small>${now < e.start || e.draft ? 'Teszt mód – a játékosok még nem látják' : live ? `Még ${d ? `${d} nap ${h} óra` : `${h} óra`} · ${e.end.getMonth() + 1}. ${e.end.getDate() - 1}-ig` : `Véget ért · jutalmak átvehetők ${e.claimUntil.getMonth() + 1}. ${e.claimUntil.getDate() - 1}-ig`}</small></div></div>
+      <p class="ev-sub">${e.sub}</p>
+      <div class="ev-score"><span class="ev-num">${st.pts}</span><small>/ ${e.goal} ${e.pts}</small></div>
+      <div class="ev-track"><div class="ev-fill" style="width:${pct}%"></div>${marks}</div>
+      ${c > 1 ? `<button class="btn primary sp-all" id="evAll">Mind átveszem (${c})</button>` : ''}
+    </div>
+    <div class="lbl">Napi event-küldetések <small>· újak ${hl} óra ${ml} perc múlva</small></div>
+    ${e.daily.map(d => qrow(d, st.daily[d.id])).join('')}
+    <div class="lbl">Event-kihívások <small>· egyszer teljesíthetők</small></div>
+    ${e.quests.map(d => qrow(d, st.q[d.id])).join('')}
+    <div class="lbl">Jutalmak</div>
+    <div class="sp-list ev-list">${e.rewards.map(rrow).join('')}</div>
+    <p class="q-note">A ${e.pts} meccs végén számít (bot, ranked és PvP meccsen is). ${e.goal} ponttal minden jutalom a tiéd. Ha az event végéig valamit nem veszel át, az még egy hétig itt vár, utána magától jóváíródik.</p>`;
+  body.onclick = ev => { const b = ev.target.closest('[data-ec]'); if (b) return evClaim(+b.dataset.ec);
+    if (ev.target.closest('#evAll')) { e.rewards.forEach((r, i) => { if (st.pts >= r.at && !st.claimed.includes(i) && !r.tbd) { evGrant(p, r); st.claimed.push(i); } }); save(); renderEvent(); renderProfileBar(); renderMenuFan(); toast('Jutalmak átvéve'); } };
+  renderEventTile();
+}
+$('#goEvent').onclick = () => { if (needProfile()) return; renderEvent(); show('scr-event'); };
+
 // ---- oktató meccs: fix lapok, fix ellenfél-lépések, lépésről lépésre vezetve ----
 // A játékos (Tomi) mindig ugyanazokat a lapokat húzza, a bot (Dávid, 12 élet) az első 4 körében mindig ugyanazt rakja le.
 // Egy lépés: info (Tovább gomb) · play (csak a megadott lap a megadott helyre játszható ki) · tap (koppints a kiemelt elemre) · end (Kör vége).
@@ -2043,11 +2178,12 @@ function pvpEndMatch() {
     const aw = awardMatch(draw ? 'draw' : win ? 'win' : 'loss');
     const qd = questsOnMatch({ win, hero: S.players[ME].heroId, ...(S.qs || { actions: 0, items: 0, chars: 0, locs: 0, big: 0, heroDmg: 0, kills: 0 }) });
     const px = passOnMatch(draw ? 'draw' : win ? 'win' : 'loss', qd);
+    try { S.evRes = eventOnMatch({ win, pvp: true, ranked: !!S.pvp.ranked, lv: S.pvp.ranked ? 3 : 0, hero: S.players[ME].heroId, ...(S.qs || { actions: 0, items: 0, chars: 0, locs: 0, big: 0, heroDmg: 0, kills: 0 }) }); } catch (e) {}
     p.pvp = p.pvp || { w: 0, l: 0, d: 0 }; p.pvp[win ? 'w' : draw ? 'd' : 'l']++; save();
     if (S.pvp.ranked) S.rkRes = rankOnMatch(draw ? 'draw' : win ? 'win' : 'loss');
     reward = (aw ? `<div class="reward"><span class="coin" aria-hidden="true"></span><b>+${aw.gain}</b><small>coin · ma ${aw.today}/${ECON.dailyCap}</small></div>` : '')
       + qd.map(q => `<div class="q-done-pop">✓ Küldetés teljesítve: <b>${q.txt}</b><em>+${q.rew}</em></div>`).join('')
-      + (px ? `<div class="sp-pop${px.up ? ' up' : ''}"><b>+${px.gain} XP</b> Season Pass</div>` : '') + rkResultHTML(S.rkRes);
+      + (px ? `<div class="sp-pop${px.up ? ' up' : ''}"><b>+${px.gain} XP</b> Season Pass</div>` : '') + evResultHTML(S.evRes) + rkResultHTML(S.rkRes);
   }
   const opp = escH(S.names?.[BOT] || 'Az ellenfél');
   const why = S.reason === 'forfeit' ? (win ? `${opp} feladta a meccset.` : 'Feladtad a meccset.')
@@ -2221,7 +2357,7 @@ const frOn = () => !!(window.APP_MODE && Store.db && Store.uid && Store.p);
 const frPair = (a, b) => [a, b].sort().join('_');
 const frOther = d => d.parts.find(u => u !== Store.uid);
 const frName = uid => FR.pub[uid]?.name || (FR.list.find(d => frOther(d) === uid) || {}).names?.[uid] || 'Barát';
-const tradable = id => { const c = CARD[id]; return c && !c.token && !c.variantOf && !c.foilOnly && !c.passOnly; };
+const tradable = id => { const c = CARD[id]; return c && !c.token && !c.variantOf && !c.foilOnly && !c.passOnly && !c.eventOnly; };
 const RAR_ORDER = { l: 0, e: 1, r: 2, k: 3 };
 // eszköztípus (2026-10-13): megmérjük, ki milyen eszközön játszik (telefon / tablet / gép) – a nagy képernyős fejlesztésekhez
 function devKind() {

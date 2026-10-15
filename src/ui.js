@@ -440,7 +440,7 @@ $('#vFoil').onclick = () => { ui.foil = true; $('#vFoil').setAttribute('aria-pre
 // egy lap nagy nézete a Gyűjteményben – ha 2 példány fölött van belőle, egyenként beváltható
 function collCardModal(id, cap) {
   const e = Store.p?.coll[id] || { n: 0, f: 0 }, extra = e.n + e.f - DUPE_KEEP;
-  cap = cap || `<i class="rar r-${CARD[id].rarity}" aria-hidden="true"></i> ${RAR[CARD[id].rarity]} · ${e.n} db${e.f ? ` + ${e.f} Full Art` : ''}${CARD[id].passOnly ? ' · csak a Season Passból szerezhető' : !e.n && !e.f ? ' · boosterből szerezhető' : ''}`;
+  cap = cap || `<i class="rar r-${CARD[id].rarity}" aria-hidden="true"></i> ${RAR[CARD[id].rarity]} · ${e.n} db${e.f ? ` + ${e.f} Full Art` : ''}${CARD[id].passOnly ? ' · csak a Season Passból szerezhető' : CARD[id].eventOnly ? ' · csak eventből szerezhető' : !e.n && !e.f ? ' · boosterből szerezhető' : ''}`;
   const btns = extra > 0 ? `<div class="cv-row">${e.n > 0 ? `<button class="btn cv-btn" data-cv="n">♻️ 1 lap beváltása · +${dupeVal(id, false)} coin</button>` : ''}${e.f > 0 ? `<button class="btn cv-btn fa" data-cv="f">♻️ 1 Full Art beváltása · +${dupeVal(id, true)} coin</button>` : ''}</div><small class="cv-note">${extra} fölösleges példány – 2 mindig megmarad</small>` : '';
   openModal(cardHTML(id, { big: true, foil: ui.foil || (e.f > 0 && !e.n) }), cap, btns + cardHelpHTML(id));
   const o = $('#layer').lastElementChild;
@@ -1508,7 +1508,7 @@ function startMatch(heroId, deckId, opt = {}) {
   S.botLv = opt.ranked ? rkBotLv() : (opt.lv || botLvPref());   // bot-szint: rankedben a rangtól függ
   if (S.botLv === 4) {   // Mester bot: a 🪄 paklisegéd a teljes kártyakészletből rakja össze a bot hősének paklijét
     try {
-      const full = id => { const c = CARD[id]; return c.token || c.off || c.passOnly || c.shopOnly || c.wheelOnly || c.variantOf ? 0 : c.rarity === 'l' ? 1 : 2; };
+      const full = id => { const c = CARD[id]; return c.token || c.off || c.passOnly || c.eventOnly || c.shopOnly || c.wheelOnly || c.variantOf ? 0 : c.rarity === 'l' ? 1 : 2; };
       const strong = deckHelperFill({}, bh, full).list;
       if (deckCount(strong) === DECK_SIZE) S = Object.assign(newGame(heroId, { ...mine }, bh, strong, first, { mulligan: true, foils: [0, 1].map(k => k === ME ? myFoils(mine) : {}) }), { events: [], botLv: 4, ranked: S.ranked });
     } catch (e) {}
@@ -1597,10 +1597,11 @@ function endMatch() {
   if (S.ranked && !S.rkDone) { S.rkDone = true; S.rkRes = rankOnMatch(draw ? 'draw' : win ? 'win' : 'loss'); }
   const qd = S.qDone ? [] : questsOnMatch({ win, hero: S.players[ME].heroId, ...(S.qs || { actions: 0, items: 0, chars: 0, locs: 0, big: 0, heroDmg: 0, kills: 0 }) });
   const px = S.qDone ? null : passOnMatch(draw ? 'draw' : win ? 'win' : 'loss', qd);
+  if (!S.qDone) try { S.evRes = eventOnMatch({ win, ranked: !!S.ranked, lv: S.botLv || 2, hero: S.players[ME].heroId, ...(S.qs || { actions: 0, items: 0, chars: 0, locs: 0, big: 0, heroDmg: 0, kills: 0 }) }); } catch (e) {}
   S.qDone = true;
   const reward = (aw ? `<div class="reward"><span class="coin" aria-hidden="true"></span><b>+${aw.gain}</b><small>${aw.capped ? 'Elérted a mai coin-plafont' : 'coin'} · ma ${aw.today}/${ECON.dailyCap}</small></div>` : '')
     + qd.map(q => `<div class="q-done-pop">✓ Küldetés teljesítve: <b>${q.txt}</b><em>+${q.rew}</em></div>`).join('')
-    + (px ? `<div class="sp-pop${px.up ? ' up' : ''}"><b>+${px.gain} XP</b> Season Pass${px.up ? ` · <em>Szintlépés! ${px.lv}. szint – vedd át a jutalmat</em>` : ` · ${px.lv}. szint (${px.inLv}/${PASS_XP.perLevel})`}</div>` : '') + (S.ranked ? rkResultHTML(S.rkRes) : '');
+    + (px ? `<div class="sp-pop${px.up ? ' up' : ''}"><b>+${px.gain} XP</b> Season Pass${px.up ? ` · <em>Szintlépés! ${px.lv}. szint – vedd át a jutalmat</em>` : ` · ${px.lv}. szint (${px.inLv}/${PASS_XP.perLevel})`}</div>` : '') + evResultHTML(S.evRes) + (S.ranked ? rkResultHTML(S.rkRes) : '');
   const o = document.createElement('div'); o.className = 'overlay';
   o.innerHTML = `<div class="modal result${win ? '' : ' lose'}${draw ? '' : ' resart'}">${draw ? '<h2 class="banner-h"><img src="art/ui/banner-draw.webp" alt="Döntetlen"></h2>' : resultArt(win)}<p>${why}</p>${kill}${reward}
     <button class="btn small ghost res-log" data-log>📜 Mi történt a meccsen?</button>

@@ -437,6 +437,17 @@ Hősképesség-ötletek a táblázatban (még nem zöldek, nincsenek beépítve)
 - Az ellenfél körében (PvP-ben és bot ellen is) a kezedben lévő lapok elsötétülnek, mint a ki nem játszható lapok – korábban ilyenkor mind „aktívnak” látszott.
 - A variáns lapok szalagja: „✦ Variáns” (kicsiben) / „✦ Ritka variáns” (nagy lapon) – korábban „Változat”.
 
+## Eventek – első: Halloween (keret: 2026-10-15, élesítés: a skinek és lapok megérkezése után)
+- **Keret (`EVENTS` a meta.js-ben):** minden event = kezdet/vég + pontcsík (`goal`, most 100) + napi event-küldetések + egyszeri event-kihívások + jutalmak pontküszöbökön. A pontot meccs végén számolja (bot, ranked, PvP): `eventOnMatch()`. Állapot: `p.evs[id]` (`pts`, napi és egyszeri haladás, `claimed`).
+- **Főmenü:** saját narancs-lila „🎃 Halloween event” gomb a Ranked alatt, pontszámmal (pl. 37/100), zöldül, ha van átvehető jutalom. Képernyő: fejléc visszaszámlálóval, nagy pontszám, csík a jutalom-jelölőkkel, napi küldetések, kihívások, jutalomlista „Átvesz” gombbal (+ „Mind átveszem”). A meccs végi ablak is mutatja: „🎃 +10 tökpont · 47/100”.
+- **Halloween (hw26), tervezet:** 2026-10-16 – 11-02 (vége 11-03 0:00), jutalmak átvehetők 11-09-ig, utána ami elérve, de átvétlen, magától jóváíródik.
+  - Napi (minden nap újra, 3 × 5 pont): Játssz le 2 meccset · Nyerj 1 meccset · Pusztíts el 5 ellenséges karaktert.
+  - Egyszeri kihívások (40 pont): Nyerj 5 meccset (10) · Nyerj a Nehéz bot ellen / rankedben Aranytól (10) · Nyerj 2 ranked meccset (5) · Játssz egy PvP meccset (5) · Okozz összesen 100 sebzést az ellenfél hősének (10).
+  - 100 pont kb. 4 aktív nap (napi 15 + kihívások), lazábban ~1 hét.
+  - Jutalmak (helykitöltők, amíg Tomi küldi): 10 skin · 20 új lap · 35 skin · 50 új lap · 60 skin · 75 skin · 90 új lap · 100 skin.
+- **Tesztelés élesítés előtt:** az event `draft: true` – csak az a telefon látja, ahol egyszer megnyitották a …/?ev=test linket (kikapcsolás: ?ev=off). Élesítés: a `draft` törlése.
+- **Event-lapok:** `eventOnly: true` – nincs packban, nem cserélhető, a paklisegéd Mester-paklijába sem kerül; a gyűjteményben „csak eventből szerezhető”. Jutalomként alapból 2 példány jár (legendásból 1).
+
 ## Főmenü: „Kártyák” csempe (2026-10-15, Laci)
 - A főmenü „Gyűjtemény” csempéjén a felirat telefonon kettétört („Gyűjteme-ny”). A csempe felirata mostantól **Kártyák** (a képernyő címe továbbra is Gyűjtemény).
 
