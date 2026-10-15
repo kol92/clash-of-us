@@ -307,7 +307,7 @@ const PORTRAITS = {
   p_david_hw:     { hero: 'david', name: 'Dávid, a rémbolt előtt', passOnly: true, ev: 'hw26' },
   p_tomi_hw:      { hero: 'tomi',  name: 'Tomi, a holdfény fotósa', passOnly: true, ev: 'hw26' },
   p_laci_hw:      { hero: 'laci',  name: 'Laci, az éjféli úriember', passOnly: true, ev: 'hw26' },
-  p_sasi_mage:    { hero: 'sasi',  name: 'Sasi, a mágus', price: 250 },   // bolt, 2026-10-15   // event: a heti ládából is jöhet   // ajándék: Best of Us TCG nap (2026-10-12)
+  p_sasi_mage:    { hero: 'sasi',  name: 'Sasi, a mágus', price: 250, from: '2026-10-16' },   // bolt: a következő rotációtól (from = ettől a naptól kapható)   // event: a heti ládából is jöhet   // ajándék: Best of Us TCG nap (2026-10-12)
 };
 const isPort = v => !!(v && PORTRAITS[v] && ART[v]);
 function heroCardHTML(h, o = {}) {

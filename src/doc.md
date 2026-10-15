@@ -438,7 +438,7 @@ Hősképesség-ötletek a táblázatban (még nem zöldek, nincsenek beépítve)
 - A variáns lapok szalagja: „✦ Variáns” (kicsiben) / „✦ Ritka variáns” (nagy lapon) – korábban „Változat”.
 
 ## Sasi, a mágus – bolti skin (2026-10-15)
-- Új hős-portré Sasinak (p_sasi_mage), a Boltban **250 coin**. Mint a többi bolti portré, a heti láda 0,5%-os portré-esélyében is benne van.
+- Új hős-portré Sasinak (p_sasi_mage), a Boltban **250 coin**, **2026-10-16-tól** (a következő bolt-rotációtól; `PORTRAITS[].from`, `portOnSale`). Mint a többi bolti portré, a heti láda 0,5%-os portré-esélyében is benne van.
 
 ## Eventek – első: Halloween (keret: 2026-10-15, élesítés: a skinek és lapok megérkezése után)
 - **Keret (`EVENTS` a meta.js-ben):** minden event = kezdet/vég + pontcsík (`goal`, most 100) + napi event-küldetések + egyszeri event-kihívások + jutalmak pontküszöbökön. A pontot meccs végén számolja (bot, ranked, PvP): `eventOnMatch()`. Állapot: `p.evs[id]` (`pts`, napi és egyszeri haladás, `claimed`).

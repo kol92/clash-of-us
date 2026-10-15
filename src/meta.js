@@ -399,7 +399,8 @@ function rollCardSlot(p, rar, foil) {
   if (foil) e.f++; else e.n++;
   return { id, foil, isNew };
 }
-const chestPorts = p => Object.keys(PORTRAITS).filter(k => (PORTRAITS[k].price || PORTRAITS[k].event) && ART[k] && !(p.portraits || []).includes(k));
+const portOnSale = k => !PORTRAITS[k].from || new Date() >= new Date(PORTRAITS[k].from + 'T00:00');   // from: ettől a naptól kapható a Boltban
+const chestPorts = p => Object.keys(PORTRAITS).filter(k => (PORTRAITS[k].price || PORTRAITS[k].event) && portOnSale(k) && ART[k] && !(p.portraits || []).includes(k));
 function chestRoll() {
   const p = Store.p, out = [];
   out.push(rollCardSlot(p, Math.random() < 1.5 / 8 ? 'l' : 'e', false));   // biztos epikus vagy jobb (a pack-esélyek arányában)
@@ -651,7 +652,7 @@ const SHOP_REFRESH = '2026-10-16';   // a limitált kínálat következő friss�
 function renderShop() {
   const p = Store.p; if (!p) return;
   const free = freePackReady();
-  const items = SHOP_ITEMS(), ports = Object.keys(PORTRAITS).filter(k => ART[k] && !PORTRAITS[k].passOnly);
+  const items = SHOP_ITEMS(), ports = Object.keys(PORTRAITS).filter(k => ART[k] && !PORTRAITS[k].passOnly && portOnSale(k));
   let refresh = 'A kínálat időnként frissül – ami most itt van, csak a következő frissítésig kapható.';
   if (SHOP_REFRESH) { const end = new Date(SHOP_REFRESH + 'T00:00'), d = Math.ceil((end - new Date()) / 864e5), md = `${end.getMonth() + 1}. ${end.getDate()}.`;
     refresh = d > 1 ? `Frissül: <b>${d} nap múlva</b> (${md}) – addig kapható, ami most itt van.` : d === 1 ? `Frissül: <b>holnap</b> (${md}) – ez az utolsó nap!` : 'Hamarosan új kínálat érkezik – addig még kapható, ami most itt van.'; }

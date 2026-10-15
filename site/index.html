@@ -2305,7 +2305,7 @@ body.pf-loading #scr-menu .pb-name::after{content:'';display:inline-block;width:
 <script src="vendor/firebase-auth-compat.js"></script>
 <script src="vendor/firebase-firestore-compat.js"></script>
 <script src="vendor/firebase-database-compat.js"></script>
-<script>window.APP_VERSION = "2026.10.15-1403"; window.APP_BUILD = "2026.10.15-1403";</script>
+<script>window.APP_VERSION = "2026.10.15-1405"; window.APP_BUILD = "2026.10.15-1405";</script>
 <script>// ===== Best of Us – saját szerver (Firebase) =====
 // A játék eredetileg a Claude-os tárolót használta (window.claude.use('db' | 'user' | 'room')).
 // Ez a fájl ugyanazt a felületet adja Firebase-ből, így a játék kódja szinte változatlan maradhat:
@@ -3864,7 +3864,7 @@ const PORTRAITS = {
   p_david_hw:     { hero: 'david', name: 'Dávid, a rémbolt előtt', passOnly: true, ev: 'hw26' },
   p_tomi_hw:      { hero: 'tomi',  name: 'Tomi, a holdfény fotósa', passOnly: true, ev: 'hw26' },
   p_laci_hw:      { hero: 'laci',  name: 'Laci, az éjféli úriember', passOnly: true, ev: 'hw26' },
-  p_sasi_mage:    { hero: 'sasi',  name: 'Sasi, a mágus', price: 250 },   // bolt, 2026-10-15   // event: a heti ládából is jöhet   // ajándék: Best of Us TCG nap (2026-10-12)
+  p_sasi_mage:    { hero: 'sasi',  name: 'Sasi, a mágus', price: 250, from: '2026-10-16' },   // bolt: a következő rotációtól (from = ettől a naptól kapható)   // event: a heti ládából is jöhet   // ajándék: Best of Us TCG nap (2026-10-12)
 };
 const isPort = v => !!(v && PORTRAITS[v] && ART[v]);
 function heroCardHTML(h, o = {}) {
@@ -5690,7 +5690,8 @@ function rollCardSlot(p, rar, foil) {
   if (foil) e.f++; else e.n++;
   return { id, foil, isNew };
 }
-const chestPorts = p => Object.keys(PORTRAITS).filter(k => (PORTRAITS[k].price || PORTRAITS[k].event) && ART[k] && !(p.portraits || []).includes(k));
+const portOnSale = k => !PORTRAITS[k].from || new Date() >= new Date(PORTRAITS[k].from + 'T00:00');   // from: ettől a naptól kapható a Boltban
+const chestPorts = p => Object.keys(PORTRAITS).filter(k => (PORTRAITS[k].price || PORTRAITS[k].event) && portOnSale(k) && ART[k] && !(p.portraits || []).includes(k));
 function chestRoll() {
   const p = Store.p, out = [];
   out.push(rollCardSlot(p, Math.random() < 1.5 / 8 ? 'l' : 'e', false));   // biztos epikus vagy jobb (a pack-esélyek arányában)
@@ -5942,7 +5943,7 @@ const SHOP_REFRESH = '2026-10-16';   // a limitált kínálat következő friss�
 function renderShop() {
   const p = Store.p; if (!p) return;
   const free = freePackReady();
-  const items = SHOP_ITEMS(), ports = Object.keys(PORTRAITS).filter(k => ART[k] && !PORTRAITS[k].passOnly);
+  const items = SHOP_ITEMS(), ports = Object.keys(PORTRAITS).filter(k => ART[k] && !PORTRAITS[k].passOnly && portOnSale(k));
   let refresh = 'A kínálat időnként frissül – ami most itt van, csak a következő frissítésig kapható.';
   if (SHOP_REFRESH) { const end = new Date(SHOP_REFRESH + 'T00:00'), d = Math.ceil((end - new Date()) / 864e5), md = `${end.getMonth() + 1}. ${end.getDate()}.`;
     refresh = d > 1 ? `Frissül: <b>${d} nap múlva</b> (${md}) – addig kapható, ami most itt van.` : d === 1 ? `Frissül: <b>holnap</b> (${md}) – ez az utolsó nap!` : 'Hamarosan új kínálat érkezik – addig még kapható, ami most itt van.'; }
