@@ -202,7 +202,7 @@ Hősképesség-ötletek a táblázatban (még nem zöldek, nincsenek beépítve)
 **Akciók**
 - Legénybúcsú! 4, legendás – minden saját karaktered végleg +1 támadást és +1 életet kap
 - Nem én voltam hanem a haverom! 1, gyakori – két saját karaktered helyet cserél, vagy egy karaktered átlép egy üres sávodba (előbb a karakter, aztán a másik karakter vagy üres hely)
-- Mosh Pit 3, epikus – az ellenfél összes karaktere egy sávval jobbra csúszik, a jobb szélső a bal szélre kerül
+- Mosh Pit 3, epikus – az ellenfél összes karaktere egy sávval jobbra csúszik, a jobb szélső a bal szélre kerül, **majd mindegyik 1 sebzést kap** (buff: 2026-10-15)
 - Ki vagy tiltva! 2, gyakori – eltünteted a pályán lévő helyszínt (a gazdája temetőjébe kerül), és húzol egy lapot; helyszín nélkül is kijátszható (akkor csak húzol)
 - Musztafa Gyros Tál 5, ritka – eldobod az összes kézben lévő lapodat (a temetőbe kerülnek), majd húzol 4 lapot
 - Cheddar sajtkrém leves 2, gyakori – húzol 2 lapot (minden kezdőpakliban benne van, 1–2 db)
@@ -436,6 +436,11 @@ Hősképesség-ötletek a táblázatban (még nem zöldek, nincsenek beépítve)
 ## Apró javítások (2026-10-12 este)
 - Az ellenfél körében (PvP-ben és bot ellen is) a kezedben lévő lapok elsötétülnek, mint a ki nem játszható lapok – korábban ilyenkor mind „aktívnak” látszott.
 - A variáns lapok szalagja: „✦ Variáns” (kicsiben) / „✦ Ritka variáns” (nagy lapon) – korábban „Változat”.
+
+## Mosh Pit buff (2026-10-15)
+- Tomi észrevette, hogy a Mosh Pit szinte semmit nem ér. Mérés (`LO=2 HI=4 tools/pt.js`, 3000 meccs): régi változat **43,4%** (összevetésül a 3-as epikus Tubi 50,1%, az Among Us 49,7%).
+- Kipróbált változatok: 2 mana 42,8% · +1 húzás 45,3% · **+1 sebzés minden ellenséges karakternek 49,3%** · +1 sebzés és +1 húzás 52,4% · 2 mana és +1 sebzés 50,3%.
+- Döntés: 3 mana marad, a forgatás után **az ellenfél összes karaktere 1 sebzést kap** (Pajzsot leveszi, rejtett lapot felfordít). Motorban: `CARD.a_moshpit.dmg` (és kipróbálható `draw`). Teszt: `tools/mosh_test.js`.
 
 ## Heti láda (2026-10-14)
 - **Minden hétfőn 0:01-kor (helyi idő)** minden játékos kap egy ingyenes **heti ládát**. A hét kulcsa `weekKey()` (a hét hétfője, 1 perccel eltolva). A láda az első app-indításkor/profilbetöltéskor kerül jóvá (`chestWeeklyCheck()` → `p.chests++`, `p.chestWeek`). Ha valaki egy egész hetet kihagy, az a láda elmarad (nem gyűlik visszamenőleg), de a ki nem nyitott ládák megmaradnak és összeadódnak. Bevezető (onboard) alatt nem jár.

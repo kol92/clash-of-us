@@ -637,7 +637,7 @@ function logEvents(evs, snap) {
       case 'lock': L(`🔒 ${e.side === ME ? 'Le vagy bénítva' : 'Az ellenfél le van bénítva'}: a következő körben nem játszhat ki lapot`); break;
       case 'locgone': L(`🚫 Kitiltva: ${CARD[e.id].name}`); break;
       case 'locreplaced': L(`🏚 ${who(e.side)} Munkahelye eltűnt (${e.how === 'banned' ? 'kitiltották' : 'új helyszín váltotta'}) – cserébe 5 életet gyógyul`); break;
-      case 'mosh': L('🤘 Mosh Pit: az ellenfél karakterei odébb csúsztak'); break;
+      case 'mosh': L('🤘 Mosh Pit: az ellenfél karakterei odébb csúsztak, és mindegyik kapott egy könyököst (1 sebzés)'); break;
       case 'morph': L(`🦹 ${who(e.side)} Baszóvá változott`); break;
       case 'machine': L(`🤖 ${who(e.side)} Gépüzemmódban visszatért`); break;
       case 'discard': L(`🗑 ${who(e.side)} eldobta a kezét (${e.n} lap)`); break;
@@ -814,7 +814,7 @@ async function animateEvents(evs) {
       case 'push': floatAt(anchor, 'Arrébb tolva!', 'info'); hold = Math.max(hold, 300); break;
       case 'stolen': fx(el, e.side === ME ? 'fx-bounce-up' : 'fx-bounce-down'); floatAt(anchor, '🫳 Ellopták!', 'dmg'); hold = Math.max(hold, 650); break;
       case 'steal': floatAt(anchor, `🫳 ${CARD[e.id].name} átállt!`, 'buff'); hold = Math.max(hold, 700); break;
-      case 'mosh': fx($('#app'), 'fx-quake'); floatAt(anchor, '🤘 Mosh Pit! Mindenki arrébb', 'dmg'); hold = Math.max(hold, 600); break;
+      case 'mosh': fx($('#app'), 'fx-quake'); floatAt(anchor, '🤘 Mosh Pit! Mindenki arrébb, −1', 'dmg'); hold = Math.max(hold, 600); break;
       case 'revive': fx(el, 'fx-buff'); floatAt(anchor, '✨ Újraéledt!', 'buff'); hold = Math.max(hold, 800); break;
       case 'drinkdraw': floatAt(anchor, '🍺 +1 lap', 'info'); hold = Math.max(hold, 450); break;
       case 'discard': floatAt(anchor, e.n ? `Eldobva: ${e.n} lap` : 'Üres kéz', 'info'); hold = Math.max(hold, 500); break;

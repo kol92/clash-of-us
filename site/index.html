@@ -2242,7 +2242,7 @@ body.pf-loading #scr-menu .pb-name::after{content:'';display:inline-block;width:
 <script src="vendor/firebase-auth-compat.js"></script>
 <script src="vendor/firebase-firestore-compat.js"></script>
 <script src="vendor/firebase-database-compat.js"></script>
-<script>window.APP_VERSION = "2026.10.14-1338"; window.APP_BUILD = "2026.10.14-1408";</script>
+<script>window.APP_VERSION = "2026.10.15-1032"; window.APP_BUILD = "2026.10.15-1032";</script>
 <script>// ===== Best of Us – saját szerver (Firebase) =====
 // A játék eredetileg a Claude-os tárolót használta (window.claude.use('db' | 'user' | 'room')).
 // Ez a fájl ugyanazt a felületet adja Firebase-ből, így a játék kódja szinte változatlan maradhat:
@@ -2565,7 +2565,7 @@ const CARDS = [
   { id:'a_kitiltva', type:'action', name:'Ki vagy tiltva!', cost:2, tgt:'none', rarity:'k', text:'Eltünteted a pályán lévő helyszínt, és húzol egy lapot.' },
   { id:'a_legeny', type:'action', name:'Legénybúcsú!', cost:4, tgt:'none', rarity:'l', text:'Minden karaktered +1 támadást és +1 életet kap.' },
   { id:'a_haver', type:'action', name:'Nem én voltam hanem a haverom!', cost:1, tgt:'swap', rarity:'k', text:'Két saját karaktered helyet cserél, vagy egy karaktered átlép egy üres sávodba.' },
-  { id:'a_moshpit', type:'action', name:'Mosh Pit', cost:3, tgt:'none', rarity:'e', text:'Az ellenfél összes karaktere egy sávval jobbra csúszik, a jobb szélső a bal szélre kerül.' },
+  { id:'a_moshpit', type:'action', name:'Mosh Pit', cost:3, tgt:'none', rarity:'e', dmg:1, text:'Az ellenfél összes karaktere egy sávval jobbra csúszik (a jobb szélső a bal szélre kerül), majd mindegyik 1 sebzést kap.' },
   { id:'a_delfin', type:'action', name:'Delfin póz', cost:1, tgt:'none', rarity:'k', text:'A hősöd 2 sebzést kap, és húzol 2 lapot.' },
   { id:'a_rehab', drink:true, type:'action', name:'Rehab', cost:3, tgt:'ownOrHero', rarity:'k', text:'Egy saját karaktered 3 életet gyógyul, és megszűnik a bénulása. A hősödre is kijátszhatod (3 élet).' },
   { id:'a_rehab2', drink:true, type:'action', name:'Rehab', cost:3, tgt:'ownOrHero', rarity:'k', variantOf:'a_rehab', text:'Egy saját karaktered 3 életet gyógyul, és megszűnik a bénulása. A hősödre is kijátszhatod (3 élet).' },
@@ -2964,7 +2964,9 @@ function playCard(s, pi, hi, t) {
       case 'a_moshpit': if (e.board.some(Boolean)) {   // a zárt helyek (JBL) és a Cápa kimaradnak a forgatásból
         const L = []; for (let j = 0; j < LANES; j++) if (!closedLane(s, ei, j) && !isFixed(e.board[j])) L.push(j);
         const v = L.map(j => e.board[j]); v.unshift(v.pop()); L.forEach((j, k) => { e.board[j] = v[k]; });
-        ev(s, { t:'mosh', side:ei, i:-1 }); } break;
+        ev(s, { t:'mosh', side:ei, i:-1 });
+        if (CARD.a_moshpit.dmg) for (let j = 0; j < LANES; j++) if (e.board[j]) damageUnit(s, ei, j, CARD.a_moshpit.dmg); }
+        if (CARD.a_moshpit.draw) draw(s, pi); break;
       case 'a_cheddar': draw(s, pi); draw(s, pi); break;
       case 'a_delfin': damageHero(s, pi, CARD.a_delfin.self ?? 2); if (s.winner == null) { draw(s, pi); draw(s, pi); } break;
       case 'a_mangos': healHero(s, pi, 4); if (CARD.a_mangos.draw) draw(s, pi); break;
@@ -4099,7 +4101,7 @@ function logEvents(evs, snap) {
       case 'lock': L(`🔒 ${e.side === ME ? 'Le vagy bénítva' : 'Az ellenfél le van bénítva'}: a következő körben nem játszhat ki lapot`); break;
       case 'locgone': L(`🚫 Kitiltva: ${CARD[e.id].name}`); break;
       case 'locreplaced': L(`🏚 ${who(e.side)} Munkahelye eltűnt (${e.how === 'banned' ? 'kitiltották' : 'új helyszín váltotta'}) – cserébe 5 életet gyógyul`); break;
-      case 'mosh': L('🤘 Mosh Pit: az ellenfél karakterei odébb csúsztak'); break;
+      case 'mosh': L('🤘 Mosh Pit: az ellenfél karakterei odébb csúsztak, és mindegyik kapott egy könyököst (1 sebzés)'); break;
       case 'morph': L(`🦹 ${who(e.side)} Baszóvá változott`); break;
       case 'machine': L(`🤖 ${who(e.side)} Gépüzemmódban visszatért`); break;
       case 'discard': L(`🗑 ${who(e.side)} eldobta a kezét (${e.n} lap)`); break;
@@ -4276,7 +4278,7 @@ async function animateEvents(evs) {
       case 'push': floatAt(anchor, 'Arrébb tolva!', 'info'); hold = Math.max(hold, 300); break;
       case 'stolen': fx(el, e.side === ME ? 'fx-bounce-up' : 'fx-bounce-down'); floatAt(anchor, '🫳 Ellopták!', 'dmg'); hold = Math.max(hold, 650); break;
       case 'steal': floatAt(anchor, `🫳 ${CARD[e.id].name} átállt!`, 'buff'); hold = Math.max(hold, 700); break;
-      case 'mosh': fx($('#app'), 'fx-quake'); floatAt(anchor, '🤘 Mosh Pit! Mindenki arrébb', 'dmg'); hold = Math.max(hold, 600); break;
+      case 'mosh': fx($('#app'), 'fx-quake'); floatAt(anchor, '🤘 Mosh Pit! Mindenki arrébb, −1', 'dmg'); hold = Math.max(hold, 600); break;
       case 'revive': fx(el, 'fx-buff'); floatAt(anchor, '✨ Újraéledt!', 'buff'); hold = Math.max(hold, 800); break;
       case 'drinkdraw': floatAt(anchor, '🍺 +1 lap', 'info'); hold = Math.max(hold, 450); break;
       case 'discard': floatAt(anchor, e.n ? `Eldobva: ${e.n} lap` : 'Üres kéz', 'info'); hold = Math.max(hold, 500); break;
