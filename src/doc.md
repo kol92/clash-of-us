@@ -437,6 +437,9 @@ Hősképesség-ötletek a táblázatban (még nem zöldek, nincsenek beépítve)
 - Az ellenfél körében (PvP-ben és bot ellen is) a kezedben lévő lapok elsötétülnek, mint a ki nem játszható lapok – korábban ilyenkor mind „aktívnak” látszott.
 - A variáns lapok szalagja: „✦ Variáns” (kicsiben) / „✦ Ritka variáns” (nagy lapon) – korábban „Változat”.
 
+## Főmenü: „Kártyák” csempe (2026-10-15, Laci)
+- A főmenü „Gyűjtemény” csempéjén a felirat telefonon kettétört („Gyűjteme-ny”). A csempe felirata mostantól **Kártyák** (a képernyő címe továbbra is Gyűjtemény).
+
 ## Mosh Pit buff (2026-10-15)
 - Tomi észrevette, hogy a Mosh Pit szinte semmit nem ér. Mérés (`LO=2 HI=4 tools/pt.js`, 3000 meccs): régi változat **43,4%** (összevetésül a 3-as epikus Tubi 50,1%, az Among Us 49,7%).
 - Kipróbált változatok: 2 mana 42,8% · +1 húzás 45,3% · **+1 sebzés minden ellenséges karakternek 49,3%** · +1 sebzés és +1 húzás 52,4% · 2 mana és +1 sebzés 50,3%.
