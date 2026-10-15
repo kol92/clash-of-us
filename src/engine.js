@@ -71,6 +71,9 @@ const CARDS = [
   { id:'a_kitiltva', type:'action', name:'Ki vagy tiltva!', cost:2, tgt:'none', rarity:'k', text:'Eltünteted a pályán lévő helyszínt, és húzol egy lapot.' },
   { id:'a_legeny', type:'action', name:'Legénybúcsú!', cost:4, tgt:'none', rarity:'l', text:'Minden karaktered +1 támadást és +1 életet kap.' },
   { id:'a_haver', type:'action', name:'Nem én voltam hanem a haverom!', cost:1, tgt:'swap', rarity:'k', text:'Két saját karaktered helyet cserél, vagy egy karaktered átlép egy üres sávodba.' },
+  // Halloween event lapok (2026-10-15) – csak az eventből szerezhetők (eventOnly)
+  { id:'a_polaroid', type:'action', name:'Polaroid emlékek', cost:6, tgt:'none', rarity:'e', eventOnly:true, text:'Keverd vissza a temetődben lévő lapjaid felét a paklidba.' },
+  { id:'a_hwparty', type:'action', name:'Tomi Halloweeni bulija', cost:5, tgt:'none', rarity:'l', eventOnly:true, text:'Minden karakter (mindkét oldalon) kicserélődik egy véletlen karakterre.' },
   { id:'a_moshpit', type:'action', name:'Mosh Pit', cost:3, tgt:'none', rarity:'e', dmg:1, text:'Az ellenfél összes karaktere egy sávval jobbra csúszik (a jobb szélső a bal szélre kerül), majd mindegyik 1 sebzést kap.' },
   { id:'a_delfin', type:'action', name:'Delfin póz', cost:1, tgt:'none', rarity:'k', text:'A hősöd 2 sebzést kap, és húzol 2 lapot.' },
   { id:'a_rehab', drink:true, type:'action', name:'Rehab', cost:3, tgt:'ownOrHero', rarity:'k', text:'Egy saját karaktered 3 életet gyógyul, és megszűnik a bénulása. A hősödre is kijátszhatod (3 élet).' },
@@ -474,6 +477,26 @@ function playCard(s, pi, hi, t) {
         if (CARD.a_moshpit.dmg) for (let j = 0; j < LANES; j++) if (e.board[j]) damageUnit(s, ei, j, CARD.a_moshpit.dmg); }
         if (CARD.a_moshpit.draw) draw(s, pi); break;
       case 'a_cheddar': draw(s, pi); draw(s, pi); break;
+      case 'a_polaroid': {   // a temető felét (felfelé kerekítve, véletlenszerűen) visszakeveri a pakliba; tokenek nem mennek vissza
+        const idx = p.grave.map((g, k) => k).filter(k => CARD[p.grave[k].id] && !CARD[p.grave[k].id].token);
+        const n = Math.ceil(idx.length / 2), pick = [];
+        while (pick.length < n) pick.push(idx.splice(Math.floor(rnd() * idx.length), 1)[0]);
+        const ids = pick.map(k => p.grave[k].id);
+        pick.sort((a, b) => b - a).forEach(k => p.grave.splice(k, 1));
+        for (const id of ids) p.deck.push(id);
+        shuffle(p.deck); ev(s, { t:'polaroid', side:pi, i:-1, n:ids.length }); break; }
+      case 'a_hwparty': {   // minden (nem rögzített) karakter helyére egy véletlen karakter; a régi a temetőbe, az eszközei is
+        const pool = CARDS.filter(x => x.type === 'char' && !x.token && !x.variantOf && !x.fixed && !x.off).map(x => x.id);
+        const ch = [];
+        for (const side of [pi, ei]) { const B = s.players[side].board;
+          for (let j = 0; j < LANES; j++) { const u = B[j]; if (!u || isFixed(u)) continue;
+            const id = pool[Math.floor(rnd() * pool.length)], nu = makeUnit(s, id, side);
+            nu.hidden = false; nu.fresh = u.fresh;   // aki támadhatott, az új is támadhat
+            buryItems(s, side, u); bury(s, side, u.id, 'party');
+            B[j] = nu; ch.push({ side, i:j, from:u.id, id }); } }
+        ev(s, { t:'hwparty', side:pi, i:-1, ch });
+        for (const c of ch) ev(s, { t:'summon', side:c.side, i:c.i, id:c.id, party:true });
+        break; }
       case 'a_delfin': damageHero(s, pi, CARD.a_delfin.self ?? 2); if (s.winner == null) { draw(s, pi); draw(s, pi); } break;
       case 'a_mangos': healHero(s, pi, 4); if (CARD.a_mangos.draw) draw(s, pi); break;
       case 'a_rantott': if (t.k === 'hero') healHero(s, pi, 3); else healUnit(s, pi, t.i, 3); break;

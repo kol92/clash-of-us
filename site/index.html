@@ -2293,7 +2293,7 @@ body.pf-loading #scr-menu .pb-name::after{content:'';display:inline-block;width:
 <script src="vendor/firebase-auth-compat.js"></script>
 <script src="vendor/firebase-firestore-compat.js"></script>
 <script src="vendor/firebase-database-compat.js"></script>
-<script>window.APP_VERSION = "2026.10.15-1032"; window.APP_BUILD = "2026.10.15-1300";</script>
+<script>window.APP_VERSION = "2026.10.15-1306"; window.APP_BUILD = "2026.10.15-1310";</script>
 <script>// ===== Best of Us – saját szerver (Firebase) =====
 // A játék eredetileg a Claude-os tárolót használta (window.claude.use('db' | 'user' | 'room')).
 // Ez a fájl ugyanazt a felületet adja Firebase-ből, így a játék kódja szinte változatlan maradhat:
@@ -2616,6 +2616,9 @@ const CARDS = [
   { id:'a_kitiltva', type:'action', name:'Ki vagy tiltva!', cost:2, tgt:'none', rarity:'k', text:'Eltünteted a pályán lévő helyszínt, és húzol egy lapot.' },
   { id:'a_legeny', type:'action', name:'Legénybúcsú!', cost:4, tgt:'none', rarity:'l', text:'Minden karaktered +1 támadást és +1 életet kap.' },
   { id:'a_haver', type:'action', name:'Nem én voltam hanem a haverom!', cost:1, tgt:'swap', rarity:'k', text:'Két saját karaktered helyet cserél, vagy egy karaktered átlép egy üres sávodba.' },
+  // Halloween event lapok (2026-10-15) – csak az eventből szerezhetők (eventOnly)
+  { id:'a_polaroid', type:'action', name:'Polaroid emlékek', cost:6, tgt:'none', rarity:'e', eventOnly:true, text:'Keverd vissza a temetődben lévő lapjaid felét a paklidba.' },
+  { id:'a_hwparty', type:'action', name:'Tomi Halloweeni bulija', cost:5, tgt:'none', rarity:'l', eventOnly:true, text:'Minden karakter (mindkét oldalon) kicserélődik egy véletlen karakterre.' },
   { id:'a_moshpit', type:'action', name:'Mosh Pit', cost:3, tgt:'none', rarity:'e', dmg:1, text:'Az ellenfél összes karaktere egy sávval jobbra csúszik (a jobb szélső a bal szélre kerül), majd mindegyik 1 sebzést kap.' },
   { id:'a_delfin', type:'action', name:'Delfin póz', cost:1, tgt:'none', rarity:'k', text:'A hősöd 2 sebzést kap, és húzol 2 lapot.' },
   { id:'a_rehab', drink:true, type:'action', name:'Rehab', cost:3, tgt:'ownOrHero', rarity:'k', text:'Egy saját karaktered 3 életet gyógyul, és megszűnik a bénulása. A hősödre is kijátszhatod (3 élet).' },
@@ -3019,6 +3022,26 @@ function playCard(s, pi, hi, t) {
         if (CARD.a_moshpit.dmg) for (let j = 0; j < LANES; j++) if (e.board[j]) damageUnit(s, ei, j, CARD.a_moshpit.dmg); }
         if (CARD.a_moshpit.draw) draw(s, pi); break;
       case 'a_cheddar': draw(s, pi); draw(s, pi); break;
+      case 'a_polaroid': {   // a temető felét (felfelé kerekítve, véletlenszerűen) visszakeveri a pakliba; tokenek nem mennek vissza
+        const idx = p.grave.map((g, k) => k).filter(k => CARD[p.grave[k].id] && !CARD[p.grave[k].id].token);
+        const n = Math.ceil(idx.length / 2), pick = [];
+        while (pick.length < n) pick.push(idx.splice(Math.floor(rnd() * idx.length), 1)[0]);
+        const ids = pick.map(k => p.grave[k].id);
+        pick.sort((a, b) => b - a).forEach(k => p.grave.splice(k, 1));
+        for (const id of ids) p.deck.push(id);
+        shuffle(p.deck); ev(s, { t:'polaroid', side:pi, i:-1, n:ids.length }); break; }
+      case 'a_hwparty': {   // minden (nem rögzített) karakter helyére egy véletlen karakter; a régi a temetőbe, az eszközei is
+        const pool = CARDS.filter(x => x.type === 'char' && !x.token && !x.variantOf && !x.fixed && !x.off).map(x => x.id);
+        const ch = [];
+        for (const side of [pi, ei]) { const B = s.players[side].board;
+          for (let j = 0; j < LANES; j++) { const u = B[j]; if (!u || isFixed(u)) continue;
+            const id = pool[Math.floor(rnd() * pool.length)], nu = makeUnit(s, id, side);
+            nu.hidden = false; nu.fresh = u.fresh;   // aki támadhatott, az új is támadhat
+            buryItems(s, side, u); bury(s, side, u.id, 'party');
+            B[j] = nu; ch.push({ side, i:j, from:u.id, id }); } }
+        ev(s, { t:'hwparty', side:pi, i:-1, ch });
+        for (const c of ch) ev(s, { t:'summon', side:c.side, i:c.i, id:c.id, party:true });
+        break; }
       case 'a_delfin': damageHero(s, pi, CARD.a_delfin.self ?? 2); if (s.winner == null) { draw(s, pi); draw(s, pi); } break;
       case 'a_mangos': healHero(s, pi, 4); if (CARD.a_mangos.draw) draw(s, pi); break;
       case 'a_rantott': if (t.k === 'hero') healHero(s, pi, 3); else healUnit(s, pi, t.i, 3); break;
@@ -3760,6 +3783,8 @@ const ART = {
   a_kitiltva: { src:'art/kitiltva.webp?v=bbd4b6f44fd618bf', pos:'50% 35%' },
   a_haver: { src:'art/haver.webp?v=7bbcf093c8b23f32', pos:'50% 22%' },
   a_moshpit: { src:'art/moshpit.webp?v=b2bdba284d3d3ec0', pos:'50% 42%' },
+  a_polaroid: { src:'art/polaroid.webp?v=622df2a1a4880bfd', pos:'48% 34%' },
+  a_hwparty: { src:'art/hwparty.webp?v=a796009c7c7efba2', pos:'50% 34%' },
   c_miloivo: { src:'art/miloivo.webp?v=b06397ce7d2233c2', pos:'62% 18%' },
   c_laczko: { src:'art/laczko.webp?v=20750c2b7e4af27a', pos:'55% 25%' },
   c_gabileg: { src:'art/gabileg.webp?v=7c83a0cb4595b5a1', pos:'55% 22%' },
@@ -4139,7 +4164,7 @@ function logEvents(evs, snap) {
       case 'regdraw': L(`🍺 ${e.side === ME ? 'Helyszínt cseréltél – Törzsvendégként húztál egy lapot' : 'Dávid helyszínt cserélt, és húzott egy lapot'}`); break;
       case 'heatwave': L(`☀️ Napszúrás: ${e.side === ME ? 'Nyitid' : 'Az ellenfél Nyitije'} miatt minden más karakter 1 sebzést kapott`); break;
       case 'boon': L(`✨ ${unitName(e.side, e.i)} új erőt kapott: ${BOON_NAME[e.b]}`); break;
-      case 'summon': case 'rise': L(`✨ ${CARD[e.id]?.name || 'Egy lap'} a pályára került (${e.side === ME ? 'nálad' : 'az ellenfélnél'})`); break;
+      case 'summon': case 'rise': if (e.party) break; L(`✨ ${CARD[e.id]?.name || 'Egy lap'} a pályára került (${e.side === ME ? 'nálad' : 'az ellenfélnél'})`); break;
       case 'revive': L(`✨ ${unitName(e.side, e.i)} feltámadt`); break;
       case 'buff': if (e.i >= 0 && e.n) L(`▲ ${unitName(e.side, e.i)}: +${e.n} támadás`); break;
       case 'debuff': L(`▼ ${unitName(e.side, e.i)}: −${e.n} támadás`); break;
@@ -4164,6 +4189,9 @@ function logEvents(evs, snap) {
       case 'lock': L(`🔒 ${e.side === ME ? 'Le vagy bénítva' : 'Az ellenfél le van bénítva'}: a következő körben nem játszhat ki lapot`); break;
       case 'locgone': L(`🚫 Kitiltva: ${CARD[e.id].name}`); break;
       case 'locreplaced': L(`🏚 ${who(e.side)} Munkahelye eltűnt (${e.how === 'banned' ? 'kitiltották' : 'új helyszín váltotta'}) – cserébe 5 életet gyógyul`); break;
+      case 'polaroid': L(`📸 Polaroid emlékek: ${e.n ? `${e.n} lap visszakeveredett ${e.side === ME ? 'a paklidba' : 'az ellenfél paklijába'} a temetőből` : 'a temető üres volt, nem keveredett vissza semmi'}`); break;
+      case 'hwparty': { const ln = id => `<b class="lc" data-lc="${id}">${escH(CARD[id].name)}</b>`;
+        L(`🎃 Tomi Halloweeni bulija: ${e.ch.length ? 'minden karakter kicserélődött – ' + e.ch.map(c => `${ln(c.from)} → ${ln(c.id)} (${c.side === ME ? 'nálad' : 'ellenfél'})`).join(', ') : 'nem volt karakter a pályán'}`); break; }
       case 'mosh': L('🤘 Mosh Pit: az ellenfél karakterei odébb csúsztak, és mindegyik kapott egy könyököst (1 sebzés)'); break;
       case 'morph': L(`🦹 ${who(e.side)} Baszóvá változott`); break;
       case 'machine': L(`🤖 ${who(e.side)} Gépüzemmódban visszatért`); break;
@@ -4341,6 +4369,8 @@ async function animateEvents(evs) {
       case 'push': floatAt(anchor, 'Arrébb tolva!', 'info'); hold = Math.max(hold, 300); break;
       case 'stolen': fx(el, e.side === ME ? 'fx-bounce-up' : 'fx-bounce-down'); floatAt(anchor, '🫳 Ellopták!', 'dmg'); hold = Math.max(hold, 650); break;
       case 'steal': floatAt(anchor, `🫳 ${CARD[e.id].name} átállt!`, 'buff'); hold = Math.max(hold, 700); break;
+      case 'polaroid': floatAt(anchor, `📸 ${e.n} lap vissza a pakliba`, 'buff'); hold = Math.max(hold, 800); break;
+      case 'hwparty': fx($('#app'), 'fx-quake'); floatAt(anchor, '🎃 Halloweeni buli! Mindenki átváltozik!', 'info'); hold = Math.max(hold, 900); break;
       case 'mosh': fx($('#app'), 'fx-quake'); floatAt(anchor, '🤘 Mosh Pit! Mindenki arrébb, −1', 'dmg'); hold = Math.max(hold, 600); break;
       case 'revive': fx(el, 'fx-buff'); floatAt(anchor, '✨ Újraéledt!', 'buff'); hold = Math.max(hold, 800); break;
       case 'drinkdraw': floatAt(anchor, '🍺 +1 lap', 'info'); hold = Math.max(hold, 450); break;
@@ -6765,8 +6795,8 @@ const EVENTS = [
     ],
     // a jutalmak: Tomi küldi (5 skin + 3 új lap); amíg nincs meg, „?” helykitöltő
     rewards: [
-      { at: 10, port: 'p_gabi_hw' }, { at: 20, tbd: 'Új Halloween lap' }, { at: 30, back: 'halloween' }, { at: 40, port: 'p_david_hw' }, { at: 50, tbd: 'Új Halloween lap' },
-      { at: 60, port: 'p_bence_hw' }, { at: 75, port: 'p_tomi_hw' }, { at: 90, tbd: 'Új Halloween lap' }, { at: 100, port: 'p_laci_hw' },
+      { at: 10, port: 'p_gabi_hw' }, { at: 20, card: 'a_polaroid', foil: true }, { at: 30, back: 'halloween' }, { at: 40, port: 'p_david_hw' }, { at: 50, tbd: 'Új Halloween lap' },
+      { at: 60, port: 'p_bence_hw' }, { at: 75, port: 'p_tomi_hw' }, { at: 90, card: 'a_hwparty', foil: true }, { at: 100, port: 'p_laci_hw' },
     ] },
 ];
 // a futó (vagy még átvehető) event; teszt módban a még el nem indult is látszik

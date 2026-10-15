@@ -245,6 +245,8 @@ const ART = {
   a_kitiltva: { src:'art/kitiltva.webp', pos:'50% 35%' },
   a_haver: { src:'art/haver.webp', pos:'50% 22%' },
   a_moshpit: { src:'art/moshpit.webp', pos:'50% 42%' },
+  a_polaroid: { src:'art/polaroid.webp', pos:'48% 34%' },
+  a_hwparty: { src:'art/hwparty.webp', pos:'50% 34%' },
   c_miloivo: { src:'art/miloivo.webp', pos:'62% 18%' },
   c_laczko: { src:'art/laczko.webp', pos:'55% 25%' },
   c_gabileg: { src:'art/gabileg.webp', pos:'55% 22%' },
@@ -624,7 +626,7 @@ function logEvents(evs, snap) {
       case 'regdraw': L(`🍺 ${e.side === ME ? 'Helyszínt cseréltél – Törzsvendégként húztál egy lapot' : 'Dávid helyszínt cserélt, és húzott egy lapot'}`); break;
       case 'heatwave': L(`☀️ Napszúrás: ${e.side === ME ? 'Nyitid' : 'Az ellenfél Nyitije'} miatt minden más karakter 1 sebzést kapott`); break;
       case 'boon': L(`✨ ${unitName(e.side, e.i)} új erőt kapott: ${BOON_NAME[e.b]}`); break;
-      case 'summon': case 'rise': L(`✨ ${CARD[e.id]?.name || 'Egy lap'} a pályára került (${e.side === ME ? 'nálad' : 'az ellenfélnél'})`); break;
+      case 'summon': case 'rise': if (e.party) break; L(`✨ ${CARD[e.id]?.name || 'Egy lap'} a pályára került (${e.side === ME ? 'nálad' : 'az ellenfélnél'})`); break;
       case 'revive': L(`✨ ${unitName(e.side, e.i)} feltámadt`); break;
       case 'buff': if (e.i >= 0 && e.n) L(`▲ ${unitName(e.side, e.i)}: +${e.n} támadás`); break;
       case 'debuff': L(`▼ ${unitName(e.side, e.i)}: −${e.n} támadás`); break;
@@ -649,6 +651,9 @@ function logEvents(evs, snap) {
       case 'lock': L(`🔒 ${e.side === ME ? 'Le vagy bénítva' : 'Az ellenfél le van bénítva'}: a következő körben nem játszhat ki lapot`); break;
       case 'locgone': L(`🚫 Kitiltva: ${CARD[e.id].name}`); break;
       case 'locreplaced': L(`🏚 ${who(e.side)} Munkahelye eltűnt (${e.how === 'banned' ? 'kitiltották' : 'új helyszín váltotta'}) – cserébe 5 életet gyógyul`); break;
+      case 'polaroid': L(`📸 Polaroid emlékek: ${e.n ? `${e.n} lap visszakeveredett ${e.side === ME ? 'a paklidba' : 'az ellenfél paklijába'} a temetőből` : 'a temető üres volt, nem keveredett vissza semmi'}`); break;
+      case 'hwparty': { const ln = id => `<b class="lc" data-lc="${id}">${escH(CARD[id].name)}</b>`;
+        L(`🎃 Tomi Halloweeni bulija: ${e.ch.length ? 'minden karakter kicserélődött – ' + e.ch.map(c => `${ln(c.from)} → ${ln(c.id)} (${c.side === ME ? 'nálad' : 'ellenfél'})`).join(', ') : 'nem volt karakter a pályán'}`); break; }
       case 'mosh': L('🤘 Mosh Pit: az ellenfél karakterei odébb csúsztak, és mindegyik kapott egy könyököst (1 sebzés)'); break;
       case 'morph': L(`🦹 ${who(e.side)} Baszóvá változott`); break;
       case 'machine': L(`🤖 ${who(e.side)} Gépüzemmódban visszatért`); break;
@@ -826,6 +831,8 @@ async function animateEvents(evs) {
       case 'push': floatAt(anchor, 'Arrébb tolva!', 'info'); hold = Math.max(hold, 300); break;
       case 'stolen': fx(el, e.side === ME ? 'fx-bounce-up' : 'fx-bounce-down'); floatAt(anchor, '🫳 Ellopták!', 'dmg'); hold = Math.max(hold, 650); break;
       case 'steal': floatAt(anchor, `🫳 ${CARD[e.id].name} átállt!`, 'buff'); hold = Math.max(hold, 700); break;
+      case 'polaroid': floatAt(anchor, `📸 ${e.n} lap vissza a pakliba`, 'buff'); hold = Math.max(hold, 800); break;
+      case 'hwparty': fx($('#app'), 'fx-quake'); floatAt(anchor, '🎃 Halloweeni buli! Mindenki átváltozik!', 'info'); hold = Math.max(hold, 900); break;
       case 'mosh': fx($('#app'), 'fx-quake'); floatAt(anchor, '🤘 Mosh Pit! Mindenki arrébb, −1', 'dmg'); hold = Math.max(hold, 600); break;
       case 'revive': fx(el, 'fx-buff'); floatAt(anchor, '✨ Újraéledt!', 'buff'); hold = Math.max(hold, 800); break;
       case 'drinkdraw': floatAt(anchor, '🍺 +1 lap', 'info'); hold = Math.max(hold, 450); break;
