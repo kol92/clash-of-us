@@ -302,7 +302,7 @@ function effAtk(s, side, i) {
 
 function targetsFor(s, pi, id) {
   const c = CARD[id], p = s.players[pi], ei = other(pi), e = s.players[ei], T = [];
-  const own = () => p.board.forEach((u, i) => { if (u) T.push({ k:'unit', side:pi, i }); });
+  const own = () => p.board.forEach((u, i) => { if (u && !isFixed(u)) T.push({ k:'unit', side:pi, i }); });   // a nálad úszó (ellenséges) Cápa nem a te karaktered
   const foe = () => e.board.forEach((u, i) => { if (u) T.push({ k:'unit', side:ei, i }); });
   switch (c.type) {
     case 'char': {
@@ -426,7 +426,7 @@ function playCard(s, pi, hi, t) {
         ev(s, { t:'steal', side:pi, i:j, id:u.id });
       }
     }
-    if (bid(c.id) === 'c_fogel') p.board.forEach((x, j) => { if (x && j !== t.i) { x.hp += 2; x.maxHp += 2; ev(s, { t:'buff', side:pi, i:j }); } });
+    if (bid(c.id) === 'c_fogel') p.board.forEach((x, j) => { if (x && j !== t.i && !isFixed(x)) { x.hp += 2; x.maxHp += 2; ev(s, { t:'buff', side:pi, i:j }); } });
     if (bid(c.id) === 'c_zsibrita' && t.t2 && t.t2.t3) {
       const a = t.t2.i, b = t.t2.t3.i;
       if (e.board[a] && !e.board[b]) { reveal(s, ei, a); e.board[b] = e.board[a]; e.board[a] = null; ev(s, { t:'push', side:ei, i:b }); }
@@ -469,7 +469,7 @@ function playCard(s, pi, hi, t) {
       case 'a_kitiltva':
         if (s.location) { ev(s, { t:'locgone', side:pi, i:-1, id:s.location.id }); dropLocation(s, 'banned'); }
         draw(s, pi); break;
-      case 'a_legeny': p.board.forEach((x, j) => { if (x) { x.atk += 1; x.hp += 1; x.maxHp += 1; ev(s, { t:'buff', side:pi, i:j }); } }); break;
+      case 'a_legeny': p.board.forEach((x, j) => { if (x && !isFixed(x)) { x.atk += 1; x.hp += 1; x.maxHp += 1; ev(s, { t:'buff', side:pi, i:j }); } }); break;
       case 'a_haver': if (t.t2) { const a = t.i, b = t.t2.i; [p.board[a], p.board[b]] = [p.board[b], p.board[a]]; ev(s, { t:'swap', side:pi, i:b }); } break;
       case 'a_moshpit': if (e.board.some(Boolean)) {   // a zárt helyek (JBL) és a Cápa kimaradnak a forgatásból
         const L = []; for (let j = 0; j < LANES; j++) if (!closedLane(s, ei, j) && !isFixed(e.board[j])) L.push(j);
@@ -513,8 +513,8 @@ function playCard(s, pi, hi, t) {
         { const u = p.board[t.i];
           if (u && u.stun) { u.stun = 0; if (u.items.includes('i_buffalo')) { u.items = u.items.filter(x => x !== 'i_buffalo'); u.foe = (u.foe || []).filter(x => x !== 'i_buffalo'); bury(s, ei, 'i_buffalo', 'item'); } ev(s, { t:'unstun', side:pi, i:t.i }); } }
         break;
-      case 'a_bag': p.board.forEach((x, i) => { if (x) { x.atk += 2; x.hp -= 1; x.maxHp = Math.max(1, x.maxHp - 1); ev(s, { t:'buff', side:pi, i }); } }); break;
-      case 'a_sasiutes': { let sum = 0; for (let i = 0; i < LANES; i++) sum += effAtk(s, pi, i); if (t.k === 'hero') damageHero(s, ei, sum); else damageUnit(s, ei, t.i, sum); break; }
+      case 'a_bag': p.board.forEach((x, i) => { if (x && !isFixed(x)) { x.atk += 2; x.hp -= 1; x.maxHp = Math.max(1, x.maxHp - 1); ev(s, { t:'buff', side:pi, i }); } }); break;
+      case 'a_sasiutes': { let sum = 0; for (let i = 0; i < LANES; i++) if (!isFixed(p.board[i])) sum += effAtk(s, pi, i);   /* a nálad úszó Cápa ereje nem számít bele */ if (t.k === 'hero') damageHero(s, ei, sum); else damageUnit(s, ei, t.i, sum); break; }
       case 'a_koktel': {
         const all = [];
         for (const sd of [0, 1]) s.players[sd].board.forEach((x, j) => { if (x) all.push([sd, j]); });

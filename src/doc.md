@@ -437,6 +437,12 @@ Hősképesség-ötletek a táblázatban (még nem zöldek, nincsenek beépítve)
 - Az ellenfél körében (PvP-ben és bot ellen is) a kezedben lévő lapok elsötétülnek, mint a ki nem játszható lapok – korábban ilyenkor mind „aktívnak” látszott.
 - A variáns lapok szalagja: „✦ Variáns” (kicsiben) / „✦ Ritka variáns” (nagy lapon) – korábban „Változat”.
 
+## Cápa: nem a te karaktered, ha nálad úszik (2026-10-16, Laci kérdése)
+- A „Hátad mögött, cápa megesz!” Cápája az ellenfél térfelén úszik, de a lerakóé. Eddig a Sasi ütése a térfeleden lévő Cápa 9 támadását is beleszámolta, és saját-célú lapokkal (pl. Rehab, eszközök) célozható volt, a Legénybúcsú / Bagoly / Fogel pedig erősítette. Mostantól a nálad úszó Cápa egyikbe sem számít bele. Akcióval (pl. Abszint, Dinnyés) továbbra is sebezhető. Teszt: `tools/hw_test.js`.
+
+## Event-jutalom felfedése (2026-10-16, Laci kérése)
+- Átvételkor teljes képernyős felfedés: a „?” Halloween-kártya lebeg (koppintásra vagy 2 mp után), megremeg, narancs-lila villanás és szikrák, majd előtűnik a skin / lap / hátlap, „Új skin! / Új lap! / Új hátlap!” felirattal és leírással (`evRewardReveal`). „Mind átveszem”-nél egymás után jönnek.
+
 ## 3D döntés a nagy lapnézetben (2026-10-16, Laci ötlete)
 - A nagyban megnyitott lap (gyűjtemény, meccs, jutalmak – minden `openModal`) a telefon döntésére 3D-ben dől, **mindkét tengelyen a telefonnal ellentétesen** (Laci javítása): előre-hátra (pitch) és oldalra (roll), **legfeljebb 20°** mindkét tengelyen (Laci 30°-ot javasolt; `TILT.max` a ui.js-ben). Ahogy épp tartod a telefont, az a nulla; tartósan más tartásnál lassan oda áll vissza. A mozgás kisimítva, nem remeg. Fekvő telefonnál a tengelyek felcserélődnek.
 - Fényfolt követi a dőlést (Full Art / arany / gyémánt lapon erősebb).

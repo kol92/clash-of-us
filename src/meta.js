@@ -1623,6 +1623,47 @@ function renderEventTile() {
   tag.classList.toggle('hot', c > 0);
   $('#evBadge').innerHTML = `<span>${st.pts}<small>/${e.goal}</small></span>`; $('#evBadge').classList.toggle('hot', c > 0);
 }
+// jutalom-felfedő képernyő (Laci kérése, 2026-10-16): a „?” lap megremeg, villan, és előtűnik a skin / lap / hátlap
+async function evRewardReveal(e, got) {
+  let inner, label, name, sub;
+  if (got.port) { const P = PORTRAITS[got.port], h = HERO[P.hero]; inner = heroCardHTML(h, { big: true, port: got.port }); label = 'Új skin!'; name = P.name; sub = `${h.name} mostantól ezt viseli – a Gyűjteményben a hősre koppintva visszaválthatsz.`; }
+  else if (got.id) { inner = cardHTML(got.id, { big: true, foil: got.foil }); label = 'Új lap!'; name = CARD[got.id].name; sub = `${RAR[CARD[got.id].rarity]}${got.foil ? ' · Full Art' : ''} · ${got.n} példány bekerült a gyűjteményedbe`; }
+  else if (got.back) { const b = BACKS[got.back]; inner = `<img class="evr-back" src="${b.src}" alt="${b.name} hátlap">`; label = 'Új hátlap!'; name = `${b.name} hátlap`; sub = 'Már ezt használod – az ellenfeleid is ezt látják. A Gyűjteményben a 🃏 Hátlap gombbal válthatsz.'; }
+  else { evShowGot(got, e); return; }
+  if (got.port) renderMenuFan();
+  const o = document.createElement('div'); o.className = 'overlay opening ev-reveal';
+  o.innerHTML = `<div class="rare-show hw"><div class="rare-rays big hw"></div><div class="rare-card"><img class="evr-myst" src="art/ui/ev-hw-myst.webp" alt="Rejtett jutalom"></div>
+    <div class="rare-banner" hidden>${label}</div><div class="rare-name" hidden>${escH(name)}</div><div class="var-sub" hidden>${sub}</div><div class="op-hint">Koppints a felfedéshez</div></div>`;
+  $('#layer').appendChild(o);
+  const show = o.querySelector('.rare-show'), card = o.querySelector('.rare-card'), hint = o.querySelector('.op-hint');
+  show.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 250, fill: 'forwards' });
+  card.animate([{ transform: 'translateY(0)' }, { transform: 'translateY(-8px)' }, { transform: 'translateY(0)' }], { duration: 1400, iterations: Infinity, easing: 'ease-in-out' });
+  const tap = () => new Promise(res => o.addEventListener('click', ev => { ev.stopPropagation(); res(); }, { once: true }));
+  await Promise.race([tap(), sleep(2200)]);
+  hint.textContent = '';
+  card.getAnimations().forEach(a => a.cancel());
+  await card.animate([0, -3, 3, -5, 5, -7, 7, 0].map((x, k) => ({ transform: `translate(${x}px,${k % 2 ? 1 : -1}px) scale(${1 + k * 0.02})` })), { duration: 800, easing: 'ease-in' }).finished;
+  const r = card.getBoundingClientRect(), cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+  const flash = document.createElement('div'); flash.className = 'rare-flash hw'; o.appendChild(flash);
+  flash.animate([{ opacity: 0 }, { opacity: .7, offset: .15 }, { opacity: 0 }], { duration: 900, fill: 'forwards' }).finished.then(() => flash.remove());
+  const cols = ['#ffb347', '#ff7a00', '#c77dff', '#ffe08a', '#ffffff'];
+  for (let k = 0; k < 44; k++) {
+    const sp = document.createElement('i'); sp.className = 'rare-spark';
+    const a = Math.random() * Math.PI * 2, d = 90 + Math.random() * 170, sz = 4 + Math.random() * 7;
+    sp.style.cssText = `left:${cx}px;top:${cy}px;width:${sz}px;height:${sz}px;background:${cols[k % cols.length]};box-shadow:0 0 ${sz * 2}px ${cols[k % cols.length]}`;
+    o.appendChild(sp);
+    sp.animate([{ transform: 'translate(-50%,-50%) scale(1)', opacity: 1 }, { transform: `translate(calc(-50% + ${Math.cos(a) * d}px), calc(-50% + ${Math.sin(a) * d}px)) scale(.2)`, opacity: 0 }],
+               { duration: 700 + Math.random() * 600, easing: 'cubic-bezier(.1,.7,.3,1)', fill: 'forwards' }).finished.then(() => sp.remove());
+  }
+  card.innerHTML = inner;
+  card.animate([{ transform: 'scale(.55) rotateY(-180deg)', opacity: .4 }, { transform: 'scale(1.08) rotateY(0deg)', opacity: 1, offset: .7 }, { transform: 'none' }], { duration: 800, easing: 'cubic-bezier(.2,.8,.3,1)' });
+  ['.rare-banner', '.rare-name', '.var-sub'].forEach(q => { const el = o.querySelector(q); el.hidden = false; });
+  o.querySelector('.rare-banner').animate([{ transform: 'scale(2.4)', opacity: 0 }, { transform: 'scale(1)', opacity: 1 }], { duration: 420, delay: 450, easing: 'cubic-bezier(.2,1.4,.4,1)', fill: 'backwards' });
+  await sleep(700); hint.textContent = 'Koppints a folytatáshoz';
+  await tap();
+  await show.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 250, fill: 'forwards' }).finished;
+  o.remove();
+}
 function evShowGot(got, e) {
   if (!got) return;
   if (got.back) { const b = BACKS[got.back], o = document.createElement('div'); o.className = 'overlay';
@@ -1638,7 +1679,7 @@ function evClaim(i) {
   const p = Store.p, e = curEvent(); if (!e) return; const st = ensureEv(p), r = e.rewards[i];
   if (!r || r.tbd || st.claimed.includes(i) || st.pts < r.at) return;
   const got = evGrant(p, r); st.claimed.push(i); save(); renderEvent(); renderProfileBar();
-  if (got) evShowGot(got, e); else toast(`+${rewLabel(r)}`);
+  if (got) evRewardReveal(e, got); else toast(`+${rewLabel(r)}`);
 }
 // jutalom megtekintése (a lap mit tud, a skin hogy néz ki)
 const huDay = d => `${['jan.', 'febr.', 'márc.', 'ápr.', 'máj.', 'jún.', 'júl.', 'aug.', 'szept.', 'okt.', 'nov.', 'dec.'][d.getMonth()]} ${d.getDate()}`;
@@ -1691,7 +1732,10 @@ function renderEvent() {
     <p class="q-note">A ${e.pts} meccs végén számít (bot, ranked és PvP meccsen is). ${e.goal} ponttal minden jutalom a tiéd. Ha az event végéig valamit nem veszel át, az még egy hétig itt vár, utána magától jóváíródik.</p>`;
   body.onclick = ev => { const b = ev.target.closest('[data-ec]'); if (b) return evClaim(+b.dataset.ec);
     const rv = ev.target.closest('[data-ev]'); if (rv) return evPreview(e.rewards[+rv.dataset.ev], st.pts >= e.rewards[+rv.dataset.ev].at);
-    if (ev.target.closest('#evAll')) { e.rewards.forEach((r, i) => { if (st.pts >= r.at && !st.claimed.includes(i) && !r.tbd) { evGrant(p, r); st.claimed.push(i); } }); save(); renderEvent(); renderProfileBar(); renderMenuFan(); toast('Jutalmak átvéve'); } };
+    if (ev.target.closest('#evAll')) { const gots = [];
+      e.rewards.forEach((r, i) => { if (st.pts >= r.at && !st.claimed.includes(i) && !r.tbd) { const g = evGrant(p, r); st.claimed.push(i); if (g) gots.push(g); } });
+      save(); renderEvent(); renderProfileBar(); renderMenuFan();
+      (async () => { for (const g of gots) await evRewardReveal(e, g); })(); } };
   renderEventTile();
 }
 // ---- event-zene (2026-10-15): csak a menükben szól, meccs közben nem; az első koppintás indítja (iPhone) ----
