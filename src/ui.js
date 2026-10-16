@@ -516,6 +516,44 @@ function openModal(inner, live, help = '') {
   const t0 = performance.now();
   o.onclick = () => { if (performance.now() - t0 > 350) o.remove(); };   // a megnyitó koppintás ne zárja be rögtön
   $('#layer').appendChild(o);
+  try { tiltAsk(); tiltAttach(o); } catch (e) {}
+}
+// ---- 3D döntés a nagy lapnézetben: telefonon a giroszkóp, gépen az egér (Laci ötlete, 2026-10-16) ----
+// max: legfeljebb ennyi fokot dől a lap mindkét tengelyen; k: telefon-fok → lap-fok szorzó
+const TILT = { max: 20, k: 0.9 };
+let tiltPerm = null;   // null: még nem kérdeztük · true/false: a telefon engedte-e
+function tiltAsk() {   // iPhone-on a mozgásérzékelőhöz engedély kell, és csak koppintásból kérhető
+  const D = window.DeviceOrientationEvent; if (tiltPerm !== null || !D) return;
+  if (typeof D.requestPermission === 'function') D.requestPermission().then(r => { tiltPerm = r === 'granted'; }).catch(() => {});
+  else tiltPerm = true;
+}
+function tiltAttach(o) {
+  const card = o.querySelector('.modal .card.big'); if (!card || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const wrap = document.createElement('div'); wrap.className = 'tilt-wrap';
+  card.parentNode.insertBefore(wrap, card); wrap.appendChild(card);
+  const shine = document.createElement('span'); shine.className = 'tilt-shine' + (card.classList.contains('foil') || card.classList.contains('gold') || card.classList.contains('diamond') ? ' strong' : ''); wrap.appendChild(shine);
+  const clamp = v => Math.max(-TILT.max, Math.min(TILT.max, v));
+  let tx = 0, ty = 0, cx = 0, cy = 0, b0 = null, g0 = null, alive = true, raf = 0;
+  const step = () => {
+    if (!o.isConnected) { alive = false; window.removeEventListener('deviceorientation', onOri); return; }
+    cx += (tx - cx) * 0.16; cy += (ty - cy) * 0.16;
+    wrap.style.setProperty('--rx', cx.toFixed(2) + 'deg'); wrap.style.setProperty('--ry', cy.toFixed(2) + 'deg');
+    wrap.style.setProperty('--sx', (50 + cy * 2.2).toFixed(1) + '%'); wrap.style.setProperty('--sy', (50 - cx * 2.2).toFixed(1) + '%');
+    if (alive) raf = requestAnimationFrame(step);
+  };
+  const onOri = e => {
+    if (e.beta == null || e.gamma == null) return;
+    let b = e.beta, g = e.gamma; const ang = (screen.orientation && screen.orientation.angle) ?? window.orientation ?? 0;
+    if (ang === 90) [b, g] = [-g, b]; else if (ang === -90 || ang === 270) [b, g] = [g, -b];
+    if (b0 === null) { b0 = b; g0 = g; }   // ahogy épp tartja a telefont, az a „nulla”
+    b0 += (b - b0) * 0.004; g0 += (g - g0) * 0.004;   // ha tartósan máshogy fogja, lassan oda áll vissza
+    tx = clamp(-(b - b0) * TILT.k); ty = clamp((g - g0) * TILT.k);
+  };
+  const onMove = e => { if (e.pointerType === 'touch') return; const r = card.getBoundingClientRect();
+    ty = clamp((e.clientX - (r.left + r.width / 2)) / (r.width / 2) * TILT.max); tx = clamp(-(e.clientY - (r.top + r.height / 2)) / (r.height / 2) * TILT.max); };
+  window.addEventListener('deviceorientation', onOri); o.addEventListener('pointermove', onMove);
+  o.addEventListener('pointerleave', () => { tx = ty = 0; });
+  raf = requestAnimationFrame(step);
 }
 // Full Art: a saját lapjaidnál a gyűjteményed dönt; PvP-ben az ellenfélnél az, amit a meccs elején magáról megosztott
 const longWord = n => Math.max(...n.split(/[\s\u00AD]+/).map(w => w.length));   // a leghosszabb szó (ezt nem lehet tördelni)

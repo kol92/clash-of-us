@@ -437,6 +437,11 @@ Hősképesség-ötletek a táblázatban (még nem zöldek, nincsenek beépítve)
 - Az ellenfél körében (PvP-ben és bot ellen is) a kezedben lévő lapok elsötétülnek, mint a ki nem játszható lapok – korábban ilyenkor mind „aktívnak” látszott.
 - A variáns lapok szalagja: „✦ Variáns” (kicsiben) / „✦ Ritka variáns” (nagy lapon) – korábban „Változat”.
 
+## 3D döntés a nagy lapnézetben (2026-10-16, Laci ötlete)
+- A nagyban megnyitott lap (gyűjtemény, meccs, jutalmak – minden `openModal`) a telefon döntésére 3D-ben dől: előre-hátra (pitch) és oldalra (roll), **legfeljebb 20°** mindkét tengelyen (Laci 30°-ot javasolt; `TILT.max` a ui.js-ben). Ahogy épp tartod a telefont, az a nulla; tartósan más tartásnál lassan oda áll vissza. A mozgás kisimítva, nem remeg. Fekvő telefonnál a tengelyek felcserélődnek.
+- Fényfolt követi a dőlést (Full Art / arany / gyémánt lapon erősebb).
+- iPhone-on a mozgásérzékelőhöz engedélyt kér a telefon (az első lap-megnyitáskor); ha nem engedi, a lap áll, mint eddig. Gépen az egér mozgására dől. „Kevesebb mozgás” rendszerbeállításnál kikapcsol.
+
 ## Bot-paklik: szintenként más, meccsenként változik (2026-10-16, Tomi)
 - Eddig a bot mindig a hőse kezdőpakliját játszotta (csak keverve). Mostantól `botDeckFor(hős, szint)` (meta.js, a DECKHELP-blokkban), `BOT_DECK`:
   - **Könnyű:** kezdőpakli + 3 véletlen csere azonos típusú és költségű közönséges/ritka lapra.

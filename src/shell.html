@@ -250,6 +250,11 @@ h1,h2,h3{font-family:var(--display);font-weight:400;letter-spacing:.01em;text-wr
 .overlay:not(.intro){padding-top:calc(16px + env(safe-area-inset-top,0px));padding-bottom:calc(16px + env(safe-area-inset-bottom,0px));}
 .modal{display:grid;gap:14px;justify-items:center;text-align:center;max-width:320px;width:100%;}
 .modal .card{--cw:min(250px,68vw);}
+/* 3D döntés a nagy lapnézetben (giroszkóp / egér, 2026-10-16) */
+.tilt-wrap{position:relative;width:fit-content;margin:0 auto;transform:perspective(900px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg));transform-style:preserve-3d;will-change:transform;}
+.tilt-shine{position:absolute;inset:0;border-radius:6%/4.5%;pointer-events:none;z-index:6;mix-blend-mode:soft-light;opacity:.55;
+  background:radial-gradient(circle at var(--sx,50%) var(--sy,50%),rgba(255,255,255,.75),rgba(255,255,255,.12) 38%,transparent 62%);}
+.tilt-shine.strong{mix-blend-mode:overlay;opacity:.8;background:radial-gradient(circle at var(--sx,50%) var(--sy,50%),rgba(255,255,255,.85),rgba(255,200,240,.25) 30%,rgba(140,220,255,.12) 50%,transparent 66%);}
 .close-hint{font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--mute);opacity:.8;}
 .modal .live{font-size:13px;color:var(--mute);font-weight:700;}
 .played{position:fixed;inset:0;z-index:45;display:grid;place-items:center;pointer-events:none;}
