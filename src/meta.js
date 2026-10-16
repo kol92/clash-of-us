@@ -697,8 +697,8 @@ function renderShop() {
     <div class="shop-grid">
       ${shopPanelHTML({ attr: 'data-pack="base"', img: 'art/ui/pack-base.webp', contain: true, name: SETS.base.name, sub: '3 lap', price: ECON.packPrice, have: false })}
       ${shopPanelHTML({ attr: 'data-pack="shiny"', img: 'art/ui/pack-shiny.webp', contain: true, name: 'Shiny pack', sub: '1 biztos különleges', price: ECON.shinyPrice, have: false, holo: true })}
-      ${TEST_MODE ? `${shopPanelHTML({ attr: 'data-pack="ah"', img: 'art/ui/pack-base.webp', contain: true, name: SETS.ah.name, sub: 'Új szett · 3 lap', price: ECON.packPrice, have: false, extra: '<span class="sp-setrib">Amszterdam hősei</span>' })}
-      ${shopPanelHTML({ attr: 'data-pack="ahshiny"', img: 'art/ui/pack-shiny.webp', contain: true, name: 'Amszterdam Shiny', sub: '1 biztos Full Art', price: ECON.shinyPrice, have: false, holo: true, extra: '<span class="sp-setrib">Amszterdam hősei</span>' })}` : ''}
+      ${TEST_MODE ? `${shopPanelHTML({ attr: 'data-pack="ah"', img: 'art/ui/pack-ah.webp', contain: true, name: SETS.ah.name, sub: 'Új szett · 3 lap', price: ECON.packPrice, have: false })}
+      ${shopPanelHTML({ attr: 'data-pack="ahshiny"', img: 'art/ui/pack-ahshiny.webp', contain: true, name: 'Amszterdam Shiny', sub: '1 biztos Full Art', price: ECON.shinyPrice, have: false, holo: true })}` : ''}
     </div>
     ${chestPanelHTML()}
     <details class="pack-info-more"><summary>Mi van a packokban?</summary>
@@ -730,7 +730,7 @@ function renderShop() {
 function packHTML(setId, o = {}) {
   return `<div class="pack pk set-${setId}${o.shiny ? ' shiny' : ''}" role="img" aria-label="Best of Us – ${o.shiny ? 'Shiny ' : ''}${SETS[setId].name} booster pack">
     <div class="pk-part pk-body"></div><div class="pk-part pk-top"></div><div class="pk-sheen"></div>${o.shiny ? '<div class="pk-holo"></div><span class="pk-ribbon">Shiny</span>' : ''}
-    ${setId !== 'base' ? `<span class="pk-setrib">${SETS[setId].name}</span>` : ''}<div class="pk-tear"><i></i><em></em></div><div class="pk-glow"></div></div>`;
+    <div class="pk-tear"><i></i><em></em></div><div class="pk-glow"></div></div>`;
 }
 
 // ---- pack bontás ----
