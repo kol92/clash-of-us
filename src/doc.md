@@ -437,6 +437,18 @@ Hősképesség-ötletek a táblázatban (még nem zöldek, nincsenek beépítve)
 - Az ellenfél körében (PvP-ben és bot ellen is) a kezedben lévő lapok elsötétülnek, mint a ki nem játszható lapok – korábban ilyenkor mind „aktívnak” látszott.
 - A variáns lapok szalagja: „✦ Variáns” (kicsiben) / „✦ Ritka variáns” (nagy lapon) – korábban „Változat”.
 
+## Bot-paklik: szintenként más, meccsenként változik (2026-10-16, Tomi)
+- Eddig a bot mindig a hőse kezdőpakliját játszotta (csak keverve). Mostantól `botDeckFor(hős, szint)` (meta.js, a DECKHELP-blokkban), `BOT_DECK`:
+  - **Könnyű:** kezdőpakli + 3 véletlen csere azonos típusú és költségű közönséges/ritka lapra.
+  - **Normál:** a paklisegéd rakja össze a közönséges–epikus lapok véletlen 70%-ából.
+  - **Nehéz:** a paklisegéd minden nem legendás lap véletlen 75%-ából.
+  - **Mester:** a paklisegéd a teljes lapkészletből (+6 élet), mint eddig.
+  - Kánon esemény mindig a bot hőséé; csak gyűjthető lapok (event-, Pass-, bolti, kerék-lapok és változatok nélkül); lapfajtánként max. 2 (legendásból 1).
+- Mérés (`tools/botdeck.js LV N [old]`, 400 meccs, „játékos” = kezdőpakli + Normál bot-agy), a bot nyerési aránya: Könnyű 21,8% → 21,5% · Normál 50,3% → 51,8% · Nehéz 62,3% → 67,5%. (Kipróbálva, de elvetve: a kezdőpaklik véletlen cseréi Normálon 42–44%-ra gyengítették a botot, a legendásokkal együtt a Nehéz 74,5% lett.)
+
+## Javítás: „Újabb ranked” → Mégse beragadás (2026-10-16)
+- Meccs után az „Újabb ranked” gomb a lezárt meccs képernyőjén indította a keresést; ha valaki „Mégse”-t nyomott, a lezárt táblán ragadt, és a zászló sem csinált semmit. Mostantól az „Újabb ranked” előbb a Ranked képernyőre visz, a keresés megszakítása lezárt meccsből a menübe visz, és lezárt meccsen a zászló is a menübe visz.
+
 ## Sasi, a mágus – bolti skin (2026-10-15)
 - Új hős-portré Sasinak (p_sasi_mage), a Boltban **250 coin**, **2026-10-16-tól** (a következő bolt-rotációtól; `PORTRAITS[].from`, `portOnSale`). Mint a többi bolti portré, a heti láda 0,5%-os portré-esélyében is benne van.
 

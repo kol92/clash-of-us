@@ -1263,7 +1263,8 @@ async function doPlay(hi, t) {
 }
 $('#logBtn').onclick = e => { e.stopPropagation(); if (S) openLog(); };
 $('#flagBtn').onclick = () => {
-  if (!S || S.winner != null) return;
+  if (!S || S.winner != null) {   // a meccs már véget ért (pl. a keresést megszakította): a zászló kivisz a menübe, nem ragadhat be senki
+    if (!$('#layer .overlay')) { busy = false; S = null; renderMenuFan(); renderProfileBar(); show('scr-menu'); } return; }
   if (S.tut?.onboard) return toast('Előbb játszd végig a gyakorló meccset – utána jön a főmenü 🙂');
   if (busy) return toast('Várd meg, amíg lezajlik a lépés');
   const o = document.createElement('div'); o.className = 'overlay';
@@ -1528,16 +1529,11 @@ function startMatch(heroId, deckId, opt = {}) {
   const bd = DECK_OF(bh) || Object.keys(DECKS)[0];   // a bot a saját hősének kezdőpaklijával játszik
   const first = Math.random() < .5 ? ME : BOT;
   const mine = (allDecks().find(d => d.id === deckId) || allDecks()[0]).list;
-  S = newGame(heroId, { ...mine }, bh, bd, first, { mulligan: true, foils: [0, 1].map(k => k === ME ? myFoils(mine) : {}) }); S.events = [];
-  S.botLv = opt.ranked ? rkBotLv() : (opt.lv || botLvPref());   // bot-szint: rankedben a rangtól függ
-  if (S.botLv === 4) {   // Mester bot: a 🪄 paklisegéd a teljes kártyakészletből rakja össze a bot hősének paklijét
-    try {
-      const full = id => { const c = CARD[id]; return c.token || c.off || c.passOnly || c.eventOnly || c.shopOnly || c.wheelOnly || c.variantOf ? 0 : c.rarity === 'l' ? 1 : 2; };
-      const strong = deckHelperFill({}, bh, full).list;
-      if (deckCount(strong) === DECK_SIZE) S = Object.assign(newGame(heroId, { ...mine }, bh, strong, first, { mulligan: true, foils: [0, 1].map(k => k === ME ? myFoils(mine) : {}) }), { events: [], botLv: 4, ranked: S.ranked });
-    } catch (e) {}
-    S.players[BOT].hp += 6; S.players[BOT].maxHp += 6;   // nyílt előny: a Mester bot +6 élettel kezd (a VS képernyő kiírja)
-  }
+  const lv = opt.ranked ? rkBotLv() : (opt.lv || botLvPref());   // bot-szint: rankedben a rangtól függ
+  let botList = null; try { botList = botDeckFor(bh, lv); } catch (e) {}   // a bot paklija szintenként más, és meccsenként változik (2026-10-16)
+  S = newGame(heroId, { ...mine }, bh, botList || bd, first, { mulligan: true, foils: [0, 1].map(k => k === ME ? myFoils(mine) : {}) }); S.events = [];
+  S.botLv = lv;
+  if (lv === 4) { S.players[BOT].hp += 6; S.players[BOT].maxHp += 6; }   // Mester bot: nyílt előny, +6 élettel kezd (a VS képernyő kiírja)
   if (opt.ranked) { S.ranked = true; const r = ensureRank(Store.p); if (r) { r.pend = Date.now(); save(); } }   // ha bezárja az appot, vereségnek számít
   ui.sel = null; busy = true; ui.handSeen = null; ui.botHandN = null; ui.flying = new Set(); show('scr-game');
   $('#layer').innerHTML = '';
@@ -1632,7 +1628,9 @@ function endMatch() {
     <div class="row"><button class="btn" data-r="menu">Menü</button><button class="btn primary" data-r="again">${S.ranked ? 'Újabb ranked' : 'Új meccs'}</button></div></div>`;
   const wasRanked = !!S.ranked;
   o.onclick = e => { if (e.target.closest('[data-log]')) { openLog(); return; } const b = e.target.closest('[data-r]'); if (!b) return; o.remove();
-    if (b.dataset.r === 'again' && wasRanked) { const d = allDecks().find(x => x.id === ui.deck); if (d && !deckIssue(d)) rankedSearch(d); else { renderRanked(); show('scr-ranked'); } return; }
+    if (b.dataset.r === 'again' && wasRanked) { const d = allDecks().find(x => x.id === ui.deck);
+      busy = false; S = null; renderRanked(); show('scr-ranked');   // előbb vissza a Ranked képernyőre – ha a keresést megszakítja, ott marad (nem ragad a lezárt meccsen)
+      if (d && !deckIssue(d)) rankedSearch(d); return; }
     if (b.dataset.r === 'again') { const d = allDecks().find(x => x.id === ui.deck); if (d && !deckIssue(d)) startMatch(d.hero, ui.deck); else openBotPick(); } else { renderMenuFan(); renderProfileBar(); show('scr-menu'); } };
   setTimeout(() => $('#layer').appendChild(o), 700);
 }

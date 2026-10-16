@@ -968,6 +968,37 @@ function deckHelperFill(list0, hero, own) {
   }
   return { list, added };
 }
+// Bot paklija szintenként (2026-10-16, Tomi), meccsenként más (mérés: tools/botdeck.js, „játékos” = kezdőpakli + Normál agy):
+// 1 Könnyű = kezdőpakli + 3 véletlen csere azonos típusú/költségű közönséges vagy ritka lapra (bot nyer ~21%, mint eddig)
+// 2 Normál = a paklisegéd a közönséges–epikus lapok véletlen 70%-ából (~52%, eddig 50%)
+// 3 Nehéz = a paklisegéd minden nem legendás lap véletlen 75%-ából (~67%, eddig 62%)
+// 4 Mester = a paklisegéd a teljes lapkészletből (+6 élet a startMatch-ben)
+const BOT_DECK = { 1: { swaps: 3, rar: 'kr' }, 2: { share: 0.7, rar: 'kre' }, 3: { share: 0.75, noLeg: true } };
+function botDeckFor(hero, lv, rnd = Math.random) {
+  const stK = Object.keys(DECKS).find(k => DECKS[k].hero === hero); if (!stK) return null;
+  const pool = CARDS.filter(c => !c.token && !c.off && !c.passOnly && !c.eventOnly && !c.shopOnly && !c.wheelOnly && !c.variantOf && !c.finisher && (!c.hero || c.hero === hero));
+  const cap = id => CARD[id].rarity === 'l' ? 1 : 2;
+  if (lv >= 4 || (BOT_DECK[lv] && BOT_DECK[lv].share)) {
+    const cf = BOT_DECK[lv] || {}, sh = lv >= 4 ? 1 : cf.share, keep = new Set(pool.filter(c => (cf.rar ? cf.rar.includes(c.rarity) : (!cf.noLeg || c.rarity !== 'l')) && rnd() < sh).map(c => c.id));
+    const own = id => { const c = CARD[id]; return c.finisher && c.hero === hero ? 1 : keep.has(id) ? cap(id) : 0; };
+    const { list } = deckHelperFill({}, hero, own);
+    return Object.values(list).reduce((a, b) => a + b, 0) === DECK_SIZE ? list : { ...DECKS[stK].list };
+  }
+  const cfg = BOT_DECK[lv] || BOT_DECK[2], list = { ...DECKS[stK].list };
+  const bo = id => CARD[id].variantOf || id, famN = id => Object.entries(list).reduce((a, [x, n]) => a + (bo(x) === bo(id) ? n : 0), 0);
+  for (let k = 0; k < cfg.swaps; k++) {
+    const flat = Object.entries(list).flatMap(([id, n]) => Array(n).fill(id)).filter(id => !CARD[id].finisher && !CARD[id].hero);
+    const out = flat[Math.floor(rnd() * flat.length)]; if (!out) break;
+    const o = CARD[out];
+    const RK = { k: 0, r: 1, e: 2, l: 3 }, okR = c => cfg.rar.includes(c.rarity) && (!cfg.up || RK[c.rarity] >= RK[o.rarity]);   // up: nem cserél gyengébb ritkaságra
+    let cand = pool.filter(c => c.type === o.type && c.cost === o.cost && c.id !== out && okR(c) && famN(c.id) < cap(c.id));
+    if (!cand.length) cand = pool.filter(c => c.type === o.type && Math.abs(c.cost - o.cost) <= 1 && c.id !== out && okR(c) && famN(c.id) < cap(c.id));
+    if (!cand.length) continue;
+    const inn = cand[Math.floor(rnd() * cand.length)].id;
+    if (!--list[out]) delete list[out]; list[inn] = (list[inn] || 0) + 1;
+  }
+  return list;
+}
 // [DECKHELP-END]
 function allDecks() {
   const starters = Object.entries(DECKS).map(([id, d]) => ({ id, name: d.name, desc: d.desc, hero: d.hero, list: upgradeList(d.list), starter: true }));
@@ -2391,6 +2422,8 @@ function pvpStopSearch(cancel) {
   if (cancel && PVP.searching) { const d = PVP.list.find(x => x.id === PVP.searching); if (!d || d.status === 'open') pvpDoc(PVP.searching).delete().catch(() => {}); }
   PVP.searching = null; PVP.searchDeck = null; PVP.friendTo = null; PVP.friendSeen = false; PVP.ranked = false;
   $('#layer .pv-search')?.remove(); pvpPresence();
+  // ha egy lezárt meccs képernyőjén maradt (pl. „Újabb ranked” → Mégse), vigyük vissza a menübe
+  if (cancel && !$('#scr-game').hidden && (!S || S.winner != null)) { busy = false; S = null; renderMenuFan(); renderProfileBar(); show('scr-menu'); }
 }
 // körszámláló élő meccsben; ha a soros játékos nincs ott, a másik gép zárja le helyette a kört
 async function pvpAutoEnd() {
