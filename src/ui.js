@@ -547,7 +547,7 @@ function tiltAttach(o) {
     if (ang === 90) [b, g] = [-g, b]; else if (ang === -90 || ang === 270) [b, g] = [g, -b];
     if (b0 === null) { b0 = b; g0 = g; }   // ahogy épp tartja a telefont, az a „nulla”
     b0 += (b - b0) * 0.004; g0 += (g - g0) * 0.004;   // ha tartósan máshogy fogja, lassan oda áll vissza
-    tx = clamp(-(b - b0) * TILT.k); ty = clamp((g - g0) * TILT.k);
+    tx = clamp((b - b0) * TILT.k); ty = clamp(-(g - g0) * TILT.k);   // mindkét tengelyen a telefonnal ellentétesen fordul (Laci, 2026-10-16)
   };
   const onMove = e => { if (e.pointerType === 'touch') return; const r = card.getBoundingClientRect();
     ty = clamp((e.clientX - (r.left + r.width / 2)) / (r.width / 2) * TILT.max); tx = clamp(-(e.clientY - (r.top + r.height / 2)) / (r.height / 2) * TILT.max); };
