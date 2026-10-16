@@ -3,7 +3,7 @@ const ECON = { goldPlain: 0.005, goldShiny: 0.05, goldDupe: 100, heroFaChance: 0
                odds: [['l', 1.5], ['e', 6.5], ['r', 22], ['k', 70]] };
 // a „token” lapok (pl. Query) csak más lap hatására kerülnek játékba: nincsenek packban, gyűjteményben, pakliban
 const PLAYABLE = CARDS.filter(c => !c.token && !c.off);   // off: kánon esemény lap, amíg nincs hozzá grafika – sehol nem látszik
-const SETS = { base: { name: 'Base set', cards: PLAYABLE.filter(c => !c.variantOf && !c.passOnly && !c.eventOnly).map(c => c.id) } };   // passOnly: csak a Season Passból; eventOnly: csak eventből
+const SETS = { base: { name: 'Base set', cards: PLAYABLE.filter(c => !c.variantOf && !c.passOnly && !c.eventOnly && !c.shopOnly).map(c => c.id) } };   // passOnly: csak a Season Passból; eventOnly: csak eventből; shopOnly: csak a Boltból
 const VARIANT_CHANCE = 0.2;   // ha az alaplap jön, 1 az 5-höz eséllyel a ritkább változata lesz belőle
 const DECK_SIZE = 20;
 const maxCopies = id => CARD[id].rarity === 'l' ? 1 : 2;
@@ -16,7 +16,7 @@ const Store = { mode: 'loading', uid: null, db: null, ref: null, p: null, saving
 
 function starterCollection() {
   const coll = {};
-  for (const c of PLAYABLE) { if (c.variantOf) continue; if (c.rarity === 'k') coll[c.id] = { n: 2, f: 0 }; else if (c.rarity === 'r' || c.finisher) coll[c.id] = { n: 1, f: 0 }; }
+  for (const c of PLAYABLE) { if (c.variantOf || c.shopOnly || c.passOnly || c.eventOnly) continue; if (c.rarity === 'k') coll[c.id] = { n: 2, f: 0 }; else if (c.rarity === 'r' || c.finisher) coll[c.id] = { n: 1, f: 0 }; }
   return coll;
 }
 // Később bekerült gyakori lapok: a meglévő profilok is megkapják (gv = kiosztási verzió)
@@ -613,7 +613,7 @@ function shopPanelHTML({ attr, img, pos, contain, name, sub, price, have, holo, 
 }
 function shopOfferHTML(it) {
   const c = CARD[it.id];
-  return shopPanelHTML({ attr: `data-buy="${it.id}"`, img: ART[it.id].src, pos: ART[it.id].pos || '50% 20%', name: c.name, sub: '✦ Változat · 2 db', price: it.price, have: owned(it.id) > 0 });
+  return shopPanelHTML({ attr: `data-buy="${it.id}"`, img: ART[it.id].src, pos: ART[it.id].pos || '50% 20%', name: c.name, sub: c.variantOf ? '✦ Változat · 2 db' : `✦ ${TYPE[c.type] ? TYPE[c.type][0] : 'Lap'} · 2 db`, price: it.price, have: owned(it.id) > 0 });
 }
 function portOfferHTML(k) {
   const P = PORTRAITS[k];
@@ -639,14 +639,14 @@ async function buyShopItem(id) {
   if (owned(id) > 0) return openModal(cardHTML(id, { big: true }), '✓ Ez már megvan neked – a Paklik menüben ugyanúgy beteheted, mint az alaplapot.', cardHelpHTML(id));
   if (p.coins < it.price) return toast(`Nincs elég coinod (${p.coins}/${it.price})`);
   const o = document.createElement('div'); o.className = 'overlay';
-  o.innerHTML = `<div class="modal">${cardHTML(id, { big: true })}<div class="live">✦ ${c.name} – különleges változat. Ugyanúgy játszható, mint a(z) ${CARD[c.variantOf].name}, csak más a képe. Rögtön 2 példányt kapsz belőle.</div><div class="row2"><button class="btn" data-x>Mégse</button><button class="btn primary" data-ok><span class="coin sm" aria-hidden="true"></span> ${it.price} · Megveszem</button></div></div>`;
+  o.innerHTML = `<div class="modal">${cardHTML(id, { big: true })}<div class="live">${c.variantOf ? `✦ ${c.name} – különleges változat. Ugyanúgy játszható, mint a(z) ${CARD[c.variantOf].name}, csak más a képe.` : `✦ ${c.name} – csak a Boltban kapható lap, packból nem jön.`} Rögtön 2 példányt kapsz belőle.</div><div class="row2"><button class="btn" data-x>Mégse</button><button class="btn primary" data-ok><span class="coin sm" aria-hidden="true"></span> ${it.price} · Megveszem</button></div></div>`;
   $('#layer').appendChild(o);
   const ok = await new Promise(r => { o.onclick = e => { if (e.target.closest('[data-ok]')) r(true); else if (e.target.closest('[data-x]') || e.target === o) r(false); }; });
   o.remove(); if (!ok) return;
   if (p.coins < it.price || owned(id) > 0) return;
   p.coins -= it.price; const e = p.coll[id] || (p.coll[id] = { n: 0, f: 0 }); e.n += 2;   // rögtön 2 példány (packból nem szerezhető)
   await save(); renderProfileBar(); renderShop();
-  openModal(cardHTML(id, { big: true }), `🎉 Megvetted: ${c.name}! 2 példány került a gyűjteményedbe – a pakliépítőben az alaplap helyett is beteheted.`, '');
+  openModal(cardHTML(id, { big: true }), `🎉 Megvetted: ${c.name}! 2 példány került a gyűjteményedbe – ${c.variantOf ? 'a pakliépítőben az alaplap helyett is beteheted' : 'a Paklik menüben beteheted a paklidba'}.`, '');
 }
 const SHOP_REFRESH = '2026-10-16';   // a limitált kínálat következő frissítése, pl. '2026-10-20' – ha megadod, visszaszámlál
 function renderShop() {
@@ -2289,14 +2289,15 @@ async function pvpDrain() {
       const wasMull = S.phase === 'mulligan';
       if (wasMull) { $('#layer').querySelectorAll('.overlay').forEach(o => o.remove()); }
       const L = d.last || {};
-      if (!wasMull && d.v === PVP.v + 1 && L.by !== ME && (L.kind === 'play' || L.kind === 'end')) {
+      if (!wasMull && d.v === PVP.v + 1 && L.by !== ME && (L.kind === 'play' || L.kind === 'end' || L.kind === 'move')) {
         busy = true; render();
         pvpSeed(d.v);
         try {
           if (L.kind === 'play') {
             const hi = S.players[BOT].hand.findIndex((c, i) => i === L.hi && c.id === L.id);
             if (hi >= 0) { await showPlayed(L.id, L.t, !!S.players[BOT].hand[hi].foil); await runFx(() => playCard(S, BOT, hi, L.t)); }
-          } else await resolveEnd();
+          } else if (L.kind === 'move') await runFx(() => moveUnit(S, BOT, L.a, L.b));
+          else await resolveEnd();
         } catch {}
         unseedRng();
       }
@@ -2514,7 +2515,7 @@ const frOn = () => !!(window.APP_MODE && Store.db && Store.uid && Store.p);
 const frPair = (a, b) => [a, b].sort().join('_');
 const frOther = d => d.parts.find(u => u !== Store.uid);
 const frName = uid => FR.pub[uid]?.name || (FR.list.find(d => frOther(d) === uid) || {}).names?.[uid] || 'Barát';
-const tradable = id => { const c = CARD[id]; return c && !c.token && !c.variantOf && !c.foilOnly && !c.passOnly && !c.eventOnly; };
+const tradable = id => { const c = CARD[id]; return c && !c.token && !c.variantOf && !c.foilOnly && !c.passOnly && !c.eventOnly && !c.shopOnly; };
 const RAR_ORDER = { l: 0, e: 1, r: 2, k: 3 };
 // eszköztípus (2026-10-13): megmérjük, ki milyen eszközön játszik (telefon / tablet / gép) – a nagy képernyős fejlesztésekhez
 function devKind() {

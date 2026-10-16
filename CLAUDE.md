@@ -95,6 +95,7 @@ Csak build (kitétel nélkül): `cd src && python3 build-app.py ""` → `src/dis
 - **Event előzetes / ajándék:** `teaser` időpont, `evPre` / `evMood` / `evLive`, `evGiftCheck` (egyszeri ajándék a `p.gifts`-ben), `evTeaserModal`; jutalom-felfedés: `evRewardReveal`.
 - **Bolti portré későbbi kezdéssel:** `PORTRAITS[k].from = 'ÉÉÉÉ-HH-NN'` + `portOnSale()`.
 - **Cápa** (az ellenfél térfelén úszik): nem célozható saját-célú lappal, a buffok nem erősítik; a **Sasi ütése** viszont beleszámolja és célozhatja is (`tgt:'anyOrHero'`).
+- **Laci cipőkanala** (i_cipo, bolti eszköz, 2026-10-16): áthelyezés a táblán – `canMove` / `moveTargets` / `moveUnit`, UI: `ui.mv`, `doMove`, PvP lépés `move`. Bolti önálló lap: `shopOnly` nem-változat (kezdőgyűjtemény, SETS, csere kizárja). Teszt: `tools/cipo_test.js`.
 - **Tesztek:** `tools/hw_test.js` (Halloween-lapok, Álarcos bál, Cápa + Sasi), `tools/mosh_test.js`.
 
 ## Jelenlegi állapot és teendők (2026-10-16 este, account-váltáskor)

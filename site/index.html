@@ -1094,6 +1094,11 @@ body.ev-hw #scr-menu .fan{filter:drop-shadow(0 0 22px rgba(255,140,40,.35));}
 
 /* eszközök a karakter részletező ablakában */
 .gear-box{width:100%;max-width:320px;display:grid;gap:6px;}
+/* Laci cipőkanala (2026-10-16): áthelyezhető karakter jelzése és a gomb a nagy nézetben */
+.mvb{position:absolute;top:-6px;left:-6px;z-index:5;width:22px;height:22px;border-radius:50%;background:#2a1d4a;border:2px solid #b18cff;display:grid;place-items:center;font-size:12px;line-height:1;box-shadow:0 0 8px rgba(177,140,255,.8);animation:mvbPulse 1.6s ease-in-out infinite;pointer-events:none;}
+@keyframes mvbPulse{50%{box-shadow:0 0 14px rgba(177,140,255,1);transform:scale(1.08);}}
+@media (prefers-reduced-motion:reduce){.mvb{animation:none;}}
+.mv-btn{margin:2px auto 0;min-width:180px;}
 .gear-lbl{font-size:11px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:var(--gold);}
 .gear-row{display:flex;gap:8px;overflow-x:auto;padding:4px 2px 6px;justify-content:center;flex-wrap:wrap;}
 .gear-card{display:grid;justify-items:center;gap:3px;padding:0;background:none;border:0;cursor:pointer;color:inherit;}
@@ -2319,7 +2324,7 @@ body.pf-loading #scr-menu .pb-name::after{content:'';display:inline-block;width:
 <script src="vendor/firebase-auth-compat.js"></script>
 <script src="vendor/firebase-firestore-compat.js"></script>
 <script src="vendor/firebase-database-compat.js"></script>
-<script>window.APP_VERSION = "2026.10.16-1538"; window.APP_BUILD = "2026.10.16-1949";</script>
+<script>window.APP_VERSION = "2026.10.16-2027"; window.APP_BUILD = "2026.10.16-2027";</script>
 <script>// ===== Best of Us – saját szerver (Firebase) =====
 // A játék eredetileg a Claude-os tárolót használta (window.claude.use('db' | 'user' | 'room')).
 // Ez a fájl ugyanazt a felületet adja Firebase-ből, így a játék kódja szinte változatlan maradhat:
@@ -2634,6 +2639,8 @@ const CARDS = [
   { id:'i_uto', type:'item', name:'TomiNegan ütője', cost:3, atk:3, hp:0, rarity:'l', muscle:true, text:'' },
   { id:'i_vodkakancso', drink:true, type:'item', name:'Vodka Kancsó', cost:3, atk:4, hp:0, rarity:'r', muscle:true, hangover:true, text:'Utána a következő körödben a karakter bénult: nem támad, és nem üt vissza.' },
   { id:'i_bunda', type:'item', name:'Fehér szarvas bunda', cost:2, atk:0, hp:3, rarity:'r', taunt:true, text:'Gál Zoli benne nem pusztul el a támadása után, és Pajzsot is kap.' },
+  // Bolti eszköz (2026-10-16): csak a Boltban kapható, packból nem jön
+  { id:'i_cipo', type:'item', name:'Laci cipőkanala', cost:1, atk:0, hp:0, rarity:'k', shopOnly:true, price:100, mover:true, text:'Amelyik karakterre ráteszed, azt a körödben egyszer áthelyezheted a táblán (üres helyre, vagy helycserével).' },
   { id:'i_aranylanc', type:'item', name:'Tomi nyaklánca', cost:3, atk:2, hp:3, rarity:'l', text:'' },
   // --- Akciók ---
   { id:'a_dinnyes', drink:true, type:'action', name:'Dinnyés Absolute Vodka', cost:1, tgt:'enemyOrHero', rarity:'k', text:'3 sebzés egy ellenséges karakternek vagy az ellenfél hősének.' },
@@ -3322,6 +3329,25 @@ function laszyRoll(s, pi, i) {
   const opts = [{ i:-1 }]; s.players[pi].board.forEach((x, j) => { if (x && j !== i) opts.push({ i:j }); });
   return opts[Math.floor(rnd() * opts.length)];
 }
+// Laci cipőkanala (2026-10-16): a karakter, akin rajta van, a gazdája körében egyszer áthelyezhető
+// (saját üres helyre, vagy helycsere egy másik saját karakterrel). Csak a cipőkanalas karakter számít „mozgatottnak”.
+const hasMover = u => !!(u && (u.items || []).some(id => CARD[id] && CARD[id].mover));
+function canMove(s, pi, i) {
+  const p = s.players[pi], u = p.board[i];
+  return s.winner == null && !s.phase && s.active === pi && hasMover(u) && !isFixed(u) && u.moved !== s.half;
+}
+function moveTargets(s, pi, a) {
+  const p = s.players[pi], T = []; if (!canMove(s, pi, a)) return T;
+  p.board.forEach((x, b) => { if (b !== a && !isFixed(x) && (x || !closedLane(s, pi, b))) T.push({ k: x ? 'unit' : 'slot', side:pi, i:b }); });
+  return T;
+}
+function moveUnit(s, pi, a, b) {
+  if (!moveTargets(s, pi, a).some(t => t.i === b)) return false;
+  const B = s.players[pi].board, u = B[a];
+  [B[a], B[b]] = [B[b], B[a]]; u.moved = s.half;
+  ev(s, { t:'move', side:pi, i:b, from:a, swap: !!B[a] });
+  return true;
+}
 function strike(s, i) {
   const pi = s.active, ei = other(pi), me = s.players[pi], u = me.board[i];
   reveal(s, pi, i);
@@ -3569,7 +3595,7 @@ function botChoose(real, lvl = 2) {
   return best && { hi: best.hi, t: best.t };
 }
 
-if (typeof module !== 'undefined') module.exports = { BOT_LV, baszoStrike, sharkSwim, atiFlee, openSlots, closedLane, CARDS_ALL: CARDS, DECK_OF, LANES, MAX_HALF, mulligan, botMulligan, beginGame, CARDS, CARD, HEROES, HERO, DECKS, newGame, playCard, canPlay, targetsFor, cardCost, attackLane, finishTurn, runEndTurn, botChoose, canAttack, effAtk };
+if (typeof module !== 'undefined') module.exports = { canMove, moveTargets, moveUnit, BOT_LV, baszoStrike, sharkSwim, atiFlee, openSlots, closedLane, CARDS_ALL: CARDS, DECK_OF, LANES, MAX_HALF, mulligan, botMulligan, beginGame, CARDS, CARD, HEROES, HERO, DECKS, newGame, playCard, canPlay, targetsFor, cardCost, attackLane, finishTurn, runEndTurn, botChoose, canAttack, effAtk };
 // ===== Clash of Us – felület =====
 let ME = 0, BOT = 1;   // PvP-ben a vendégnél felcserélődik: mindig te vagy lent
 const $ = q => document.querySelector(q);
@@ -3606,7 +3632,7 @@ const setAppH = () => {
 setAppH(); addEventListener('resize', setAppH); addEventListener('orientationchange', () => setTimeout(setAppH, 350));
 addEventListener('pageshow', setAppH); document.addEventListener('visibilitychange', () => { if (!document.hidden) setAppH(); });
 let S = null, busy = false;
-const ui = { sel: null, pend: null, drag: null, dragEnd: 0, hero: 'barna', deck: 'roham', foil: false, handSeen: null, botHandN: null, flying: new Set() };
+const ui = { mv: null, sel: null, pend: null, drag: null, dragEnd: 0, hero: 'barna', deck: 'roham', foil: false, handSeen: null, botHandN: null, flying: new Set() };
 
 const TYPE = { char:['Karakter','t-char'], item:['Eszköz','t-item'], action:['Akció','t-action'], loc:['Helyszín','t-loc'] };
 const RAR = { k:'Gyakori', r:'Ritka', e:'Epikus', l:'Legendás', g:'Arany', d:'Gyémánt' };
@@ -3814,6 +3840,7 @@ const ART = {
   i_aranylanc: { src:'art/nyaklanc.webp?v=9112698d6e491039', pos:'50% 55%' },
   i_vodkakancso: { src:'art/vodkakancso.webp?v=e6370d8ed3fffe32', pos:'55% 30%' },
   i_bunda: { src:'art/bunda.webp?v=d20fe57cc5b5d5b9', pos:'50% 30%' },
+  i_cipo: { src:'art/cipokanal.webp?v=33119697c8a34cc6', pos:'52% 40%' },
   a_legeny: { src:'art/legeny.webp?v=dbe9eb70b7fbc278', pos:'50% 35%' },
   a_kitiltva: { src:'art/kitiltva.webp?v=bbd4b6f44fd618bf', pos:'50% 35%' },
   a_haver: { src:'art/haver.webp?v=7bbcf093c8b23f32', pos:'50% 22%' },
@@ -4029,7 +4056,7 @@ $('#vFoil').onclick = () => { ui.foil = true; $('#vFoil').setAttribute('aria-pre
 // egy lap nagy nézete a Gyűjteményben – ha 2 példány fölött van belőle, egyenként beváltható
 function collCardModal(id, cap) {
   const e = Store.p?.coll[id] || { n: 0, f: 0 }, extra = e.n + e.f - DUPE_KEEP;
-  cap = cap || `<i class="rar r-${CARD[id].rarity}" aria-hidden="true"></i> ${RAR[CARD[id].rarity]} · ${e.n} db${e.f ? ` + ${e.f} Full Art` : ''}${CARD[id].passOnly ? ' · csak a Season Passból szerezhető' : CARD[id].eventOnly ? ' · csak eventből szerezhető' : !e.n && !e.f ? ' · boosterből szerezhető' : ''}`;
+  cap = cap || `<i class="rar r-${CARD[id].rarity}" aria-hidden="true"></i> ${RAR[CARD[id].rarity]} · ${e.n} db${e.f ? ` + ${e.f} Full Art` : ''}${CARD[id].passOnly ? ' · csak a Season Passból szerezhető' : CARD[id].eventOnly ? ' · csak eventből szerezhető' : CARD[id].shopOnly && !CARD[id].variantOf ? ` · csak a Boltban kapható (${CARD[id].price || 100} coin)` : !e.n && !e.f ? ' · boosterből szerezhető' : ''}`;
   const btns = extra > 0 ? `<div class="cv-row">${e.n > 0 ? `<button class="btn cv-btn" data-cv="n">♻️ 1 lap beváltása · +${dupeVal(id, false)} coin</button>` : ''}${e.f > 0 ? `<button class="btn cv-btn fa" data-cv="f">♻️ 1 Full Art beváltása · +${dupeVal(id, true)} coin</button>` : ''}</div><small class="cv-note">${extra} fölösleges példány – 2 mindig megmarad</small>` : '';
   openModal(cardHTML(id, { big: true, foil: ui.foil || (e.f > 0 && !e.n) }), cap, btns + cardHelpHTML(id));
   const o = $('#layer').lastElementChild;
@@ -4260,6 +4287,7 @@ function logEvents(evs, snap) {
       case 'espressodraw': L(`☕ ${e.side === ME ? 'Felpörögtél: +' + e.n + ' lap' : 'Az ellenfél felpörgött: +' + e.n + ' lap'}`); break;
       case 'amongus': L(`🌶️ Among Us! A paprikás shotot ${e.i === -1 ? (e.side === ME ? 'a hősöd' : 'az ellenfél hőse') : unitName(e.side, e.i)} itta meg`); break;
       case 'flee': L(`🏃 ${unitName(e.side, e.i)} átmenekült egy másik helyre`); break;
+      case 'move': L(`👞 ${unitName(e.side, e.from)} ${e.swap ? 'helyet cserélt egy másik karakterrel' : 'átlépett egy másik helyre'} (Laci cipőkanala)`); break;
       case 'doom': case 'expire': L(`⌛ ${unitName(e.side, e.i)} eltűnt`); break;
       case 'lock': L(`🔒 ${e.side === ME ? 'Le vagy bénítva' : 'Az ellenfél le van bénítva'}: a következő körben nem játszhat ki lapot`); break;
       case 'locgone': L(`🚫 Kitiltva: ${CARD[e.id].name}`); break;
@@ -4442,6 +4470,7 @@ async function animateEvents(evs) {
       case 'party': await partyFx(e); break;
       case 'locgone': floatAt(anchor, `🚫 ${CARD[e.id].name} bezárt`, 'info'); hold = Math.max(hold, 600); break;
       case 'swap': floatAt(anchor, 'Helycsere!', 'info'); hold = Math.max(hold, 300); break;
+      case 'move': floatAt(anchor, e.swap ? '👞 Helycsere!' : '👞 Áthelyezve', 'info'); hold = Math.max(hold, 350); break;
       case 'push': floatAt(anchor, 'Arrébb tolva!', 'info'); hold = Math.max(hold, 300); break;
       case 'stolen': fx(el, e.side === ME ? 'fx-bounce-up' : 'fx-bounce-down'); floatAt(anchor, '🫳 Ellopták!', 'dmg'); hold = Math.max(hold, 650); break;
       case 'steal': floatAt(anchor, `🫳 ${CARD[e.id].name} átállt!`, 'buff'); hold = Math.max(hold, 700); break;
@@ -4644,7 +4673,7 @@ function unitHTML(u, side, i) {
     <span class="uin">${ART[u.id] ? `<span class="art has-art" style="${artStyle(u.id)}"></span>` : `<span class="art"><span class="mono">${initials(c.name)}</span></span>`}<span class="uname${c.name.length > 14 ? ' long' : ''}${longWord(c.name) > 10 ? ' xl' : ''}">${c.name}</span></span>
     <span class="st atk${atk > c.atk ? ' up' : ''}">${atk}</span>
     <span class="st hp${u.hp < u.maxHp ? ' hurt' : u.maxHp > c.hp ? ' up' : ''}">${u.hp}</span>
-    ${u.shield ? '<span class="dshield" aria-label="Pajzs"></span>' : ''}${tags ? `<span class="tags">${tags}</span>` : ''}${u.items.length ? `<span class="gear">${u.items.length}</span>` : ''}</button>`;
+    ${u.shield ? '<span class="dshield" aria-label="Pajzs"></span>' : ''}${tags ? `<span class="tags">${tags}</span>` : ''}${u.items.length ? `<span class="gear">${u.items.length}</span>` : ''}${side === ME && S.active === ME && !busy && canMove(S, ME, i) ? '<span class="mvb" role="img" aria-label="Áthelyezhető (Laci cipőkanala)" title="Koppints rá, és áthelyezheted">👞</span>' : ''}</button>`;
 }
 function laneHTML(pi, tg) {
   return S.players[pi].board.map((u, i) => {
@@ -4707,7 +4736,9 @@ function render() {
   const hand = S.players[ME].hand;
   const selCard = ui.sel != null ? hand[ui.sel] : null;
   const all = selCard ? targetsFor(S, ME, selCard.id).filter(t => t.k !== 'none') : [];
-  const tg = ui.pend != null ? pendNext(all) : all;
+  const mvOk = ui.mv != null && ui.sel == null && !busy && canMove(S, ME, ui.mv);   /* Laci cipőkanala: áthelyezés módban a lehetséges új helyek */
+  if (ui.mv != null && !mvOk) ui.mv = null;
+  const tg = mvOk ? moveTargets(S, ME, ui.mv) : ui.pend != null ? pendNext(all) : all;
   setHTML($('#eBar'), heroBar(BOT)); setHTML($('#pBar'), heroBar(ME));
   $('#eBar').classList.remove('aim'); $('#pBar').classList.remove('aim');
   $('#eBar').classList.toggle('active', S.active === BOT && S.winner == null); $('#pBar').classList.toggle('active', S.active === ME && S.winner == null);
@@ -4716,6 +4747,7 @@ function render() {
   setHTML($('#eLane'), laneHTML(BOT, tg)); setHTML($('#pLane'), laneHTML(ME, tg));
   document.querySelectorAll('.picked').forEach(x => x.classList.remove('picked'));
   if (ui.pend) for (const q of ui.pend) { const pe = q.i === -1 ? barEl(q.side) : cellEl(q.side, q.i); pe && pe.classList.add('picked'); }
+  if (mvOk) cellEl(ME, ui.mv)?.classList.add('picked');
   const L = S.location, lc = L && CARD[L.id], loc = $('#loc');
   loc.className = 'locchip' + (L ? ' on' : ' empty');
   setHTML(loc, L ? `<span class="pin${ART[L.id] ? ' has-art' : ''}" style="--h:${hueOf(L.id)};${ART[L.id] ? `background-image:url('${artSrc(L.id, false)}');background-position:${ART[L.id].pos}` : ''}">${ART[L.id] ? '' : initials(lc.name)}</span><span><b>${lc.name}</b><small>${lc.text}</small></span>`
@@ -4764,6 +4796,10 @@ function render() {
     sb.hidden = false;
     sb.innerHTML = `<div><b>${c.name}</b> · ${textHTML(c) || (c.type === 'char' ? `${c.atk} támadás, ${c.hp} élet.` : '')}${hint ? `<span class="hint">${hint}</span>` : ''}</div>
       <div class="acts">${c.playTgt === 'push' && ui.pend.length ? '<button class="btn small primary" data-act="nopush">Senkit nem tolok</button>' : ''}<button class="btn small" data-act="cancel">Mégse</button></div>`;
+  } else if (mvOk) {
+    sb.hidden = false;
+    sb.innerHTML = `<div><b>👞 ${CARD[S.players[ME].board[ui.mv].id].name} áthelyezése</b><span class="hint">Koppints egy üres helyedre, vagy egy másik karakteredre (helycsere).</span></div>
+      <div class="acts"><button class="btn small" data-act="cancel">Mégse</button></div>`;
   } else sb.hidden = true;
 }
 
@@ -4791,7 +4827,7 @@ function openPreview(i, el) {
 $('#selbar').onclick = e => {
   e.stopPropagation();
   const b = e.target.closest('[data-act]'); if (!b) return;
-  if (b.dataset.act === 'cancel') { ui.sel = null; ui.pend = null; render(); }
+  if (b.dataset.act === 'cancel') { ui.sel = null; ui.pend = null; ui.mv = null; render(); }
   else if (b.dataset.act === 'play') doPlay(ui.sel, { k:'none' });
   else if (b.dataset.act === 'nopush' && ui.pend?.length) {   // Zsibrita: lerakás tolás nélkül
     const q = ui.pend[0], t = targetsFor(S, ME, S.players[ME].hand[ui.sel].id).find(x => x.k === 'slot' && x.side === q.side && x.i === q.i && !x.t2);
@@ -4826,6 +4862,11 @@ $('#scr-game').addEventListener('click', e => {
   const gb = e.target.closest('[data-grave]');
   if (gb) { e.stopPropagation(); openGrave(+gb.dataset.grave); return; }
   const cell = e.target.closest('.cell');
+  if (ui.mv != null) {   /* Laci cipőkanala: hova kerüljön */
+    const a = ui.mv; ui.mv = null;
+    if (cell && +cell.dataset.side === ME && moveTargets(S, ME, a).some(t => t.i === +cell.dataset.i)) { doMove(a, +cell.dataset.i); return; }
+    render(); return;
+  }
   if (ui.sel != null) {
     if (cell) {
       const side = +cell.dataset.side, i = +cell.dataset.i;
@@ -4848,6 +4889,12 @@ $('#scr-game').addEventListener('click', e => {
     openModal(cardHTML(u.id, { big: true, foil: CARD[u.id].foilOnly || !!u.foil }), `Most: ${effAtk(S, side, +cell.dataset.i)} támadás, ${u.hp}/${u.maxHp} élet${u.shield ? ', Pajzs' : ''}${u.boon ? `, kapott erő: ${BOON_NAME[u.boon]}` : ''}${u.stun ? `, bénult még ${u.stun} körig` : ''}`,
       (gear ? `<div class="gear-box"><div class="gear-lbl">Eszközök rajta (${u.items.length}) · koppints a részletekért</div><div class="gear-row">${gear}</div></div>` : '') + cardHelpHTML(u.id, u));
     const ov = $('#layer').lastElementChild;
+    const ci = +cell.dataset.i;
+    if (side === ME && !busy && !S.tut && canMove(S, ME, ci)) {   /* Laci cipőkanala */
+      const mb = document.createElement('button'); mb.className = 'btn primary mv-btn'; mb.innerHTML = '👞 Áthelyezem';
+      mb.onclick = ev => { ev.stopPropagation(); ov.remove(); ui.sel = null; ui.pend = null; ui.mv = ci; render(); };
+      ov.querySelector('.modal .live')?.after(mb);
+    }
     ov.querySelector('.gear-row')?.addEventListener('click', ev => { const g = ev.target.closest('[data-gear]'); if (!g) return; ev.stopPropagation();
       openModal(cardHTML(g.dataset.gear, { big: true, foil: foilOf(+g.dataset.own, g.dataset.gear) }), `${CARD[u.id].name} karakteren · ${+g.dataset.own === ME ? 'te tetted rá' : 'az ellenfél tette rá'}`, cardHelpHTML(g.dataset.gear)); });
   }
@@ -4870,6 +4917,14 @@ async function doPlay(hi, t) {
   if (S.pvp) { unseedRng(); pvpPush('play', { hi, t, id }); }
   busy = false; render();
   if (S.winner != null) endMatch();
+}
+async function doMove(a, b) {   /* Laci cipőkanala: áthelyezés (PvP-ben is átmegy: 'move' lépés) */
+  if (busy || S.active !== ME || S.winner != null) return;
+  busy = true; ui.mv = null;
+  if (S.pvp) pvpSeed();
+  await runFx(() => moveUnit(S, ME, a, b));
+  if (S.pvp) { unseedRng(); pvpPush('move', { a, b }); }
+  busy = false; render();
 }
 $('#logBtn').onclick = e => { e.stopPropagation(); if (S) openLog(); };
 $('#flagBtn').onclick = () => {
@@ -5345,7 +5400,7 @@ const ECON = { goldPlain: 0.005, goldShiny: 0.05, goldDupe: 100, heroFaChance: 0
                odds: [['l', 1.5], ['e', 6.5], ['r', 22], ['k', 70]] };
 // a „token” lapok (pl. Query) csak más lap hatására kerülnek játékba: nincsenek packban, gyűjteményben, pakliban
 const PLAYABLE = CARDS.filter(c => !c.token && !c.off);   // off: kánon esemény lap, amíg nincs hozzá grafika – sehol nem látszik
-const SETS = { base: { name: 'Base set', cards: PLAYABLE.filter(c => !c.variantOf && !c.passOnly && !c.eventOnly).map(c => c.id) } };   // passOnly: csak a Season Passból; eventOnly: csak eventből
+const SETS = { base: { name: 'Base set', cards: PLAYABLE.filter(c => !c.variantOf && !c.passOnly && !c.eventOnly && !c.shopOnly).map(c => c.id) } };   // passOnly: csak a Season Passból; eventOnly: csak eventből; shopOnly: csak a Boltból
 const VARIANT_CHANCE = 0.2;   // ha az alaplap jön, 1 az 5-höz eséllyel a ritkább változata lesz belőle
 const DECK_SIZE = 20;
 const maxCopies = id => CARD[id].rarity === 'l' ? 1 : 2;
@@ -5358,7 +5413,7 @@ const Store = { mode: 'loading', uid: null, db: null, ref: null, p: null, saving
 
 function starterCollection() {
   const coll = {};
-  for (const c of PLAYABLE) { if (c.variantOf) continue; if (c.rarity === 'k') coll[c.id] = { n: 2, f: 0 }; else if (c.rarity === 'r' || c.finisher) coll[c.id] = { n: 1, f: 0 }; }
+  for (const c of PLAYABLE) { if (c.variantOf || c.shopOnly || c.passOnly || c.eventOnly) continue; if (c.rarity === 'k') coll[c.id] = { n: 2, f: 0 }; else if (c.rarity === 'r' || c.finisher) coll[c.id] = { n: 1, f: 0 }; }
   return coll;
 }
 // Később bekerült gyakori lapok: a meglévő profilok is megkapják (gv = kiosztási verzió)
@@ -5955,7 +6010,7 @@ function shopPanelHTML({ attr, img, pos, contain, name, sub, price, have, holo, 
 }
 function shopOfferHTML(it) {
   const c = CARD[it.id];
-  return shopPanelHTML({ attr: `data-buy="${it.id}"`, img: ART[it.id].src, pos: ART[it.id].pos || '50% 20%', name: c.name, sub: '✦ Változat · 2 db', price: it.price, have: owned(it.id) > 0 });
+  return shopPanelHTML({ attr: `data-buy="${it.id}"`, img: ART[it.id].src, pos: ART[it.id].pos || '50% 20%', name: c.name, sub: c.variantOf ? '✦ Változat · 2 db' : `✦ ${TYPE[c.type] ? TYPE[c.type][0] : 'Lap'} · 2 db`, price: it.price, have: owned(it.id) > 0 });
 }
 function portOfferHTML(k) {
   const P = PORTRAITS[k];
@@ -5981,14 +6036,14 @@ async function buyShopItem(id) {
   if (owned(id) > 0) return openModal(cardHTML(id, { big: true }), '✓ Ez már megvan neked – a Paklik menüben ugyanúgy beteheted, mint az alaplapot.', cardHelpHTML(id));
   if (p.coins < it.price) return toast(`Nincs elég coinod (${p.coins}/${it.price})`);
   const o = document.createElement('div'); o.className = 'overlay';
-  o.innerHTML = `<div class="modal">${cardHTML(id, { big: true })}<div class="live">✦ ${c.name} – különleges változat. Ugyanúgy játszható, mint a(z) ${CARD[c.variantOf].name}, csak más a képe. Rögtön 2 példányt kapsz belőle.</div><div class="row2"><button class="btn" data-x>Mégse</button><button class="btn primary" data-ok><span class="coin sm" aria-hidden="true"></span> ${it.price} · Megveszem</button></div></div>`;
+  o.innerHTML = `<div class="modal">${cardHTML(id, { big: true })}<div class="live">${c.variantOf ? `✦ ${c.name} – különleges változat. Ugyanúgy játszható, mint a(z) ${CARD[c.variantOf].name}, csak más a képe.` : `✦ ${c.name} – csak a Boltban kapható lap, packból nem jön.`} Rögtön 2 példányt kapsz belőle.</div><div class="row2"><button class="btn" data-x>Mégse</button><button class="btn primary" data-ok><span class="coin sm" aria-hidden="true"></span> ${it.price} · Megveszem</button></div></div>`;
   $('#layer').appendChild(o);
   const ok = await new Promise(r => { o.onclick = e => { if (e.target.closest('[data-ok]')) r(true); else if (e.target.closest('[data-x]') || e.target === o) r(false); }; });
   o.remove(); if (!ok) return;
   if (p.coins < it.price || owned(id) > 0) return;
   p.coins -= it.price; const e = p.coll[id] || (p.coll[id] = { n: 0, f: 0 }); e.n += 2;   // rögtön 2 példány (packból nem szerezhető)
   await save(); renderProfileBar(); renderShop();
-  openModal(cardHTML(id, { big: true }), `🎉 Megvetted: ${c.name}! 2 példány került a gyűjteményedbe – a pakliépítőben az alaplap helyett is beteheted.`, '');
+  openModal(cardHTML(id, { big: true }), `🎉 Megvetted: ${c.name}! 2 példány került a gyűjteményedbe – ${c.variantOf ? 'a pakliépítőben az alaplap helyett is beteheted' : 'a Paklik menüben beteheted a paklidba'}.`, '');
 }
 const SHOP_REFRESH = '2026-10-16';   // a limitált kínálat következő frissítése, pl. '2026-10-20' – ha megadod, visszaszámlál
 function renderShop() {
@@ -7631,14 +7686,15 @@ async function pvpDrain() {
       const wasMull = S.phase === 'mulligan';
       if (wasMull) { $('#layer').querySelectorAll('.overlay').forEach(o => o.remove()); }
       const L = d.last || {};
-      if (!wasMull && d.v === PVP.v + 1 && L.by !== ME && (L.kind === 'play' || L.kind === 'end')) {
+      if (!wasMull && d.v === PVP.v + 1 && L.by !== ME && (L.kind === 'play' || L.kind === 'end' || L.kind === 'move')) {
         busy = true; render();
         pvpSeed(d.v);
         try {
           if (L.kind === 'play') {
             const hi = S.players[BOT].hand.findIndex((c, i) => i === L.hi && c.id === L.id);
             if (hi >= 0) { await showPlayed(L.id, L.t, !!S.players[BOT].hand[hi].foil); await runFx(() => playCard(S, BOT, hi, L.t)); }
-          } else await resolveEnd();
+          } else if (L.kind === 'move') await runFx(() => moveUnit(S, BOT, L.a, L.b));
+          else await resolveEnd();
         } catch {}
         unseedRng();
       }
@@ -7856,7 +7912,7 @@ const frOn = () => !!(window.APP_MODE && Store.db && Store.uid && Store.p);
 const frPair = (a, b) => [a, b].sort().join('_');
 const frOther = d => d.parts.find(u => u !== Store.uid);
 const frName = uid => FR.pub[uid]?.name || (FR.list.find(d => frOther(d) === uid) || {}).names?.[uid] || 'Barát';
-const tradable = id => { const c = CARD[id]; return c && !c.token && !c.variantOf && !c.foilOnly && !c.passOnly && !c.eventOnly; };
+const tradable = id => { const c = CARD[id]; return c && !c.token && !c.variantOf && !c.foilOnly && !c.passOnly && !c.eventOnly && !c.shopOnly; };
 const RAR_ORDER = { l: 0, e: 1, r: 2, k: 3 };
 // eszköztípus (2026-10-13): megmérjük, ki milyen eszközön játszik (telefon / tablet / gép) – a nagy képernyős fejlesztésekhez
 function devKind() {

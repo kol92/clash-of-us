@@ -63,6 +63,8 @@ const CARDS = [
   { id:'i_uto', type:'item', name:'TomiNegan ütője', cost:3, atk:3, hp:0, rarity:'l', muscle:true, text:'' },
   { id:'i_vodkakancso', drink:true, type:'item', name:'Vodka Kancsó', cost:3, atk:4, hp:0, rarity:'r', muscle:true, hangover:true, text:'Utána a következő körödben a karakter bénult: nem támad, és nem üt vissza.' },
   { id:'i_bunda', type:'item', name:'Fehér szarvas bunda', cost:2, atk:0, hp:3, rarity:'r', taunt:true, text:'Gál Zoli benne nem pusztul el a támadása után, és Pajzsot is kap.' },
+  // Bolti eszköz (2026-10-16): csak a Boltban kapható, packból nem jön
+  { id:'i_cipo', type:'item', name:'Laci cipőkanala', cost:1, atk:0, hp:0, rarity:'k', shopOnly:true, price:100, mover:true, text:'Amelyik karakterre ráteszed, azt a körödben egyszer áthelyezheted a táblán (üres helyre, vagy helycserével).' },
   { id:'i_aranylanc', type:'item', name:'Tomi nyaklánca', cost:3, atk:2, hp:3, rarity:'l', text:'' },
   // --- Akciók ---
   { id:'a_dinnyes', drink:true, type:'action', name:'Dinnyés Absolute Vodka', cost:1, tgt:'enemyOrHero', rarity:'k', text:'3 sebzés egy ellenséges karakternek vagy az ellenfél hősének.' },
@@ -751,6 +753,25 @@ function laszyRoll(s, pi, i) {
   const opts = [{ i:-1 }]; s.players[pi].board.forEach((x, j) => { if (x && j !== i) opts.push({ i:j }); });
   return opts[Math.floor(rnd() * opts.length)];
 }
+// Laci cipőkanala (2026-10-16): a karakter, akin rajta van, a gazdája körében egyszer áthelyezhető
+// (saját üres helyre, vagy helycsere egy másik saját karakterrel). Csak a cipőkanalas karakter számít „mozgatottnak”.
+const hasMover = u => !!(u && (u.items || []).some(id => CARD[id] && CARD[id].mover));
+function canMove(s, pi, i) {
+  const p = s.players[pi], u = p.board[i];
+  return s.winner == null && !s.phase && s.active === pi && hasMover(u) && !isFixed(u) && u.moved !== s.half;
+}
+function moveTargets(s, pi, a) {
+  const p = s.players[pi], T = []; if (!canMove(s, pi, a)) return T;
+  p.board.forEach((x, b) => { if (b !== a && !isFixed(x) && (x || !closedLane(s, pi, b))) T.push({ k: x ? 'unit' : 'slot', side:pi, i:b }); });
+  return T;
+}
+function moveUnit(s, pi, a, b) {
+  if (!moveTargets(s, pi, a).some(t => t.i === b)) return false;
+  const B = s.players[pi].board, u = B[a];
+  [B[a], B[b]] = [B[b], B[a]]; u.moved = s.half;
+  ev(s, { t:'move', side:pi, i:b, from:a, swap: !!B[a] });
+  return true;
+}
 function strike(s, i) {
   const pi = s.active, ei = other(pi), me = s.players[pi], u = me.board[i];
   reveal(s, pi, i);
@@ -998,4 +1019,4 @@ function botChoose(real, lvl = 2) {
   return best && { hi: best.hi, t: best.t };
 }
 
-if (typeof module !== 'undefined') module.exports = { BOT_LV, baszoStrike, sharkSwim, atiFlee, openSlots, closedLane, CARDS_ALL: CARDS, DECK_OF, LANES, MAX_HALF, mulligan, botMulligan, beginGame, CARDS, CARD, HEROES, HERO, DECKS, newGame, playCard, canPlay, targetsFor, cardCost, attackLane, finishTurn, runEndTurn, botChoose, canAttack, effAtk };
+if (typeof module !== 'undefined') module.exports = { canMove, moveTargets, moveUnit, BOT_LV, baszoStrike, sharkSwim, atiFlee, openSlots, closedLane, CARDS_ALL: CARDS, DECK_OF, LANES, MAX_HALF, mulligan, botMulligan, beginGame, CARDS, CARD, HEROES, HERO, DECKS, newGame, playCard, canPlay, targetsFor, cardCost, attackLane, finishTurn, runEndTurn, botChoose, canAttack, effAtk };
