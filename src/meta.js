@@ -121,7 +121,11 @@ const earnedToday = () => Store.p && Store.p.earned.date === today() ? Store.p.e
 const freePackReady = () => !!Store.p && Store.p.freeDate !== today();
 
 // ---- mentés: felhő (Claude-fiók) vagy ez az eszköz ----
-const LS_KEY = 'bestofus_profile_v1';
+/* TESZT OLDAL (teszt ág, 2026-10-16): minden, ami nem az éles cím, teszt mód.
+   A profil az éles profil MÁSOLATÁVAL indul (csak olvasás), és csak ezen az eszközön mentődik – az éles adatokba semmi nem íródik vissza.
+   PvP, barátok, csere, nyilvános profil ki van kapcsolva. */
+const TEST_MODE = location.hostname !== 'bestofus.pages.dev';
+const LS_KEY = TEST_MODE ? 'bestofus_TESZT_profile' : 'bestofus_profile_v1';
 function lsGet() { try { const s = localStorage.getItem(LS_KEY); return s ? JSON.parse(s) : null; } catch { return null; } }
 function lsSet(p) { try { localStorage.setItem(LS_KEY, JSON.stringify(p)); } catch {} }
 
@@ -136,12 +140,20 @@ async function save() {
         toast('A felhőbe mentés nem sikerült, ezen az eszközön mentem');
       }
     });
-    if (window.APP_MODE) { if (!FR.unsubF) frStart(); else frPubSync(); }
+    if (window.APP_MODE && !TEST_MODE) { if (!FR.unsubF) frStart(); else frPubSync(); }
     return Store.saving;
   }
   lsSet(snap);
 }
 
+function testBanner() {   /* teszt oldal jelzése + profil újramásolása */
+  if (document.getElementById('testRibbon')) return;
+  const b = document.createElement('div'); b.id = 'testRibbon';
+  b.innerHTML = '🧪 TESZT OLDAL – semmi nem kerül az éles játékba <button type="button">↺ Profil újramásolása</button>';
+  b.querySelector('button').onclick = () => { if (!confirm('Visszaállítod a teszt profilt az éles profilod mostani másolatára? A teszten szerzett dolgok elvesznek.')) return;
+    try { localStorage.removeItem(LS_KEY); } catch {} location.reload(); };
+  document.body.appendChild(b);
+}
 async function bootProfile() {
   renderProfileBar();
   let db = null, user = null;
@@ -153,10 +165,12 @@ async function bootProfile() {
       Store.ref = db.doc('data/users/' + uid + '/profile');
       const snap = await Store.ref.get();
       Store.db = db; Store.uid = uid; Store.mode = 'cloud';
-      if (snap.exists) Store.p = migrate(snap.data());
+      if (TEST_MODE) { Store.mode = 'local'; Store.ref = null; Store.db = null; Store.testSrc = snap.exists ? snap.data() : null;   /* teszt: az éles profil csak kiinduló másolat */
+        const mine = lsGet(); Store.p = migrate(mine || Store.testSrc); if (!mine && Store.p) lsSet(Store.p); }
+      else if (snap.exists) Store.p = migrate(snap.data());
     } catch { Store.mode = 'local'; }
   } else Store.mode = 'local';
-  if (Store.mode === 'local') Store.p = migrate(lsGet());
+  if (Store.mode === 'local' && !Store.p) Store.p = migrate(lsGet());
   if (Store.p && Store.p._dirty) { delete Store.p._dirty; save(); }
   if (Store.giftMsg) { const m = Store.giftMsg; Store.giftMsg = null; setTimeout(() => toast(m), 600); }
   if (Store.faMsg) { const m = Store.faMsg; Store.faMsg = null; setTimeout(() => toast(m), 4200); }
@@ -164,7 +178,7 @@ async function bootProfile() {
   if (Store.p) document.querySelectorAll('#layer .overlay.create').forEach(o => o.remove());
   renderProfileBar(); if (Store.p && GOLD_HEROES.some(ownsHeroGold)) renderMenuFan();
   if (!Store.p) showCreate(); else if (Store.p.onboard) startOnboarding();
-  pvpStart(); renderPvpBadge(); pvpRoomInit(); frStart(); frRefresh();
+  if (TEST_MODE) testBanner(); else { pvpStart(); renderPvpBadge(); pvpRoomInit(); frStart(); frRefresh(); }
 }
 function migrate(p) {
   if (!p) return null;
@@ -2098,7 +2112,7 @@ function pvpMyTurn(d) {
   if (d.status === 'mull') return !(d.mulled || [])[me];
   return d.status === 'play' && d.state && d.state.active === me && d.state.winner == null;
 }
-function pvpStart() {   // egyetlen feliratkozás az összes PvP-meccsre (lobbi, jelvény és a futó meccs is ebből él)
+function pvpStart() { if (TEST_MODE) return;   // egyetlen feliratkozás az összes PvP-meccsre (lobbi, jelvény és a futó meccs is ebből él)
   if (PVP.unsub || !Store.db || !Store.uid) return;
   const onList = list => {
     PVP.list = list;
@@ -2375,7 +2389,7 @@ function pvpPresence() {
   const inPvp = !!PVP.searching || !!(S && S.pvp) || !$('#scr-pvp').hidden;
   PVP.room?.presence({ pvp: inPvp ? 1 : 0, uid: Store.uid || '', name: Store.p?.name || '' }).catch(() => {});
 }
-async function pvpRoomInit() {
+async function pvpRoomInit() { if (TEST_MODE) return;
   try { PVP.room = await window.claude?.use?.('room') ?? null; } catch { PVP.room = null; }
   if (!PVP.room) return;
   let t = null;
@@ -2499,7 +2513,7 @@ setInterval(() => {
 }, 500);
 $('#emoBtn').onclick = () => pvpEmoteMenu();
 
-$('#goPvp').onclick = () => { if (needProfile()) return; pvpStart(); renderPvp(); show('scr-pvp'); pvpPresence(); };
+$('#goPvp').onclick = () => { if (needProfile()) return; if (TEST_MODE) return toast('🧪 A teszt oldalon ez nem elérhető'); pvpStart(); renderPvp(); show('scr-pvp'); pvpPresence(); };
 
 // ---- menü gombok ----
 $('#goShop').onclick = () => { if (needProfile()) return; renderShop(); show('scr-shop'); };
@@ -2525,7 +2539,7 @@ function devKind() {
   const touch = navigator.maxTouchPoints > 0 || matchMedia('(pointer:coarse)').matches, a = Math.min(screen.width, screen.height);
   return touch ? (a >= 600 ? 'tablet' : 'phone') : 'pc';
 }
-function frPubSync(now) {
+function frPubSync(now) { if (TEST_MODE) return;
   if (!frOn()) return;
   clearTimeout(FR.pubT);
   FR.pubT = setTimeout(() => {
@@ -2563,7 +2577,7 @@ async function frShareInvite() {
   try { if (navigator.share) { await navigator.share({ title: 'Best of Us', text, url }); return; } } catch (e) { if (e && e.name === 'AbortError') return; }
   try { await navigator.clipboard.writeText(text + ' ' + url); toast('Meghívó link kimásolva ✔'); } catch { toast(url); }
 }
-function frStart() {
+function frStart() { if (TEST_MODE) return;
   if (!frOn() || FR.unsubF) return;
   frPubSync(true);
   FR.unsubF = Store.db.collection('friends').where('parts', 'array-contains', Store.uid).onSnapshot(s => {
@@ -2794,7 +2808,7 @@ function renderFriends() {
     if (b.hasAttribute('data-histall')) { FR.histAll = true; renderFriends(); }
   };
 }
-$('#goFriends').onclick = () => { if (needProfile()) return; frStart(); renderFriends(); show('scr-friends'); FR.list.filter(d => d.status === 'accepted').forEach(d => frFetchPub(frOther(d), true)); };
+$('#goFriends').onclick = () => { if (needProfile()) return; if (TEST_MODE) return toast('🧪 A teszt oldalon ez nem elérhető'); frStart(); renderFriends(); show('scr-friends'); FR.list.filter(d => d.status === 'accepted').forEach(d => frFetchPub(frOther(d), true)); };
 
 // ---- duplikátumok kézi beváltása (Gyűjtemény) ----
 function dupeList(p) {   // ami 2 példány fölött van (előbb a sima példányok mennek, a Full Art marad)
@@ -3125,4 +3139,4 @@ $('#rankBody').addEventListener('click', e => {
   const t = e.target.closest('[data-rkt]'); if (t) { RKB.tab = t.dataset.rkt; renderRanked(); return; }
   const r = e.target.closest('[data-rkp]'); if (r) rkPlayerCard(r.dataset.rkp);
 });
-$('#goRanked').onclick = () => { if (needProfile()) return; if (!RANKED_ON) return toast('🏆 A ranked szezon hamarosan indul!'); if (typeof frStart === 'function' && frOn()) { frStart(); FR.list.filter(d => d.status === 'accepted').forEach(d => frFetchPub(frOther(d), true)); } renderRanked(); show('scr-ranked'); rkLoadBoard(); };
+$('#goRanked').onclick = () => { if (needProfile()) return; if (TEST_MODE) return toast('🧪 A teszt oldalon ez nem elérhető'); if (!RANKED_ON) return toast('🏆 A ranked szezon hamarosan indul!'); if (typeof frStart === 'function' && frOn()) { frStart(); FR.list.filter(d => d.status === 'accepted').forEach(d => frFetchPub(frOther(d), true)); } renderRanked(); show('scr-ranked'); rkLoadBoard(); };
