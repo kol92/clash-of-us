@@ -217,7 +217,7 @@ Hősképesség-ötletek a táblázatban (még nem zöldek, nincsenek beépítve)
 - Tálca shot 6, epikus – mindenki 2 sebzést kap: az összes karakter mindkét oldalon és mindkét hős
 - STOP 4, epikus – leszedi az ellenfél karaktereiről azokat az eszközöket, amiket ő maga tett rájuk (a te Buffalo!/Csattogós lepkéd rajtuk marad); a hatásuk is megszűnik (támadás, élet – a karakter nem hal bele, legfeljebb 1 élete marad –, Pajzs, Lendület, Akuma halála). Az eszközök a gazdájuk temetőjébe kerülnek.
 - Adios Motherfucker! 5, legendás – megbénítja az ellenfél hősét: a következő körében nem játszhat ki lapot (a karakterei támadnak, energiát kap, húz). A hős sávján „bénult” címke jelzi.
-- Sasi ütése 6, epikus – a karaktereid összesített támadása egy ellenséges karakterre vagy az ellenfél hősére
+- Sasi ütése 6, epikus – a térfeleden álló karakterek (a nálad úszó Cápát is beleértve) összesített támadása egy választott karakterre (a sajátodra is) vagy az ellenfél hősére (2026-10-16)
 - Tubi 3, epikus – 6 sebzés egy ellenséges karakternek vagy az ellenfél hősének, 3 sebzés a saját hősödnek
 
 **Eszközök**
@@ -238,7 +238,7 @@ Hősképesség-ötletek a táblázatban (még nem zöldek, nincsenek beépítve)
 
 ## Értelmezési döntések (ha máshogy gondoltad, módosítható)
 - Vera a karakter helyének kiválasztása után céloz; ha nincs ellenséges karakter, hatás nélkül kerül le; a visszaküldött karakter eszközei elvesznek.
-- Az Abszint csak ellenséges karaktert célozhat; a Dinnyés, a Sasi ütése és a Tubi ellenséges karaktert vagy hőst. Rejtett lapot is lehet célozni (ettől felfordul). A sávot váltó karakterek (helycsere, Zsibrita, Mosh Pit) odacsúsznak az új helyükre. Ha egy rejtett lapot sebzés ér, előbb felfordul és látszik, csak utána hal meg (akkor is, ha az ütéstől azonnal meghal).
+- Az Abszint csak ellenséges karaktert célozhat; a Dinnyés és a Tubi ellenséges karaktert vagy hőst; a Sasi ütése bármelyik karaktert (a sajátodat is) vagy az ellenfél hősét. Rejtett lapot is lehet célozni (ettől felfordul). A sávot váltó karakterek (helycsere, Zsibrita, Mosh Pit) odacsúsznak az új helyükre. Ha egy rejtett lapot sebzés ér, előbb felfordul és látszik, csak utána hal meg (akkor is, ha az ütéstől azonnal meghal).
 - Laszy félrecsúszott támadására nem jön visszaütés. 
 - Rebi −1-e minden támadásra hat (visszaütés, Sasi ütése összege is); a támadás 0 alá nem mehet.
 - TZS önsebzése minden támadásakor bekövetkezik; az Akácfa söröző ezt is növeli.
@@ -438,7 +438,8 @@ Hősképesség-ötletek a táblázatban (még nem zöldek, nincsenek beépítve)
 - A variáns lapok szalagja: „✦ Variáns” (kicsiben) / „✦ Ritka variáns” (nagy lapon) – korábban „Változat”.
 
 ## Cápa: nem a te karaktered, ha nálad úszik (2026-10-16, Laci kérdése)
-- A „Hátad mögött, cápa megesz!” Cápája az ellenfél térfelén úszik, de a lerakóé. Eddig a Sasi ütése a térfeleden lévő Cápa 9 támadását is beleszámolta, és saját-célú lapokkal (pl. Rehab, eszközök) célozható volt, a Legénybúcsú / Bagoly / Fogel pedig erősítette. Mostantól a nálad úszó Cápa egyikbe sem számít bele. Akcióval (pl. Abszint, Dinnyés) továbbra is sebezhető. Teszt: `tools/hw_test.js`.
+- A „Hátad mögött, cápa megesz!” Cápája az ellenfél térfelén úszik, de a lerakóé. Saját-célú lapokkal (pl. Rehab, eszközök) nem célozható, a Legénybúcsú / Bagoly / Fogel nem erősíti. Akcióval (pl. Abszint, Dinnyés) sebezhető.
+- **Sasi ütése (Tomi döntése, 2026-10-16):** a térfeleden álló **minden** karakter ereje beleszámít – a nálad úszó Cápa 9-e is –, és **bármelyik karaktert célozhatja, a sajátodat is** (így a nálad úszó Cápa is megölhető vele), vagy az ellenfél hősét (`tgt:'anyOrHero'`). Teszt: `tools/hw_test.js`.
 
 ## Event-jutalom felfedése (2026-10-16, Laci kérése)
 - Átvételkor teljes képernyős felfedés: a „?” Halloween-kártya lebeg (koppintásra vagy 2 mp után), megremeg, narancs-lila villanás és szikrák, majd előtűnik a skin / lap / hátlap, „Új skin! / Új lap! / Új hátlap!” felirattal és leírással (`evRewardReveal`). „Mind átveszem”-nél egymás után jönnek.

@@ -88,7 +88,7 @@ const CARDS = [
   { id:'a_talca', drink:true, type:'action', name:'Tálca shot', cost:6, tgt:'none', rarity:'e', text:'Mindenki 2 sebzést kap: az összes karakter és mindkét hős.' },
   { id:'a_stop', type:'action', name:'STOP', cost:4, tgt:'none', rarity:'e', text:'Leszedsz minden eszközt az ellenfél karaktereiről (amit ő tett rájuk). A hatásuk is megszűnik.' },
   { id:'a_adios', drink:true, type:'action', name:'Adios Motherfucker!', cost:5, tgt:'none', rarity:'l', text:'Megbénítod az ellenfél hősét: a következő körében nem játszhat ki lapot (a karakterei attól még támadnak).' },
-  { id:'a_sasiutes', type:'action', name:'Sasi ütése', cost:6, tgt:'enemyOrHero', rarity:'e', text:'A karaktereid összesített támadóereje sebzést okoz egy választott ellenséges karakternek vagy az ellenfél hősének.' },
+  { id:'a_sasiutes', type:'action', name:'Sasi ütése', cost:6, tgt:'anyOrHero', rarity:'e', text:'A térfeleden álló karakterek összesített támadóereje sebzést okoz egy választott karakternek (akár a sajátodnak is) vagy az ellenfél hősének.' },
   { id:'a_tubi', drink:true, type:'action', name:'Tubi', cost:3, tgt:'enemyOrHero', rarity:'e', text:'6 sebzés egy választott ellenséges karakternek vagy az ellenfél hősének, és 3 sebzés a saját hősödnek.' },
   // --- Helyszínek ---
   { id:'l_akacfa', type:'loc', name:'Akácfa söröző', cost:1, rarity:'k', text:'Minden sebzés +1-gyel nagyobb.' },
@@ -325,6 +325,7 @@ function targetsFor(s, pi, id) {
     case 'action':
       if (c.tgt === 'enemy') foe();
       else if (c.tgt === 'enemyOrHero') { foe(); T.push({ k:'hero', side:ei, i:-1 }); }
+      else if (c.tgt === 'anyOrHero') { foe(); p.board.forEach((u, i) => { if (u) T.push({ k:'unit', side:pi, i }); }); T.push({ k:'hero', side:ei, i:-1 }); }   // Sasi ütése: a saját térfeleden bárki (a nálad úszó Cápa is)
       else if (c.tgt === 'enemyEmpty') e.board.forEach((u, i) => { if (!u) T.push({ k:'eslot', side:ei, i }); });
       else if (c.tgt === 'own') own();
       else if (c.tgt === 'ownOrHero') { own(); T.push({ k:'hero', side:pi, i:-1 }); }
@@ -514,7 +515,7 @@ function playCard(s, pi, hi, t) {
           if (u && u.stun) { u.stun = 0; if (u.items.includes('i_buffalo')) { u.items = u.items.filter(x => x !== 'i_buffalo'); u.foe = (u.foe || []).filter(x => x !== 'i_buffalo'); bury(s, ei, 'i_buffalo', 'item'); } ev(s, { t:'unstun', side:pi, i:t.i }); } }
         break;
       case 'a_bag': p.board.forEach((x, i) => { if (x && !isFixed(x)) { x.atk += 2; x.hp -= 1; x.maxHp = Math.max(1, x.maxHp - 1); ev(s, { t:'buff', side:pi, i }); } }); break;
-      case 'a_sasiutes': { let sum = 0; for (let i = 0; i < LANES; i++) if (!isFixed(p.board[i])) sum += effAtk(s, pi, i);   /* a nálad úszó Cápa ereje nem számít bele */ if (t.k === 'hero') damageHero(s, ei, sum); else damageUnit(s, ei, t.i, sum); break; }
+      case 'a_sasiutes': { let sum = 0; for (let i = 0; i < LANES; i++) sum += effAtk(s, pi, i);   /* a térfeleden úszó Cápa is beleszámít (Tomi, 2026-10-16) */ if (t.k === 'hero') damageHero(s, ei, sum); else damageUnit(s, t.side ?? ei, t.i, sum); break; }
       case 'a_koktel': {
         const all = [];
         for (const sd of [0, 1]) s.players[sd].board.forEach((x, j) => { if (x) all.push([sd, j]); });

@@ -42,13 +42,16 @@ console.log(fails ? 'HIBÁK: ' + fails : 'HALLOWEEN OK');
   ok2(o.hand.length === 1 && o.hand[0].id === 'c_pifti', 'az ellenfélnél: az én 1 maradék lapom');
   if (f2) console.log('HIBÁK: ' + f2);
 }
-{ // Cápa a saját térfeleden: nem a te karaktered (Sasi ütése nem számolja bele, saját-célú lap nem célozhatja)
+{ // Cápa a saját térfeleden: Sasi ütése beleszámolja és rá is célozhat; saját-célú lap (Rehab) nem célozhatja
   const s = E.newGame('bence', E.DECK_OF('bence'), 'gabi', E.DECK_OF('gabi'), 0);
-  const p = s.players[0], o = s.players[1]; p.board = [null, null, null, null]; o.board = [null, null, null, null]; s.active = 0; p.energy = p.maxEnergy = 10;
+  const p = s.players[0], o = s.players[1]; p.board = [null, null, null, null]; o.board = [null, null, null, null]; s.active = 0; p.energy = p.maxEnergy = 20;
   p.board[1] = { uid: 501, id: 'c_capa', atk: 9, hp: 9, maxHp: 9, temp: 0, items: [], owner: 1, swims: 4, fresh: false };
   p.hand.unshift({ uid: 9301, id: 'c_vera' }); E.playCard(s, 0, 0, { k: 'slot', side: 0, i: 2 });
   const hp0 = o.hp, atkVera = p.board[2].atk;
+  ok(E.targetsFor(s, 0, 'a_sasiutes').some(t => t.k === 'unit' && t.side === 0 && t.i === 1), 'Sasi ütése célozhatja a nálad úszó Cápát');
   p.hand.unshift({ uid: 9302, id: 'a_sasiutes' }); E.playCard(s, 0, 0, { k: 'hero', side: 1, i: -1 });
-  console.log((hp0 - o.hp) === atkVera ? 'ok   Sasi ütése a Cápa nélkül számol' : `HIBA: Sasi ütése ${hp0 - o.hp}, várt ${atkVera}`);
-  const T = E.targetsFor(s, 0, 'a_rehab'); console.log(T.some(t => t.k === 'unit' && t.side === 0 && t.i === 1) ? 'HIBA: a Cápa célozható saját lapként' : 'ok   a Cápa nem célozható saját-célú lappal');
+  ok(hp0 - o.hp === atkVera + 9, `Sasi ütése a Cápával együtt számol (${hp0 - o.hp} = ${atkVera}+9)`);
+  p.hand.unshift({ uid: 9303, id: 'a_sasiutes' }); E.playCard(s, 0, 0, { k: 'unit', side: 0, i: 1 });
+  ok(!p.board[1], 'Sasi ütésével a saját térfeleden lévő Cápa megölhető');
+  ok(!E.targetsFor(s, 0, 'a_rehab').some(t => t.k === 'unit' && t.side === 0 && E.CARD[(p.board[t.i] || {}).id || 'c_vera'].fixed), 'Rehab nem célozza a Cápát');
 }
