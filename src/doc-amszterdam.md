@@ -8,6 +8,10 @@
 - **Kiosztás:** senki nem kap belőle ingyen (a kezdőgyűjtemény és a `STARTER_ADDS` kizárja a `set`-es lapokat). A Game Over sem jár automatikusan, mint a régi Kánon lapok.
 - **Gyűjtemény:** szett-szűrő „🌷 Amszterdam hősei” (csak a teszt oldalon látszik). Kód: a lapokon `set:'ah'`, `SETS.ah` (meta.js), `CF_SETS` (ui.js).
 
+## Lapképek
+- **Kész (10/20, 2026-10-16):** Süti, Bence terrorja, Sasi, Barna, Laci, Tomi, Utcai füst, Drog kereső kutya, High Hawaiians, Vöröslámpás negyed (`art/ah_*.webp`, ART-bejegyzés a ui.js-ben).
+- **Még nincs képe:** Ati, Varázsgomba, Cigi, Ír kávé, Elfekvő, Caffee Shop, Reptéri ellenőrzés, Bong, Ír reggeli, Game Over (+ a Betti token).
+
 ## Új kulcsszavak
 - **Igézhetetlen** (`elusive`): akcióval és más lapok kijátszáskori hatásával nem célozható – se a gazdája, se az ellenfél (Dinnyés, Ír kávé, Vera, Zsibrita, Reptéri ellenőrzés stb.). A véletlen célzású hatások kihagyják (Alekosz, Molnár Zsolti, Koktélarmageddon, Tomi, a parti lelke, Among Us, Cápa érkezése). **Eszköz rátehető** (saját és ellenséges is, Tomi döntése). A mindenkit érő hatások eltalálják (Tálca shot, JBL, Nyiti, Mosh Pit, Game Over). Jel a lapon: 🛡.
 - **Feltámadás** (`revive`, ugyanaz a mechanika, mint Gabi, a legyőzhetetlen): amikor először meghal, 1 élettel feléled a helyén (az eszközei lekerülnek); másodszorra végleg meghal. Jel: ♻.
