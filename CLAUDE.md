@@ -87,10 +87,20 @@ Csak build (kitétel nélkül): `cd src && python3 build-app.py ""` → `src/dis
 - Season Pass: `SEASONS` (meta.js). Most az „1. szezon · Nyitókör” fut 2026-11-11-ig – előtte fel kell venni a következő szezont (új `id`, start/end, 30 `tiers`). Jutalomtípusok: `coins`, `packs`, `shiny`, `fa`, `card` (+`had`: coin, ha már megvan), `port` (hős-portré, `PORTRAITS`-ban `passOnly`), `heroPick` (Full Art hős), `goldPick` (Arany hős).
 - A szabálydokumentum (`src/doc.md`) a felhasználó claude.ai Projectjében is megvan („claude/clash-of-us-szabalyok.md”). Ha van Project-hozzáférésed, minden változás után töltsd fel oda is.
 
-## Nyitott ötletek / teendők
+## Újabb rendszerek (2026-10-14 – 10-16) – röviden, a részletek a doc.md-ben
 
-- Hibajelentő gomb + hibanapló a játékban.
-- Tesztelés két valódi telefonon (PvP, csere).
-- Hangok.
-- Astrától várt UI-elemek: modal keret, inaktív fül, Munkahely helyszínkép, Season Pass / Küldetések / Barátok / PvP fejlécek, mulligan képernyő, belépő képernyő.
-- 2026-10-16: bolt-rotáció.
+- **Bot-paklik:** `botDeckFor(hős, szint)` és `BOT_DECK` (meta.js, a DECKHELP-blokkban): Könnyű = kezdőpakli + 3 véletlen csere, Normál / Nehéz = paklisegéd a lapkészlet véletlen részéből (meccsenként más), Mester = teljes lapkészlet + 6 élet. Mérés: `node tools/botdeck.js LV N [old]`.
+- **3D lapdöntés** a nagy lapnézetben: `TILT` / `tiltAsk` / `tiltAttach` (ui.js, az `openModal` hívja). Giroszkóp (iPhone-on engedélykérés) vagy egér, max 20°, a telefonnal ellentétes irányba.
+- **Event-zene:** `Music` (meta.js), `EVENTS[].music`; Web Audio GainNode (iPhone-on az audio elem hangereje nem állítható), meccs közben 45%. A hangfájl a buildben verziózott, a service worker kihagyja (mint az .mp4-et).
+- **Event előzetes / ajándék:** `teaser` időpont, `evPre` / `evMood` / `evLive`, `evGiftCheck` (egyszeri ajándék a `p.gifts`-ben), `evTeaserModal`; jutalom-felfedés: `evRewardReveal`.
+- **Bolti portré későbbi kezdéssel:** `PORTRAITS[k].from = 'ÉÉÉÉ-HH-NN'` + `portOnSale()`.
+- **Cápa** (az ellenfél térfelén úszik): nem célozható saját-célú lappal, a buffok nem erősítik; a **Sasi ütése** viszont beleszámolja és célozhatja is (`tgt:'anyOrHero'`).
+- **Tesztek:** `tools/hw_test.js` (Halloween-lapok, Álarcos bál, Cápa + Sasi), `tools/mosh_test.js`.
+
+## Jelenlegi állapot és teendők (2026-10-16 este, account-váltáskor)
+
+- **Halloween event fut** (`EVENTS` hw26): 2026-10-15 19:00 – 11-02 (vége 11-03 0:00), jutalmak 11-09-ig vehetők át, utána maguktól jóváíródnak. A menü-háttér és a zene csak az event alatt él, utána magától visszaáll.
+- **Bolt-rotáció esedékes:** a `SHOP_REFRESH` most `2026-10-16` – Tomi küldi az új kínálatot (és a következő dátumot). Sasi, a mágus (p_sasi_mage, 250 coin) 10-16-tól már a Boltban van.
+- **Season Pass:** az „1. szezon · Nyitókör” 2026-11-11-ig fut – **előtte fel kell venni a következő szezont** (`SEASONS`: új id, start/end, 30 `tiers`). A ranked 2. szezonja innen automatikusan nehezebb (`rkHard()`).
+- **Nyitott kérdés:** gépen (PC) egy játékos nem látta a hősöket a gyűjteményben – képernyőkép / böngésző még nem jött.
+- Ötletek: hibajelentő gomb + hibanapló; tesztelés két valódi telefonon (PvP, csere); további event-típusok (Kocsmaharc, Főellenség, Szülinap, Draft); Astrától várt UI-elemek (modal keret, inaktív fül, Munkahely helyszínkép, Season Pass / Küldetések / Barátok / PvP fejlécek, mulligan képernyő, belépő képernyő).
