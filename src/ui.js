@@ -275,6 +275,9 @@ const ART = {
   a_bong:      { src:'art/ah_bong.webp', av:'50% 40%', pos:'50% 40%' },
   c_ah_ati:    { src:'art/ah_ati.webp', av:'47% 20%', pos:'47% 22%' },
   c_betti:     { src:'art/ah_betti.webp', av:'42% 20%', pos:'42% 22%' },
+  c_vizipipa:  { src:'art/ah_vizipipa.webp', av:'48% 25%', pos:'45% 28%' },
+  a_trip:      { src:'art/ah_trip.webp', av:'52% 22%', pos:'52% 25%' },
+  c_ppvar:     { src:'art/ah_ppvar.webp', av:'47% 20%', pos:'47% 22%' },
   a_legeny: { src:'art/legeny.webp', pos:'50% 35%' },
   a_kitiltva: { src:'art/kitiltva.webp', pos:'50% 35%' },
   a_haver: { src:'art/haver.webp', pos:'50% 22%' },
@@ -730,6 +733,12 @@ function logEvents(evs, snap) {
       case 'flee': L(`🏃 ${unitName(e.side, e.i)} átmenekült egy másik helyre`); break;
       case 'silence': L(`🍪 ${unitName(e.side, e.i)} elvesztette a kulcsszavait (Süti)`); break;
       case 'airport': L(`🛂 Reptéri ellenőrzés: <b class="lc" data-lc="${e.id}">${escH(CARD[e.id].name)}</b> átkerült ${e.side === ME ? 'hozzád' : 'az ellenfélhez'}`); break;
+      case 'pipa': L(`💨 Barna vízipipája az ellenfél oldalára került`); break;
+      case 'pipabuff': L(`💨 ${unitName(e.side, e.i)} elszívta a vízipipát: +2/+2`); break;
+      case 'future': L(`🌀 <b class="lc" data-lc="${e.id}">${escH(CARD[e.id].name)}</b> a jövőbe utazott`); break;
+      case 'futureback': L(`🌀 <b class="lc" data-lc="${e.id}">${escH(CARD[e.id].name)}</b> visszatért a jövőből: +3/+3`); break;
+      case 'futuregone': L(`🌀 <b class="lc" data-lc="${e.id}">${escH(CARD[e.id].name)}</b> nem talált helyet – végleg a jövőben maradt`); break;
+      case 'past': L(`🌀 ${unitName(e.side, e.i)} a múltba utazott: visszakapta a lerakáskori értékeit`); break;
       case 'chain': L(`⛓ ${unitName(e.side, e.i)}: Börtönlánc, 1 sebzés`); break;
       case 'smoke': L(`💨 Utcai füst: ${e.side === ME ? 'a karaktereid' : 'az ellenfél karakterei'} elrejtőztek és összekeveredtek`); break;
       case 'gameover': L(`💀 GAME OVER: ${who(e.side)} maximum élete 10 lett – az ellenfél összes karaktere elpusztul, a hőse 5 sebzést kap`); break;
@@ -911,6 +920,10 @@ async function animateEvents(evs) {
       case 'shuffled': floatAt(anchor, `${e.id === 'i_gomba' ? '🍄' : '👑'} +${e.n} ${CARD[e.id].name} a ${e.side === ME ? 'paklidba' : 'paklijába'}!`, 'info'); hold = Math.max(hold, 900); break;
       case 'silence': fx(el, 'fx-hit'); floatAt(anchor, '🍪 Süti! Nincs több trükk', 'info'); hold = Math.max(hold, 750); break;
       case 'airport': floatAt(anchor, '🛂 Átrakva!', 'info'); hold = Math.max(hold, 750); break;
+      case 'pipabuff': fx(el, 'fx-buff'); floatAt(anchor, '💨 +2/+2', 'buff'); hold = Math.max(hold, 700); break;
+      case 'future': floatAt(anchor, '🌀 A jövőbe!', 'info'); hold = Math.max(hold, 800); break;
+      case 'futureback': floatAt(anchor, '🌀 Vissza! +3/+3', 'buff'); hold = Math.max(hold, 800); break;
+      case 'past': floatAt(anchor, '🌀 A múltba!', 'info'); hold = Math.max(hold, 800); break;
       case 'chain': floatAt(anchor, '⛓', 'dmg'); hold = Math.max(hold, 350); break;
       case 'smoke': floatAt(anchor, '💨 Utcai füst!', 'info'); hold = Math.max(hold, 800); break;
       case 'gameover': floatAt(anchor, '💀 GAME OVER', 'dmg'); hold = Math.max(hold, 1000); break;
@@ -1254,7 +1267,7 @@ function render() {
       : c.tgt === 'enemyTwo' ? 'Most koppints a második ellenséges karakterre.'
       : c.playTgt === 'push' ? (ui.pend.length < 2 ? 'Koppints arra az ellenséges karakterre, akit arrébb tolsz – vagy ne tolj senkit.' : 'Most koppints az ellenfél egyik üres helyére, oda kerül.')
       : 'Most válaszd ki, melyik ellenséges karaktert küldöd vissza.')
-      : c.type === 'char' ? 'Húzd vagy koppints egy üres helyre.' : c.type === 'item' ? (c.tgt === 'enemy' ? 'Húzd rá vagy koppints egy ellenséges karakterre.' : 'Húzd rá vagy koppints a saját karakteredre.')
+      : c.type === 'char' ? (c.enemySide ? 'Húzd vagy koppints az ellenfél egyik üres helyére – oda kerül.' : 'Húzd vagy koppints egy üres helyre.') : c.type === 'item' ? (c.tgt === 'enemy' ? 'Húzd rá vagy koppints egy ellenséges karakterre.' : 'Húzd rá vagy koppints a saját karakteredre.')
       : c.tgt === 'enemyEmpty' ? 'Húzd vagy koppints az ellenfél egyik üres helyére.' : c.tgt === 'ownOrHero' ? 'Húzd rá egy saját karakteredre vagy a hősödre.' : needs ? 'Húzd rá vagy koppints egy ellenséges karakterre.'
       : 'Húzd fel a táblára, vagy nyomd meg a Kijátszás gombot.';
     sb.hidden = false;
@@ -1370,9 +1383,9 @@ $('#hand').addEventListener('keydown', e => { if ((e.key === 'Enter' || e.key ==
 
 async function doPlay(hi, t) {
   const c0 = CARD[S.players[ME].hand[hi]?.id];
-  if (c0 && c0.opts && (t == null || t.o == null)) {   // választós lap (Gluténbomba): előbb dönts
+  if (c0 && c0.opts) {   // választós lap (Gluténbomba, Végtelen trip): előbb dönts – a célpont megmarad
     const o = await chooseOpt(c0); if (o == null) { ui.sel = null; ui.pend = null; render(); return; }
-    t = { k:'none', o };
+    t = { ...(t && t.k !== 'none' ? t : { k:'none' }), o };
   }
   busy = true; ui.sel = null; ui.pend = null;
   const id = S.players[ME].hand[hi].id;

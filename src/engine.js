@@ -80,6 +80,9 @@ const CARDS = [
   { id:'f_gameover', set:'ah', type:'action', name:'Game Over', cost:6, rarity:'l', finisher:true, tgt:'none', text:'A maximum életed 10 lesz. Az ellenfél összes karaktere elpusztul, a hőse 5 sebzést kap.' },
   { id:'i_lanc', set:'ah', type:'item', name:'Börtönlánc', cost:2, tgt:'enemy', rarity:'r', chain:1, text:'Egy ellenséges karakterre teszed: a gazdája minden körének elején 1 sebzést kap.' },
   { id:'a_csend', set:'ah', type:'action', name:'Csend a vihar előtt', cost:5, tgt:'enemyTwo', rarity:'e', text:'Válassz két ellenséges karaktert: visszakerülnek az ellenfél kezébe.' },
+  { id:'c_vizipipa', set:'ah', type:'char', name:'Barna vízipipája', cost:1, atk:0, hp:2, rarity:'e', enemySide:true, noAttack:true, text:'Az ellenfél oldalára teszed le. Nem támad. Amelyik karakter elpusztítja, +2/+2-t kap.' },
+  { id:'a_trip', set:'ah', type:'action', name:'Végtelen trip', cost:3, tgt:'own', rarity:'l', opts:['Múltba: visszakapja a lerakáskori értékeit', 'Jövőbe: egy körre eltűnik, és +3/+3-mal tér vissza'], text:'Egy karakteredet elküldöd a múltba (visszakapja a lerakáskori értékeit, minden más hatás lekerül róla) vagy a jövőbe (eltűnik, a következő köröd elején +3/+3-mal visszatér; ha nincs hely, végleg eltűnik).' },
+  { id:'c_ppvar', set:'ah', type:'char', name:'PP, a váratlan', cost:2, atk:3, hp:1, rarity:'e', sneak:true, text:'Ha egy karakter megtámadja, 2-vel kisebb sebzést okoz neki.' },
   { id:'c_ah_sasi', set:'ah', type:'char', name:'Sasi, Amszterdam hőse', cost:4, atk:2, hp:6, rarity:'k', haste:true, text:'' },
   { id:'c_ah_tomi', set:'ah', type:'char', name:'Tomi, Amszterdam hőse', cost:3, atk:1, hp:4, rarity:'k', elusive:true, text:'' },
   { id:'c_ah_barna', set:'ah', type:'char', name:'Barna, Amszterdam hőse', cost:3, atk:3, hp:2, rarity:'k', text:'Kijátszáskor keverj egy Varázsgomba lapot a paklidba.' },
@@ -300,6 +303,15 @@ function startTurn(s) {
   p.charThisTurn = false; p.itemThisTurn = false; p.struck = false; p.drinkDraw = false;
   p.board.forEach(u => { if (u) u.fresh = false; });
   ev(s, { t:'turn', side:pi });
+  if (p.future && p.future.length) {   /* Végtelen trip: a jövőbe küldött karakter +3/+3-mal visszatér (ha nincs hely, végleg eltűnik) */
+    const keep = [];
+    for (const f of p.future) { if (p.turns < f.back) { keep.push(f); continue; }
+      const u = f.u; u.atk += 3; u.hp += 3; u.maxHp += 3; u.fresh = false;
+      const j = !p.board[f.i] && !closedLane(s, pi, f.i) ? f.i : (openSlots(s, pi)[0] ?? -1);
+      if (j >= 0) { p.board[j] = u; ev(s, { t:'futureback', side:pi, i:j, id:u.id }); }
+      else { buryItems(s, pi, u); bury(s, pi, u.id, 'future', !!u.foil); ev(s, { t:'futuregone', side:pi, i:-1, id:u.id }); } }
+    p.future = keep;
+  }
   if (s.half > 1) draw(s, pi);
   if (p.espresso) { const n = p.espresso; p.espresso = 0; ev(s, { t:'espressodraw', side:pi, i:-1, n }); for (let k = 0; k < n; k++) draw(s, pi); }   // Espresso Martini: a következő köre elején +2 húzás (a szokásos mellé)
   if (s.half === 2 && !s.noCoin) { addToHand(s, pi, 'a_kor'); ev(s, { t:'coin', side:pi, i:-1 }); }   // a második játékos kiegyenlítése
@@ -346,6 +358,7 @@ function targetsFor(s, pi, id) {
     case 'char': {
       const foes = e.board.map((u, i) => u ? i : -1).filter(i => i >= 0);
       const foesM = foes.filter(j => !isFixed(e.board[j]) && !isEl(e.board[j]));
+      if (c.enemySide) { e.board.forEach((u, j) => { if (!u && !closedLane(s, ei, j)) T.push({ k:'eslot', side:ei, i:j }); }); break; }   /* Barna vízipipája */
       p.board.forEach((u, i) => {
         if (u || !canPlace(s, pi, i)) return;
         const empt = e.board.map((u, j) => u || closedLane(s, ei, j) ? -1 : j).filter(j => j >= 0);
@@ -365,7 +378,7 @@ function targetsFor(s, pi, id) {
       else if (c.tgt === 'enemyOrHero') { foeA(); T.push({ k:'hero', side:ei, i:-1 }); }
       else if (c.tgt === 'anyOrHero') { foeA(); p.board.forEach((u, i) => { if (u && !isEl(u)) T.push({ k:'unit', side:pi, i }); }); T.push({ k:'hero', side:ei, i:-1 }); }   // Sasi ütése: a saját térfeleden bárki (a nálad úszó Cápa is)
       else if (c.tgt === 'enemyEmpty') e.board.forEach((u, i) => { if (!u) T.push({ k:'eslot', side:ei, i }); });
-      else if (c.tgt === 'own') ownA();
+      else if (c.tgt === 'own') { ownA(); if (c.opts) { const b = T.splice(0); for (const x of b) c.opts.forEach((_, o) => T.push({ ...x, o })); } }   /* Végtelen trip: célpont × választás */
       else if (c.tgt === 'ownOrHero') { ownA(); T.push({ k:'hero', side:pi, i:-1 }); }
       else if (c.tgt === 'enemyTwo') {   /* Csend a vihar előtt: két különböző ellenséges karakter (nem Igézhetetlen, nem Cápa) */
         const one = e.board.map((u, i) => u && !isEl(u) && !isFixed(u) ? i : -1).filter(i => i >= 0);
@@ -407,6 +420,7 @@ function whyNot(s, pi, hi) {
   if (cardCost(s, pi, h.id) > s.players[pi].energy) return 'Nincs elég energiád';
   if (!targetsFor(s, pi, h.id).length) {
     const c = CARD[h.id];
+    if (c.enemySide) return 'Az ellenfélnek nincs üres helye';
     if (c.type === 'char' || c.tgt === 'summon' || c.tgt === 'ownSlot') return 'Nincs szabad helyed';
     if (c.tgt === 'grave') return graveChars(s.players[pi]).length ? 'Nincs szabad helyed' : 'Nincs karakter a temetődben';
     if (c.type === 'item') return c.tgt === 'enemy' ? 'Az ellenfélnek nincs karaktere' : 'Nincs karaktered, akire rátehetnéd';
@@ -431,8 +445,9 @@ function playCard(s, pi, hi, t) {
   }
   if (c.type === 'char') {
     const u = makeUnit(s, c.id, pi); if (h.foil) u.foil = true;
-    p.board[t.i] = u; p.lastPlaced = u.uid;   // a Cápa erre vadászik
-    if (has(p, 'firstCharAtk') && !p.charThisTurn && c.id !== 'c_korso' && c.cost <= 2) { u.atk += 1; ev(s, { t:'passive', side:pi, k:'firstCharAtk', id:c.id }); ev(s, { t:'buff', side:pi, i:t.i }); }
+    if (c.enemySide) { u.owner = pi; e.board[t.i] = u; ev(s, { t:'pipa', side:ei, i:t.i }); }   /* Barna vízipipája: az ellenfélhez kerül */
+    else { p.board[t.i] = u; p.lastPlaced = u.uid; }   // a Cápa erre vadászik
+    if (has(p, 'firstCharAtk') && !p.charThisTurn && c.id !== 'c_korso' && !c.enemySide && c.cost <= 2) { u.atk += 1; ev(s, { t:'passive', side:pi, k:'firstCharAtk', id:c.id }); ev(s, { t:'buff', side:pi, i:t.i }); }
     p.charThisTurn = true;
     if (bid(c.id) === 'c_pp') {   // Query idézése: előbb jobbra, aztán balra, ha ott nincs hely, bárhova
       const os = openSlots(s, pi), spots = [t.i + 1, t.i - 1].filter(j => os.includes(j));
@@ -566,6 +581,12 @@ function playCard(s, pi, hi, t) {
           reveal(s, ei, x.i); e.board[x.i] = null; ev(s, { t:'bounce', side:ei, i:x.i }); buryItems(s, ei, u);
           if (!CARD[u.id].token) addToHand(s, ei, u.id, u.foil); }
         break;
+      case 'a_trip': { const u = p.board[t.i]; if (!u) break;
+        if (t.o === 1) { p.board[t.i] = null; (p.future = p.future || []).push({ u, i:t.i, back:p.turns + 1 }); ev(s, { t:'future', side:pi, i:t.i, id:u.id }); }
+        else { const c0 = CARD[u.id]; buryItems(s, pi, u);   /* múlt: a lerakáskori értékek, minden későbbi hatás nélkül */
+          Object.assign(u, { atk:c0.atk, hp:c0.hp, maxHp:c0.hp, items:[], foe:[], temp:0, stun:0, shield:!!c0.shield, haste:!!c0.haste, doom:false, hangover:false, muscle:false, taunt:false, invis:false, elusive:false, noKw:false });
+          delete u.boon; ev(s, { t:'past', side:pi, i:t.i }); }
+        break; }
       case 'a_irreggeli': healHero(s, pi, 999); healHero(s, ei, 999); break;
       case 'a_utcaifust': {   /* minden saját karakter rejtett lesz és összekeverednek (a zárt és a Cápás helyek kimaradnak) */
         const L = []; for (let j = 0; j < LANES; j++) if (!closedLane(s, pi, j) && !isFixed(p.board[j])) L.push(j);
@@ -895,7 +916,8 @@ function strike(s, i) {
   reveal(s, ei, j);
   const r = x.stun || isInv(u) ? 0 : effAtk(s, ei, j);   // Láthatatlan támadót nem lehet visszaütni
   const sh = x.shield;
-  damageUnit(s, ei, j, a);
+  damageUnit(s, ei, j, x.id === 'c_ppvar' ? Math.max(0, a - 2) : a);   /* PP, a váratlan: aki megtámadja, 2-vel kisebbet üt rá */
+  if (x.id === 'c_vizipipa' && x.hp <= 0 && s.players[pi].board[i] === u) { u.atk += 2; u.hp += 2; u.maxHp += 2; ev(s, { t:'pipabuff', side:pi, i }); }   /* Barna vízipipája: aki elpusztítja, +2/+2 */
   // Izom: ami sebzés a karakter halála után megmarad, az ellenfél hősét éri (a Pajzs elnyeli az egészet)
   if ((kwC(u, 'muscle') || u.muscle) && !sh && x.hp < 0) { ev(s, { t:'overflow', side:ei, i:-1, n:-x.hp }); damageHero(s, ei, -x.hp, true); }
   damageUnit(s, pi, i, r); cleanup(s);
@@ -1046,6 +1068,7 @@ function evalState(s, me) {
     if (u.id === 'c_korso') x = 0.6; if (bid(u.id) === 'c_zoli' && !(u.items || []).includes('i_bunda')) x *= 0.6; if (u.id === 'c_zana') x += a * 0.8;
     if (CARD[u.id].noAttack) x = u.hp * 0.5;   // JBL hangfal: fal, nem üt
     if (CARD[u.id].fixed) x = -7;              // Cápa: annak az oldalnak árt, ahol áll
+    if (u.id === 'c_vizipipa') x = -2.5;      /* vízipipa: annak jó, aki elpusztíthatja */
     return x;
   };
   for (let i = 0; i < LANES; i++) {
@@ -1055,6 +1078,7 @@ function evalState(s, me) {
     if (x && (!u || isInv(u) || x.id === 'c_nyiti') && !x.stun && !CARD[x.id].noAttack) v -= effAtk(s, other(me), i) * 0.8;
   }
   v += P.hand.length * 0.6 - E.hand.length * 0.3 + (P.espresso || 0) * 0.55;
+  for (const f of P.future || []) v += ((f.u.atk + 3) * 1.1 + (f.u.hp + 3) * 0.9) * 0.8;   /* Végtelen trip: a jövőben váró karakter */
   for (const h of P.hand) if (CARD[h.id].bong) v -= CARD[h.id].cost * 1.0 + 0.6;   /* Bong: forró krumpli – nálam maradva sebez */
   for (const h of E.hand) if (CARD[h.id].bong) v += CARD[h.id].cost * 0.7 + 0.3;   // Espresso Martini: a jövő körben érkező lapok
   if (s.location && s.location.owner === me) v += 1.0;
@@ -1139,4 +1163,4 @@ function botChoose(real, lvl = 2) {
   return best && { hi: best.hi, t: best.t };
 }
 
-if (typeof module !== 'undefined') module.exports = { preAttack, isEl, canMove, moveTargets, moveUnit, BOT_LV, baszoStrike, sharkSwim, atiFlee, openSlots, closedLane, CARDS_ALL: CARDS, DECK_OF, LANES, MAX_HALF, mulligan, botMulligan, beginGame, CARDS, CARD, HEROES, HERO, DECKS, newGame, playCard, canPlay, targetsFor, cardCost, attackLane, finishTurn, runEndTurn, botChoose, canAttack, effAtk };
+if (typeof module !== 'undefined') module.exports = { whyNot, preAttack, isEl, canMove, moveTargets, moveUnit, BOT_LV, baszoStrike, sharkSwim, atiFlee, openSlots, closedLane, CARDS_ALL: CARDS, DECK_OF, LANES, MAX_HALF, mulligan, botMulligan, beginGame, CARDS, CARD, HEROES, HERO, DECKS, newGame, playCard, canPlay, targetsFor, cardCost, attackLane, finishTurn, runEndTurn, botChoose, canAttack, effAtk };

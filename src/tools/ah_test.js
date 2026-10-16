@@ -12,9 +12,9 @@ const T = (s, side, id) => E.targetsFor(s, side, id);
 
 // --- a szett lapjai ---
 const ah = E.CARDS.filter(c => c.set === 'ah' && !c.token);
-ok(ah.length === 22, `22 gyűjthető lap az Amszterdam hősei szettben (${ah.length})`);
+ok(ah.length === 25, `25 gyűjthető lap az Amszterdam hősei szettben (${ah.length})`);
 const rc = r => ah.filter(c => c.rarity === r).length;
-ok(rc('k') === 12 && rc('r') === 6 && rc('e') === 2 && rc('l') === 2, `ritkaságok 12/6/2/2 (${rc('k')}/${rc('r')}/${rc('e')}/${rc('l')})`);
+ok(rc('k') === 12 && rc('r') === 6 && rc('e') === 4 && rc('l') === 3, `ritkaságok 12/6/4/3 (${rc('k')}/${rc('r')}/${rc('e')}/${rc('l')})`);
 
 // --- Varázsgomba: halmozódik ---
 { const s = G(); const u = U(s, 0, 1, 'c_vajda');
@@ -113,9 +113,40 @@ ok(rc('k') === 12 && rc('r') === 6 && rc('e') === 2 && rc('l') === 2, `ritkaság
   ok(!s.players[1].board[0] && !s.players[1].board[1] && s.players[1].hand.map(h => h.id).sort().join() === 'c_pifti,c_vajda', 'Csend: két ellenséges karakter vissza a kézbe');
   ok(s.players[1].grave.some(g => g.id === 'i_napszemuveg'), 'Csend: az eszközük a temetőbe');
   const s2 = G(); U(s2, 1, 3, 'c_vajda'); ok(T(s2, 0, 'a_csend').length === 1, 'Csend: egy ellenségnél egy célpont is elég'); }
+// --- Barna vízipipája ---
+{ const s = G(); U(s, 0, 1, 'c_vajda'); U(s, 1, 0, 'c_pifti');
+  const tg = T(s, 0, 'c_vizipipa'); ok(tg.length === 3 && tg.every(t => t.side === 1 && t.k === 'eslot'), 'Vízipipa: csak az ellenfél üres helyeire');
+  play(s, 0, 'c_vizipipa', { k: 'eslot', side: 1, i: 1 }); const pp = s.players[1].board[1];
+  ok(pp && pp.id === 'c_vizipipa' && !s.players[0].board.some(u => u && u.id === 'c_vizipipa'), 'Vízipipa: az ellenfél oldalára került');
+  E.runEndTurn(s);
+  ok(!s.events.some(e => e.t === 'attack' && e.side === 1 && e.i === 1), 'Vízipipa: nem támad');
+  E.runEndTurn(s); const v = s.players[0].board[1];
+  ok(!s.players[1].board[1] && v.atk === 5 && v.maxHp === 6, `Vízipipa: Vajda elpusztította, +2/+2 (${v.atk}/${v.maxHp})`);
+  const s2 = G(); for (let j = 0; j < 4; j++) U(s2, 1, j, 'c_pifti'); s2.players[0].hand = [{ uid: 5, id: 'c_vizipipa' }];
+  ok(E.whyNot(s2, 0, 0) === 'Az ellenfélnek nincs üres helye', 'Vízipipa: tele ellenfélnél nem játszható'); }
+// --- Végtelen trip ---
+{ const s = G(); const u = U(s, 0, 0, 'c_vajda'); u.atk = 1; u.hp = 1; u.items = ['i_napszemuveg']; u.stun = 2;
+  ok(T(s, 0, 'a_trip').filter(t => t.i === 0).map(t => t.o).join() === '0,1', 'Végtelen trip: célpont × két választás');
+  play(s, 0, 'a_trip', { k: 'unit', side: 0, i: 0, o: 0 });
+  ok(u.atk === 3 && u.hp === 4 && !u.items.length && !u.stun, `Múltba: Vajda újra 3/4, eszköz és bénulás nélkül (${u.atk}/${u.hp})`);
+  play(s, 0, 'a_trip', { k: 'unit', side: 0, i: 0, o: 1 });
+  ok(!s.players[0].board[0] && s.players[0].future.length === 1, 'Jövőbe: eltűnt a tábláról');
+  E.runEndTurn(s); ok(!s.players[0].board[0], 'Jövőbe: az ellenfél körében még nincs itt');
+  E.runEndTurn(s); const b = s.players[0].board[0];
+  ok(b && b.id === 'c_vajda' && b.atk === 6 && b.maxHp === 7 && !s.players[0].future.length, `Jövőbe: a következő köröd elején +3/+3-mal vissza (${b && b.atk}/${b && b.maxHp})`);
+  const s2 = G(); U(s2, 0, 0, 'c_vajda'); play(s2, 0, 'a_trip', { k: 'unit', side: 0, i: 0, o: 1 });
+  E.runEndTurn(s2); for (let j = 0; j < 4; j++) U(s2, 0, j, 'c_pifti'); E.runEndTurn(s2);
+  ok(!s2.players[0].board.some(x => x && x.id === 'c_vajda') && s2.events.some(e => e.t === 'futuregone'), 'Jövőbe: ha nincs hely, végleg eltűnik');
+  const s3 = G(); U(s3, 0, 0, 'c_ah_tomi'); ok(!T(s3, 0, 'a_trip').length, 'Végtelen trip: Igézhetetlenre nem (akció)'); }
+// --- PP, a váratlan ---
+{ const s = G(); const p = U(s, 1, 0, 'c_ppvar'); U(s, 0, 0, 'c_ah_laci');
+  E.runEndTurn(s); ok(s.players[1].board[0] && s.players[1].board[0].hp === 1, 'PP: a 2 támadású Laci nem sebzi (2−2=0)');
+  const s2 = G(); U(s2, 1, 0, 'c_ppvar'); U(s2, 0, 0, 'c_vajda'); E.runEndTurn(s2);
+  ok(!s2.players[1].board[0], 'PP: a 3 támadású Vajda megöli (3−2=1)');
+  ok(E.CARD.c_ppvar.sneak, 'PP: Sunyulás'); }
 // --- botok nem akadnak el az új lapokkal ---
 { let games = 0, errs = 0;
-  const deck = { i_lanc: 1, a_csend: 1, i_gomba: 2, i_cigi: 1, a_irkave: 1, a_suti: 1, l_voros: 1, c_kutya: 1, a_bong: 1, a_repter: 1, c_ah_sasi: 2, c_ah_tomi: 2, c_ah_barna: 2, c_ah_laci: 2, c_ah_ati: 1, c_ah_bence: 1 };
+  const deck = { c_vizipipa: 1, a_trip: 1, c_ppvar: 1, i_lanc: 1, a_csend: 1, i_gomba: 2, i_cigi: 1, a_irkave: 1, a_suti: 1, l_voros: 1, c_kutya: 1, a_bong: 1, a_repter: 1, c_ah_sasi: 2, c_ah_tomi: 2, c_ah_barna: 1, c_ah_laci: 1, c_ah_ati: 1, c_ah_bence: 1 };
   for (let g = 0; g < 60; g++) { try { const s = E.newGame('tomi', deck, 'gabi', E.DECK_OF('gabi'), g % 2); let n = 0;
     while (s.winner == null && n++ < 200) { let m = 0, c; while (s.winner == null && m++ < 15 && (c = E.botChoose(s))) E.playCard(s, s.active, c.hi, c.t); if (s.winner == null) E.runEndTurn(s); }
     games++; } catch (e) { errs++; if (errs < 3) console.log(e.stack.split('\n').slice(0, 3).join(' | ')); } }
