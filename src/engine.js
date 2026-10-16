@@ -78,6 +78,8 @@ const CARDS = [
   { id:'a_irreggeli', set:'ah', type:'action', name:'Ír reggeli', cost:6, tgt:'none', rarity:'k', text:'Mindkét hős élete teljesen visszagyógyul.' },
   { id:'a_utcaifust', set:'ah', type:'action', name:'Utcai füst', cost:4, tgt:'none', rarity:'r', text:'Minden saját karaktered rejtett lesz, és véletlenszerűen helyet cserélnek (üres helyre is kerülhetnek).' },
   { id:'f_gameover', set:'ah', type:'action', name:'Game Over', cost:6, rarity:'l', finisher:true, tgt:'none', text:'A maximum életed 10 lesz. Az ellenfél összes karaktere elpusztul, a hőse 5 sebzést kap.' },
+  { id:'i_lanc', set:'ah', type:'item', name:'Börtönlánc', cost:2, tgt:'enemy', rarity:'r', chain:1, text:'Egy ellenséges karakterre teszed: a gazdája minden körének elején 1 sebzést kap.' },
+  { id:'a_csend', set:'ah', type:'action', name:'Csend a vihar előtt', cost:5, tgt:'enemyTwo', rarity:'e', text:'Válassz két ellenséges karaktert: visszakerülnek az ellenfél kezébe.' },
   { id:'c_ah_sasi', set:'ah', type:'char', name:'Sasi, Amszterdam hőse', cost:4, atk:2, hp:6, rarity:'k', haste:true, text:'' },
   { id:'c_ah_tomi', set:'ah', type:'char', name:'Tomi, Amszterdam hőse', cost:3, atk:1, hp:4, rarity:'k', elusive:true, text:'' },
   { id:'c_ah_barna', set:'ah', type:'char', name:'Barna, Amszterdam hőse', cost:3, atk:3, hp:2, rarity:'k', text:'Kijátszáskor keverj egy Varázsgomba lapot a paklidba.' },
@@ -301,6 +303,10 @@ function startTurn(s) {
   if (s.half > 1) draw(s, pi);
   if (p.espresso) { const n = p.espresso; p.espresso = 0; ev(s, { t:'espressodraw', side:pi, i:-1, n }); for (let k = 0; k < n; k++) draw(s, pi); }   // Espresso Martini: a következő köre elején +2 húzás (a szokásos mellé)
   if (s.half === 2 && !s.noCoin) { addToHand(s, pi, 'a_kor'); ev(s, { t:'coin', side:pi, i:-1 }); }   // a második játékos kiegyenlítése
+  p.board.forEach((u, i) => { if (!u) return;   /* Börtönlánc: lánconként 1 sebzés a gazdája körének elején */
+    const n = u.items.filter(x => CARD[x] && CARD[x].chain).length;
+    for (let k = 0; k < n && p.board[i] === u && u.hp > 0; k++) { ev(s, { t:'chain', side:pi, i }); damageUnit(s, pi, i, 1); } });
+  cleanup(s); checkWin(s); if (s.winner != null) return;
   atiFlee(s, pi);
   sharkSwim(s, pi);
   if (has(p, 'extraDraw') && p.turns % 3 === 0) { ev(s, { t:'passive', side:pi, k:'extraDraw' }); draw(s, pi); }
@@ -361,6 +367,11 @@ function targetsFor(s, pi, id) {
       else if (c.tgt === 'enemyEmpty') e.board.forEach((u, i) => { if (!u) T.push({ k:'eslot', side:ei, i }); });
       else if (c.tgt === 'own') ownA();
       else if (c.tgt === 'ownOrHero') { ownA(); T.push({ k:'hero', side:pi, i:-1 }); }
+      else if (c.tgt === 'enemyTwo') {   /* Csend a vihar előtt: két különböző ellenséges karakter (nem Igézhetetlen, nem Cápa) */
+        const one = e.board.map((u, i) => u && !isEl(u) && !isFixed(u) ? i : -1).filter(i => i >= 0);
+        if (one.length === 1) T.push({ k:'unit', side:ei, i:one[0] });
+        else for (const a of one) for (const b of one) if (a !== b) T.push({ k:'unit', side:ei, i:a, t2:{ k:'unit', side:ei, i:b } });
+      }
       else if (c.tgt === 'airport') {   /* Reptéri ellenőrzés: bármelyik (nem rögzített, nem Igézhetetlen) karakter át a túloldal egy üres helyére */
         for (const sd of [pi, ei]) { const os = other(sd);
           s.players[sd].board.forEach((u, i) => { if (!u || isFixed(u) || isEl(u)) return;
@@ -549,6 +560,11 @@ function playCard(s, pi, hi, t) {
         u.foe = foe; u.fresh = true; u.hidden = false;
         dst.board[j] = u;
         ev(s, { t:'airport', side:os, i:j, from:t.i, fs:sd, id:u.id }); }
+        break;
+      case 'a_csend': for (const x of [t, t.t2]) { if (!x) continue;   /* vissza az ellenfél kezébe (az eszközei a temetőbe; token eltűnik) */
+          const u = e.board[x.i]; if (!u || isFixed(u)) continue;
+          reveal(s, ei, x.i); e.board[x.i] = null; ev(s, { t:'bounce', side:ei, i:x.i }); buryItems(s, ei, u);
+          if (!CARD[u.id].token) addToHand(s, ei, u.id, u.foil); }
         break;
       case 'a_irreggeli': healHero(s, pi, 999); healHero(s, ei, 999); break;
       case 'a_utcaifust': {   /* minden saját karakter rejtett lesz és összekeverednek (a zárt és a Cápás helyek kimaradnak) */

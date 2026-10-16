@@ -12,9 +12,9 @@ const T = (s, side, id) => E.targetsFor(s, side, id);
 
 // --- a szett lapjai ---
 const ah = E.CARDS.filter(c => c.set === 'ah' && !c.token);
-ok(ah.length === 20, `20 gyűjthető lap az Amszterdam hősei szettben (${ah.length})`);
+ok(ah.length === 22, `22 gyűjthető lap az Amszterdam hősei szettben (${ah.length})`);
 const rc = r => ah.filter(c => c.rarity === r).length;
-ok(rc('k') === 12 && rc('r') === 5 && rc('e') === 1 && rc('l') === 2, `ritkaságok 12/5/1/2 (${rc('k')}/${rc('r')}/${rc('e')}/${rc('l')})`);
+ok(rc('k') === 12 && rc('r') === 6 && rc('e') === 2 && rc('l') === 2, `ritkaságok 12/6/2/2 (${rc('k')}/${rc('r')}/${rc('e')}/${rc('l')})`);
 
 // --- Varázsgomba: halmozódik ---
 { const s = G(); const u = U(s, 0, 1, 'c_vajda');
@@ -99,9 +99,23 @@ ok(rc('k') === 12 && rc('r') === 5 && rc('e') === 1 && rc('l') === 2, `ritkaság
   ok(s.players[0].maxHp === 10 && s.players[0].hp === 10, 'Game Over: a maximum életed 10');
   ok(!s.players[1].board[0] && s.players[1].board[1] && s.players[1].board[1].hp === 1, 'Game Over: az ellenfél karakterei elpusztulnak (Gabi feltámad)');
   ok(s.players[1].hp === eh - 5, 'Game Over: 5 sebzés az ellenfél hősének'); }
+// --- Börtönlánc ---
+{ const s = G(); const u = U(s, 1, 0, 'c_vajda'); play(s, 0, 'i_lanc', { k: 'unit', side: 1, i: 0 });
+  ok(u.items.includes('i_lanc') && u.hp === 4, 'Börtönlánc: rákerül, azonnal nem sebez');
+  ok(T(s, 0, 'i_lanc').every(t => t.side === 1), 'Börtönlánc csak ellenséges karakterre');
+  E.runEndTurn(s); ok(s.active === 1 && u.hp === 3, `Börtönlánc: az ellenfél körének elején 1 sebzés (${u.hp})`);
+  s.events = []; E.runEndTurn(s); ok(!s.events.some(e => e.t === 'chain'), 'Börtönlánc: a te körödben nem sebez');
+  const t = U(s, 1, 2, 'c_ah_tomi'); ok(T(s, 0, 'i_lanc').some(x => x.side === 1 && x.i === 2), 'Börtönlánc Igézhetetlenre is rátehető (eszköz)'); }
+// --- Csend a vihar előtt ---
+{ const s = G(); U(s, 1, 0, 'c_vajda'); U(s, 1, 1, 'c_pifti'); U(s, 1, 2, 'c_ah_tomi'); s.players[1].board[0].items = ['i_napszemuveg'];
+  ok(!T(s, 0, 'a_csend').some(t => t.i === 2 || (t.t2 && t.t2.i === 2)), 'Csend: Igézhetetlen nem célozható');
+  play(s, 0, 'a_csend', { k: 'unit', side: 1, i: 0, t2: { k: 'unit', side: 1, i: 1 } });
+  ok(!s.players[1].board[0] && !s.players[1].board[1] && s.players[1].hand.map(h => h.id).sort().join() === 'c_pifti,c_vajda', 'Csend: két ellenséges karakter vissza a kézbe');
+  ok(s.players[1].grave.some(g => g.id === 'i_napszemuveg'), 'Csend: az eszközük a temetőbe');
+  const s2 = G(); U(s2, 1, 3, 'c_vajda'); ok(T(s2, 0, 'a_csend').length === 1, 'Csend: egy ellenségnél egy célpont is elég'); }
 // --- botok nem akadnak el az új lapokkal ---
 { let games = 0, errs = 0;
-  const deck = { i_gomba: 2, i_cigi: 2, a_irkave: 1, a_suti: 1, l_voros: 1, c_kutya: 1, a_bong: 1, a_repter: 1, c_ah_sasi: 2, c_ah_tomi: 2, c_ah_barna: 2, c_ah_laci: 2, c_ah_ati: 1, c_ah_bence: 1 };
+  const deck = { i_lanc: 1, a_csend: 1, i_gomba: 2, i_cigi: 1, a_irkave: 1, a_suti: 1, l_voros: 1, c_kutya: 1, a_bong: 1, a_repter: 1, c_ah_sasi: 2, c_ah_tomi: 2, c_ah_barna: 2, c_ah_laci: 2, c_ah_ati: 1, c_ah_bence: 1 };
   for (let g = 0; g < 60; g++) { try { const s = E.newGame('tomi', deck, 'gabi', E.DECK_OF('gabi'), g % 2); let n = 0;
     while (s.winner == null && n++ < 200) { let m = 0, c; while (s.winner == null && m++ < 15 && (c = E.botChoose(s))) E.playCard(s, s.active, c.hi, c.t); if (s.winner == null) E.runEndTurn(s); }
     games++; } catch (e) { errs++; if (errs < 3) console.log(e.stack.split('\n').slice(0, 3).join(' | ')); } }

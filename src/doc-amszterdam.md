@@ -3,14 +3,13 @@
 **Állapot (2026-10-16):** csak a teszt oldalon (https://teszt.bestofus.pages.dev). Élesbe csak Tomi szavára, a `teszt` ág `main`-be olvasztásával kerül. Megjelenés: valamikor októberben.
 
 - **Téma:** a társaság 2022-es amszterdami útja.
-- **Méret:** 25 lap lesz, most 20 van kész (12 gyakori / 5 ritka / 1 epikus / 2 legendás). Javaslat a hátralévő 5-re: 3 epikus, 1 legendás, 1 ritka (→ 12/6/4/3), hogy a saját packokban ne mindig ugyanaz az egy epikus jöjjön.
+- **Méret:** 25 lap lesz, most 22 van kész (12 gyakori / 6 ritka / 2 epikus / 2 legendás). Javaslat a hátralévő 3-ra: 2 epikus + 1 legendás (→ 12/6/4/3).
 - **Beszerzés:** csak a Boltban, saját packból: **Amszterdam hősei booster** (50 coin, 3 lap) és **Amszterdam Shiny** (250 coin, a legjobb lap biztosan Full Art). Csak a szett lapjai vannak benne (nincs Full Art hős, arany hős, Base set-változat); ha egy ritkaságból nincs lap, eggyel lejjebb sorsol. A Base set packokba nem kerülnek az új lapok. Saját pack-grafika (Astra, 2026-10-16): zöld „Booster pack” és türkiz holografikus „Shiny pack” (`art/ui/pack-ah.webp`, `pack-ahshiny.webp` + `sm/`; a tartalomra vágva, oldalt átlátszó szegéllyel 600×965-re igazítva, hogy a feltépés ugyanott fusson, mint a Base set packnál). A Boltban és a bontásnál is ezek látszanak.
 - **Kiosztás:** senki nem kap belőle ingyen (a kezdőgyűjtemény és a `STARTER_ADDS` kizárja a `set`-es lapokat). A Game Over sem jár automatikusan, mint a régi Kánon lapok.
 - **Gyűjtemény:** szett-szűrő „🌷 Amszterdam hősei” (csak a teszt oldalon látszik). Kód: a lapokon `set:'ah'`, `SETS.ah` (meta.js), `CF_SETS` (ui.js).
 
 ## Lapképek
-- **Kész (16/20, 2026-10-16):** Süti, Bence terrorja, Sasi, Barna, Laci, Tomi, Utcai füst, Drog kereső kutya, High Hawaiians, Vöröslámpás negyed, Game Over, Elfekvő, Varázsgomba, Cigi, Ír reggeli, Coffee Shop (`art/ah_*.webp`, ART-bejegyzés a ui.js-ben).
-- **Még nincs képe:** Ati, Ír kávé, Reptéri ellenőrzés, Bong (+ a Betti token).
+- **Mind a 22 lapnak és a Betti tokennek van képe (2026-10-16).** A Bong drágább példányai (`a_bong2…10`) ugyanazt a képet kapják.
 
 ## Új kulcsszavak
 - **Igézhetetlen** (`elusive`): akcióval és más lapok kijátszáskori hatásával nem célozható – se a gazdája, se az ellenfél (Dinnyés, Ír kávé, Vera, Zsibrita, Reptéri ellenőrzés stb.). A véletlen célzású hatások kihagyják (Alekosz, Molnár Zsolti, Koktélarmageddon, Tomi, a parti lelke, Among Us, Cápa érkezése). **Eszköz rátehető** (saját és ellenséges is, Tomi döntése). A mindenkit érő hatások eltalálják (Tálca shot, JBL, Nyiti, Mosh Pit, Game Over). Jel a lapon: 🛡.
@@ -28,10 +27,12 @@
 - **Drog kereső kutya** (c_kutya) · 2 · 2/1 · ritka · Sunyulás; halálakor az ellenfél eldob egy véletlen lapot a kezéből
 
 **Eszközök**
+- **Börtönlánc** (i_lanc) · 2 · ritka · ellenséges karakterre teszed; a karakter a gazdája minden körének elején 1 sebzést kap (láncanként). Igézhetetlenre is rátehető (eszköz). A STOP nem szedi le (az az ellenfél eszközeit veszi le a saját karaktereiről, ez pedig a te eszközöd).
 - **Varázsgomba** (i_gomba) · 1 · gyakori · +1/+1; minden további gomba ugyanazon a karakteren eggyel többet ad (2. +2/+2, 3. +3/+3…). A STOP a halmozott bónuszt is leveszi.
 - **Cigi** (i_cigi) · 1 · gyakori · ellenséges karakterre: −1/−1, az élete ettől nem mehet 1 alá
 
 **Akciók**
+- **Csend a vihar előtt** (a_csend) · 5 · epikus · válassz két különböző ellenséges karaktert (nem Igézhetetlen, nem Cápa): visszakerülnek az ellenfél kezébe (az eszközeik a temetőbe, token eltűnik, teli kéznél elég). Ha csak egy választható ellenség van, egy is elég.
 - **Ír kávé** (a_irkave) · 1 · gyakori · egy saját karaktered Pajzsot kap (értelmezés: csak saját)
 - **Süti** (a_suti) · 1 · gyakori · egy választott ellenséges karakter elveszíti minden kulcsszavát (Lendület, Provokáció, Pajzs, Izom, Sunyulás – felfordul –, Láthatatlan, Igézhetetlen, Feltámadás). A lap szövegében leírt képességek (pl. halálhatás) megmaradnak; a később kapott eszközök kulcsszavai működnek. Jel: 🍪. (Tomi: célzott, csak ellenséges.)
 - **High Hawaiians** (a_hawaiians) · 4 · epikus · öt Varázsgomba a paklidba
@@ -71,6 +72,8 @@ A lapot minden kezdőpakliban egy hasonló költségű karakter helyére teszi. 
 | Utcai füst (4) | 39,1 | |
 | Bong (1) | 38,5 | |
 | Elfekvő (4) | 37,9 | |
+| Csend a vihar előtt (5) | 47,5 | Tubi 46,4 |
+| Börtönlánc (2) | 38,9 – a bot alulértékeli (a későbbi sebzést nem számolja) | Csattogós lepke 49,9 |
 
 Megjegyzés: a bot a helyzeti lapokat (helyszínek, Süti, Utcai füst, Bong, a pakliba kevert gombák) alulhasználja, ezek számai lefelé torzítanak – élő játékban erősebbek lehetnek. Döntésre vár (Tomi): Laci, Bence terrorja, Reptéri és Game Over gyengítése; Tomi, A. hőse, High Hawaiians, Elfekvő erősítése.
 

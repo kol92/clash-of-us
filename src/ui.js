@@ -269,6 +269,12 @@ const ART = {
   i_cigi:      { src:'art/ah_cigi.webp', av:'45% 50%', pos:'50% 50%' },
   a_irreggeli: { src:'art/ah_irreggeli.webp', av:'50% 50%', pos:'50% 50%' },
   l_coffeeshop:{ src:'art/ah_coffeeshop.webp', av:'40% 30%', pos:'45% 35%' },
+  i_lanc:      { src:'art/ah_lanc.webp', av:'45% 30%', pos:'45% 30%' },
+  a_csend:     { src:'art/ah_csend.webp', av:'55% 25%', pos:'55% 28%' },
+  a_irkave:    { src:'art/ah_irkave.webp', av:'60% 35%', pos:'60% 40%' },
+  a_bong:      { src:'art/ah_bong.webp', av:'50% 40%', pos:'50% 40%' },
+  c_ah_ati:    { src:'art/ah_ati.webp', av:'47% 20%', pos:'47% 22%' },
+  c_betti:     { src:'art/ah_betti.webp', av:'42% 20%', pos:'42% 22%' },
   a_legeny: { src:'art/legeny.webp', pos:'50% 35%' },
   a_kitiltva: { src:'art/kitiltva.webp', pos:'50% 35%' },
   a_haver: { src:'art/haver.webp', pos:'50% 22%' },
@@ -298,6 +304,7 @@ const ART = {
   l_barhole:{ src:'art/barhole.webp', pos:'50% 45%' },
   c_query:  { src:'art/query.webp', pos:'55% 30%' },
 };
+for (let n = 2; n <= 10; n++) ART['a_bong' + n] = ART.a_bong;   /* Bong: a továbbadott, drágább példányok is ugyanazzal a képpel */
 // kis lapokhoz (kéz, tábla, gyűjtemény) a 360 px-es kép, nagy nézethez a teljes
 const artSrc = (id, big) => big ? ART[id].src : ART[id].src.replace('art/', 'art/sm/');
 // Animált lapkép (2026-10-12): csak a nagy lapnézetben fut; amíg nem indul el (vagy ha nem tud, pl. alacsony fogyasztású mód), az állókép látszik
@@ -723,6 +730,7 @@ function logEvents(evs, snap) {
       case 'flee': L(`🏃 ${unitName(e.side, e.i)} átmenekült egy másik helyre`); break;
       case 'silence': L(`🍪 ${unitName(e.side, e.i)} elvesztette a kulcsszavait (Süti)`); break;
       case 'airport': L(`🛂 Reptéri ellenőrzés: <b class="lc" data-lc="${e.id}">${escH(CARD[e.id].name)}</b> átkerült ${e.side === ME ? 'hozzád' : 'az ellenfélhez'}`); break;
+      case 'chain': L(`⛓ ${unitName(e.side, e.i)}: Börtönlánc, 1 sebzés`); break;
       case 'smoke': L(`💨 Utcai füst: ${e.side === ME ? 'a karaktereid' : 'az ellenfél karakterei'} elrejtőztek és összekeveredtek`); break;
       case 'gameover': L(`💀 GAME OVER: ${who(e.side)} maximum élete 10 lett – az ellenfél összes karaktere elpusztul, a hőse 5 sebzést kap`); break;
       case 'bong': L(`🌿 A Bong ${e.side === ME ? 'hozzád került' : 'az ellenfélhez került'} – most ${e.n} energiába kerül`); break;
@@ -903,6 +911,7 @@ async function animateEvents(evs) {
       case 'shuffled': floatAt(anchor, `${e.id === 'i_gomba' ? '🍄' : '👑'} +${e.n} ${CARD[e.id].name} a ${e.side === ME ? 'paklidba' : 'paklijába'}!`, 'info'); hold = Math.max(hold, 900); break;
       case 'silence': fx(el, 'fx-hit'); floatAt(anchor, '🍪 Süti! Nincs több trükk', 'info'); hold = Math.max(hold, 750); break;
       case 'airport': floatAt(anchor, '🛂 Átrakva!', 'info'); hold = Math.max(hold, 750); break;
+      case 'chain': floatAt(anchor, '⛓', 'dmg'); hold = Math.max(hold, 350); break;
       case 'smoke': floatAt(anchor, '💨 Utcai füst!', 'info'); hold = Math.max(hold, 800); break;
       case 'gameover': floatAt(anchor, '💀 GAME OVER', 'dmg'); hold = Math.max(hold, 1000); break;
       case 'bong': floatAt(anchor, `🌿 Bong a ${e.side === ME ? 'kezedbe' : 'kezébe'}! (${e.n} energia)`, 'info'); hold = Math.max(hold, 800); break;
@@ -1242,6 +1251,7 @@ function render() {
     const hint = ui.pend != null ? (c.tgt === 'two' ? 'Megvan az első célpont. Most koppints a másodikra.'
       : c.tgt === 'swap' ? 'Most koppints egy másik saját karakteredre (helycsere) vagy egy üres helyedre.'
       : c.tgt === 'airport' ? 'Most koppints a túloldal egyik üres helyére – oda kerül.'
+      : c.tgt === 'enemyTwo' ? 'Most koppints a második ellenséges karakterre.'
       : c.playTgt === 'push' ? (ui.pend.length < 2 ? 'Koppints arra az ellenséges karakterre, akit arrébb tolsz – vagy ne tolj senkit.' : 'Most koppints az ellenfél egyik üres helyére, oda kerül.')
       : 'Most válaszd ki, melyik ellenséges karaktert küldöd vissza.')
       : c.type === 'char' ? 'Húzd vagy koppints egy üres helyre.' : c.type === 'item' ? (c.tgt === 'enemy' ? 'Húzd rá vagy koppints egy ellenséges karakterre.' : 'Húzd rá vagy koppints a saját karakteredre.')
