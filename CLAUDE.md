@@ -39,6 +39,14 @@ bash src/deploy.sh "Rövid magyar újdonság-szöveg" "commit üzenet"
 
 Csak build (kitétel nélkül): `cd src && python3 build-app.py ""` → `src/dist/`. Kell hozzá: Python 3 + Pillow (`pip install pillow`).
 
+## Teszt oldal (2026-10-16)
+
+- **https://teszt.bestofus.pages.dev** = a `teszt` ág (Cloudflare előnézet). Ide megy minden, ami még nem élesíthető (most: az **Amszterdam hősei** mini-szett, leírás: `src/doc-amszterdam.md` a `teszt` ágon).
+- Kitétel oda: `git checkout teszt && bash src/deploy-test.sh "commit üzenet"` – előbb behúzza a `main` friss állását (a `site/` és `announce.json` ütközést magától oldja), tesztel, buildel, pusholja a `teszt` ágat. Élesbe továbbra is csak a `main`-ről, a `deploy.sh`-val.
+- Teszt mód (`TEST_MODE`, a `ui.js` elején, csak a `teszt` ágon): minden nem éles cím. Az éles profil **másolatával** indul, csak helyben ment (`Store.db = null`, más localStorage-kulcs), PvP / barátok / ranked / csere kikapcsolva, lila sáv alul („+1000 coin”, „Újramásolás”). Az éles adatokba semmi nem íródik.
+- A kiegészítő élesítése: a `teszt` ág beolvasztása a `main`-be, majd `deploy.sh` (a `TEST_MODE`-függő részeket – pl. a bolti `ah` packok, a szett-szűrő – akkor élesre kell állítani).
+- Tomi teendője volt: Cloudflare-ben az előnézeti kitétel bekapcsolva, Firebase-ben a `teszt.bestofus.pages.dev` engedélyezett domain (Google-belépéshez).
+
 ## Új lap felvétele (a leggyakoribb feladat)
 
 1. **Motor** – `src/engine.js`, a `CARDS` tömbbe:
