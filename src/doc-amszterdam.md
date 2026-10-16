@@ -9,7 +9,7 @@
 - **Gyűjtemény:** szett-szűrő „🌷 Amszterdam hősei” (csak a teszt oldalon látszik). Kód: a lapokon `set:'ah'`, `SETS.ah` (meta.js), `CF_SETS` (ui.js).
 
 ## Lapképek
-- **Kész (16/20, 2026-10-16):** Süti, Bence terrorja, Sasi, Barna, Laci, Tomi, Utcai füst, Drog kereső kutya, High Hawaiians, Vöröslámpás negyed, Game Over, Elfekvő, Varázsgomba, Cigi, Ír reggeli, Caffee Shop (`art/ah_*.webp`, ART-bejegyzés a ui.js-ben).
+- **Kész (16/20, 2026-10-16):** Süti, Bence terrorja, Sasi, Barna, Laci, Tomi, Utcai füst, Drog kereső kutya, High Hawaiians, Vöröslámpás negyed, Game Over, Elfekvő, Varázsgomba, Cigi, Ír reggeli, Coffee Shop (`art/ah_*.webp`, ART-bejegyzés a ui.js-ben).
 - **Még nincs képe:** Ati, Ír kávé, Reptéri ellenőrzés, Bong (+ a Betti token).
 
 ## Új kulcsszavak
@@ -43,7 +43,7 @@
 
 **Helyszínek** (mindkét félre hatnak)
 - **Elfekvő** (l_elfekvo) · 4 · gyakori · minden karakter, amelyik támadott, a következő körében bénult (a visszaütés nem számít támadásnak)
-- **Caffee Shop** (l_coffeeshop) · 3 · ritka · minden kör végén a soron lévő játékos paklijába egy véletlen eszköz kerül (bármelyik gyűjthető eszköz, bolti/Pass/event nélkül)
+- **Coffee Shop** (l_coffeeshop) · 3 · ritka · minden kör végén a soron lévő játékos paklijába egy véletlen eszköz kerül (bármelyik gyűjthető eszköz, bolti/Pass/event nélkül)
 - **Vöröslámpás negyed** (l_voros) · 1 · gyakori · minden kör végén, a támadások előtt a soron lévő játékos egy véletlen karaktere végleg +1 támadást kap (`preAttack`)
 
 ## Egyensúly – első mérés (2026-10-16, `tools/pt.js`, 1500 meccs/lap, ±2,5%)
@@ -67,7 +67,7 @@ A lapot minden kezdőpakliban egy hasonló költségű karakter helyére teszi. 
 | Vöröslámpás negyed (1) | 41,1 | Akácfa 43,1 |
 | High Hawaiians (4) | 39,9 | Tubi 51,5 |
 | Süti (1) | 39,9 | |
-| Caffee Shop (3) | 39,4 | |
+| Coffee Shop (3) | 39,4 | |
 | Utcai füst (4) | 39,1 | |
 | Bong (1) | 38,5 | |
 | Elfekvő (4) | 37,9 | |

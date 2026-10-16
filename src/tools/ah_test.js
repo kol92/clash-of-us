@@ -60,7 +60,7 @@ ok(rc('k') === 12 && rc('r') === 5 && rc('e') === 1 && rc('l') === 2, `ritkaság
   E.runEndTurn(s); const before = s.players[1].board[0].hp; E.runEndTurn(s);
   ok(s.players[1].board[0].hp === before, 'Elfekvő: a bénult körben nem támad'); }
 { const s = G(); const d0 = s.players[0].deck.length; play(s, 0, 'l_coffeeshop', { k: 'none' }); E.runEndTurn(s);
-  ok(s.players[0].deck.length === d0 + 1 && E.CARD[s.events.find(e => e.t === 'coffee').id].type === 'item', 'Caffee Shop: kör végén +1 véletlen eszköz a paklidba'); }
+  ok(s.players[0].deck.length === d0 + 1 && E.CARD[s.events.find(e => e.t === 'coffee').id].type === 'item', 'Coffee Shop: kör végén +1 véletlen eszköz a paklidba'); }
 { const s = G(); const u = U(s, 0, 0, 'c_vajda'); play(s, 0, 'l_voros', { k: 'none' }); s.players[1].hp = 99; s.players[1].maxHp = 99;
   E.runEndTurn(s); ok(u.atk === 4 && s.players[1].hp === 99 - 4, `Vöröslámpás: +1 támadás a támadás előtt, végleg (${u.atk}, sebzés ${99 - s.players[1].hp})`); }
 // --- Drog kereső kutya ---

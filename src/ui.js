@@ -727,7 +727,7 @@ function logEvents(evs, snap) {
       case 'gameover': L(`💀 GAME OVER: ${who(e.side)} maximum élete 10 lett – az ellenfél összes karaktere elpusztul, a hőse 5 sebzést kap`); break;
       case 'bong': L(`🌿 A Bong ${e.side === ME ? 'hozzád került' : 'az ellenfélhez került'} – most ${e.n} energiába kerül`); break;
       case 'bongburn': L(`🌿 ${who(e.side)} kezében maradt a Bong: −${e.n} élet`); break;
-      case 'coffee': L(`☕ Caffee Shop: ${e.side === ME ? `<b class="lc" data-lc="${e.id}">${escH(CARD[e.id].name)}</b> került a paklidba` : 'egy eszköz került az ellenfél paklijába'}`); break;
+      case 'coffee': L(`☕ Coffee Shop: ${e.side === ME ? `<b class="lc" data-lc="${e.id}">${escH(CARD[e.id].name)}</b> került a paklidba` : 'egy eszköz került az ellenfél paklijába'}`); break;
       case 'dogdiscard': L(`🐕 Drog kereső kutya: ${e.side === ME ? 'eldobtad' : 'az ellenfél eldobta'}: <b class="lc" data-lc="${e.id}">${escH(CARD[e.id].name)}</b>`); break;
       case 'move': L(`👞 ${unitName(e.side, e.from)} ${e.swap ? 'helyet cserélt egy másik karakterrel' : 'átlépett egy másik helyre'} (Laci cipőkanala)`); break;
       case 'doom': case 'expire': L(`⌛ ${unitName(e.side, e.i)} eltűnt`); break;

@@ -69,7 +69,7 @@ const CARDS = [
   { id:'a_irkave', set:'ah', type:'action', name:'Ír kávé', cost:1, tgt:'own', rarity:'k', text:'Egy saját karaktered Pajzsot kap.' },
   { id:'a_suti', set:'ah', type:'action', name:'Süti', cost:1, tgt:'enemy', rarity:'k', text:'Egy ellenséges karakter elveszíti minden kulcsszavát (Lendület, Provokáció, Pajzs, Izom, Sunyulás, Láthatatlan, Igézhetetlen, Feltámadás).' },
   { id:'l_elfekvo', set:'ah', type:'loc', name:'Elfekvő', cost:4, rarity:'k', text:'Minden karakter, amelyik támad, a következő körében bénult.' },
-  { id:'l_coffeeshop', set:'ah', type:'loc', name:'Caffee Shop', cost:3, rarity:'r', text:'Minden kör végén a soron lévő játékos paklijába bekeveredik egy véletlen eszköz lap.' },
+  { id:'l_coffeeshop', set:'ah', type:'loc', name:'Coffee Shop', cost:3, rarity:'r', text:'Minden kör végén a soron lévő játékos paklijába bekeveredik egy véletlen eszköz lap.' },
   { id:'l_voros', set:'ah', type:'loc', name:'Vöröslámpás negyed', cost:1, rarity:'k', text:'Minden kör végén, a támadások előtt a soron lévő játékos egy véletlen karaktere végleg +1 támadást kap.' },
   { id:'c_kutya', set:'ah', type:'char', name:'Drog kereső kutya', cost:2, atk:2, hp:1, rarity:'r', sneak:true, deathDiscard:1, text:'Amikor meghal, az ellenfél eldob egy véletlen lapot a kezéből.' },
   { id:'a_hawaiians', set:'ah', type:'action', name:'High Hawaiians', cost:4, tgt:'none', rarity:'e', text:'Keverj öt Varázsgomba lapot a paklidba.' },
@@ -970,7 +970,7 @@ function finishTurn(s) {
     for (const sd of [pi, other(pi)]) s.players[sd].board.forEach((x, j) => { if (x && x !== u && !isFixed(x)) { if (sd !== pi) reveal(s, sd, j); damageUnit(s, sd, j, 1); } });
     cleanup(s);
   });
-  if (locIs(s, 'l_coffeeshop') && s.winner == null) {   /* Caffee Shop: véletlen eszköz a soron lévő játékos paklijába */
+  if (locIs(s, 'l_coffeeshop') && s.winner == null) {   /* Coffee Shop: véletlen eszköz a soron lévő játékos paklijába */
     const pool = CARDS.filter(x => x.type === 'item' && !x.token && !x.variantOf && !x.off && !x.shopOnly && !x.passOnly && !x.eventOnly).map(x => x.id);
     const id = pool[Math.floor(rnd() * pool.length)]; p.deck.push(id); shuffle(p.deck); ev(s, { t:'coffee', side:pi, i:-1, id });
   }
