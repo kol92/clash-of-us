@@ -399,8 +399,11 @@ function rollCardSlot(p, rar, foil) {
   if (foil) e.f++; else e.n++;
   return { id, foil, isNew };
 }
-const portOnSale = k => !PORTRAITS[k].from || new Date() >= new Date(PORTRAITS[k].from + 'T00:00');   // from: ettől a naptól kapható a Boltban
-const chestPorts = p => Object.keys(PORTRAITS).filter(k => (PORTRAITS[k].price || PORTRAITS[k].event) && portOnSale(k) && ART[k] && !(p.portraits || []).includes(k));
+const portStarted = k => !PORTRAITS[k].from || new Date() >= new Date(PORTRAITS[k].from + 'T00:00');   // from: ettől a naptól kapható a Boltban
+/* until (2026-10-16): eddig a napig (kizárólag) volt a Boltban – utána lekerül, de aki megvette, megtartja, és a heti ládában továbbra is jöhet */
+const onSale = x => !x.until || new Date() < new Date(x.until + 'T00:00');
+const portOnSale = k => portStarted(k) && onSale(PORTRAITS[k]);
+const chestPorts = p => Object.keys(PORTRAITS).filter(k => (PORTRAITS[k].price || PORTRAITS[k].event) && portStarted(k) && ART[k] && !(p.portraits || []).includes(k));
 function chestRoll() {
   const p = Store.p, out = [];
   out.push(rollCardSlot(p, Math.random() < 1.5 / 8 ? 'l' : 'e', false));   // biztos epikus vagy jobb (a pack-esélyek arányában)
@@ -600,7 +603,7 @@ function openWheel() {
 
 // ---- bolt képernyő ----
 // a boltban coinért megvehető különleges lapok (változatok); egyszer vehető meg mindegyik
-const SHOP_ITEMS = () => CARDS.filter(c => c.shopOnly && ART[c.id]).map(c => ({ id: c.id, price: c.price || 100 }));
+const SHOP_ITEMS = () => CARDS.filter(c => c.shopOnly && ART[c.id] && onSale(c)).map(c => ({ id: c.id, price: c.price || 100 }));
 // egységes bolti termékpanel (Astra UI): kép + név + ársáv; állapotok: vehető / megszerezted / nincs elég coin
 function shopPanelHTML({ attr, img, pos, contain, name, sub, price, have, holo, extra = '' }) {
   const poor = !have && Store.p.coins < price, st = have ? 'owned' : poor ? 'poor' : 'ok';
@@ -648,7 +651,7 @@ async function buyShopItem(id) {
   await save(); renderProfileBar(); renderShop();
   openModal(cardHTML(id, { big: true }), `🎉 Megvetted: ${c.name}! 2 példány került a gyűjteményedbe – ${c.variantOf ? 'a pakliépítőben az alaplap helyett is beteheted' : 'a Paklik menüben beteheted a paklidba'}.`, '');
 }
-const SHOP_REFRESH = '2026-10-16';   // a limitált kínálat következő frissítése, pl. '2026-10-20' – ha megadod, visszaszámlál
+const SHOP_REFRESH = '2026-10-29';   // a limitált kínálat következő frissítése, pl. '2026-10-20' – ha megadod, visszaszámlál
 function renderShop() {
   const p = Store.p; if (!p) return;
   const free = freePackReady();

@@ -630,3 +630,14 @@ Hősképesség-ötletek a táblázatban (még nem zöldek, nincsenek beépítve)
 - **PvP:** új lépésfajta (`move`, a, b), az ellenfél gépe lejátssza (`moveUnit`). Motor: `canMove` / `moveTargets` / `moveUnit` (engine.js), kártya-jelölő `mover:true`. Teszt: `tools/cipo_test.js`.
 - **Bot:** packban/bot-paklikban nincs (bolti lap), a bot nem használja az áthelyezést. Emiatt a szokásos botos egyensúly-mérés erre a lapra nem mond semmit (a botnak egy hatás nélküli 1-es lap lenne) – élő játékban kell figyelni.
 - Közben javítva: a kezdőgyűjtemény (új profil) a bolti / Season Pass / event lapokat nem adja oda (a gyakoriakból eddig mindent 2×-esen adott volna).
+
+## Bolt-rotáció (2026-10-16)
+- A régi limitált kínálat lekerült (`until:'2026-10-16'`): Gál Zoli és Fogel variáns, Bence, Pre-BoU, Sasi, az Izmos és Krisz, az utca ura portré. Aki megvette, megtartja; a levett portrék a heti láda 0,5%-os portré-esélyében továbbra is benne vannak. A gyűjteményben a levett bolti lapoknál „korábban a Boltban volt kapható” áll.
+- Most kapható: **Sasi, a mágus** (250 coin) és **Laci cipőkanala** (100 coin, 2 db).
+- **Következő frissítés: 2026-10-29** (`SHOP_REFRESH`).
+- Új mező: `until: 'ÉÉÉÉ-HH-NN'` a bolti lapokon (`CARDS`) és portrékon (`PORTRAITS`) – ettől a naptól nem kapható (`onSale`, `portOnSale`); a `from` továbbra is a kezdőnap.
+
+## Szett-szűrő a gyűjteményben (2026-10-16)
+- A Gyűjtemény szűrőiben új sor: **Base set** / **🎃 Halloween**. Csoporton belül VAGY, a többi szűrővel ÉS (mint eddig). A hősök a Base sethez tartoznak (csak Halloween szűrésnél eltűnnek).
+- A lap szettje az `engine.js`-ben a `set` mező (`set:'hw'`), ha nincs: Base set. A Halloween szett most: Álarcos bál, Polaroid emlékek, Tomi Halloweeni bulija. Új szettnél: `CF_SETS` (ui.js) + a lapokon `set:'…'`.
+- Laci cipőkanala (bolti lap) a Base setben van.

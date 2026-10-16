@@ -295,9 +295,9 @@ function avHTML(h, extra = '') {
 }
 // boltban vehető hős-portrék: mindig Full Art, saját névvel
 const PORTRAITS = {
-  p_bence_prebou: { hero: 'bence', name: 'Bence, Pre-BoU', price: 150 },
-  p_sasi_izmos:   { hero: 'sasi',  name: 'Sasi, az Izmos', price: 150 },
-  p_krisz_utca:   { hero: 'krisz', name: 'Krisz, az utca ura', price: 250 },
+  p_bence_prebou: { hero: 'bence', name: 'Bence, Pre-BoU', price: 150, until: '2026-10-16' },
+  p_sasi_izmos:   { hero: 'sasi',  name: 'Sasi, az Izmos', price: 150, until: '2026-10-16' },
+  p_krisz_utca:   { hero: 'krisz', name: 'Krisz, az utca ura', price: 250, until: '2026-10-16' },
   p_milo_busz:    { hero: 'milo',  name: 'Milo, a 213-as utasa', passOnly: true },   // 1. szezon, 15. szint
   p_krisz_vip:    { hero: 'krisz', name: 'Krisz, a VIP', passOnly: true },           // 1. szezon, 25. szint
   p_laci_kave:    { hero: 'laci',  name: 'Laci, a reggeli feles', passOnly: true },   // 1. szezon, 10. szint
@@ -400,15 +400,19 @@ $('#botLvRow').onclick = e => { const b = e.target.closest('[data-lv]'); if (!b 
 $('#rkBotRow input').onchange = e => { if (Store.p) { Store.p.rkBot = e.target.checked; save(); } renderPick(); };
 
 // ---- gyűjtemény-szűrő (Astra UI): név, típus, ritkaság, költség, megvan/hiányzik ----
-const CF = { q: '', type: new Set(), rar: new Set(), cost: new Set(), own: '' };
+const CF = { q: '', type: new Set(), rar: new Set(), cost: new Set(), own: '', set: new Set() };
+/* szettek (2026-10-16): a lap `set` mezője (engine.js), ha nincs: Base set */
+const CF_SETS = [['base', 'Base set'], ['hw', 'Halloween']];
+const cardSet = c => c.set || 'base';
 const CF_TYPES = [['char', 'Karakter'], ['action', 'Akció'], ['item', 'Eszköz'], ['loc', 'Helyszín']];
 const CF_RARS = [['k', 'Gyakori'], ['r', 'Ritka'], ['e', 'Epikus'], ['l', 'Legendás'], ['d', 'Gyémánt']];
 const CF_COSTS = ['0-1', '2', '3', '4', '5', '6+'];
-const cfActive = () => CF.q || CF.type.size || CF.rar.size || CF.cost.size || CF.own;
+const cfActive = () => CF.q || CF.type.size || CF.rar.size || CF.cost.size || CF.own || CF.set.size;
 const costKey = c => c.cost <= 1 ? '0-1' : c.cost >= 6 ? '6+' : String(c.cost);
 const cfNorm = t => String(t).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 function cfMatch(c) {
   if (CF.q && !cfNorm(c.name + ' ' + (c.text || '')).includes(cfNorm(CF.q))) return false;
+  if (CF.set.size && !CF.set.has(cardSet(c))) return false;
   if (CF.type.size && !CF.type.has(c.type)) return false;
   if (CF.rar.size && !CF.rar.has(rarKey(c))) return false;
   if (CF.cost.size && !CF.cost.has(costKey(c))) return false;
@@ -419,6 +423,7 @@ function renderCollFilters() {
   const el = $('#collFilters'); if (!el) return;
   const chip = (grp, val, inner, on, label) => `<button class="cf-chip${on ? ' on' : ''}" data-cf="${grp}" data-v="${val}" aria-pressed="${on}" aria-label="${label}">${inner}</button>`;
   el.innerHTML = `<label class="cf-search"><span class="sr-only">Keresés</span><input id="cfQ" type="search" placeholder="Keresés…" value="${escH(CF.q)}" autocomplete="off"></label>
+    <div class="cf-row">${CF_SETS.map(([k, n]) => chip('set', k, `<span class="lbl-t">${k === 'hw' ? '🎃 ' : ''}${n}</span>`, CF.set.has(k), n + ' szett')).join('')}</div>
     <div class="cf-row">${CF_TYPES.map(([k, n]) => chip('type', k, `<img src="art/ui/ic-type-${k}.webp" alt=""><span class="lbl-t">${n}</span>`, CF.type.has(k), n)).join('')}</div>
     <div class="cf-row">${CF_RARS.map(([k, n]) => chip('rar', k, `<i class="rar r-${k}"></i>`, CF.rar.has(k), n)).join('')}
       ${chip('own', 'have', '<img src="art/ui/ic-owned.webp" alt="">', CF.own === 'have', 'Megvan')}${chip('own', 'miss', '<img src="art/ui/ic-missing.webp" alt="">', CF.own === 'miss', 'Hiányzik')}</div>
@@ -426,7 +431,7 @@ function renderCollFilters() {
     ${cfActive() ? '<button class="cf-clear" data-cfclear>✕ Szűrők törlése</button>' : ''}`;
   const q = $('#cfQ'); q.oninput = () => { CF.q = q.value.trim(); renderColl(true); const cl = el.querySelector('[data-cfclear]'); if (!!cl !== !!cfActive()) { renderCollFilters(); $('#cfQ').focus(); } };
   el.onclick = e => {
-    if (e.target.closest('[data-cfclear]')) { CF.q = ''; CF.type.clear(); CF.rar.clear(); CF.cost.clear(); CF.own = ''; renderCollFilters(); renderColl(true); return; }
+    if (e.target.closest('[data-cfclear]')) { CF.q = ''; CF.type.clear(); CF.rar.clear(); CF.cost.clear(); CF.set.clear(); CF.own = ''; renderCollFilters(); renderColl(true); return; }
     const b = e.target.closest('[data-cf]'); if (!b) return;
     const g = b.dataset.cf, v = b.dataset.v;
     if (g === 'own') CF.own = CF.own === v ? '' : v; else { const S2 = CF[g]; S2.has(v) ? S2.delete(v) : S2.add(v); }
@@ -436,7 +441,7 @@ function renderCollFilters() {
 function renderColl(bodyOnly) {
   if (!bodyOnly) renderCollFilters();
   const heroQ = h => !CF.q || cfNorm(h.name + ' ' + h.text).includes(cfNorm(CF.q));
-  const heroOk = !(CF.type.size || CF.rar.size || CF.cost.size || CF.own) && HEROES.some(heroQ);
+  const heroOk = !(CF.type.size || CF.rar.size || CF.cost.size || CF.own || (CF.set.size && !CF.set.has('base'))) && HEROES.some(heroQ);
   const groups = [['Hősök', null], ['Karakterek', 'char'], ['Eszközök', 'item'], ['Akciók', 'action'], ['Helyszínek', 'loc']]
     .filter(([, type]) => type ? PLAYABLE.some(c => c.type === type && cfMatch(c)) : heroOk);
   const have = PLAYABLE.filter(c => owned(c.id) > 0).length, foils = PLAYABLE.filter(c => ownsFoil(c.id)).length;
@@ -458,7 +463,7 @@ $('#vFoil').onclick = () => { ui.foil = true; $('#vFoil').setAttribute('aria-pre
 // egy lap nagy nézete a Gyűjteményben – ha 2 példány fölött van belőle, egyenként beváltható
 function collCardModal(id, cap) {
   const e = Store.p?.coll[id] || { n: 0, f: 0 }, extra = e.n + e.f - DUPE_KEEP;
-  cap = cap || `<i class="rar r-${CARD[id].rarity}" aria-hidden="true"></i> ${RAR[CARD[id].rarity]} · ${e.n} db${e.f ? ` + ${e.f} Full Art` : ''}${CARD[id].passOnly ? ' · csak a Season Passból szerezhető' : CARD[id].eventOnly ? ' · csak eventből szerezhető' : CARD[id].shopOnly && !CARD[id].variantOf ? ` · csak a Boltban kapható (${CARD[id].price || 100} coin)` : !e.n && !e.f ? ' · boosterből szerezhető' : ''}`;
+  cap = cap || `<i class="rar r-${CARD[id].rarity}" aria-hidden="true"></i> ${RAR[CARD[id].rarity]} · ${e.n} db${e.f ? ` + ${e.f} Full Art` : ''}${CARD[id].passOnly ? ' · csak a Season Passból szerezhető' : CARD[id].eventOnly ? ' · csak eventből szerezhető' : CARD[id].shopOnly && !CARD[id].variantOf ? (CARD[id].until ? ' · korábban a Boltban volt kapható' : ` · csak a Boltban kapható (${CARD[id].price || 100} coin)`) : !e.n && !e.f ? ' · boosterből szerezhető' : ''}`;
   const btns = extra > 0 ? `<div class="cv-row">${e.n > 0 ? `<button class="btn cv-btn" data-cv="n">♻️ 1 lap beváltása · +${dupeVal(id, false)} coin</button>` : ''}${e.f > 0 ? `<button class="btn cv-btn fa" data-cv="f">♻️ 1 Full Art beváltása · +${dupeVal(id, true)} coin</button>` : ''}</div><small class="cv-note">${extra} fölösleges példány – 2 mindig megmarad</small>` : '';
   openModal(cardHTML(id, { big: true, foil: ui.foil || (e.f > 0 && !e.n) }), cap, btns + cardHelpHTML(id));
   const o = $('#layer').lastElementChild;
@@ -482,7 +487,7 @@ $('#collBody').onclick = e => {
   if (hg && ownsHeroGold(hg.dataset.hgold) && heroSkins(hg.dataset.hgold).length > 1) return skinModal(hg.dataset.hgold);
   if (hg) { const hid = hg.dataset.hgold; openModal(heroCardHTML(HERO[hid], { big: true, gold: true }), ownsHeroGold(hid) ? '✦ Arany hős · a tiéd!' : `✦ Arany hős · boosterből ${ECON.goldPlain * 100}%, Shiny boosterből ${ECON.goldShiny * 100}% eséllyel`); return; }
   if (c) { const id = c.dataset.card, e = Store.p?.coll[id] || { n: 0, f: 0 };
-    if (CARD[id].variantOf) return collCardModal(id, `✦ Ritka változat: a(z) ${CARD[CARD[id].variantOf].name} különleges kinézete – ugyanúgy játszható, ugyanaz a hatása · ${e.n + e.f} db${CARD[id].passOnly ? ' · csak a Season Passból' : CARD[id].shopOnly ? ` · csak a Boltban kapható (${CARD[id].price || 100} coin)` : !e.n && !e.f ? ' · Shiny boosterből szerezhető' : ''}`, null);
+    if (CARD[id].variantOf) return collCardModal(id, `✦ Ritka változat: a(z) ${CARD[CARD[id].variantOf].name} különleges kinézete – ugyanúgy játszható, ugyanaz a hatása · ${e.n + e.f} db${CARD[id].passOnly ? ' · csak a Season Passból' : CARD[id].shopOnly ? (CARD[id].until ? ' · korábban a Boltban volt kapható' : ` · csak a Boltban kapható (${CARD[id].price || 100} coin)`) : !e.n && !e.f ? ' · Shiny boosterből szerezhető' : ''}`, null);
     collCardModal(id); }
   if (h) openModal(heroCardHTML(HERO[h.dataset.hcard], { big: true, foil: ui.foil }), ui.foil ? (ownsHeroFa(h.dataset.hcard) ? 'Full Art hős' : 'Full Art hős · boosterből szerezhető') : 'Hős');
 };

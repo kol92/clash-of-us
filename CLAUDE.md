@@ -75,7 +75,7 @@ Csak build (kitétel nélkül): `cd src && python3 build-app.py ""` → `src/dis
 - Full Art példányonként számít (`s.foilCnt`). A gyémánt lap mindig Full Art.
 - Boltból vagy Season Passból vett változat-lapból 2 példány jár.
 - Napi coin-plafon: `ECON.dailyCap` (most 200). A szerencsekerék coinja nem számít bele.
-- Bolt: limitált kínálat, `SHOP_REFRESH` (meta.js) a következő frissítés dátuma (most `2026-10-16`). Rotációkor a felhasználó küldi az új kínálatot, és új dátumot kell beállítani.
+- Bolt: limitált kínálat, `SHOP_REFRESH` (meta.js) a következő frissítés dátuma (most `2026-10-29`). Rotációkor a felhasználó küldi az új kínálatot, és új dátumot kell beállítani. A levett tételekre `until:'ÉÉÉÉ-HH-NN'` (lapon és portrén is), nem törlés.
 - A bot sosem cseréli le a saját Munkahelyét helyszínre.
 - Animált lapok: `ART[id].vid = 'art/vid/NEV.mp4'` (H.264 600×800, ~1 MB, `-crf 29 -movflags +faststart -an`); csak nagy lapnézetben fut, a service worker kihagyja az .mp4-et. Részletek: doc.md „Animált lapok”.
 - Heti láda (meta.js): `CHEST`, `weekKey()`, `chestWeeklyCheck()` (hétfő 0:01, `p.chests` / `p.chestWeek`), `chestRoll()` (10 lap: 1 epikus+, 1 Full Art, 0,5% portré a `price`/`event` portrékból), `openChest()` → `chestOpening()` → közös `cardReveal()` (a packnyitás is ezt használja).
@@ -96,12 +96,13 @@ Csak build (kitétel nélkül): `cd src && python3 build-app.py ""` → `src/dis
 - **Bolti portré későbbi kezdéssel:** `PORTRAITS[k].from = 'ÉÉÉÉ-HH-NN'` + `portOnSale()`.
 - **Cápa** (az ellenfél térfelén úszik): nem célozható saját-célú lappal, a buffok nem erősítik; a **Sasi ütése** viszont beleszámolja és célozhatja is (`tgt:'anyOrHero'`).
 - **Laci cipőkanala** (i_cipo, bolti eszköz, 2026-10-16): áthelyezés a táblán – `canMove` / `moveTargets` / `moveUnit`, UI: `ui.mv`, `doMove`, PvP lépés `move`. Bolti önálló lap: `shopOnly` nem-változat (kezdőgyűjtemény, SETS, csere kizárja). Teszt: `tools/cipo_test.js`.
+- **Szettek:** a lap `set` mezője (`'hw'` = Halloween, alap: Base set), gyűjtemény-szűrő: `CF_SETS` / `cardSet` (ui.js).
 - **Tesztek:** `tools/hw_test.js` (Halloween-lapok, Álarcos bál, Cápa + Sasi), `tools/mosh_test.js`.
 
 ## Jelenlegi állapot és teendők (2026-10-16 este, account-váltáskor)
 
 - **Halloween event fut** (`EVENTS` hw26): 2026-10-15 19:00 – 11-02 (vége 11-03 0:00), jutalmak 11-09-ig vehetők át, utána maguktól jóváíródnak. A menü-háttér és a zene csak az event alatt él, utána magától visszaáll.
-- **Bolt-rotáció esedékes:** a `SHOP_REFRESH` most `2026-10-16` – Tomi küldi az új kínálatot (és a következő dátumot). Sasi, a mágus (p_sasi_mage, 250 coin) 10-16-tól már a Boltban van.
+- **Bolt:** 10-16-i rotáció kész (Sasi, a mágus + Laci cipőkanala); a következő frissítés **2026-10-29** – Tomi küldi az új kínálatot.
 - **Season Pass:** az „1. szezon · Nyitókör” 2026-11-11-ig fut – **előtte fel kell venni a következő szezont** (`SEASONS`: új id, start/end, 30 `tiers`). A ranked 2. szezonja innen automatikusan nehezebb (`rkHard()`).
 - **Nyitott kérdés:** gépen (PC) egy játékos nem látta a hősöket a gyűjteményben – képernyőkép / böngésző még nem jött.
 - Ötletek: hibajelentő gomb + hibanapló; tesztelés két valódi telefonon (PvP, csere); további event-típusok (Kocsmaharc, Főellenség, Szülinap, Draft); Astrától várt UI-elemek (modal keret, inaktív fül, Munkahely helyszínkép, Season Pass / Küldetések / Barátok / PvP fejlécek, mulligan képernyő, belépő képernyő).
