@@ -1,3 +1,5 @@
+/* TESZT OLDAL (teszt ág): minden, ami nem az éles cím, teszt mód – lásd meta.js testBanner / bootProfile */
+const TEST_MODE = typeof location !== 'undefined' && location.hostname !== 'bestofus.pages.dev';
 // ===== Clash of Us – felület =====
 let ME = 0, BOT = 1;   // PvP-ben a vendégnél felcserélődik: mindig te vagy lent
 const $ = q => document.querySelector(q);
@@ -58,6 +60,9 @@ const KW_HELP = {
   doom:  ['Eltűnik', 'A köröd végén magától elpusztul (előtte még támad).'],
   invis: ['Láthatatlan', 'A támadások átmennek rajta: aki vele szemben áll, mintha üres lenne a hely, az ellenfél hősét üti. Támadással nem lehet sebezni vagy megölni (akciókkal igen); ha ő támad, nem lehet visszaütni.'],
   legend:['Legendás', 'Egy pakliban legfeljebb 1 lehet belőle.'],
+  elusive:['Igézhetetlen', 'Akciókkal és más lapok hatásával nem lehet megcélozni (se neked, se az ellenfélnek), és a véletlenszerű hatások kihagyják. Eszközt viszont rá lehet tenni, és a mindenkit érő hatások (pl. Tálca shot) eltalálják.'],
+  revive:['Feltámadás', 'Amikor először meghal, 1 élettel feléled a helyén (az eszközei lekerülnek). Másodszorra már végleg meghal.'],
+  nokw:['Süti', 'Elvesztette a lapra nyomtatott kulcsszavait (Lendület, Provokáció, Pajzs, Izom, Sunyulás, Láthatatlan, Igézhetetlen, Feltámadás).'],
 };
 function cardHelpHTML(id, u) {
   const c = CARD[id], rows = [TYPE_HELP[c.type]];
@@ -72,8 +77,12 @@ function cardHelpHTML(id, u) {
   if (u && u.fresh && !u.haste && !u.stun) add('fresh');
   if (u && (u.doom || u.expire != null)) add('doom');
   if (c.invis || u?.invis) add('invis');
+  if ((c.elusive && !u?.noKw) || u?.elusive) add('elusive');
+  if (c.revive && !u?.noKw && !u?.revived) add('revive');
+  if (u?.noKw) add('nokw');
   if (c.rarity === 'l') add('legend');
-  if (c.finisher) rows.unshift(['Kánon esemény', `Ultra erős lap, csak ${HERO[c.hero].name} paklijába tehető (a jobb felső sarokban az ő portréja). Kijátszáskor elsötétül a pálya, és különleges bevonulással érkezik.`]);
+  if (c.finisher && !c.hero) rows.unshift(['Kánon esemény · közös', 'Ultra erős lap, bármelyik hős paklijába beteheted (egy pakliban legfeljebb 1). Kijátszáskor elsötétül a pálya, és különleges bevonulása van.']);
+  else if (c.finisher) rows.unshift(['Kánon esemény', `Ultra erős lap, csak ${HERO[c.hero].name} paklijába tehető (a jobb felső sarokban az ő portréja). Kijátszáskor elsötétül a pálya, és különleges bevonulással érkezik.`]);
   return `<dl class="help">${rows.map(([a, b]) => `<div><dt>${a}</dt><dd>${b}</dd></div>`).join('')}</dl>`;
 }
 
@@ -111,7 +120,7 @@ function cardHTML(id, o = {}) {
         : ART[id] ? `<div class="art has-art" style="${artStyle(id, o.big)}">${o.big && ART[id].vid ? artVidHTML(id) : ''}</div>`
         : `<div class="art"><span class="mono">${initials(c.name)}</span>${o.big && !o.foil ? '<span class="artnote">Illusztráció helye</span>' : ''}</div>`}
       <div class="ctype">${c.finisher ? '<i class="ic-kanon" aria-hidden="true"></i>Kánon esemény' : TYPE[c.type][0]}${c.drink ? ' · Ital' : ''}<i class="rar r-${rarKey(c)}" title="${RAR[rarKey(c)]}"></i></div>
-      ${c.finisher ? `<i class="kanon-hero" title="${HERO[c.hero].name}" style="--h:${HERO[c.hero].hue};${ART[c.hero] ? `background-image:url('${artSrc(c.hero, false)}');background-position:${ART[c.hero].av || '50% 15%'}` : ''}">${ART[c.hero] ? '' : initials(HERO[c.hero].name)}</i>` : ''}
+      ${c.finisher && c.hero ? `<i class="kanon-hero" title="${HERO[c.hero].name}" style="--h:${HERO[c.hero].hue};${ART[c.hero] ? `background-image:url('${artSrc(c.hero, false)}');background-position:${ART[c.hero].av || '50% 15%'}` : ''}">${ART[c.hero] ? '' : initials(HERO[c.hero].name)}</i>` : ''}
       ${c.type !== 'char' && !o.big && !c.finisher ? `<div class="tribbon">${TYPE[c.type][0]}${c.drink ? '<i class="drk">Ital</i>' : ''}</div>` : ''}
       <div class="name${c.name.length > 16 ? ' long' : ''}${longWord(c.name) > 11 ? ' xl' : ''}">${c.name}</div>${c.diamond ? (o.big ? '<i class="var-ribbon dia"><b>💎 Gyémánt lap</b><span>💎 Gyémánt</span></i>' : '') : c.variantOf ? '<i class="var-ribbon"><b>✦ Ritka variáns</b><span>✦ Variáns</span></i>' : ''}${c.diamond ? '<i class="dia-spark" aria-hidden="true"></i>' : ''}
       <div class="txt"><span>${textHTML(c)}</span></div>
@@ -402,7 +411,7 @@ $('#rkBotRow input').onchange = e => { if (Store.p) { Store.p.rkBot = e.target.c
 // ---- gyűjtemény-szűrő (Astra UI): név, típus, ritkaság, költség, megvan/hiányzik ----
 const CF = { q: '', type: new Set(), rar: new Set(), cost: new Set(), own: '', set: new Set() };
 /* szettek (2026-10-16): a lap `set` mezője (engine.js), ha nincs: Base set */
-const CF_SETS = [['base', 'Base set'], ['hw', 'Halloween']];
+const CF_SETS = [['base', 'Base set'], ['hw', 'Halloween'], ...(TEST_MODE ? [['ah', 'Amszterdam hősei']] : [])];
 const cardSet = c => c.set || 'base';
 const CF_TYPES = [['char', 'Karakter'], ['action', 'Akció'], ['item', 'Eszköz'], ['loc', 'Helyszín']];
 const CF_RARS = [['k', 'Gyakori'], ['r', 'Ritka'], ['e', 'Epikus'], ['l', 'Legendás'], ['d', 'Gyémánt']];
@@ -423,7 +432,7 @@ function renderCollFilters() {
   const el = $('#collFilters'); if (!el) return;
   const chip = (grp, val, inner, on, label) => `<button class="cf-chip${on ? ' on' : ''}" data-cf="${grp}" data-v="${val}" aria-pressed="${on}" aria-label="${label}">${inner}</button>`;
   el.innerHTML = `<label class="cf-search"><span class="sr-only">Keresés</span><input id="cfQ" type="search" placeholder="Keresés…" value="${escH(CF.q)}" autocomplete="off"></label>
-    <div class="cf-row">${CF_SETS.map(([k, n]) => chip('set', k, `<span class="lbl-t">${k === 'hw' ? '🎃 ' : ''}${n}</span>`, CF.set.has(k), n + ' szett')).join('')}</div>
+    <div class="cf-row">${CF_SETS.map(([k, n]) => chip('set', k, `<span class="lbl-t">${k === 'hw' ? '🎃 ' : k === 'ah' ? '🌷 ' : ''}${n}</span>`, CF.set.has(k), n + ' szett')).join('')}</div>
     <div class="cf-row">${CF_TYPES.map(([k, n]) => chip('type', k, `<img src="art/ui/ic-type-${k}.webp" alt=""><span class="lbl-t">${n}</span>`, CF.type.has(k), n)).join('')}</div>
     <div class="cf-row">${CF_RARS.map(([k, n]) => chip('rar', k, `<i class="rar r-${k}"></i>`, CF.rar.has(k), n)).join('')}
       ${chip('own', 'have', '<img src="art/ui/ic-owned.webp" alt="">', CF.own === 'have', 'Megvan')}${chip('own', 'miss', '<img src="art/ui/ic-missing.webp" alt="">', CF.own === 'miss', 'Hiányzik')}</div>
@@ -663,7 +672,8 @@ function logEvents(evs, snap) {
         const PT = { deathPing: 'meghalt egy karaktere → 1 sebzés az ellenfél hősének', teamPing: 'legalább 2 karaktere áll a táblán → 1 sebzés az ellenfél hősének',
                      endHeal: 'a köre végén 1 életet gyógyít', extraDraw: 'minden 3. körében húz egy extra lapot', firstCharAtk: `+1 támadás: ${e.id ? `<b class="lc" data-lc="${e.id}">${escH(CARD[e.id].name)}</b>` : 'az első karaktere'}` };
         L(`✨ ${w} képessége: ${PT[e.k] || ''}`); break; }
-      case 'locfx': L(`📍 <b class="lc" data-lc="${e.id}">${escH(CARD[e.id].name)}</b>: ${e.id === 'l_korhaz' ? (e.side === ME ? 'a karaktereid gyógyulnak' : 'az ellenfél karakterei gyógyulnak') : (e.side === ME ? 'minden karaktered 1 sebzést kap' : 'az ellenfél minden karaktere 1 sebzést kap')}`); break;
+      case 'locfx': if (e.id === 'l_voros') { L(`📍 <b class="lc" data-lc="${e.id}">${escH(CARD[e.id].name)}</b>: ${e.side === ME ? 'egy karaktered' : 'az ellenfél egyik karaktere'} végleg +1 támadást kap`); break; }
+        L(`📍 <b class="lc" data-lc="${e.id}">${escH(CARD[e.id].name)}</b>: ${e.id === 'l_korhaz' ? (e.side === ME ? 'a karaktereid gyógyulnak' : 'az ellenfél karakterei gyógyulnak') : (e.side === ME ? 'minden karaktered 1 sebzést kap' : 'az ellenfél minden karaktere 1 sebzést kap')}`); break;
       case 'attack': L(`⚔ ${unitName(e.side, e.i)} támad`); break;
       case 'heroatk': L(`⚔ ${who(e.side)} (Baszó) odacsap`); break;
       case 'dmg': L(`💥 ${nm(e.side, e.i)}: −${e.n}`); break;
@@ -694,6 +704,14 @@ function logEvents(evs, snap) {
       case 'espressodraw': L(`☕ ${e.side === ME ? 'Felpörögtél: +' + e.n + ' lap' : 'Az ellenfél felpörgött: +' + e.n + ' lap'}`); break;
       case 'amongus': L(`🌶️ Among Us! A paprikás shotot ${e.i === -1 ? (e.side === ME ? 'a hősöd' : 'az ellenfél hőse') : unitName(e.side, e.i)} itta meg`); break;
       case 'flee': L(`🏃 ${unitName(e.side, e.i)} átmenekült egy másik helyre`); break;
+      case 'silence': L(`🍪 ${unitName(e.side, e.i)} elvesztette a kulcsszavait (Süti)`); break;
+      case 'airport': L(`🛂 Reptéri ellenőrzés: <b class="lc" data-lc="${e.id}">${escH(CARD[e.id].name)}</b> átkerült ${e.side === ME ? 'hozzád' : 'az ellenfélhez'}`); break;
+      case 'smoke': L(`💨 Utcai füst: ${e.side === ME ? 'a karaktereid' : 'az ellenfél karakterei'} elrejtőztek és összekeveredtek`); break;
+      case 'gameover': L(`💀 GAME OVER: ${who(e.side)} maximum élete 10 lett – az ellenfél összes karaktere elpusztul, a hőse 5 sebzést kap`); break;
+      case 'bong': L(`🌿 A Bong ${e.side === ME ? 'hozzád került' : 'az ellenfélhez került'} – most ${e.n} energiába kerül`); break;
+      case 'bongburn': L(`🌿 ${who(e.side)} kezében maradt a Bong: −${e.n} élet`); break;
+      case 'coffee': L(`☕ Caffee Shop: ${e.side === ME ? `<b class="lc" data-lc="${e.id}">${escH(CARD[e.id].name)}</b> került a paklidba` : 'egy eszköz került az ellenfél paklijába'}`); break;
+      case 'dogdiscard': L(`🐕 Drog kereső kutya: ${e.side === ME ? 'eldobtad' : 'az ellenfél eldobta'}: <b class="lc" data-lc="${e.id}">${escH(CARD[e.id].name)}</b>`); break;
       case 'move': L(`👞 ${unitName(e.side, e.from)} ${e.swap ? 'helyet cserélt egy másik karakterrel' : 'átlépett egy másik helyre'} (Laci cipőkanala)`); break;
       case 'doom': case 'expire': L(`⌛ ${unitName(e.side, e.i)} eltűnt`); break;
       case 'lock': L(`🔒 ${e.side === ME ? 'Le vagy bénítva' : 'Az ellenfél le van bénítva'}: a következő körben nem játszhat ki lapot`); break;
@@ -865,7 +883,15 @@ async function animateEvents(evs) {
       case 'jblwave': await jblWaveFx(e); break;
       case 'heatwave': fx($('#app'), 'fx-quake'); floatAt(anchor, '☀️ Napszúrás! Mindenki −1', 'dmg'); hold = Math.max(hold, 800); break;
       case 'sharkgone': floatAt(anchor, '🦈 Elúszott…', 'info'); hold = Math.max(hold, 600); break;
-      case 'shuffled': floatAt(anchor, `👑 +${e.n} Pifti haverja a ${e.side === ME ? 'paklidba' : 'paklijába'}!`, 'info'); hold = Math.max(hold, 900); break;
+      case 'shuffled': floatAt(anchor, `${e.id === 'i_gomba' ? '🍄' : '👑'} +${e.n} ${CARD[e.id].name} a ${e.side === ME ? 'paklidba' : 'paklijába'}!`, 'info'); hold = Math.max(hold, 900); break;
+      case 'silence': fx(el, 'fx-hit'); floatAt(anchor, '🍪 Süti! Nincs több trükk', 'info'); hold = Math.max(hold, 750); break;
+      case 'airport': floatAt(anchor, '🛂 Átrakva!', 'info'); hold = Math.max(hold, 750); break;
+      case 'smoke': floatAt(anchor, '💨 Utcai füst!', 'info'); hold = Math.max(hold, 800); break;
+      case 'gameover': floatAt(anchor, '💀 GAME OVER', 'dmg'); hold = Math.max(hold, 1000); break;
+      case 'bong': floatAt(anchor, `🌿 Bong a ${e.side === ME ? 'kezedbe' : 'kezébe'}! (${e.n} energia)`, 'info'); hold = Math.max(hold, 800); break;
+      case 'bongburn': floatAt(anchor, `🌿 Bong: −${e.n}`, 'dmg'); hold = Math.max(hold, 700); break;
+      case 'coffee': floatAt(anchor, '☕ +1 eszköz a pakliba', 'info'); hold = Math.max(hold, 600); break;
+      case 'dogdiscard': floatAt(anchor, `🐕 Eldobva: ${CARD[e.id].name}`, 'info'); hold = Math.max(hold, 800); break;
       case 'amongus': await amongUsFx(el, anchor); break;
       case 'espresso': floatAt(anchor, '☕ Jövő körben +2 lap', 'info'); hold = Math.max(hold, 700); break;
       case 'espressodraw': floatAt(anchor, `☕ Felpörögve: +${e.n} lap`, 'buff'); hold = Math.max(hold, 700); break;
@@ -935,7 +961,7 @@ async function finisherIntro(e) {
   // 3) vörös fényimpulzus fut végig a kereten, 4) jön a hatás. Maga a fényeffekt ~1,1 mp; koppintásra hamarabb továbbmegy.
   const c = CARD[e.id], h = HERO[c.hero];
   const o = document.createElement('div'); o.className = 'fin-intro';
-  const sub = c.opts && e.o != null ? c.opts[e.o] : h ? `${h.name} kánon eseménye` : '';
+  const sub = c.opts && e.o != null ? c.opts[e.o] : h ? `${h.name} kánon eseménye` : 'Közös kánon esemény';
   o.innerHTML = `<div class="fin-dark"></div><div class="fin-rays"></div><i class="fin-icon ic-kanon" aria-hidden="true"></i><div class="fin-card">${cardHTML(e.id, { big: true, foil: e.foil ?? foilOf(e.side, e.id) })}</div>
     <div class="fin-title" role="status">${e.side === ME ? '' : '<i>Az ellenfél</i>'}<small>Kánon esemény</small><b>${c.name}</b><em>${sub}</em></div><div class="fin-flash"></div>`;
   $('#layer').appendChild(o);
@@ -1071,10 +1097,13 @@ function unitHTML(u, side, i) {
     <span class="st atk">?</span><span class="st hp">?</span>${u.stun ? `<span class="tags"><span class="zz stun" aria-hidden="true">bénult</span><span class="stc" role="img" aria-label="Bénult még ${u.stun} körig" title="Bénult még ${u.stun} körig"><b>${u.stun}</b></span></span>` : ''}</button>`;
   const c = CARD[u.id], atk = S.players[side].board[i]?.uid === u.uid ? effAtk(S, side, i) : u.atk, sleeping = u.fresh && !u.haste && u.id !== 'c_korso' && !c.noAttack && !u.stun;
   const tags = (sleeping ? '<span class="stb rest" role="img" aria-label="Pihen" title="Pihen: ebben a körben még nem támad"></span>' : u.id === 'c_capa' ? '' : c.noAttack ? STB_NOATK : u.id === 'c_ati' && !u.stun && !atiFree(S, side, i) ? STB_NOATK : '')
-    + (c.invis || u.invis ? `<span class="stb invis" role="img" aria-label="Láthatatlan" title="Láthatatlan: a támadások átmennek rajta"></span>${u.id === 'c_capa' ? `<span class="stc" role="img" aria-label="Még ${u.swims ?? 4} úszás" title="Még ennyi úszás, utána eltűnik"><b>${u.swims ?? 4}</b></span>` : ''}` : '')
+    + ((c.invis && !u.noKw) || u.invis ? `<span class="stb invis" role="img" aria-label="Láthatatlan" title="Láthatatlan: a támadások átmennek rajta"></span>${u.id === 'c_capa' ? `<span class="stc" role="img" aria-label="Még ${u.swims ?? 4} úszás" title="Még ennyi úszás, utána eltűnik"><b>${u.swims ?? 4}</b></span>` : ''}` : '')
     + (u.expire != null || u.doom ? '<span class="stb doom" role="img" aria-label="Eltűnik" title="Eltűnik: a köröd végén magától elpusztul"></span>' : '') + (u.stun ? `<span class="zz stun" aria-hidden="true">bénult</span><span class="stc" role="img" aria-label="Bénult még ${u.stun} körig" title="Bénult még ${u.stun} körig"><b>${u.stun}</b></span>` : '')
     + (u.hidden ? '<span class="stb hid" role="img" aria-label="Rejtve" title="Rejtve: az ellenfél nem látja"></span>' : '')
-    + (c.taunt || u.taunt ? '<span class="stb taunt" role="img" aria-label="Provokál" title="Provokáció: mindenki őt támadja"></span>' : '');
+    + ((c.taunt && !u.noKw) || u.taunt ? '<span class="stb taunt" role="img" aria-label="Provokál" title="Provokáció: mindenki őt támadja"></span>' : '')
+    + ((c.elusive && !u.noKw) || u.elusive ? '<span class="kwt el" role="img" aria-label="Igézhetetlen" title="Igézhetetlen: akcióval nem célozható">🛡</span>' : '')
+    + (c.revive && !u.noKw && !u.revived ? '<span class="kwt rv" role="img" aria-label="Feltámadás" title="Feltámadás: egyszer feléled">♻</span>' : '')
+    + (u.noKw ? '<span class="kwt nk" role="img" aria-label="Süti: nincs kulcsszava" title="Süti: elvesztette a kulcsszavait">🍪</span>' : '');
   const fa = CARD[u.id].foilOnly || !!u.foil;
   return `<button data-uid="${u.uid}" class="unit ${TYPE.char[1]}${fa ? ' fa' : ''}${CARD[u.id].diamond ? ' diamond' : ''}${u.shield ? ' shield' : ''}${sleeping ? ' sleep' : ''}" style="--h:${hueOf(u.id)}">
     <span class="uin">${ART[u.id] ? `<span class="art has-art" style="${artStyle(u.id)}"></span>` : `<span class="art"><span class="mono">${initials(c.name)}</span></span>`}<span class="uname${c.name.length > 14 ? ' long' : ''}${longWord(c.name) > 10 ? ' xl' : ''}">${c.name}</span></span>
@@ -1195,6 +1224,7 @@ function render() {
     const c = CARD[selCard.id], needs = all.length > 0;
     const hint = ui.pend != null ? (c.tgt === 'two' ? 'Megvan az első célpont. Most koppints a másodikra.'
       : c.tgt === 'swap' ? 'Most koppints egy másik saját karakteredre (helycsere) vagy egy üres helyedre.'
+      : c.tgt === 'airport' ? 'Most koppints a túloldal egyik üres helyére – oda kerül.'
       : c.playTgt === 'push' ? (ui.pend.length < 2 ? 'Koppints arra az ellenséges karakterre, akit arrébb tolsz – vagy ne tolj senkit.' : 'Most koppints az ellenfél egyik üres helyére, oda kerül.')
       : 'Most válaszd ki, melyik ellenséges karaktert küldöd vissza.')
       : c.type === 'char' ? 'Húzd vagy koppints egy üres helyre.' : c.type === 'item' ? (c.tgt === 'enemy' ? 'Húzd rá vagy koppints egy ellenséges karakterre.' : 'Húzd rá vagy koppints a saját karakteredre.')
@@ -1421,6 +1451,7 @@ async function misfireAnim(pi, i, el, mf) {
 
 async function resolveEnd() {
   const pi = S.active;
+  if (S.location && S.location.id === 'l_voros') await runFx(() => preAttack(S));   /* Vöröslámpás negyed: a támadások előtt */
   for (let i = 0; i < LANES; i++) {
     if (S.winner != null) break;
     const u = S.players[pi].board[i];

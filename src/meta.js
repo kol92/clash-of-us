@@ -3,7 +3,9 @@ const ECON = { goldPlain: 0.005, goldShiny: 0.05, goldDupe: 100, heroFaChance: 0
                odds: [['l', 1.5], ['e', 6.5], ['r', 22], ['k', 70]] };
 // a „token” lapok (pl. Query) csak más lap hatására kerülnek játékba: nincsenek packban, gyűjteményben, pakliban
 const PLAYABLE = CARDS.filter(c => !c.token && !c.off);   // off: kánon esemény lap, amíg nincs hozzá grafika – sehol nem látszik
-const SETS = { base: { name: 'Base set', cards: PLAYABLE.filter(c => !c.variantOf && !c.passOnly && !c.eventOnly && !c.shopOnly).map(c => c.id) } };   // passOnly: csak a Season Passból; eventOnly: csak eventből; shopOnly: csak a Boltból
+const SETS = { base: { name: 'Base set', cards: PLAYABLE.filter(c => !c.set && !c.variantOf && !c.passOnly && !c.eventOnly && !c.shopOnly).map(c => c.id) },
+  /* Amszterdam hősei (első mini-szett, 2026-10-16, teszt ág): saját booster és Shiny booster, csak ennek a szettnek a lapjaival */
+  ah: { name: 'Amszterdam hősei', short: 'Amszterdam', cards: PLAYABLE.filter(c => c.set === 'ah' && !c.variantOf).map(c => c.id) } };   // passOnly: csak a Season Passból; eventOnly: csak eventből; shopOnly: csak a Boltból
 const VARIANT_CHANCE = 0.2;   // ha az alaplap jön, 1 az 5-höz eséllyel a ritkább változata lesz belőle
 const DECK_SIZE = 20;
 const maxCopies = id => CARD[id].rarity === 'l' ? 1 : 2;
@@ -16,11 +18,11 @@ const Store = { mode: 'loading', uid: null, db: null, ref: null, p: null, saving
 
 function starterCollection() {
   const coll = {};
-  for (const c of PLAYABLE) { if (c.variantOf || c.shopOnly || c.passOnly || c.eventOnly) continue; if (c.rarity === 'k') coll[c.id] = { n: 2, f: 0 }; else if (c.rarity === 'r' || c.finisher) coll[c.id] = { n: 1, f: 0 }; }
+  for (const c of PLAYABLE) { if (c.variantOf || c.shopOnly || c.passOnly || c.eventOnly || c.set) continue; if (c.rarity === 'k') coll[c.id] = { n: 2, f: 0 }; else if (c.rarity === 'r' || c.finisher) coll[c.id] = { n: 1, f: 0 }; }
   return coll;
 }
 // Később bekerült gyakori lapok: a meglévő profilok is megkapják (gv = kiosztási verzió)
-const STARTER_ADDS = { 2: ['a_delfin', 'i_varazsho', 'i_lepke'], 3: ['a_rehab'], 4: ['c_pp'], 5: ['c_nfc'], 6: ['a_cheddar'], 7: ['c_vajda', 'c_veghtomi'], 8: ['c_kovacs'], 9: ['a_kitiltva'], 10: ['a_haver'], 11: PLAYABLE.filter(c => c.rarity === 'r' && !c.variantOf).map(c => c.id), 12: ['c_sasimeselo'], 13: ['c_norbi'], 14: ['c_udvarhelyi'], 15: ['c_molnar'], 16: CARDS.filter(c => c.finisher).map(c => c.id), 17: ['c_barnaelet'], 18: ['c_amszterdam'], 19: ['c_davidsofor'], 20: ['a_szulinap'], 21: ['c_atiuldozott'], 22: ['c_alvari'], 23: ['a_amongus'], 24: ['a_espresso'] };   // 16: mindenki megkapja mind a 9 Kánon esemény lapot   // 12: Laci új kezdőpaklijához   // 11: minden ritka lapból 1 (a kezdőpaklikhoz)
+const STARTER_ADDS = { 2: ['a_delfin', 'i_varazsho', 'i_lepke'], 3: ['a_rehab'], 4: ['c_pp'], 5: ['c_nfc'], 6: ['a_cheddar'], 7: ['c_vajda', 'c_veghtomi'], 8: ['c_kovacs'], 9: ['a_kitiltva'], 10: ['a_haver'], 11: PLAYABLE.filter(c => c.rarity === 'r' && !c.variantOf && !c.set).map(c => c.id), 12: ['c_sasimeselo'], 13: ['c_norbi'], 14: ['c_udvarhelyi'], 15: ['c_molnar'], 16: CARDS.filter(c => c.finisher && !c.set).map(c => c.id), 17: ['c_barnaelet'], 18: ['c_amszterdam'], 19: ['c_davidsofor'], 20: ['a_szulinap'], 21: ['c_atiuldozott'], 22: ['c_alvari'], 23: ['a_amongus'], 24: ['a_espresso'] };   // 16: mindenki megkapja mind a 9 Kánon esemény lapot   // 12: Laci új kezdőpaklijához   // 11: minden ritka lapból 1 (a kezdőpaklikhoz)
 const GRANT_V = Math.max(1, ...Object.keys(STARTER_ADDS).map(Number));
 // Ajándékok: minden profil egyszer kapja meg (a meglévők a következő megnyitáskor, az újak létrehozáskor)
 const GIFTS = [{ id: 'g-2026-09-28', packs: 1 }, { id: 'g-2026-09-28b', packs: 5 },
@@ -124,7 +126,7 @@ const freePackReady = () => !!Store.p && Store.p.freeDate !== today();
 /* TESZT OLDAL (teszt ág, 2026-10-16): minden, ami nem az éles cím, teszt mód.
    A profil az éles profil MÁSOLATÁVAL indul (csak olvasás), és csak ezen az eszközön mentődik – az éles adatokba semmi nem íródik vissza.
    PvP, barátok, csere, nyilvános profil ki van kapcsolva. */
-const TEST_MODE = location.hostname !== 'bestofus.pages.dev';
+/* TEST_MODE: a ui.js elején definiálva (azt tölti be előbb a böngésző) */
 const LS_KEY = TEST_MODE ? 'bestofus_TESZT_profile' : 'bestofus_profile_v1';
 function lsGet() { try { const s = localStorage.getItem(LS_KEY); return s ? JSON.parse(s) : null; } catch { return null; } }
 function lsSet(p) { try { localStorage.setItem(LS_KEY, JSON.stringify(p)); } catch {} }
@@ -149,8 +151,9 @@ async function save() {
 function testBanner() {   /* teszt oldal jelzése + profil újramásolása */
   if (document.getElementById('testRibbon')) return;
   const b = document.createElement('div'); b.id = 'testRibbon';
-  b.innerHTML = '🧪 TESZT OLDAL – semmi nem kerül az éles játékba <button type="button">↺ Profil újramásolása</button>';
-  b.querySelector('button').onclick = () => { if (!confirm('Visszaállítod a teszt profilt az éles profilod mostani másolatára? A teszten szerzett dolgok elvesznek.')) return;
+  b.innerHTML = '🧪 TESZT – semmi nem kerül élesbe <button type="button" data-coin>+1000 coin</button><button type="button" data-reset>↺ Újramásolás</button>';
+  b.querySelector('[data-coin]').onclick = () => { if (!Store.p) return; Store.p.coins += 1000; save(); renderProfileBar(); if (!$('#scr-shop').hidden) renderShop(); toast('🧪 +1000 coin (csak a teszt oldalon)'); };
+  b.querySelector('[data-reset]').onclick = () => { if (!confirm('Visszaállítod a teszt profilt az éles profilod mostani másolatára? A teszten szerzett dolgok elvesznek.')) return;
     try { localStorage.removeItem(LS_KEY); } catch {} location.reload(); };
   document.body.appendChild(b);
 }
@@ -376,16 +379,18 @@ function openPackRoll(setId, forceFoil = false, shiny = false) {
   slots.sort((a, b) => order[a] - order[b]);
   const faSlot = forceFoil || shiny ? 2 : -1;   // garantált Full Art: a pack legjobb lapja lesz az
   // Shiny pack: a különleges hely 25% eséllyel változat-lap (pl. a zöld Rehab), különben Full Art
-  const allVars = CARDS.filter(v => v.variantOf && !v.passOnly && !v.shopOnly && !v.wheelOnly);
+  const extra = setId !== 'base';   /* kiegészítő pack (pl. Amszterdam hősei): csak a szett lapjai */
+  const allVars = extra ? [] : CARDS.filter(v => v.variantOf && !v.passOnly && !v.shopOnly && !v.wheelOnly);
   const sr = Math.random();
   const varSlot = shiny && allVars.length && sr < ECON.shinyVariant ? 2 : -1;
   // Full Art hős: sima packban kis eséllyel a leggyengébb lap helyén, Shiny packban a különleges helyen
-  const heroSlot = shiny ? (varSlot < 0 && sr < ECON.shinyVariant + ECON.shinyHero ? 2 : -1) : (Math.random() < ECON.heroFaChance ? 0 : -1);
-  const goldSlot = GOLD_HEROES.length && Math.random() < (shiny ? ECON.goldShiny : ECON.goldPlain) ? 0 : -1;   // Arany hős: a pack első lapja helyén
+  const heroSlot = extra ? -1 : shiny ? (varSlot < 0 && sr < ECON.shinyVariant + ECON.shinyHero ? 2 : -1) : (Math.random() < ECON.heroFaChance ? 0 : -1);
+  const goldSlot = !extra && GOLD_HEROES.length && Math.random() < (shiny ? ECON.goldShiny : ECON.goldPlain) ? 0 : -1;   // Arany hős: a pack első lapja helyén
   return slots.map((rar, si) => {
     if (si === goldSlot) return rollHeroGold(p);
     if (si === heroSlot) return rollHeroFa(p);
-    const ids = pool.filter(id => CARD[id].rarity === rar);
+    let ids = pool.filter(id => CARD[id].rarity === rar);
+    for (const lo of ['l', 'e', 'r', 'k']) { if (ids.length) break; if (order[lo] < order[rar]) ids = pool.filter(id => CARD[id].rarity === lo); }
     let id = ids[Math.floor(Math.random() * ids.length)];
     const vars = CARDS.filter(v => v.variantOf === id && !v.passOnly && !v.shopOnly && !v.wheelOnly);
     if (vars.length && Math.random() < VARIANT_CHANCE) id = vars[Math.floor(Math.random() * vars.length)].id;
@@ -692,11 +697,14 @@ function renderShop() {
     <div class="shop-grid">
       ${shopPanelHTML({ attr: 'data-pack="base"', img: 'art/ui/pack-base.webp', contain: true, name: SETS.base.name, sub: '3 lap', price: ECON.packPrice, have: false })}
       ${shopPanelHTML({ attr: 'data-pack="shiny"', img: 'art/ui/pack-shiny.webp', contain: true, name: 'Shiny pack', sub: '1 biztos különleges', price: ECON.shinyPrice, have: false, holo: true })}
+      ${TEST_MODE ? `${shopPanelHTML({ attr: 'data-pack="ah"', img: 'art/ui/pack-base.webp', contain: true, name: SETS.ah.name, sub: 'Új szett · 3 lap', price: ECON.packPrice, have: false, extra: '<span class="sp-setrib">Amszterdam hősei</span>' })}
+      ${shopPanelHTML({ attr: 'data-pack="ahshiny"', img: 'art/ui/pack-shiny.webp', contain: true, name: 'Amszterdam Shiny', sub: '1 biztos Full Art', price: ECON.shinyPrice, have: false, holo: true, extra: '<span class="sp-setrib">Amszterdam hősei</span>' })}` : ''}
     </div>
     ${chestPanelHTML()}
     <details class="pack-info-more"><summary>Mi van a packokban?</summary>
       <p><b>${SETS.base.name}:</b> 3 véletlen lap a teljes alapkészletből, legalább egy ritka vagy jobb.</p>
       <p><b>🧰 Heti láda:</b> minden hétfőn 0:01-kor jár egy ingyen; ha már kinyitottad, ${CHEST.price} coinért vehetsz még. 10 lap: 1 biztos epikus vagy legendás, 1 biztos Full Art, a többi véletlen. 0,5% eséllyel egy ritka hős-portré is lehet benne.</p>
+      ${TEST_MODE ? `<p><b>${SETS.ah.name}:</b> 3 lap csak az új szettből (${SETS.ah.cards.length} lap), legalább egy ritka vagy jobb. A Shiny változatban a legjobb lap biztosan Full Art. Hős-lap és arany hős nincs benne.</p>` : ''}
       <p><b>Shiny pack:</b> 3 lap, amiből egy biztosan különleges: Full Art lap, Full Art hős vagy ritka változat-lap. ${ECON.goldShiny * 100}% eséllyel ✦ Arany hős is lehet benne.</p></details>
     ${limited}
     <div class="odds"><div class="lbl">Esélyek laponként</div>
@@ -709,9 +717,9 @@ function renderShop() {
   $('#shopBody').querySelectorAll('[data-buy]').forEach(b => b.onclick = () => buyShopItem(b.dataset.buy));
   $('#shopBody').querySelectorAll('[data-port]').forEach(b => b.onclick = () => buyPortrait(b.dataset.port));
   $('#shopBody').querySelectorAll('[data-pack]').forEach(b => b.onclick = () => {
-    const sh = b.dataset.pack === 'shiny', pr = sh ? ECON.shinyPrice : ECON.packPrice;
+    const k = b.dataset.pack, sh = k === 'shiny' || k === 'ahshiny', pr = sh ? ECON.shinyPrice : ECON.packPrice;
     if (Store.p.coins < pr) return toast(`Nincs elég coinod (${Store.p.coins}/${pr})`);
-    buyPack('base', sh ? 'shiny' : false); });
+    buyPack(k.startsWith('ah') ? 'ah' : 'base', sh ? 'shiny' : false); });
   const jb = $('#shopBody').querySelector('[data-jump]'); if (jb) jb.onclick = () => $('#shopBody .shop-limited')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   $('#freePack').onclick = () => buyPack('base', true);
   if ($('#chestBtn')) $('#chestBtn').onclick = () => buyChest();
@@ -720,9 +728,9 @@ function renderShop() {
   if ($('#giftShiny')) $('#giftShiny').onclick = () => buyPack('base', 'shinyGift');
 }
 function packHTML(setId, o = {}) {
-  return `<div class="pack pk${o.shiny ? ' shiny' : ''}" role="img" aria-label="Best of Us – ${o.shiny ? 'Shiny ' : ''}${SETS[setId].name} booster pack">
+  return `<div class="pack pk set-${setId}${o.shiny ? ' shiny' : ''}" role="img" aria-label="Best of Us – ${o.shiny ? 'Shiny ' : ''}${SETS[setId].name} booster pack">
     <div class="pk-part pk-body"></div><div class="pk-part pk-top"></div><div class="pk-sheen"></div>${o.shiny ? '<div class="pk-holo"></div><span class="pk-ribbon">Shiny</span>' : ''}
-    <div class="pk-tear"><i></i><em></em></div><div class="pk-glow"></div></div>`;
+    ${setId !== 'base' ? `<span class="pk-setrib">${SETS[setId].name}</span>` : ''}<div class="pk-tear"><i></i><em></em></div><div class="pk-glow"></div></div>`;
 }
 
 // ---- pack bontás ----

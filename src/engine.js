@@ -63,6 +63,28 @@ const CARDS = [
   { id:'i_uto', type:'item', name:'TomiNegan ütője', cost:3, atk:3, hp:0, rarity:'l', muscle:true, text:'' },
   { id:'i_vodkakancso', drink:true, type:'item', name:'Vodka Kancsó', cost:3, atk:4, hp:0, rarity:'r', muscle:true, hangover:true, text:'Utána a következő körödben a karakter bénult: nem támad, és nem üt vissza.' },
   { id:'i_bunda', type:'item', name:'Fehér szarvas bunda', cost:2, atk:0, hp:3, rarity:'r', taunt:true, text:'Gál Zoli benne nem pusztul el a támadása után, és Pajzsot is kap.' },
+  // ===== Amszterdam hősei (első mini-szett, set:'ah', 2026-10-16 – csak a teszt ágon) =====
+  { id:'i_gomba', set:'ah', type:'item', name:'Varázsgomba', cost:1, atk:0, hp:0, rarity:'k', gomba:true, text:'+1/+1. Minden további Varázsgomba ugyanazon a karakteren eggyel többet ad: a második +2/+2, a harmadik +3/+3…' },
+  { id:'i_cigi', set:'ah', type:'item', name:'Cigi', cost:1, tgt:'enemy', rarity:'k', cigi:true, text:'Egy ellenséges karakterre teszed: −1/−1. Az élete ettől nem mehet 1 alá.' },
+  { id:'a_irkave', set:'ah', type:'action', name:'Ír kávé', cost:1, tgt:'own', rarity:'k', text:'Egy saját karaktered Pajzsot kap.' },
+  { id:'a_suti', set:'ah', type:'action', name:'Süti', cost:1, tgt:'enemy', rarity:'k', text:'Egy ellenséges karakter elveszíti minden kulcsszavát (Lendület, Provokáció, Pajzs, Izom, Sunyulás, Láthatatlan, Igézhetetlen, Feltámadás).' },
+  { id:'l_elfekvo', set:'ah', type:'loc', name:'Elfekvő', cost:4, rarity:'k', text:'Minden karakter, amelyik támad, a következő körében bénult.' },
+  { id:'l_coffeeshop', set:'ah', type:'loc', name:'Caffee Shop', cost:3, rarity:'r', text:'Minden kör végén a soron lévő játékos paklijába bekeveredik egy véletlen eszköz lap.' },
+  { id:'l_voros', set:'ah', type:'loc', name:'Vöröslámpás negyed', cost:1, rarity:'k', text:'Minden kör végén, a támadások előtt a soron lévő játékos egy véletlen karaktere végleg +1 támadást kap.' },
+  { id:'c_kutya', set:'ah', type:'char', name:'Drog kereső kutya', cost:2, atk:2, hp:1, rarity:'r', sneak:true, deathDiscard:1, text:'Amikor meghal, az ellenfél eldob egy véletlen lapot a kezéből.' },
+  { id:'a_hawaiians', set:'ah', type:'action', name:'High Hawaiians', cost:4, tgt:'none', rarity:'e', text:'Keverj öt Varázsgomba lapot a paklidba.' },
+  { id:'a_repter', set:'ah', type:'action', name:'Reptéri ellenőrzés', cost:6, tgt:'airport', rarity:'r', text:'Válassz egy karaktert (sajátot vagy ellenségeset), és tedd át a tábla másik oldalára, egy ottani üres helyre.' },
+  { id:'a_bong', set:'ah', type:'action', name:'Bong', cost:1, tgt:'none', rarity:'r', bong:1, text:'Az ellenfeled kezébe kerül, 1-gyel drágábban. Akinek a köre végén a kezében marad, eldobja, és a hőse annyit sebződik, amennyibe a lap kerül.' },
+  { id:'a_irreggeli', set:'ah', type:'action', name:'Ír reggeli', cost:6, tgt:'none', rarity:'k', text:'Mindkét hős élete teljesen visszagyógyul.' },
+  { id:'a_utcaifust', set:'ah', type:'action', name:'Utcai füst', cost:4, tgt:'none', rarity:'r', text:'Minden saját karaktered rejtett lesz, és véletlenszerűen helyet cserélnek (üres helyre is kerülhetnek).' },
+  { id:'f_gameover', set:'ah', type:'action', name:'Game Over', cost:6, rarity:'l', finisher:true, tgt:'none', text:'A maximum életed 10 lesz. Az ellenfél összes karaktere elpusztul, a hőse 5 sebzést kap.' },
+  { id:'c_ah_sasi', set:'ah', type:'char', name:'Sasi, Amszterdam hőse', cost:4, atk:2, hp:6, rarity:'k', haste:true, text:'' },
+  { id:'c_ah_tomi', set:'ah', type:'char', name:'Tomi, Amszterdam hőse', cost:3, atk:1, hp:4, rarity:'k', elusive:true, text:'' },
+  { id:'c_ah_barna', set:'ah', type:'char', name:'Barna, Amszterdam hőse', cost:3, atk:3, hp:2, rarity:'k', text:'Kijátszáskor keverj egy Varázsgomba lapot a paklidba.' },
+  { id:'c_ah_laci', set:'ah', type:'char', name:'Laci, Amszterdam hőse', cost:2, atk:2, hp:2, rarity:'k', text:'Kijátszáskor két Ír kávé kerül a kezedbe.' },
+  { id:'c_ah_ati', set:'ah', type:'char', name:'Ati, Amszterdam hőse', cost:5, atk:3, hp:4, rarity:'k', text:'Kijátszáskor maga mellé idéz egy 2/2-es Bettit.' },
+  { id:'c_betti', set:'ah', type:'char', name:'Betti', cost:0, atk:2, hp:2, rarity:'k', token:true, text:'Ati, Amszterdam hőse idézi meg.' },
+  { id:'c_ah_bence', set:'ah', type:'char', name:'Bence, Amszterdam terrorja', cost:6, atk:4, hp:5, rarity:'l', haste:true, revive:true, text:'' },
   // Bolti eszköz (2026-10-16): csak a Boltban kapható, packból nem jön
   { id:'i_cipo', type:'item', name:'Laci cipőkanala', cost:1, atk:0, hp:0, rarity:'k', shopOnly:true, price:100, mover:true, text:'Amelyik karakterre ráteszed, azt a körödben egyszer áthelyezheted a táblán (üres helyre, vagy helycserével).' },
   { id:'i_aranylanc', type:'item', name:'Tomi nyaklánca', cost:3, atk:2, hp:3, rarity:'l', text:'' },
@@ -127,6 +149,8 @@ const CARDS = [
   { id:'l_munkahely', type:'loc', name:'Munkahely', cost:0, rarity:'l', token:true, text:'A gazdája lapjai 1-gyel olcsóbbak, az ellenfeléi 1-gyel drágábbak. Ha eltűnik, a gazdája 5 életet gyógyul.' },
   { id:'l_korhaz', type:'loc', name:'Siófoki Kórház', cost:1, rarity:'k', text:'Minden karakter 1 életet gyógyul a gazdája körének végén.' },
 ];
+/* Bong (Amszterdam hősei): minden továbbadáskor 1-gyel drágább token-példány (legfeljebb 10) */
+for (let n = 2; n <= 10; n++) CARDS.push({ ...CARDS.find(c => c.id === 'a_bong'), id:'a_bong' + n, cost:n, bong:n, token:true, rarity:'r' });
 const CARD = Object.fromEntries(CARDS.map(c => [c.id, c]));
 
 const HEROES = [
@@ -161,6 +185,10 @@ function openSlots(s, side) {   // ahová most új karaktert lehet tenni (balró
 const canPlace = (s, side, j) => openSlots(s, side).includes(j);
 const bid = id => (CARD[id] && CARD[id].variantOf) || id;   // változat-lap = az alaplap (ugyanaz a hatás)
 const isFixed = u => !!(u && CARD[u.id].fixed);
+/* Süti (Amszterdam hősei): a lapra nyomtatott kulcsszavak elvesznek (u.noKw); a később kapott erők (eszköz, Átok) működnek */
+const kwC = (u, k) => !!(u && !u.noKw && CARD[u.id][k]);
+/* Igézhetetlen: akcióval és más lapok hatásával nem célozható (eszköz rátehető), a véletlen célzású hatások kihagyják; a mindenkit érő hatások eltalálják */
+const isEl = u => !!(u && (kwC(u, 'elusive') || u.elusive));
 const graveChars = p => p.grave.filter(g => CARD[g.id] && CARD[g.id].type === 'char' && !CARD[g.id].token);   // Dávid, a törzsvendég: a helyszínek neki kedveznek
 
 const DECKS = {
@@ -306,10 +334,12 @@ function targetsFor(s, pi, id) {
   const c = CARD[id], p = s.players[pi], ei = other(pi), e = s.players[ei], T = [];
   const own = () => p.board.forEach((u, i) => { if (u && !isFixed(u)) T.push({ k:'unit', side:pi, i }); });   // a nálad úszó (ellenséges) Cápa nem a te karaktered
   const foe = () => e.board.forEach((u, i) => { if (u) T.push({ k:'unit', side:ei, i }); });
+  const ownA = () => p.board.forEach((u, i) => { if (u && !isFixed(u) && !isEl(u)) T.push({ k:'unit', side:pi, i }); });
+  const foeA = () => e.board.forEach((u, i) => { if (u && !isEl(u)) T.push({ k:'unit', side:ei, i }); });
   switch (c.type) {
     case 'char': {
       const foes = e.board.map((u, i) => u ? i : -1).filter(i => i >= 0);
-      const foesM = foes.filter(j => !isFixed(e.board[j]));
+      const foesM = foes.filter(j => !isFixed(e.board[j]) && !isEl(e.board[j]));
       p.board.forEach((u, i) => {
         if (u || !canPlace(s, pi, i)) return;
         const empt = e.board.map((u, j) => u || closedLane(s, ei, j) ? -1 : j).filter(j => j >= 0);
@@ -325,18 +355,23 @@ function targetsFor(s, pi, id) {
     case 'item': if (c.tgt === 'enemy') foe(); else own(); break;
     case 'loc': if (!locIs(s, id)) T.push({ k:'none' }); break;
     case 'action':
-      if (c.tgt === 'enemy') foe();
-      else if (c.tgt === 'enemyOrHero') { foe(); T.push({ k:'hero', side:ei, i:-1 }); }
-      else if (c.tgt === 'anyOrHero') { foe(); p.board.forEach((u, i) => { if (u) T.push({ k:'unit', side:pi, i }); }); T.push({ k:'hero', side:ei, i:-1 }); }   // Sasi ütése: a saját térfeleden bárki (a nálad úszó Cápa is)
+      if (c.tgt === 'enemy') foeA();
+      else if (c.tgt === 'enemyOrHero') { foeA(); T.push({ k:'hero', side:ei, i:-1 }); }
+      else if (c.tgt === 'anyOrHero') { foeA(); p.board.forEach((u, i) => { if (u && !isEl(u)) T.push({ k:'unit', side:pi, i }); }); T.push({ k:'hero', side:ei, i:-1 }); }   // Sasi ütése: a saját térfeleden bárki (a nálad úszó Cápa is)
       else if (c.tgt === 'enemyEmpty') e.board.forEach((u, i) => { if (!u) T.push({ k:'eslot', side:ei, i }); });
-      else if (c.tgt === 'own') own();
-      else if (c.tgt === 'ownOrHero') { own(); T.push({ k:'hero', side:pi, i:-1 }); }
+      else if (c.tgt === 'own') ownA();
+      else if (c.tgt === 'ownOrHero') { ownA(); T.push({ k:'hero', side:pi, i:-1 }); }
+      else if (c.tgt === 'airport') {   /* Reptéri ellenőrzés: bármelyik (nem rögzített, nem Igézhetetlen) karakter át a túloldal egy üres helyére */
+        for (const sd of [pi, ei]) { const os = other(sd);
+          s.players[sd].board.forEach((u, i) => { if (!u || isFixed(u) || isEl(u)) return;
+            s.players[os].board.forEach((x, j) => { if (!x && !closedLane(s, os, j)) T.push({ k:'unit', side:sd, i, t2:{ k: os === pi ? 'slot' : 'eslot', side:os, i:j } }); }); }); }
+      }
       else if (c.tgt === 'swap') {   // saját karakter + másik saját karakter (csere) vagy saját üres hely (átlépés)
-        p.board.forEach((u, a) => { if (u && !isFixed(u)) p.board.forEach((x, b) => { if (b !== a && !isFixed(x) && (x || !closedLane(s, pi, b))) T.push({ k:'unit', side:pi, i:a, t2:{ k: x ? 'unit' : 'slot', side:pi, i:b } }); }); });
+        p.board.forEach((u, a) => { if (u && !isFixed(u) && !isEl(u)) p.board.forEach((x, b) => { if (b !== a && !isFixed(x) && !isEl(x) && (x || !closedLane(s, pi, b))) T.push({ k:'unit', side:pi, i:a, t2:{ k: x ? 'unit' : 'slot', side:pi, i:b } }); }); });
       }
       else if (c.tgt === 'two') {   // két különböző célpont: bármely karakter vagy az ellenfél hőse
         const one = [];
-        for (const sd of [pi, ei]) s.players[sd].board.forEach((u, i) => { if (u) one.push({ k:'unit', side:sd, i }); });
+        for (const sd of [pi, ei]) s.players[sd].board.forEach((u, i) => { if (u && !isEl(u)) one.push({ k:'unit', side:sd, i }); });
         one.push({ k:'hero', side:ei, i:-1 });
         if (one.length === 1) T.push(one[0]);
         else for (const a of one) for (const b of one) if (a !== b) T.push({ ...a, t2:{ ...b } });
@@ -400,6 +435,12 @@ function playCard(s, pi, hi, t) {
       addToHand(s, pi, d);
     }
     if (bid(c.id) === 'c_sasimeselo') draw(s, pi);
+    if (c.id === 'c_ah_barna') { p.deck.push('i_gomba'); shuffle(p.deck); ev(s, { t:'shuffled', side:pi, i:t.i, n:1, id:'i_gomba' }); }
+    if (c.id === 'c_ah_laci') { ev(s, { t:'gift', side:pi, i:t.i, id:'a_irkave' }); addToHand(s, pi, 'a_irkave'); addToHand(s, pi, 'a_irkave'); }
+    if (c.id === 'c_ah_ati') {   /* Betti maga mellé (előbb jobbra, aztán balra, különben bárhova) */
+      const os = openSlots(s, pi), spots = [t.i + 1, t.i - 1].filter(j => os.includes(j)), j = spots.length ? spots[0] : os.length ? os[0] : -1;
+      if (j >= 0) { p.board[j] = makeUnit(s, 'c_betti', pi); ev(s, { t:'summon', side:pi, i:j, id:'c_betti' }); }
+    }
     if (bid(c.id) === 'c_bou') {   // Best of Us: együtt erősebbek
       let n = 0;
       p.board.forEach((x, j) => { if (x && j !== t.i && !isFixed(x)) { x.atk += 1; x.hp += 1; x.maxHp += 1; n++; ev(s, { t:'buff', side:pi, i:j, n:1 }); } });
@@ -414,7 +455,7 @@ function playCard(s, pi, hi, t) {
     if (bid(c.id) === 'c_alekosz') {   // véletlen ellenséges karaktert ellop, és maga mellé teszi (előbb jobbra, aztán balra, aztán bárhova)
       const os = openSlots(s, pi), spots = [t.i + 1, t.i - 1].filter(j => os.includes(j));
       const j = spots.length ? spots[0] : (CARD.c_alekosz.anywhere && os.length) ? os[0] : -1;   // csak közvetlenül mellé (ahogy a lap írja)
-      const cand = e.board.map((x, k) => x && x.id !== 'c_korso' && !isFixed(x) && CARD[x.id].cost <= (CARD.c_alekosz.maxCost ?? 99) ? k : -1).filter(k => k >= 0);
+      const cand = e.board.map((x, k) => x && x.id !== 'c_korso' && !isFixed(x) && !isEl(x) && CARD[x.id].cost <= (CARD.c_alekosz.maxCost ?? 99) ? k : -1).filter(k => k >= 0);
       if (j >= 0 && cand.length) {
         const k = cand[Math.floor(rnd() * cand.length)];
         reveal(s, ei, k);
@@ -444,14 +485,19 @@ function playCard(s, pi, hi, t) {
     reveal(s, ei, t.i); u.items.push(c.id); (u.foe = u.foe || []).push(c.id);
     if (c.stun) { u.stun = c.stun; ev(s, { t:'stun', side:ei, i:t.i }); }
     if (c.debuff) { u.atk = Math.max(0, u.atk - c.debuff); ev(s, { t:'debuff', side:ei, i:t.i, n:c.debuff }); }
+    if (c.cigi) { u.atk = Math.max(0, u.atk - 1); u.maxHp = Math.max(1, u.maxHp - 1); u.hp = Math.max(1, Math.min(u.hp - 1, u.maxHp)); ev(s, { t:'debuff', side:ei, i:t.i, n:1, hp:1 }); }
   } else if (c.type === 'item') {
     p.itemThisTurn = true;
     const u = p.board[t.i];
     const hp = (c.hp || 0) + (has(p, 'itemHp') ? 1 : 0);
     u.atk += c.atk || 0; u.hp += hp; u.maxHp += hp;
     if (c.shield) u.shield = true; if (c.haste) u.haste = true; if (c.doom) u.doom = true; if (c.muscle) u.muscle = true; if (c.hangover) u.hangover = true; if (c.taunt) u.taunt = true;
+    if (c.gomba) {   /* Varázsgomba: annyit ad, ahányadik gomba ezen a karakteren */
+      const n = u.items.filter(x => CARD[x] && CARD[x].gomba).length + 1;
+      u.atk += n; u.hp += n; u.maxHp += n;
+    }
     u.items.push(c.id);
-    ev(s, { t:'buff', side:pi, i:t.i });
+    ev(s, { t:'buff', side:pi, i:t.i, n: c.gomba ? u.items.filter(x => CARD[x] && CARD[x].gomba).length : undefined });
     // Fehér szarvas bunda Gál Zolin: Pajzsot is kap (2026-10-12)
     if (c.id === 'i_bunda' && bid(u.id) === 'c_zoli' && !u.shield) { u.shield = true; ev(s, { t:'boon', side:pi, i:t.i, b:'shield' }); }
     if (c.selfDmg) damageHero(s, pi, c.selfDmg);
@@ -461,6 +507,11 @@ function playCard(s, pi, hi, t) {
     s.location = { id:c.id, owner:pi, foil:!!h.foil };
     if (had && isReg(s, pi)) { ev(s, { t:'regdraw', side:pi, i:-1 }); draw(s, pi); }   // Dávid (2026-10-09): ha helyszínt cserél, húz egy lapot
   } else {
+    if (c.bong) {   /* Bong: az ellenfél kezébe kerül, 1-gyel drágábban */
+      const nx = 'a_bong' + Math.min(10, c.bong + 1);
+      ev(s, { t:'bong', side:ei, i:-1, n:CARD[nx].cost });
+      addToHand(s, ei, nx);
+    }
     switch (c.id) {
       case 'a_dinnyes': if (t.k === 'hero') damageHero(s, ei, 3); else damageUnit(s, ei, t.i, 3); break;
       case 'a_gyros': {
@@ -481,6 +532,35 @@ function playCard(s, pi, hi, t) {
         if (CARD.a_moshpit.dmg) for (let j = 0; j < LANES; j++) if (e.board[j]) damageUnit(s, ei, j, CARD.a_moshpit.dmg); }
         if (CARD.a_moshpit.draw) draw(s, pi); break;
       case 'a_cheddar': draw(s, pi); draw(s, pi); break;
+      // ===== Amszterdam hősei =====
+      case 'a_irkave': { const u = p.board[t.i]; if (u && !u.shield) { u.shield = true; ev(s, { t:'boon', side:pi, i:t.i, b:'shield' }); } break; }
+      case 'a_suti': { const u = e.board[t.i]; if (!u) break;
+        reveal(s, ei, t.i);
+        Object.assign(u, { noKw:true, haste:false, shield:false, taunt:false, muscle:false, invis:false, elusive:false, hidden:false }); delete u.boon;
+        ev(s, { t:'silence', side:ei, i:t.i }); break; }
+      case 'a_hawaiians': for (let k = 0; k < 5; k++) p.deck.push('i_gomba'); shuffle(p.deck); ev(s, { t:'shuffled', side:pi, i:-1, n:5, id:'i_gomba' }); break;
+      case 'a_repter': if (t.t2) {
+        const sd = t.side, os = t.t2.side, j = t.t2.i, src = s.players[sd], dst = s.players[os], u = src.board[t.i];
+        if (!u || dst.board[j]) break;
+        reveal(s, sd, t.i);
+        src.board[t.i] = null;
+        const oldFoe = [...(u.foe || [])], foe = [];   /* az eszközök gazdája marad, aki rátette (mint Alekosz lopásánál) */
+        for (const id of u.items) { const x = oldFoe.indexOf(id); if (x >= 0) oldFoe.splice(x, 1); else foe.push(id); }
+        u.foe = foe; u.fresh = true; u.hidden = false;
+        dst.board[j] = u;
+        ev(s, { t:'airport', side:os, i:j, from:t.i, fs:sd, id:u.id }); }
+        break;
+      case 'a_irreggeli': healHero(s, pi, 999); healHero(s, ei, 999); break;
+      case 'a_utcaifust': {   /* minden saját karakter rejtett lesz és összekeverednek (a zárt és a Cápás helyek kimaradnak) */
+        const L = []; for (let j = 0; j < LANES; j++) if (!closedLane(s, pi, j) && !isFixed(p.board[j])) L.push(j);
+        const v = shuffle(L.map(j => p.board[j]));
+        L.forEach((j, k) => { p.board[j] = v[k]; if (v[k]) v[k].hidden = true; });
+        ev(s, { t:'smoke', side:pi, i:-1 }); break; }
+      case 'f_gameover': {
+        p.maxHp = 10; p.hp = Math.min(p.hp, 10);
+        ev(s, { t:'gameover', side:pi, i:-1 });
+        e.board.forEach((x, j) => { if (!x || isFixed(x)) return; reveal(s, ei, j); x.shield = false; x.hp = 0; });
+        cleanup(s); damageHero(s, ei, 5); break; }
       case 'a_alarc': {   // kézcsere; a Kánon esemény (hősfüggő) a gazdájánál marad; ami a kézlimit fölé kerül, elég
         const fin = c => CARD[c.id].finisher, mine = p.hand.filter(c => !fin(c)), theirs = e.hand.filter(c => !fin(c));
         p.hand = [...p.hand.filter(fin), ...theirs]; e.hand = [...e.hand.filter(fin), ...mine];
@@ -520,7 +600,7 @@ function playCard(s, pi, hi, t) {
       case 'a_sasiutes': { let sum = 0; for (let i = 0; i < LANES; i++) sum += effAtk(s, pi, i);   /* a térfeleden úszó Cápa is beleszámít (Tomi, 2026-10-16) */ if (t.k === 'hero') damageHero(s, ei, sum); else damageUnit(s, t.side ?? ei, t.i, sum); break; }
       case 'a_koktel': {
         const all = [];
-        for (const sd of [0, 1]) s.players[sd].board.forEach((x, j) => { if (x) all.push([sd, j]); });
+        for (const sd of [0, 1]) s.players[sd].board.forEach((x, j) => { if (x && !isEl(x)) all.push([sd, j]); });
         if (!all.length) break;
         const [bs, bi] = all.splice(Math.floor(rnd() * all.length), 1)[0];
         s.players[bs].board[bi].atk += 5; ev(s, { t:'buff', side:bs, i:bi, n:5 });
@@ -539,6 +619,8 @@ function playCard(s, pi, hi, t) {
           if (!own.length) return;
           reveal(s, ei, i);
           const base = CARD[u.id];
+          const gm = own.filter(id => CARD[id].gomba).length, gb = gm * (gm + 1) / 2;   /* Varázsgombák: 1+2+…+n */
+          if (gb) { u.atk = Math.max(0, u.atk - gb); u.maxHp = Math.max(1, u.maxHp - gb); u.hp = Math.max(1, Math.min(u.hp, u.maxHp)); }
           for (const id of own) {
             const c = CARD[id], hp = (c.hp || 0) + (has(e, 'itemHp') ? 1 : 0);
             u.atk = Math.max(0, u.atk - (c.atk || 0));
@@ -558,7 +640,7 @@ function playCard(s, pi, hi, t) {
       case 'a_espresso': p.espresso = (p.espresso || 0) + 2; ev(s, { t:'espresso', side:pi, i:-1 }); break;
       case 'a_amongus': {   // 10 shot, az egyikben durva paprika: mindenki iszik (mindkét oldal karakterei és hősei), egy valaki megszívja
         const part = [];
-        for (const sd of [pi, ei]) s.players[sd].board.forEach((u, i) => { if (u && !isFixed(u)) { part.push({ sd, i }); if (sd === pi) { u.atk += 1; u.hp += 1; u.maxHp += 1; ev(s, { t:'buff', side:sd, i, n:1 }); } } });
+        for (const sd of [pi, ei]) s.players[sd].board.forEach((u, i) => { if (u && !isFixed(u)) { if (!isEl(u)) part.push({ sd, i }); if (sd === pi) { u.atk += 1; u.hp += 1; u.maxHp += 1; ev(s, { t:'buff', side:sd, i, n:1 }); } } });
         for (const sd of [pi, ei]) { healHero(s, sd, 2); part.push({ sd, i:-1 }); }
         const r = part[Math.floor(rnd() * part.length)];
         ev(s, { t:'amongus', side:r.sd, i:r.i, id:r.i >= 0 ? s.players[r.sd].board[r.i].id : null });
@@ -606,7 +688,7 @@ function playCard(s, pi, hi, t) {
       case 'f_munkahely': draw(s, pi); if (s.winner == null) draw(s, pi); dropLocation(s, 'loc'); s.location = { id:'l_munkahely', owner:pi }; ev(s, { t:'summon', side:pi, i:-1, id:'l_munkahely' }); break;
       case 'f_gepuzem': p.machine = 1; ev(s, { t:'machineon', side:pi, i:-1 }); break;
       case 'f_capa': {   // a cápa egy véletlen ellenséges karakter helyére érkezik, és megeszi; ha nincs kit, a jobb szélre
-        const cand = e.board.map((u, k) => u && !isFixed(u) ? k : -1).filter(k => k >= 0);
+        const cand = e.board.map((u, k) => u && !isFixed(u) && !isEl(u) ? k : -1).filter(k => k >= 0);
         let j = cand.length ? cand[Math.floor(rnd() * cand.length)] : -1;
         if (j < 0) for (let k = LANES - 1; k >= 0; k--) if (!e.board[k]) { j = k; break; }
         if (j < 0) break;
@@ -629,7 +711,7 @@ function playCard(s, pi, hi, t) {
 const PARTY_POOL = () => CARDS.filter(x => x.drink && !x.variantOf && !x.token && !x.noParty).map(x => x.id);   // noParty: nincs értelme ellenséges karakterre (pl. Espresso Martini)
 function partyDrink(s, pi, si) {
   const ei = other(pi), e = s.players[ei];
-  const cand = e.board.map((x, k) => x && !isFixed(x) ? k : -1).filter(k => k >= 0);
+  const cand = e.board.map((x, k) => x && !isFixed(x) && !isEl(x) ? k : -1).filter(k => k >= 0);
   const pool = PARTY_POOL(), d = pool[Math.floor(rnd() * pool.length)];
   if (!cand.length) { ev(s, { t:'party', side:pi, i:si, ts:ei, ti:-1, id:d, none:true }); return; }
   const j = cand[Math.floor(rnd() * cand.length)], u = e.board[j], c = CARD[d];
@@ -695,7 +777,7 @@ function cleanup(s) {
     for (const side of [0, 1]) {
       const p = s.players[side];
       p.board.forEach((u, i) => {
-        if (u && u.hp <= 0 && CARD[u.id].revive && !u.revived) {   // Gabi, a legyőzhetetlen: egyszer feltámad a helyén 1 élettel
+        if (u && u.hp <= 0 && kwC(u, 'revive') && !u.revived) {   // Feltámadás (Gabi, a legyőzhetetlen; Bence, Amszterdam terrorja): egyszer feléled a helyén 1 élettel
           any = true; buryItems(s, side, u);
           const c = CARD[u.id];
           p.board[i] = { ...u, atk:c.atk, hp:1, maxHp:c.hp, items:[], foe:[], shield:false, doom:false, hangover:false, stun:0, muscle:false, taunt:false, temp:0, revived:true, fresh:false };
@@ -708,6 +790,10 @@ function cleanup(s) {
           bury(s, side, u.id, 'death', !!u.foil); buryItems(s, side, u);
           if (u.items.includes('i_kabala')) draw(s, side);
           if (CARD[u.id].deathDraw) draw(s, side);   // Barna, az életunt
+          if (CARD[u.id].deathDiscard) {   /* Drog kereső kutya: az ellenfél eldob egy véletlen lapot a kezéből */
+            const os = other(side), H = s.players[os].hand;
+            if (H.length) { const x = H.splice(Math.floor(rnd() * H.length), 1)[0]; bury(s, os, x.id, 'discard', !!x.foil); ev(s, { t:'dogdiscard', side:os, i:-1, id:x.id }); }
+          }
           if (CARD[u.id].deathHeal) healHero(s, side, CARD[u.id].deathHeal);   // Bence, Amszterdam hőse
           if (CARD[u.id].deathGift) { ev(s, { t:'gift', side, i, id:CARD[u.id].deathGift }); addToHand(s, side, CARD[u.id].deathGift); }   // Laci, La Grand Finale: az ing a kézbe
           const vsBaszo = s.baszoHit === other(side);   // Baszó ütésére meghalt lap nem vághat vissza neki
@@ -720,7 +806,7 @@ function cleanup(s) {
           }
           if (CARD[u.id].deathKill) {   // Molnár Zsolti: halálakor egy véletlen ellenséges karaktert elpusztít (pajzs sem véd)
             const os = other(side), ob = s.players[os].board;
-            const cand = ob.map((x, k) => x && x.hp > 0 && x.id !== 'c_korso' ? k : -1).filter(k => k >= 0);
+            const cand = ob.map((x, k) => x && x.hp > 0 && x.id !== 'c_korso' && !isEl(x) ? k : -1).filter(k => k >= 0);
             if (cand.length) {
               const k = cand[Math.floor(rnd() * cand.length)];
               reveal(s, os, k);
@@ -795,12 +881,12 @@ function strike(s, i) {
   const sh = x.shield;
   damageUnit(s, ei, j, a);
   // Izom: ami sebzés a karakter halála után megmarad, az ellenfél hősét éri (a Pajzs elnyeli az egészet)
-  if ((CARD[u.id].muscle || u.muscle) && !sh && x.hp < 0) { ev(s, { t:'overflow', side:ei, i:-1, n:-x.hp }); damageHero(s, ei, -x.hp, true); }
+  if ((kwC(u, 'muscle') || u.muscle) && !sh && x.hp < 0) { ev(s, { t:'overflow', side:ei, i:-1, n:-x.hp }); damageHero(s, ei, -x.hp, true); }
   damageUnit(s, pi, i, r); cleanup(s);
 }
-const isInv = u => !!(u && (CARD[u.id].invis || u.invis));   // Láthatatlan: a lapon vagy kapott erőként (Tomi Kánon eseménye)
+const isInv = u => !!(u && (kwC(u, 'invis') || u.invis));   // Láthatatlan: a lapon vagy kapott erőként (Tomi Kánon eseménye)
 const invisAt = (s, side, i) => isInv(s.players[side].board[i]);   // Láthatatlan: a támadás átmegy rajta
-function tauntAt(s, side) { return s.players[side].board.findIndex(u => u && !u.hidden && (CARD[u.id].taunt || u.taunt)); }
+function tauntAt(s, side) { return s.players[side].board.findIndex(u => u && !u.hidden && (kwC(u, 'taunt') || u.taunt)); }
 
 const atiFree = (s, side, i) => s.players[side].board.every((x, j) => j === i || !x);
 
@@ -814,6 +900,7 @@ function attackLane(s, i) {
     if (s.winner != null || s.players[pi].board[i] !== u) break;
     strike(s, i);
   }
+  if (locIs(s, 'l_elfekvo') && s.players[pi].board[i] === u && u.hp > 0) u.hangover = true;   /* Elfekvő: aki támadott, a következő körében bénult */
   // Gál Zoli egy támadás után elpusztul – kivéve, ha rajta van a Fehér szarvas bunda (2026-10-12)
   if (bid(u.id) === 'c_zoli' && s.players[pi].board[i] === u && !(u.items || []).includes('i_bunda')) { u.hp = 0; ev(s, { t:'expire', side:pi, i }); cleanup(s); }
   checkWin(s);
@@ -883,6 +970,14 @@ function finishTurn(s) {
     for (const sd of [pi, other(pi)]) s.players[sd].board.forEach((x, j) => { if (x && x !== u && !isFixed(x)) { if (sd !== pi) reveal(s, sd, j); damageUnit(s, sd, j, 1); } });
     cleanup(s);
   });
+  if (locIs(s, 'l_coffeeshop') && s.winner == null) {   /* Caffee Shop: véletlen eszköz a soron lévő játékos paklijába */
+    const pool = CARDS.filter(x => x.type === 'item' && !x.token && !x.variantOf && !x.off && !x.shopOnly && !x.passOnly && !x.eventOnly).map(x => x.id);
+    const id = pool[Math.floor(rnd() * pool.length)]; p.deck.push(id); shuffle(p.deck); ev(s, { t:'coffee', side:pi, i:-1, id });
+  }
+  for (let k = p.hand.length - 1; k >= 0 && s.winner == null; k--) {   /* Bong: akinél a köre végén a kezében maradt, eldobja és sebződik */
+    const h = p.hand[k], c = CARD[h.id]; if (!c.bong) continue;
+    p.hand.splice(k, 1); bury(s, pi, 'a_bong', 'bong'); ev(s, { t:'bongburn', side:pi, i:-1, n:c.cost }); damageHero(s, pi, c.cost, true);
+  }
   p.locked = false;   // az Adios Motherfucker! bénítása a megbénított játékos körének végén jár le
   if (s.winner == null && has(p, 'endHeal')) {
     ev(s, { t:'passive', side:pi, k:'endHeal' });
@@ -910,7 +1005,14 @@ function finishTurn(s) {
   startTurn(s);
 }
 
-function runEndTurn(s) { for (let i = 0; i < LANES; i++) attackLane(s, i); finishTurn(s); }
+/* Kör végi hatások a támadások ELŐTT (Vöröslámpás negyed: a soron lévő játékos egy véletlen karaktere végleg +1 támadást kap) */
+function preAttack(s) {
+  if (s.winner != null || !locIs(s, 'l_voros')) return;
+  const pi = s.active, b = s.players[pi].board, c = b.map((u, i) => u && !isFixed(u) ? i : -1).filter(i => i >= 0);
+  if (!c.length) return;
+  const i = c[Math.floor(rnd() * c.length)]; b[i].atk += 1; ev(s, { t:'locfx', side:pi, id:'l_voros' }); ev(s, { t:'buff', side:pi, i, n:1 });
+}
+function runEndTurn(s) { preAttack(s); for (let i = 0; i < LANES; i++) attackLane(s, i); finishTurn(s); }
 
 // ===== Bot =====
 const clone = s => JSON.parse(JSON.stringify(s));
@@ -936,7 +1038,9 @@ function evalState(s, me) {
     if (x0) v -= val(other(me), i);
     if (x && (!u || isInv(u) || x.id === 'c_nyiti') && !x.stun && !CARD[x.id].noAttack) v -= effAtk(s, other(me), i) * 0.8;
   }
-  v += P.hand.length * 0.6 - E.hand.length * 0.3 + (P.espresso || 0) * 0.55;   // Espresso Martini: a jövő körben érkező lapok
+  v += P.hand.length * 0.6 - E.hand.length * 0.3 + (P.espresso || 0) * 0.55;
+  for (const h of P.hand) if (CARD[h.id].bong) v -= CARD[h.id].cost * 1.0 + 0.6;   /* Bong: forró krumpli – nálam maradva sebez */
+  for (const h of E.hand) if (CARD[h.id].bong) v += CARD[h.id].cost * 0.7 + 0.3;   // Espresso Martini: a jövő körben érkező lapok
   if (s.location && s.location.owner === me) v += 1.0;
   if (locIs(s, 'l_munkahely')) v += s.location.owner === me ? 4 : -4;   // Munkahely: tartós energiaelőny
   if (E.locked) v += 3; if (P.locked) v -= 3;
@@ -1019,4 +1123,4 @@ function botChoose(real, lvl = 2) {
   return best && { hi: best.hi, t: best.t };
 }
 
-if (typeof module !== 'undefined') module.exports = { canMove, moveTargets, moveUnit, BOT_LV, baszoStrike, sharkSwim, atiFlee, openSlots, closedLane, CARDS_ALL: CARDS, DECK_OF, LANES, MAX_HALF, mulligan, botMulligan, beginGame, CARDS, CARD, HEROES, HERO, DECKS, newGame, playCard, canPlay, targetsFor, cardCost, attackLane, finishTurn, runEndTurn, botChoose, canAttack, effAtk };
+if (typeof module !== 'undefined') module.exports = { preAttack, isEl, canMove, moveTargets, moveUnit, BOT_LV, baszoStrike, sharkSwim, atiFlee, openSlots, closedLane, CARDS_ALL: CARDS, DECK_OF, LANES, MAX_HALF, mulligan, botMulligan, beginGame, CARDS, CARD, HEROES, HERO, DECKS, newGame, playCard, canPlay, targetsFor, cardCost, attackLane, finishTurn, runEndTurn, botChoose, canAttack, effAtk };
