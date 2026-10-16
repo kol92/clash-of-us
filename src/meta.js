@@ -157,6 +157,17 @@ function testBanner() {   /* teszt oldal jelzése + profil újramásolása */
     try { localStorage.removeItem(LS_KEY); } catch {} location.reload(); };
   document.body.appendChild(b);
 }
+/* TESZT OLDAL (2026-10-16, Tomi kérése): ezek a profilok (név szerint, kisbetűvel) a teszt oldalon minden gyűjthető lapot megkapnak
+   (legendásból 1, a többiből 2 példány; bolti, Pass-, event- és változat-lapokkal együtt). Minden betöltéskor lefut, így az új lapokat is megkapják.
+   Csak a teszt oldal helyi profil-másolatát érinti – az éles adatokhoz nem nyúl. */
+const TEST_ALL_CARDS = ['btppictures'];
+function testGrantAll(p) {
+  let n = 0;
+  for (const c of PLAYABLE) { if (c.token || c.off) continue;
+    const want = maxCopies(c.id), e = p.coll[c.id] || (p.coll[c.id] = { n: 0, f: 0 });
+    if (e.n + e.f < want) { n += want - e.n - e.f; e.n = want - e.f; } }
+  if (n) { save(); setTimeout(() => toast(`🧪 Teszt: megkaptad az összes lapot (+${n} példány)`), 1200); }
+}
 async function bootProfile() {
   renderProfileBar();
   let db = null, user = null;
@@ -175,6 +186,7 @@ async function bootProfile() {
   } else Store.mode = 'local';
   if (Store.mode === 'local' && !Store.p) Store.p = migrate(lsGet());
   if (Store.p && Store.p._dirty) { delete Store.p._dirty; save(); }
+  if (TEST_MODE && Store.p && TEST_ALL_CARDS.includes(String(Store.p.name || '').trim().toLowerCase())) testGrantAll(Store.p);   /* teszt: minden lap ennek a profilnak */
   if (Store.giftMsg) { const m = Store.giftMsg; Store.giftMsg = null; setTimeout(() => toast(m), 600); }
   if (Store.faMsg) { const m = Store.faMsg; Store.faMsg = null; setTimeout(() => toast(m), 4200); }
   if (Store.dupeMsg) { const m = Store.dupeMsg; Store.dupeMsg = null; setTimeout(() => toast(m), Store.giftMsg === null ? 2400 : 600); }

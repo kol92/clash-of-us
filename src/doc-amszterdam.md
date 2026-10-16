@@ -86,3 +86,4 @@ Megjegyzés: a bot a helyzeti lapokat (helyszínek, Süti, Utcai füst, Bong, a 
 ## Tesztek
 - `tools/ah_test.js` – minden új lap és kulcsszó (45 ellenőrzés + 60 bot-meccs az új lapokkal).
 - Teszt oldal: `src/deploy-test.sh` (a `teszt` ágon). A teszt mód (`TEST_MODE`, ui.js eleje): az éles profil másolatával indul, csak helyben ment, a felhő-kapcsolat (`Store.db`) le van választva, PvP / barátok / ranked tiltva; a lila sávban „+1000 coin” és „Újramásolás”.
+- **Teljes gyűjtemény teszteléshez (2026-10-17):** a teszt oldalon a `TEST_ALL_CARDS` listán lévő profilnevek (most: **Btppictures**) minden betöltéskor megkapják az összes gyűjthető lapot (legendásból 1, a többiből 2 példány, bolti / Pass / event / változat lapokkal együtt). Csak a teszt oldal helyi másolatát érinti. Kód: `testGrantAll` (meta.js).
