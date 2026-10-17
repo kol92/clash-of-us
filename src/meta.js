@@ -109,7 +109,7 @@ function rollHeroGold(p) {
   p.heroGold = p.heroGold || {}; const isNew = !p.heroGold[h]; p.heroGold[h] = (p.heroGold[h] || 0) + 1;
   return { id: 'gold:' + h, hero: h, gold: true, foil: true, isNew };
 }
-const pcRar = c => c.gold ? 'g' : c.hero ? 'l' : CARD[c.id].rarity;
+const pcRar = c => c.gold || (!c.hero && CARD[c.id]?.goldVar) ? 'g' : c.hero ? 'l' : CARD[c.id].rarity;
 const pcName = c => c.hero ? HERO[c.hero].name : CARD[c.id].name;
 const pcHTML = (c, o) => c.hero ? heroCardHTML(HERO[c.hero], { ...o, gold: c.gold }) : cardHTML(c.id, o);
 function rollHeroFa(p) {
@@ -392,19 +392,22 @@ function openPackRoll(setId, forceFoil = false, shiny = false) {
   const faSlot = forceFoil || shiny ? 2 : -1;   // garantált Full Art: a pack legjobb lapja lesz az
   // Shiny pack: a különleges hely 25% eséllyel változat-lap (pl. a zöld Rehab), különben Full Art
   const extra = setId !== 'base';   /* kiegészítő pack (pl. Amszterdam hősei): csak a szett lapjai */
-  const allVars = extra ? [] : CARDS.filter(v => v.variantOf && !v.passOnly && !v.shopOnly && !v.wheelOnly);
+  const allVars = extra ? [] : CARDS.filter(v => v.variantOf && !v.passOnly && !v.shopOnly && !v.wheelOnly && !v.goldVar);
   const sr = Math.random();
   const varSlot = shiny && allVars.length && sr < ECON.shinyVariant ? 2 : -1;
   // Full Art hős: sima packban kis eséllyel a leggyengébb lap helyén, Shiny packban a különleges helyen
   const heroSlot = extra ? -1 : shiny ? (varSlot < 0 && sr < ECON.shinyVariant + ECON.shinyHero ? 2 : -1) : (Math.random() < ECON.heroFaChance ? 0 : -1);
-  const goldSlot = !extra && GOLD_HEROES.length && Math.random() < (shiny ? ECON.goldShiny : ECON.goldPlain) ? 0 : -1;   // Arany hős: a pack első lapja helyén
+  const setGold = extra ? CARDS.filter(v => v.goldVar && v.set === setId).map(v => v.id) : [];   /* kiegészítő: arany lap (0,5% / Shiny 5%) */
+  const goldSlot = (extra ? setGold.length : GOLD_HEROES.length) && Math.random() < (shiny ? ECON.goldShiny : ECON.goldPlain) ? 0 : -1;   // Arany hős: a pack első lapja helyén
   return slots.map((rar, si) => {
+    if (si === goldSlot && extra) { const id = setGold[Math.floor(Math.random() * setGold.length)], isNew = owned(id) === 0;
+      const e = p.coll[id] || (p.coll[id] = { n: 0, f: 0 }); e.n++; return { id, foil: false, gold: true, isNew }; }
     if (si === goldSlot) return rollHeroGold(p);
     if (si === heroSlot) return rollHeroFa(p);
     let ids = pool.filter(id => CARD[id].rarity === rar);
     for (const lo of ['l', 'e', 'r', 'k']) { if (ids.length) break; if (order[lo] < order[rar]) ids = pool.filter(id => CARD[id].rarity === lo); }
     let id = ids[Math.floor(Math.random() * ids.length)];
-    const vars = CARDS.filter(v => v.variantOf === id && !v.passOnly && !v.shopOnly && !v.wheelOnly);
+    const vars = CARDS.filter(v => v.variantOf === id && !v.passOnly && !v.shopOnly && !v.wheelOnly && !v.goldVar);
     if (vars.length && Math.random() < VARIANT_CHANCE) id = vars[Math.floor(Math.random() * vars.length)].id;
     if (si === varSlot) id = allVars[Math.floor(Math.random() * allVars.length)].id;
     const foil = (si === faSlot && si !== varSlot) || Math.random() < ECON.foilChance;
@@ -422,7 +425,7 @@ function imgRetry(el) { if (el.dataset.retry === el.src) return; const u = el.sr
 function rollCardSlot(p, rar, foil) {
   const pool = SETS.base.cards.filter(id => CARD[id].rarity === rar);
   let id = pool[Math.floor(Math.random() * pool.length)];
-  const vars = CARDS.filter(v => v.variantOf === id && !v.passOnly && !v.shopOnly && !v.wheelOnly);
+  const vars = CARDS.filter(v => v.variantOf === id && !v.passOnly && !v.shopOnly && !v.wheelOnly && !v.goldVar);
   if (vars.length && Math.random() < VARIANT_CHANCE) id = vars[Math.floor(Math.random() * vars.length)].id;
   foil = foil || Math.random() < ECON.foilChance;
   const isNew = owned(id) === 0 || (foil && !ownsFoil(id));
@@ -716,7 +719,7 @@ function renderShop() {
     <details class="pack-info-more"><summary>Mi van a packokban?</summary>
       <p><b>${SETS.base.name}:</b> 3 véletlen lap a teljes alapkészletből, legalább egy ritka vagy jobb.</p>
       <p><b>🧰 Heti láda:</b> minden hétfőn 0:01-kor jár egy ingyen; ha már kinyitottad, ${CHEST.price} coinért vehetsz még. 10 lap: 1 biztos epikus vagy legendás, 1 biztos Full Art, a többi véletlen. 0,5% eséllyel egy ritka hős-portré is lehet benne.</p>
-      ${TEST_MODE ? `<p><b>${SETS.ah.name}:</b> 3 lap csak az új szettből (${SETS.ah.cards.length} lap), legalább egy ritka vagy jobb. A Shiny változatban a legjobb lap biztosan Full Art. Hős-lap és arany hős nincs benne.</p>` : ''}
+      ${TEST_MODE ? `<p><b>${SETS.ah.name}:</b> 3 lap csak az új szettből (${SETS.ah.cards.length} lap), legalább egy ritka vagy jobb. A Shiny változatban a legjobb lap biztosan Full Art. ★ Arany lap (Isten hozott Amszterdamban, High Hawaiians vagy Game Over aranyban): ${String(ECON.goldPlain * 100).replace('.', ',')}% · Shiny packban ${ECON.goldShiny * 100}%. Hős-lap és arany hős nincs benne.</p>` : ''}
       <p><b>Shiny pack:</b> 3 lap, amiből egy biztosan különleges: Full Art lap, Full Art hős vagy ritka változat-lap. ${ECON.goldShiny * 100}% eséllyel ✦ Arany hős is lehet benne.</p></details>
     ${limited}
     <div class="odds"><div class="lbl">Esélyek laponként</div>
@@ -907,8 +910,8 @@ function goldMote(parent, x, y, tx, ty) {
 // ---- különleges bontás: legendás vagy Full Art lap ----
 async function rareReveal(o, f, c) {
   const leg = !c.hero && CARD[c.id].rarity === 'l', fa = !!c.foil;
-  const vari = !c.hero && !!CARD[c.id].variantOf;
-  const kind = vari && !fa ? 'var' : fa && leg ? 'both' : fa ? 'fa' : 'leg';
+  const vari = !c.hero && !!CARD[c.id].variantOf, goldC = !c.hero && !!CARD[c.id].goldVar;
+  const kind = goldC ? 'leg' : vari && !fa ? 'var' : fa && leg ? 'both' : fa ? 'fa' : 'leg';
   const r = f.getBoundingClientRect(), cx = r.left + r.width / 2, cy = r.top + r.height / 2;
   o.classList.add('rare-dim');
   // 1) a lap megremeg, egyre erősebben izzik, mögötte fénysugarak kezdenek forogni
@@ -936,7 +939,7 @@ async function rareReveal(o, f, c) {
   await sleep(380);
   // 3) bemutató: a lap nagyban középre ugrik, felirattal
   const show = document.createElement('div'); show.className = `rare-show ${kind}`;
-  const label = c.hero ? 'Full Art hős!' : vari ? '✦ Ritka változat!' : kind === 'both' ? 'Legendás · Full Art!' : kind === 'fa' ? 'Full Art!' : 'Legendás!';
+  const label = c.hero ? 'Full Art hős!' : goldC ? '★ Arany lap!' : vari ? '✦ Ritka változat!' : kind === 'both' ? 'Legendás · Full Art!' : kind === 'fa' ? 'Full Art!' : 'Legendás!';
   show.innerHTML = `<div class="rare-rays big ${kind}"></div><div class="rare-card">${pcHTML(c, { big: true, foil: c.foil })}</div>
     <div class="rare-banner">${label}</div><div class="rare-name">${c.hero ? `${HERO[c.hero].name} – Full Art hős` : CARD[c.id].name}${c.isNew ? ' · Új!' : ''}</div>${vari ? `<div class="var-sub">A(z) ${CARD[CARD[c.id].variantOf].name} különleges, ritka kinézete – ugyanúgy játszható</div>` : ''}<div class="op-hint">Koppints a folytatáshoz</div>`;
   o.appendChild(show);

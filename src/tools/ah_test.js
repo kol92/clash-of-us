@@ -11,7 +11,7 @@ const play = (s, side, id, t) => { s.players[side].hand.unshift({ uid: 9000 + Ma
 const T = (s, side, id) => E.targetsFor(s, side, id);
 
 // --- a szett lapjai ---
-const ah = E.CARDS.filter(c => c.set === 'ah' && !c.token);
+const ah = E.CARDS.filter(c => c.set === 'ah' && !c.token && !c.variantOf);
 ok(ah.length === 26, `26 gyűjthető lap az Amszterdam hősei szettben (${ah.length})`);
 const rc = r => ah.filter(c => c.rarity === r).length;
 ok(rc('k') === 13 && rc('r') === 6 && rc('e') === 4 && rc('l') === 3, `ritkaságok 13/6/4/3 (${rc('k')}/${rc('r')}/${rc('e')}/${rc('l')})`);
@@ -154,6 +154,14 @@ ok(rc('k') === 13 && rc('r') === 6 && rc('e') === 4 && rc('l') === 3, `ritkaság
   const s2 = G(); const d0 = s2.players[0].deck.length; play(s2, 0, 'a_welcome', { k: 'none' });
   const add = s2.players[0].deck.length - d0;
   ok(add === 5 && s2.players[0].deck.slice(-99).filter(id => E.CARD[id].set === 'ah').length >= 5 && !s2.players[0].deck.includes('a_welcome'), 'Isten hozott: 5 Amszterdam-lap a pakliba (önmaga nem)'); }
+// --- Arany lapok ---
+{ const g = E.CARDS.filter(c => c.goldVar); ok(g.map(c => c.id).sort().join() === 'a_hawaiians_g,a_welcome_g,f_gameover_g' && g.every(c => c.set === 'ah'), 'Arany lapok: Isten hozott, High Hawaiians, Game Over');
+  const s = G(); const d0 = s.players[0].deck.length; play(s, 0, 'a_hawaiians_g', { k: 'none' });
+  ok(s.players[0].deck.length === d0 + 5, 'Arany High Hawaiians: ugyanaz a hatás (5 gomba)');
+  const s2 = G(); s2.players[0].heroId = 'laci'; U(s2, 1, 0, 'c_vajda'); play(s2, 0, 'f_gameover_g', { k: 'none' });
+  ok(s2.players[0].maxHp === 10 && !s2.players[1].board[0], 'Arany Game Over: ugyanaz a hatás');
+  let inHand = 0; for (let k = 0; k < 20; k++) { const s3 = E.newGame('tomi', { a_welcome_g: 1, ...E.DECK_OF('tomi') }, 'gabi', E.DECK_OF('gabi'), 0, { mulligan: true }); if (s3.players[0].hand.some(h => h.id === 'a_welcome_g')) inHand++; }
+  ok(inHand === 20, 'Arany Isten hozott: ez is mindig a kezdő kézben'); }
 // --- botok nem akadnak el az új lapokkal ---
 { let games = 0, errs = 0;
   const deck = { a_welcome: 1, c_vizipipa: 1, a_trip: 1, c_ppvar: 1, i_lanc: 1, a_csend: 1, i_gomba: 2,  a_irkave: 1, a_suti: 1, l_voros: 1, c_kutya: 1, a_bong: 1, a_repter: 1, c_ah_sasi: 2, c_ah_tomi: 2, c_ah_barna: 1, c_ah_laci: 1, c_ah_ati: 1, c_ah_bence: 1 };

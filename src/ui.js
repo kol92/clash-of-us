@@ -40,7 +40,7 @@ const ui = { mv: null, sel: null, pend: null, drag: null, dragEnd: 0, hero: 'bar
 
 const TYPE = { char:['Karakter','t-char'], item:['Eszköz','t-item'], action:['Akció','t-action'], loc:['Helyszín','t-loc'] };
 const RAR = { k:'Gyakori', r:'Ritka', e:'Epikus', l:'Legendás', g:'Arany', d:'Gyémánt' };
-const rarKey = c => c.diamond ? 'd' : c.rarity;   // a gyémánt lap legendásként számít, de saját jelvénye van
+const rarKey = c => c.diamond ? 'd' : c.goldVar ? 'g' : c.rarity;   // a gyémánt lap legendásként számít, de saját jelvénye van
 // Lapfajták és kulcsszavak magyarázata (koppintásra a lap alatt jelenik meg)
 const TYPE_HELP = {
   char:  ['Karakter', 'Lekerül a táblára egy üres helyre, és ott marad. Minden köröd végén megtámadja a vele szemben állót; ha ott nincs senki, az ellenfél hősét.'],
@@ -107,13 +107,13 @@ function textHTML(c) {
   return parts.join(' ');
 }
 // Keretválasztás egy helyen. Elsőbbség: Kánon esemény → arany → Full Art → alap
-function frameKind(c, o) { return c.finisher ? 'kanon' : o.gold ? 'gold' : o.foil ? 'foil' : 'base'; }
+function frameKind(c, o) { return c.goldVar || o.gold ? 'gold' : c.finisher ? 'kanon' : o.foil ? 'foil' : 'base'; }
 function cardHTML(id, o = {}) {
   const c = CARD[id], cost = o.cost ?? c.cost;
   if (c.foilOnly && !o.foil) o = { ...o, foil: true };   // csak Full Artban létező lap
   const fk = frameKind(c, o);
   const tl = textHTML(c).replace(/<[^>]+>/g, '').length, tlc = tl > 150 ? ' tl-l tl-xl' : tl > 95 ? ' tl-l' : tl > 62 ? ' tl-m' : '';
-  const fcls = fk === 'kanon' ? (o.foil ? ' framed xf xf-kanon xf-kanonfa kholo' : ' framed xf xf-kanon') + tlc : fk === 'foil' ? ' foil' : ' framed' + tlc;
+  const fcls = fk === 'gold' ? ' framed xf xf-gold gold' + tlc : fk === 'kanon' ? (o.foil ? ' framed xf xf-kanon xf-kanonfa kholo' : ' framed xf xf-kanon') + tlc : fk === 'foil' ? ' foil' : ' framed' + tlc;
   return `<div class="card ${TYPE[c.type][1]}${c.finisher ? ' kanon' : ''}${c.variantOf ? ' variant' : ''}${c.diamond ? ' diamond' : ''}${o.big ? ' big' : ''}${fcls}${o.cls ? ' ' + o.cls : ''}" style="--h:${hueOf(id)}" ${o.big ? `data-rar="${rarKey(c)}"` : ''} ${o.attrs || ''}>
     <div class="cframe">
       ${ART[id] && ART[id].fit && o.foil ? `<div class="art has-art fit" style="${artStyle(id, o.big)}--fit:${ART[id].fit};--fit-top:${ART[id].fitTop || '8%'}"><i class="art-blur"></i><i class="art-fit">${o.big && ART[id].vid ? artVidHTML(id) : ''}</i></div>`
@@ -122,7 +122,7 @@ function cardHTML(id, o = {}) {
       <div class="ctype">${c.finisher ? '<i class="ic-kanon" aria-hidden="true"></i>Kánon esemény' : TYPE[c.type][0]}${c.drink ? ' · Ital' : ''}<i class="rar r-${rarKey(c)}" title="${RAR[rarKey(c)]}"></i></div>
       ${c.finisher && c.hero ? `<i class="kanon-hero" title="${HERO[c.hero].name}" style="--h:${HERO[c.hero].hue};${ART[c.hero] ? `background-image:url('${artSrc(c.hero, false)}');background-position:${ART[c.hero].av || '50% 15%'}` : ''}">${ART[c.hero] ? '' : initials(HERO[c.hero].name)}</i>` : ''}
       ${c.type !== 'char' && !o.big && !c.finisher ? `<div class="tribbon">${TYPE[c.type][0]}${c.drink ? '<i class="drk">Ital</i>' : ''}</div>` : ''}
-      <div class="name${c.name.length > 16 ? ' long' : ''}${longWord(c.name) > 11 ? ' xl' : ''}">${c.name}</div>${c.diamond ? (o.big ? '<i class="var-ribbon dia"><b>💎 Gyémánt lap</b><span>💎 Gyémánt</span></i>' : '') : c.variantOf ? '<i class="var-ribbon"><b>✦ Ritka variáns</b><span>✦ Variáns</span></i>' : ''}${c.diamond ? '<i class="dia-spark" aria-hidden="true"></i>' : ''}
+      <div class="name${c.name.length > 16 ? ' long' : ''}${longWord(c.name) > 11 ? ' xl' : ''}">${c.name}</div>${c.diamond ? (o.big ? '<i class="var-ribbon dia"><b>💎 Gyémánt lap</b><span>💎 Gyémánt</span></i>' : '') : c.goldVar ? '<i class="var-ribbon goldr"><b>★ Arany lap</b><span>★ Arany</span></i><i class="gold-dust"></i>' : c.variantOf ? '<i class="var-ribbon"><b>✦ Ritka variáns</b><span>✦ Variáns</span></i>' : ''}${c.diamond ? '<i class="dia-spark" aria-hidden="true"></i>' : ''}
       <div class="txt"><span>${textHTML(c)}</span></div>
     </div>
     ${o.big ? `<div class="ctype-below">${c.finisher ? '<i class="ic-kanon" aria-hidden="true"></i>Kánon esemény' : TYPE[c.type][0]}${c.drink ? ' · Ital' : ''}</div>` : ''}
@@ -279,6 +279,9 @@ const ART = {
   a_trip:      { src:'art/ah_trip.webp', av:'50% 22%', pos:'50% 25%' },
   a_repter:    { src:'art/ah_repter.webp', av:'68% 18%', pos:'62% 22%' },
   a_welcome:   { src:'art/ah_welcome.webp', av:'50% 55%', pos:'50% 50%' },
+  a_welcome_g: { src:'art/ah_welcome_g.webp', av:'50% 55%', pos:'50% 50%' },
+  a_hawaiians_g:{ src:'art/ah_hawaiians_g.webp', av:'50% 45%', pos:'50% 45%' },
+  f_gameover_g:{ src:'art/ah_gameover_g.webp', av:'50% 40%', pos:'50% 40%' },
   c_ppvar:     { src:'art/ah_ppvar.webp', av:'47% 20%', pos:'47% 22%' },
   a_legeny: { src:'art/legeny.webp', pos:'50% 35%' },
   a_kitiltva: { src:'art/kitiltva.webp', pos:'50% 35%' },
@@ -525,6 +528,7 @@ $('#collBody').onclick = e => {
   if (hg && ownsHeroGold(hg.dataset.hgold) && heroSkins(hg.dataset.hgold).length > 1) return skinModal(hg.dataset.hgold);
   if (hg) { const hid = hg.dataset.hgold; openModal(heroCardHTML(HERO[hid], { big: true, gold: true }), ownsHeroGold(hid) ? '✦ Arany hős · a tiéd!' : `✦ Arany hős · boosterből ${ECON.goldPlain * 100}%, Shiny boosterből ${ECON.goldShiny * 100}% eséllyel`); return; }
   if (c) { const id = c.dataset.card, e = Store.p?.coll[id] || { n: 0, f: 0 };
+    if (CARD[id].goldVar) return collCardModal(id, `★ Arany lap: a(z) ${CARD[CARD[id].variantOf].name} arany kinézete – ugyanúgy játszható, ugyanaz a hatása · ${e.n + e.f} db · Amszterdam hősei boosterből (0,5%, Shiny packból 5%)`, null);
     if (CARD[id].variantOf) return collCardModal(id, `✦ Ritka változat: a(z) ${CARD[CARD[id].variantOf].name} különleges kinézete – ugyanúgy játszható, ugyanaz a hatása · ${e.n + e.f} db${CARD[id].passOnly ? ' · csak a Season Passból' : CARD[id].shopOnly ? (CARD[id].until ? ' · korábban a Boltban volt kapható' : ` · csak a Boltban kapható (${CARD[id].price || 100} coin)`) : !e.n && !e.f ? ' · Shiny boosterből szerezhető' : ''}`, null);
     collCardModal(id); }
   if (h) openModal(heroCardHTML(HERO[h.dataset.hcard], { big: true, foil: ui.foil }), ui.foil ? (ownsHeroFa(h.dataset.hcard) ? 'Full Art hős' : 'Full Art hős · boosterből szerezhető') : 'Hős');

@@ -11,6 +11,11 @@
 ## Lapképek
 - **Mind a 26 lapnak és a Betti tokennek van képe (2026-10-17: új kép a Végtelen tripnek, a Reptéri ellenőrzés is megkapta a sajátját – addig tévesen képesnek írtam).** A Bong drágább példányai (`a_bong2…10`) ugyanazt a képet kapják.
 
+## Arany lapok (2026-10-17)
+- Három lapnak van **★ Arany** változata (külön kép, arany keret, „★ Arany lap” szalag, ugyanaz a hatás): **Isten hozott Amszterdamban** (a_welcome_g), **High Hawaiians** (a_hawaiians_g), **Game Over** (f_gameover_g – arany keretben, nem a piros Kánon-keretben).
+- Csak az Amszterdam hősei boosterből: a pack első lapja helyén **0,5%** (sima) / **5%** (Shiny) eséllyel, mint a Base set arany hősei (`ECON.goldPlain` / `goldShiny`). Mérve 20 000 bontásból: 0,52% / 4,86%; Base set packba nem kerül. A sima 20%-os változat-esély és a Shiny változat-hely nem adja (`goldVar` kizárva).
+- Pakliban az alaplappal együtt számít (2-es, Game Overnél 1-es korlát), nem cserélhető. Motor: `variantOf` + `goldVar`; az akciók hatása mostantól az alaplap szerint fut (`switch (bid(c.id))`). Felfedés: „★ Arany lap!”.
+
 ## Új kulcsszavak
 - **Igézhetetlen** (`elusive`): akcióval és más lapok kijátszáskori hatásával nem célozható – se a gazdája, se az ellenfél (Dinnyés, Ír kávé, Vera, Zsibrita, Reptéri ellenőrzés stb.). A véletlen célzású hatások kihagyják (Alekosz, Molnár Zsolti, Koktélarmageddon, Tomi, a parti lelke, Among Us, Cápa érkezése). **Eszköz rátehető** (saját és ellenséges is, Tomi döntése). A mindenkit érő hatások eltalálják (Tálca shot, JBL, Nyiti, Mosh Pit, Game Over). Jel a lapon: 🛡.
 - **Feltámadás** (`revive`, ugyanaz a mechanika, mint Gabi, a legyőzhetetlen): amikor először meghal, 1 élettel feléled a helyén (az eszközei lekerülnek); másodszorra végleg meghal. Jel: ♻.

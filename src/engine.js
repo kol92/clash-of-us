@@ -155,6 +155,8 @@ const CARDS = [
   { id:'l_munkahely', type:'loc', name:'Munkahely', cost:0, rarity:'l', token:true, text:'A gazdája lapjai 1-gyel olcsóbbak, az ellenfeléi 1-gyel drágábbak. Ha eltűnik, a gazdája 5 életet gyógyul.' },
   { id:'l_korhaz', type:'loc', name:'Siófoki Kórház', cost:1, rarity:'k', text:'Minden karakter 1 életet gyógyul a gazdája körének végén.' },
 ];
+/* Arany lapok (Amszterdam hősei, 2026-10-17): az alaplap arany változata – ugyanaz a hatás, csak boosterből (0,5% / Shiny 5%) */
+for (const b of ['a_welcome', 'a_hawaiians', 'f_gameover']) CARDS.push({ ...CARDS.find(c => c.id === b), id:b + '_g', variantOf:b, goldVar:true });
 /* Bong (Amszterdam hősei): minden továbbadáskor 1-gyel drágább token-példány (legfeljebb 10) */
 for (let n = 2; n <= 10; n++) CARDS.push({ ...CARDS.find(c => c.id === 'a_bong'), id:'a_bong' + n, cost:n, bong:n, token:true, rarity:'r' });
 const CARD = Object.fromEntries(CARDS.map(c => [c.id, c]));
@@ -540,7 +542,7 @@ function playCard(s, pi, hi, t) {
       ev(s, { t:'bong', side:ei, i:-1, n:CARD[nx].cost });
       addToHand(s, ei, nx);
     }
-    switch (c.id) {
+    switch (bid(c.id)) {   /* változat-lap (pl. arany) = az alaplap hatása */
       case 'a_dinnyes': if (t.k === 'hero') damageHero(s, ei, 3); else damageUnit(s, ei, t.i, 3); break;
       case 'a_gyros': {
         const n = p.hand.length;
