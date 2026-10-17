@@ -87,3 +87,31 @@ Megjegyzés: a bot a helyzeti lapokat (helyszínek, Süti, Utcai füst, Bong, a 
 - `tools/ah_test.js` – minden új lap és kulcsszó (45 ellenőrzés + 60 bot-meccs az új lapokkal).
 - Teszt oldal: `src/deploy-test.sh` (a `teszt` ágon). A teszt mód (`TEST_MODE`, ui.js eleje): az éles profil másolatával indul, csak helyben ment, a felhő-kapcsolat (`Store.db`) le van választva, PvP / barátok / ranked tiltva; a lila sávban „+1000 coin” és „Újramásolás”.
 - **Teljes gyűjtemény teszteléshez (2026-10-17):** a teszt oldalon a `TEST_ALL_CARDS` listán lévő profilnevek (most: **Btppictures**) minden betöltéskor megkapják az összes gyűjthető lapot (legendásból 1, a többiből 2 példány, bolti / Pass / event / változat lapokkal együtt). Csak a teszt oldal helyi másolatát érinti. Kód: `testGrantAll` (meta.js).
+
+## Nagy mérés (2026-10-17, ~68 000 meccs, `tools/bigsim.js` + `tools/pt.js`)
+**1. Hősök a kezdőpaklijukkal** (hősönként 2400 meccs, ±2%) – éles motor → teszt motor: Barna 47,0→48,3 · Bence 49,3→49,2 · Gabi 49,2→51,5 · Krisz 50,3→48,8 · Laci 49,5→47,7 · Tomi 53,1→53,8 · Dávid 48,5→51,3 · Milo 53,5→53,2 · Sasi 48,7→48,2. Mind a 47–54% sávban; az Amszterdam-motorváltozások a mostani játékot nem borítják (az eltérések a mérési zajon belül vannak).
+
+**2. Hősök változatos paklikkal** (paklisegéd a lapkészlet véletlen 75%-ából, hősönként ~800 meccs, ±3,5%) – Amszterdammal / nélküle: Tomi 58,1/55,6 · Barna 55,1/52,6 · Bence 52,1/51,1 · Gabi 51,9/54,8 · Milo 51,9/50,9 · Sasi 50,8/53,1 · Krisz 46,4/48,5 · Laci 43,6/44,1 · Dávid 40,1/39,3. A szett nem tolja el a hősöket; Dávid és Laci a szettől függetlenül gyenge a „nem kezdőpaklis” paklikkal (a hős-képességük a kezdőpakli lapjaira épít).
+A paklisegéd a szettből szinte csak az epikus/legendás lapokat választja (PP 29%, vízipipa 28%, Végtelen trip 18% a paklik közül) – a gyakoriakat a ritkaság-súlyozás miatt alig.
+
+**3. „Csak Amszterdam” pakli** (a szett + Kánon, a kezdőpaklik ellen): 16–34% – a szett magában nem pakli, a Base set lapjaival keverve működik (ez egy 25 lapos mini-szettnél várható).
+
+**4. Lapok egyenként** (2000 meccs/lap, ±2,2%; sáv 47–54%)
+| Lap | % | | Lap | % |
+|---|---|---|---|---|
+| Game Over | **60,0** túl erős | | Ír kávé | 44,4 |
+| Bence, A. terrorja | **57,5** erős | | Ír reggeli | 42,6 |
+| Laci, A. hőse | **55,9** erős | | Süti | 42,4 |
+| Reptéri ellenőrzés | **55,8** erős | | Börtönlánc | 41,4* |
+| Ati, A. hőse | 54,0 | | High Hawaiians | 40,8* |
+| Sasi, A. hőse | 50,5 | | Utcai füst | 40,4* |
+| PP, a váratlan | 49,5 | | Bong | 39,9* |
+| Végtelen trip | 49,5 | | Elfekvő | 39,8* |
+| Drog kereső kutya | 48,7 | | Vöröslámpás negyed | 39,6* |
+| Varázsgomba | 48,7 | | Coffee Shop | 38,8* |
+| Barna, A. hőse | 48,6 | | Barna vízipipája | 43,5* |
+| Csend a vihar előtt | 48,0 | | | |
+| Cigi | 47,2 | | | |
+| Tomi, A. hőse | 45,2 | | | |
+Viszonyítás (régi lapok, ugyanígy mérve): Vajda 50,3 · Tubi 51,4 · Dinnyés 50,5 · Kancsó 48,5 · Csattogós lepke 48,4 · Gyuri 48,0 · Udvarhelyi 47,7 · Akácfa söröző 41,9.
+\* A botok ezeket rosszul játsszák (helyszín, késleltetett vagy helyzeti hatás) – a régi Akácfa is 41,9-et hoz ugyanígy, tehát ezek élőben valószínűleg rendben vannak.
