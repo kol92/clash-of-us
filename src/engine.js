@@ -83,6 +83,7 @@ const CARDS = [
   { id:'c_vizipipa', set:'ah', type:'char', name:'Barna vízipipája', cost:1, atk:0, hp:2, rarity:'e', enemySide:true, noAttack:true, text:'Az ellenfél oldalára teszed le. Nem támad. Amelyik karakter elpusztítja, +2/+2-t kap.' },
   { id:'a_trip', set:'ah', type:'action', name:'Végtelen trip', cost:3, tgt:'own', rarity:'l', opts:['Múltba: visszakapja a lerakáskori értékeit', 'Jövőbe: egy körre eltűnik, és +3/+3-mal tér vissza'], text:'Egy karakteredet elküldöd a múltba (visszakapja a lerakáskori értékeit, minden más hatás lekerül róla) vagy a jövőbe (eltűnik, a következő köröd elején +3/+3-mal visszatér; ha nincs hely, végleg eltűnik).' },
   { id:'c_ppvar', set:'ah', type:'char', name:'PP, a váratlan', cost:2, atk:3, hp:1, rarity:'e', sneak:true, text:'Ha egy karakter megtámadja, 2-vel kisebb sebzést okoz neki.' },
+  { id:'a_welcome', set:'ah', type:'action', name:'Isten hozott Amszterdamban', cost:1, tgt:'none', rarity:'k', openingHand:true, text:'Keverj öt véletlen Amszterdam hősei lapot a paklidba. Mindig a kezdő kezedben van (hacsak le nem cseréled).' },
   { id:'c_ah_sasi', set:'ah', type:'char', name:'Sasi, Amszterdam hőse', cost:4, atk:2, hp:6, rarity:'k', haste:true, text:'' },
   { id:'c_ah_tomi', set:'ah', type:'char', name:'Tomi, Amszterdam hőse', cost:3, atk:1, hp:4, rarity:'k', elusive:true, text:'' },
   { id:'c_ah_barna', set:'ah', type:'char', name:'Barna, Amszterdam hőse', cost:3, atk:3, hp:2, rarity:'k', text:'Kijátszáskor keverj egy Varázsgomba lapot a paklidba.' },
@@ -254,6 +255,7 @@ function newGame(h0, d0, h1, d1, first, opt = {}) {
   const s = { players:[makePlayer(h0,d0), makePlayer(h1,d1)], active:first, half:0, location:null,
               uidc:0, events:[], winner:null, reason:null,
               foilCnt: [0, 1].map(k => ({ ...((opt.foils || [])[k] || {}) })) };   // Full Art példányok száma lapfajtánként (az első húzott példányok csillognak)
+  for (const P of s.players) { const k = P.deck.findIndex(id => CARD[id] && CARD[id].openingHand); if (k >= 0) P.deck.push(P.deck.splice(k, 1)[0]); }   /* Isten hozott Amszterdamban: mindig a kezdő kézben */
   for (let k = 0; k < 4; k++) { draw(s, 0); draw(s, 1); }
   s.events = [];
   if (opt.mulligan) { s.phase = 'mulligan'; s.mulled = [false, false]; return s; }
@@ -587,6 +589,10 @@ function playCard(s, pi, hi, t) {
           Object.assign(u, { atk:c0.atk, hp:c0.hp, maxHp:c0.hp, items:[], foe:[], temp:0, stun:0, shield:!!c0.shield, haste:!!c0.haste, doom:false, hangover:false, muscle:false, taunt:false, invis:false, elusive:false, noKw:false });
           delete u.boon; ev(s, { t:'past', side:pi, i:t.i }); }
         break; }
+      case 'a_welcome': {   /* öt véletlen Amszterdam hősei lap a pakliba (önmaga és a tokenek nélkül) */
+        const pool = CARDS.filter(x => x.set === 'ah' && !x.token && !x.variantOf && x.id !== 'a_welcome').map(x => x.id);
+        for (let k = 0; k < 5; k++) p.deck.push(pool[Math.floor(rnd() * pool.length)]);
+        shuffle(p.deck); p.welc = (p.welc || 0) + 5; ev(s, { t:'welcome', side:pi, i:-1, n:5 }); if (CARD.a_welcome.drawN) for (let k = 0; k < CARD.a_welcome.drawN; k++) draw(s, pi); break; }
       case 'a_irreggeli': healHero(s, pi, 999); healHero(s, ei, 999); break;
       case 'a_utcaifust': {   /* minden saját karakter rejtett lesz és összekeverednek (a zárt és a Cápás helyek kimaradnak) */
         const L = []; for (let j = 0; j < LANES; j++) if (!closedLane(s, pi, j) && !isFixed(p.board[j])) L.push(j);
@@ -1078,6 +1084,7 @@ function evalState(s, me) {
     if (x && (!u || isInv(u) || x.id === 'c_nyiti') && !x.stun && !CARD[x.id].noAttack) v -= effAtk(s, other(me), i) * 0.8;
   }
   v += P.hand.length * 0.6 - E.hand.length * 0.3 + (P.espresso || 0) * 0.55;
+  v += (P.welc || 0) * 0.3;   /* Isten hozott Amszterdamban: a paklidba kevert lapok */
   for (const f of P.future || []) v += ((f.u.atk + 3) * 1.1 + (f.u.hp + 3) * 0.9) * 0.8;   /* Végtelen trip: a jövőben váró karakter */
   for (const h of P.hand) if (CARD[h.id].bong) v -= CARD[h.id].cost * 1.0 + 0.6;   /* Bong: forró krumpli – nálam maradva sebez */
   for (const h of E.hand) if (CARD[h.id].bong) v += CARD[h.id].cost * 0.7 + 0.3;   // Espresso Martini: a jövő körben érkező lapok

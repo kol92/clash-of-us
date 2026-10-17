@@ -12,9 +12,9 @@ const T = (s, side, id) => E.targetsFor(s, side, id);
 
 // --- a szett lapjai ---
 const ah = E.CARDS.filter(c => c.set === 'ah' && !c.token);
-ok(ah.length === 25, `25 gyűjthető lap az Amszterdam hősei szettben (${ah.length})`);
+ok(ah.length === 26, `26 gyűjthető lap az Amszterdam hősei szettben (${ah.length})`);
 const rc = r => ah.filter(c => c.rarity === r).length;
-ok(rc('k') === 12 && rc('r') === 6 && rc('e') === 4 && rc('l') === 3, `ritkaságok 12/6/4/3 (${rc('k')}/${rc('r')}/${rc('e')}/${rc('l')})`);
+ok(rc('k') === 13 && rc('r') === 6 && rc('e') === 4 && rc('l') === 3, `ritkaságok 13/6/4/3 (${rc('k')}/${rc('r')}/${rc('e')}/${rc('l')})`);
 
 // --- Varázsgomba: halmozódik ---
 { const s = G(); const u = U(s, 0, 1, 'c_vajda');
@@ -144,9 +144,19 @@ ok(rc('k') === 12 && rc('r') === 6 && rc('e') === 4 && rc('l') === 3, `ritkaság
   const s2 = G(); U(s2, 1, 0, 'c_ppvar'); U(s2, 0, 0, 'c_vajda'); E.runEndTurn(s2);
   ok(!s2.players[1].board[0], 'PP: a 3 támadású Vajda megöli (3−2=1)');
   ok(E.CARD.c_ppvar.sneak, 'PP: Sunyulás'); }
+// --- Isten hozott Amszterdamban ---
+{ let inHand = 0; for (let g = 0; g < 50; g++) { const s = E.newGame('tomi', { a_welcome: 1, ...E.DECK_OF('tomi') }, 'gabi', E.DECK_OF('gabi'), g % 2, { mulligan: true });
+    if (s.players[0].hand.some(h => h.id === 'a_welcome')) inHand++; }
+  ok(inHand === 50, `Isten hozott: mindig a kezdő kézben (${inHand}/50)`);
+  const s = E.newGame('tomi', { a_welcome: 1, ...E.DECK_OF('tomi') }, 'gabi', E.DECK_OF('gabi'), 0, { mulligan: true });
+  const k = s.players[0].hand.findIndex(h => h.id === 'a_welcome'); E.mulligan(s, 0, [k]);
+  ok(!s.players[0].hand.some(h => h.id === 'a_welcome') && s.players[0].deck.includes('a_welcome'), 'Isten hozott: lecserélve visszamegy a pakliba');
+  const s2 = G(); const d0 = s2.players[0].deck.length; play(s2, 0, 'a_welcome', { k: 'none' });
+  const add = s2.players[0].deck.length - d0;
+  ok(add === 5 && s2.players[0].deck.slice(-99).filter(id => E.CARD[id].set === 'ah').length >= 5 && !s2.players[0].deck.includes('a_welcome'), 'Isten hozott: 5 Amszterdam-lap a pakliba (önmaga nem)'); }
 // --- botok nem akadnak el az új lapokkal ---
 { let games = 0, errs = 0;
-  const deck = { c_vizipipa: 1, a_trip: 1, c_ppvar: 1, i_lanc: 1, a_csend: 1, i_gomba: 2, i_cigi: 1, a_irkave: 1, a_suti: 1, l_voros: 1, c_kutya: 1, a_bong: 1, a_repter: 1, c_ah_sasi: 2, c_ah_tomi: 2, c_ah_barna: 1, c_ah_laci: 1, c_ah_ati: 1, c_ah_bence: 1 };
+  const deck = { a_welcome: 1, c_vizipipa: 1, a_trip: 1, c_ppvar: 1, i_lanc: 1, a_csend: 1, i_gomba: 2,  a_irkave: 1, a_suti: 1, l_voros: 1, c_kutya: 1, a_bong: 1, a_repter: 1, c_ah_sasi: 2, c_ah_tomi: 2, c_ah_barna: 1, c_ah_laci: 1, c_ah_ati: 1, c_ah_bence: 1 };
   for (let g = 0; g < 60; g++) { try { const s = E.newGame('tomi', deck, 'gabi', E.DECK_OF('gabi'), g % 2); let n = 0;
     while (s.winner == null && n++ < 200) { let m = 0, c; while (s.winner == null && m++ < 15 && (c = E.botChoose(s))) E.playCard(s, s.active, c.hi, c.t); if (s.winner == null) E.runEndTurn(s); }
     games++; } catch (e) { errs++; if (errs < 3) console.log(e.stack.split('\n').slice(0, 3).join(' | ')); } }

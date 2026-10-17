@@ -278,6 +278,7 @@ const ART = {
   c_vizipipa:  { src:'art/ah_vizipipa.webp', av:'48% 25%', pos:'45% 28%' },
   a_trip:      { src:'art/ah_trip.webp', av:'50% 22%', pos:'50% 25%' },
   a_repter:    { src:'art/ah_repter.webp', av:'68% 18%', pos:'62% 22%' },
+  a_welcome:   { src:'art/ah_welcome.webp', av:'50% 55%', pos:'50% 50%' },
   c_ppvar:     { src:'art/ah_ppvar.webp', av:'47% 20%', pos:'47% 22%' },
   a_legeny: { src:'art/legeny.webp', pos:'50% 35%' },
   a_kitiltva: { src:'art/kitiltva.webp', pos:'50% 35%' },
@@ -740,6 +741,7 @@ function logEvents(evs, snap) {
       case 'futureback': L(`🌀 <b class="lc" data-lc="${e.id}">${escH(CARD[e.id].name)}</b> visszatért a jövőből: +3/+3`); break;
       case 'futuregone': L(`🌀 <b class="lc" data-lc="${e.id}">${escH(CARD[e.id].name)}</b> nem talált helyet – végleg a jövőben maradt`); break;
       case 'past': L(`🌀 ${unitName(e.side, e.i)} a múltba utazott: visszakapta a lerakáskori értékeit`); break;
+      case 'welcome': L(`🌷 ${who(e.side)} paklijába 5 véletlen Amszterdam hősei lap került`); break;
       case 'chain': L(`⛓ ${unitName(e.side, e.i)}: Börtönlánc, 1 sebzés`); break;
       case 'smoke': L(`💨 Utcai füst: ${e.side === ME ? 'a karaktereid' : 'az ellenfél karakterei'} elrejtőztek és összekeveredtek`); break;
       case 'gameover': L(`💀 GAME OVER: ${who(e.side)} maximum élete 10 lett – az ellenfél összes karaktere elpusztul, a hőse 5 sebzést kap`); break;
@@ -925,6 +927,7 @@ async function animateEvents(evs) {
       case 'future': floatAt(anchor, '🌀 A jövőbe!', 'info'); hold = Math.max(hold, 800); break;
       case 'futureback': floatAt(anchor, '🌀 Vissza! +3/+3', 'buff'); hold = Math.max(hold, 800); break;
       case 'past': floatAt(anchor, '🌀 A múltba!', 'info'); hold = Math.max(hold, 800); break;
+      case 'welcome': floatAt(anchor, '🌷 +5 Amszterdam-lap a pakliba!', 'info'); hold = Math.max(hold, 900); break;
       case 'chain': floatAt(anchor, '⛓', 'dmg'); hold = Math.max(hold, 350); break;
       case 'smoke': floatAt(anchor, '💨 Utcai füst!', 'info'); hold = Math.max(hold, 800); break;
       case 'gameover': floatAt(anchor, '💀 GAME OVER', 'dmg'); hold = Math.max(hold, 1000); break;

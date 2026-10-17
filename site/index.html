@@ -2335,7 +2335,7 @@ body.pf-loading #scr-menu .pb-name::after{content:'';display:inline-block;width:
 <script src="vendor/firebase-auth-compat.js"></script>
 <script src="vendor/firebase-firestore-compat.js"></script>
 <script src="vendor/firebase-database-compat.js"></script>
-<script>window.APP_VERSION = "2026.10.16-2353"; window.APP_BUILD = "2026.10.17-1640";</script>
+<script>window.APP_VERSION = "2026.10.17-1649"; window.APP_BUILD = "2026.10.17-1649";</script>
 <script>// ===== Best of Us – saját szerver (Firebase) =====
 // A játék eredetileg a Claude-os tárolót használta (window.claude.use('db' | 'user' | 'room')).
 // Ez a fájl ugyanazt a felületet adja Firebase-ből, így a játék kódja szinte változatlan maradhat:
@@ -2670,6 +2670,7 @@ const CARDS = [
   { id:'c_vizipipa', set:'ah', type:'char', name:'Barna vízipipája', cost:1, atk:0, hp:2, rarity:'e', enemySide:true, noAttack:true, text:'Az ellenfél oldalára teszed le. Nem támad. Amelyik karakter elpusztítja, +2/+2-t kap.' },
   { id:'a_trip', set:'ah', type:'action', name:'Végtelen trip', cost:3, tgt:'own', rarity:'l', opts:['Múltba: visszakapja a lerakáskori értékeit', 'Jövőbe: egy körre eltűnik, és +3/+3-mal tér vissza'], text:'Egy karakteredet elküldöd a múltba (visszakapja a lerakáskori értékeit, minden más hatás lekerül róla) vagy a jövőbe (eltűnik, a következő köröd elején +3/+3-mal visszatér; ha nincs hely, végleg eltűnik).' },
   { id:'c_ppvar', set:'ah', type:'char', name:'PP, a váratlan', cost:2, atk:3, hp:1, rarity:'e', sneak:true, text:'Ha egy karakter megtámadja, 2-vel kisebb sebzést okoz neki.' },
+  { id:'a_welcome', set:'ah', type:'action', name:'Isten hozott Amszterdamban', cost:1, tgt:'none', rarity:'k', openingHand:true, text:'Keverj öt véletlen Amszterdam hősei lapot a paklidba. Mindig a kezdő kezedben van (hacsak le nem cseréled).' },
   { id:'c_ah_sasi', set:'ah', type:'char', name:'Sasi, Amszterdam hőse', cost:4, atk:2, hp:6, rarity:'k', haste:true, text:'' },
   { id:'c_ah_tomi', set:'ah', type:'char', name:'Tomi, Amszterdam hőse', cost:3, atk:1, hp:4, rarity:'k', elusive:true, text:'' },
   { id:'c_ah_barna', set:'ah', type:'char', name:'Barna, Amszterdam hőse', cost:3, atk:3, hp:2, rarity:'k', text:'Kijátszáskor keverj egy Varázsgomba lapot a paklidba.' },
@@ -2841,6 +2842,7 @@ function newGame(h0, d0, h1, d1, first, opt = {}) {
   const s = { players:[makePlayer(h0,d0), makePlayer(h1,d1)], active:first, half:0, location:null,
               uidc:0, events:[], winner:null, reason:null,
               foilCnt: [0, 1].map(k => ({ ...((opt.foils || [])[k] || {}) })) };   // Full Art példányok száma lapfajtánként (az első húzott példányok csillognak)
+  for (const P of s.players) { const k = P.deck.findIndex(id => CARD[id] && CARD[id].openingHand); if (k >= 0) P.deck.push(P.deck.splice(k, 1)[0]); }   /* Isten hozott Amszterdamban: mindig a kezdő kézben */
   for (let k = 0; k < 4; k++) { draw(s, 0); draw(s, 1); }
   s.events = [];
   if (opt.mulligan) { s.phase = 'mulligan'; s.mulled = [false, false]; return s; }
@@ -3174,6 +3176,10 @@ function playCard(s, pi, hi, t) {
           Object.assign(u, { atk:c0.atk, hp:c0.hp, maxHp:c0.hp, items:[], foe:[], temp:0, stun:0, shield:!!c0.shield, haste:!!c0.haste, doom:false, hangover:false, muscle:false, taunt:false, invis:false, elusive:false, noKw:false });
           delete u.boon; ev(s, { t:'past', side:pi, i:t.i }); }
         break; }
+      case 'a_welcome': {   /* öt véletlen Amszterdam hősei lap a pakliba (önmaga és a tokenek nélkül) */
+        const pool = CARDS.filter(x => x.set === 'ah' && !x.token && !x.variantOf && x.id !== 'a_welcome').map(x => x.id);
+        for (let k = 0; k < 5; k++) p.deck.push(pool[Math.floor(rnd() * pool.length)]);
+        shuffle(p.deck); p.welc = (p.welc || 0) + 5; ev(s, { t:'welcome', side:pi, i:-1, n:5 }); if (CARD.a_welcome.drawN) for (let k = 0; k < CARD.a_welcome.drawN; k++) draw(s, pi); break; }
       case 'a_irreggeli': healHero(s, pi, 999); healHero(s, ei, 999); break;
       case 'a_utcaifust': {   /* minden saját karakter rejtett lesz és összekeverednek (a zárt és a Cápás helyek kimaradnak) */
         const L = []; for (let j = 0; j < LANES; j++) if (!closedLane(s, pi, j) && !isFixed(p.board[j])) L.push(j);
@@ -3665,6 +3671,7 @@ function evalState(s, me) {
     if (x && (!u || isInv(u) || x.id === 'c_nyiti') && !x.stun && !CARD[x.id].noAttack) v -= effAtk(s, other(me), i) * 0.8;
   }
   v += P.hand.length * 0.6 - E.hand.length * 0.3 + (P.espresso || 0) * 0.55;
+  v += (P.welc || 0) * 0.3;   /* Isten hozott Amszterdamban: a paklidba kevert lapok */
   for (const f of P.future || []) v += ((f.u.atk + 3) * 1.1 + (f.u.hp + 3) * 0.9) * 0.8;   /* Végtelen trip: a jövőben váró karakter */
   for (const h of P.hand) if (CARD[h.id].bong) v -= CARD[h.id].cost * 1.0 + 0.6;   /* Bong: forró krumpli – nálam maradva sebez */
   for (const h of E.hand) if (CARD[h.id].bong) v += CARD[h.id].cost * 0.7 + 0.3;   // Espresso Martini: a jövő körben érkező lapok
@@ -4031,6 +4038,7 @@ const ART = {
   c_vizipipa:  { src:'art/ah_vizipipa.webp?v=cd934c18ca0611ef', av:'48% 25%', pos:'45% 28%' },
   a_trip:      { src:'art/ah_trip.webp?v=bc0de13aa9c6b06b', av:'50% 22%', pos:'50% 25%' },
   a_repter:    { src:'art/ah_repter.webp?v=7aa54c1b30ce3ae7', av:'68% 18%', pos:'62% 22%' },
+  a_welcome:   { src:'art/ah_welcome.webp?v=b8d4a58c705f8e2c', av:'50% 55%', pos:'50% 50%' },
   c_ppvar:     { src:'art/ah_ppvar.webp?v=3868b4c453890b34', av:'47% 20%', pos:'47% 22%' },
   a_legeny: { src:'art/legeny.webp?v=dbe9eb70b7fbc278', pos:'50% 35%' },
   a_kitiltva: { src:'art/kitiltva.webp?v=bbd4b6f44fd618bf', pos:'50% 35%' },
@@ -4493,6 +4501,7 @@ function logEvents(evs, snap) {
       case 'futureback': L(`🌀 <b class="lc" data-lc="${e.id}">${escH(CARD[e.id].name)}</b> visszatért a jövőből: +3/+3`); break;
       case 'futuregone': L(`🌀 <b class="lc" data-lc="${e.id}">${escH(CARD[e.id].name)}</b> nem talált helyet – végleg a jövőben maradt`); break;
       case 'past': L(`🌀 ${unitName(e.side, e.i)} a múltba utazott: visszakapta a lerakáskori értékeit`); break;
+      case 'welcome': L(`🌷 ${who(e.side)} paklijába 5 véletlen Amszterdam hősei lap került`); break;
       case 'chain': L(`⛓ ${unitName(e.side, e.i)}: Börtönlánc, 1 sebzés`); break;
       case 'smoke': L(`💨 Utcai füst: ${e.side === ME ? 'a karaktereid' : 'az ellenfél karakterei'} elrejtőztek és összekeveredtek`); break;
       case 'gameover': L(`💀 GAME OVER: ${who(e.side)} maximum élete 10 lett – az ellenfél összes karaktere elpusztul, a hőse 5 sebzést kap`); break;
@@ -4678,6 +4687,7 @@ async function animateEvents(evs) {
       case 'future': floatAt(anchor, '🌀 A jövőbe!', 'info'); hold = Math.max(hold, 800); break;
       case 'futureback': floatAt(anchor, '🌀 Vissza! +3/+3', 'buff'); hold = Math.max(hold, 800); break;
       case 'past': floatAt(anchor, '🌀 A múltba!', 'info'); hold = Math.max(hold, 800); break;
+      case 'welcome': floatAt(anchor, '🌷 +5 Amszterdam-lap a pakliba!', 'info'); hold = Math.max(hold, 900); break;
       case 'chain': floatAt(anchor, '⛓', 'dmg'); hold = Math.max(hold, 350); break;
       case 'smoke': floatAt(anchor, '💨 Utcai füst!', 'info'); hold = Math.max(hold, 800); break;
       case 'gameover': floatAt(anchor, '💀 GAME OVER', 'dmg'); hold = Math.max(hold, 1000); break;

@@ -3,13 +3,13 @@
 **Állapot (2026-10-16):** csak a teszt oldalon (https://teszt.bestofus.pages.dev). Élesbe csak Tomi szavára, a `teszt` ág `main`-be olvasztásával kerül. Megjelenés: valamikor októberben.
 
 - **Téma:** a társaság 2022-es amszterdami útja.
-- **Méret:** a szett teljes: **25 lap** (12 gyakori / 6 ritka / 4 epikus / 3 legendás).
+- **Méret:** **26 lap** (13 gyakori / 6 ritka / 4 epikus / 3 legendás).
 - **Beszerzés:** csak a Boltban, saját packból: **Amszterdam hősei booster** (50 coin, 3 lap) és **Amszterdam Shiny** (250 coin, a legjobb lap biztosan Full Art). Csak a szett lapjai vannak benne (nincs Full Art hős, arany hős, Base set-változat); ha egy ritkaságból nincs lap, eggyel lejjebb sorsol. A Base set packokba nem kerülnek az új lapok. Saját pack-grafika (Astra, 2026-10-16): zöld „Booster pack” és türkiz holografikus „Shiny pack” (`art/ui/pack-ah.webp`, `pack-ahshiny.webp` + `sm/`; a tartalomra vágva, oldalt átlátszó szegéllyel 600×965-re igazítva, hogy a feltépés ugyanott fusson, mint a Base set packnál). A Boltban és a bontásnál is ezek látszanak.
 - **Kiosztás:** senki nem kap belőle ingyen (a kezdőgyűjtemény és a `STARTER_ADDS` kizárja a `set`-es lapokat). A Game Over sem jár automatikusan, mint a régi Kánon lapok.
 - **Gyűjtemény:** szett-szűrő „🌷 Amszterdam hősei” (csak a teszt oldalon látszik). Kód: a lapokon `set:'ah'`, `SETS.ah` (meta.js), `CF_SETS` (ui.js).
 
 ## Lapképek
-- **Mind a 25 lapnak és a Betti tokennek van képe (2026-10-16).** A Bong drágább példányai (`a_bong2…10`) ugyanazt a képet kapják.
+- **Mind a 26 lapnak és a Betti tokennek van képe (2026-10-17: új kép a Végtelen tripnek, a Reptéri ellenőrzés is megkapta a sajátját – addig tévesen képesnek írtam).** A Bong drágább példányai (`a_bong2…10`) ugyanazt a képet kapják.
 
 ## Új kulcsszavak
 - **Igézhetetlen** (`elusive`): akcióval és más lapok kijátszáskori hatásával nem célozható – se a gazdája, se az ellenfél (Dinnyés, Ír kávé, Vera, Zsibrita, Reptéri ellenőrzés stb.). A véletlen célzású hatások kihagyják (Alekosz, Molnár Zsolti, Koktélarmageddon, Tomi, a parti lelke, Among Us, Cápa érkezése). **Eszköz rátehető** (saját és ellenséges is, Tomi döntése). A mindenkit érő hatások eltalálják (Tálca shot, JBL, Nyiti, Mosh Pit, Game Over). Jel a lapon: 🛡.
@@ -34,6 +34,7 @@
 - **Cigi** (i_cigi) · 1 · gyakori · ellenséges karakterre: −1/−1, az élete ettől nem mehet 1 alá
 
 **Akciók**
+- **Isten hozott Amszterdamban** (a_welcome) · 1 · gyakori · öt véletlen Amszterdam hősei lapot kever a paklidba (önmagát és a tokeneket nem). **Mindig a kezdő kezedben van** (egy példány a pakli tetejére kerül a kezdő húzás előtt), hacsak a kezdő kéz cseréjénél le nem cseréled – akkor visszakerül a pakliba. Mérés (2026-10-17, 2000 meccs, kezdőpaklikba téve): **32,0%** – a bot mindig kijátssza (átl. a 2. körében), de az 5 véletlen szett-lap felhígítja a kezdőpaklit, és a lap egy kezdő-kéz helyet + egy kört elvisz. Változatok: 0 energia 30,5% · **+ húzz 1 lapot 44,7%** · 0 energia + húzás 42,0%. (Kapcsoló: `CARD.a_welcome.drawN`, most kikapcsolva.) Szett-paklikban kevésbé hígít.
 - **Végtelen trip** (a_trip) · 3 · legendás · egy saját karaktered (nem Igézhetetlen), majd választasz: **Múltba** – visszakapja a lerakáskori (lapra nyomtatott) értékeit, minden később kapott hatás lekerül (eszközök a temetőbe, bénulás, Süti, kapott erők); **Jövőbe** – eltűnik a tábláról, a következő saját köröd elején +3/+3-mal visszatér az eredeti helyére (ha foglalt: az első szabad helyre, ha nincs: végleg eltűnik, a temetőbe kerül). Az eszközei vele utaznak. (`p.future`)
 - **Csend a vihar előtt** (a_csend) · 5 · epikus · válassz két különböző ellenséges karaktert (nem Igézhetetlen, nem Cápa): visszakerülnek az ellenfél kezébe (az eszközeik a temetőbe, token eltűnik, teli kéznél elég). Ha csak egy választható ellenség van, egy is elég.
 - **Ír kávé** (a_irkave) · 1 · gyakori · egy saját karaktered Pajzsot kap (értelmezés: csak saját)
