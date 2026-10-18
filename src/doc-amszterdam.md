@@ -51,7 +51,7 @@
 - **Bong** (a_bong) · 1 · ritka · kijátszáskor az ellenfél kezébe kerül 1-gyel drágábban (`a_bong2…a_bong10` token-példányok, legfeljebb 10). Akinek a **saját köre végén** a kezében van Bong, eldobja, és a hőse annyit sebződik, amennyibe a lap kerül (Akácfa nélkül) – ez arra is vonatkozik, aki húzta. A bot „forró krumpliként” kezeli (nála maradva büntetés).
 - **Ír reggeli** (a_irreggeli) · 6 · gyakori · mindkét hős élete maximumra gyógyul
 - **Utcai füst** (a_utcaifust) · 4 · ritka · minden saját karaktered rejtett lesz, és véletlenszerűen összekeverednek a saját helyeiden (üres helyre is kerülhetnek; zárt JBL-hely és Cápa kimarad)
-- **Game Over** (f_gameover) · 6 · legendás · **az első közös Kánon esemény** – bármelyik hős paklijába tehető (legendás: 1/pakli). A maximum életed 10 lesz (ha több volt, 10-re esik); az ellenfél összes karaktere elpusztul (a Pajzs nem véd, a Feltámadás igen; a Cápa marad); az ellenfél hőse 5 sebzést kap.
+- **Game Over** (f_gameover) · 6 · legendás · **az első közös Kánon esemény** – bármelyik hős paklijába tehető (legendás: 1/pakli). A maximum életed 10 lesz (ha több volt, 10-re esik); az ellenfél összes karaktere elpusztul (a Pajzs nem véd, a Feltámadás igen; a Cápa marad). *(2026-10-18-ig az ellenfél hőse 5 sebzést is kapott – kivéve, Tomi.)*
 
 **Helyszínek** (mindkét félre hatnak)
 - **Elfekvő** (l_elfekvo) · 4 · gyakori · minden karakter, amelyik támadott, a következő körében bénult (a visszaütés nem számít támadásnak)
@@ -105,8 +105,8 @@ A paklisegéd a szettből szinte csak az epikus/legendás lapokat választja (PP
 **Gyengítések (2026-10-18, Tomi döntése)** – kezdőpaklikba téve, 3000 meccs/lap:
 - Bence, A. terrorja 4/5 → 3/5: 55,6% → **51,4%** ✔
 - Laci, A. hőse 2 → 1 Ír kávé: 57,3% → **55,7%** (2 energiás helyen; a többi 2-es lap 47–52%). Kipróbálva még: 1/2-es statokkal 50,0%, 3 energiával 51,3%, 2/1-gyel 54,2% – Tomi döntésére vár.
-- Game Over (még nem módosítva): most 62,8%; 3 sebzés a hősnek 59,6%; **hős-sebzés nélkül 53,8%**.
-- Reptéri ellenőrzés (még nem módosítva): most 55,1%; csak ≤4 energiás karakter 55,0%; csak ≤4 támadású 54,6%; **az áttett karakter −2 támadás 52,3%**.
+- Game Over: 62,8%; 3 sebzés a hősnek 59,6%; **hős-sebzés nélkül 53,8% ✔ (élesítve 2026-10-18)**.
+- Reptéri ellenőrzés (marad, Tomi döntése): most 55,1%; csak ≤4 energiás karakter 55,0%; csak ≤4 támadású 54,6%; **az áttett karakter −2 támadás 52,3%**.
 (A 6 energia a maximum, ezért drágítás nem opció ezeknél.)
 
 **3. „Csak Amszterdam” pakli** (a szett + Kánon, a kezdőpaklik ellen): 16–34% – a szett magában nem pakli, a Base set lapjaival keverve működik (ez egy 25 lapos mini-szettnél várható).
