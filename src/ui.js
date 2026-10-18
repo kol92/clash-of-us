@@ -757,7 +757,7 @@ function logEvents(evs, snap) {
       case 'driver': L(`🚗 Bocsi, de vezetek: ${e.side === ME ? 'mostantól minden kijátszott karaktered' : 'mostantól az ellenfél minden karaktere'} +1/+1-et és egy véletlen képességet kap`); break;
       case 'chain': L(`⛓ ${unitName(e.side, e.i)}: Börtönlánc, 1 sebzés`); break;
       case 'smoke': L(`💨 Utcai füst: ${e.side === ME ? 'a karaktereid' : 'az ellenfél karakterei'} elrejtőztek és összekeveredtek`); break;
-      case 'gameover': L(`💀 GAME OVER: ${who(e.side)} maximum élete 10 lett – az ellenfél összes karaktere elpusztul, a hőse 5 sebzést kap`); break;
+      case 'gameover': L(`💀 GAME OVER: ${who(e.side)} maximum élete 10 lett – az ellenfél összes karaktere elpusztul`); break;
       case 'bong': L(`🌿 A Bong ${e.side === ME ? 'hozzád került' : 'az ellenfélhez került'} – most ${e.n} energiába kerül`); break;
       case 'bongburn': L(`🌿 ${who(e.side)} kezében maradt a Bong: −${e.n} élet`); break;
       case 'coffee': L(`☕ Coffee Shop: ${e.side === ME ? `<b class="lc" data-lc="${e.id}">${escH(CARD[e.id].name)}</b> került a paklidba` : 'egy eszköz került az ellenfél paklijába'}`); break;

@@ -77,7 +77,7 @@ const CARDS = [
   { id:'a_bong', set:'ah', type:'action', name:'Bong', cost:1, tgt:'none', rarity:'r', bong:1, text:'Az ellenfeled kezébe kerül, 1-gyel drágábban. Akinek a köre végén a kezében marad, eldobja, és a hőse annyit sebződik, amennyibe a lap kerül.' },
   { id:'a_irreggeli', set:'ah', type:'action', name:'Ír reggeli', cost:6, tgt:'none', rarity:'k', text:'Mindkét hős élete teljesen visszagyógyul.' },
   { id:'a_utcaifust', set:'ah', type:'action', name:'Utcai füst', cost:4, tgt:'none', rarity:'r', text:'Minden saját karaktered rejtett lesz, és véletlenszerűen helyet cserélnek (üres helyre is kerülhetnek).' },
-  { id:'f_gameover', set:'ah', type:'action', name:'Game Over', cost:6, rarity:'l', finisher:true, tgt:'none', text:'A maximum életed 10 lesz. Az ellenfél összes karaktere elpusztul, a hőse 5 sebzést kap.' },
+  { id:'f_gameover', set:'ah', type:'action', name:'Game Over', cost:6, rarity:'l', finisher:true, tgt:'none', text:'A maximum életed 10 lesz. Az ellenfél összes karaktere elpusztul.' },
   { id:'i_lanc', set:'ah', type:'item', name:'Börtönlánc', cost:2, tgt:'enemy', rarity:'r', chain:1, text:'Egy ellenséges karakterre teszed: a gazdája minden körének elején 1 sebzést kap.' },
   { id:'a_csend', set:'ah', type:'action', name:'Csend a vihar előtt', cost:5, tgt:'enemyTwo', rarity:'e', text:'Válassz két ellenséges karaktert: visszakerülnek az ellenfél kezébe.' },
   { id:'c_vizipipa', set:'ah', type:'char', name:'Barna vízipipája', cost:1, atk:0, hp:2, rarity:'e', enemySide:true, noAttack:true, text:'Az ellenfél oldalára teszed le. Nem támad. Amelyik karakter elpusztítja, +2/+2-t kap.' },
@@ -610,7 +610,7 @@ function playCard(s, pi, hi, t) {
         p.maxHp = 10; p.hp = Math.min(p.hp, 10);
         ev(s, { t:'gameover', side:pi, i:-1 });
         e.board.forEach((x, j) => { if (!x || isFixed(x)) return; reveal(s, ei, j); x.shield = false; x.hp = 0; });
-        cleanup(s); damageHero(s, ei, 5); break; }
+        cleanup(s); break; }   /* 2026-10-18: a hős-sebzés (5) kikerült – Tomi */
       case 'a_alarc': {   // kézcsere; a Kánon esemény (hősfüggő) a gazdájánál marad; ami a kézlimit fölé kerül, elég
         const fin = c => CARD[c.id].finisher, mine = p.hand.filter(c => !fin(c)), theirs = e.hand.filter(c => !fin(c));
         p.hand = [...p.hand.filter(fin), ...theirs]; e.hand = [...e.hand.filter(fin), ...mine];

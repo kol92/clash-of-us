@@ -98,7 +98,7 @@ ok(rc('k') === 13 && rc('r') === 6 && rc('e') === 4 && rc('l') === 3, `ritkaság
   E.playCard(s, 0, 0, { k: 'none' });
   ok(s.players[0].maxHp === 10 && s.players[0].hp === 10, 'Game Over: a maximum életed 10');
   ok(!s.players[1].board[0] && s.players[1].board[1] && s.players[1].board[1].hp === 1, 'Game Over: az ellenfél karakterei elpusztulnak (Gabi feltámad)');
-  ok(s.players[1].hp === eh - 5, 'Game Over: 5 sebzés az ellenfél hősének'); }
+  ok(s.players[1].hp === eh, 'Game Over: az ellenfél hőse nem sebződik (2026-10-18)'); }
 // --- Börtönlánc ---
 { const s = G(); const u = U(s, 1, 0, 'c_vajda'); play(s, 0, 'i_lanc', { k: 'unit', side: 1, i: 0 });
   ok(u.items.includes('i_lanc') && u.hp === 4, 'Börtönlánc: rákerül, azonnal nem sebez');

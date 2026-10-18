@@ -110,7 +110,7 @@ Csak build (kitétel nélkül): `cd src && python3 build-app.py ""` → `src/dis
 ## Amszterdam hősei (2026-10-18)
 - Élesben, **időzárral**: 2026-10-19 19:00-tól látszik (`SET_RELEASE` a ui.js elején, `setLive(setId)`, `cardOn(lap)`). Leírás: `src/doc-amszterdam.md`, teszt: `tools/ah_test.js`, nagy mérés: `tools/bigsim.js`.
 - Új szett felvételének mintája: lapokon `set:'xx'`, `SETS.xx` (meta.js, saját pack), `CF_SETS_ALL` (ui.js), `SET_RELEASE.xx`, pack-kép `art/ui/pack-xx.webp`, arany változat `goldVar` (+`variantOf`).
-- Nyitott döntések (Tomi): a 4 túl erős lap (Game Over 60%, Bence terrorja 57,5%, Laci 55,9%, Reptéri 55,8%) és az „Isten hozott” húzás-kapcsolója (`CARD.a_welcome.drawN`).
+- Döntve 2026-10-18: Bence terrorja 3/5, Laci 1 Ír kávé, Game Over hős-sebzés nélkül, Reptéri marad. Nyitott: Laci még erős (55,7%), az „Isten hozott” húzás-kapcsolója (`CARD.a_welcome.drawN`).
 
 ## Dávid (2026-10-18)
 - Új Törzsvendég (köre végén helyszín esetén véletlen saját karakter +1/+1, `finishTurn`), új Kánon `f_vezetek` (Bocsi, de vezetek, `p.driver`). A Munkahely (`f_munkahely`) `off:true`, a `migrate()` cseréli a paklikban. A teszt ágon az `ah_david` pakliban is cserélni kell.
