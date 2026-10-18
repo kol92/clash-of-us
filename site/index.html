@@ -2364,7 +2364,7 @@ body.pf-loading #scr-menu .pb-name::after{content:'';display:inline-block;width:
 <script src="vendor/firebase-auth-compat.js"></script>
 <script src="vendor/firebase-firestore-compat.js"></script>
 <script src="vendor/firebase-database-compat.js"></script>
-<script>window.APP_VERSION = "2026.10.18-2359"; window.APP_BUILD = "2026.10.18-2359";</script>
+<script>window.APP_VERSION = "2026.10.18-2359"; window.APP_BUILD = "2026.10.19-0004";</script>
 <script>// ===== Best of Us – saját szerver (Firebase) =====
 // A játék eredetileg a Claude-os tárolót használta (window.claude.use('db' | 'user' | 'room')).
 // Ez a fájl ugyanazt a felületet adja Firebase-ből, így a játék kódja szinte változatlan maradhat:
@@ -3963,6 +3963,8 @@ function textHTML(c) {
   if (c.taunt) parts.push('<b>Provokáció</b>.');
   if (c.muscle) parts.push('<b>Izom</b>.');
   if (c.invis) parts.push('<b>Láthatatlan</b>.');
+  if (c.elusive && c.type !== 'item') parts.push('<b>Igézhetetlen</b>.');   /* 2026-10-19: eddig hiányzott (Tomi, A. hőse üres volt) */
+  if (c.revive && !c.text) parts.push('<b>Feltámadás</b>.');   /* Bence terrorja; Gabi, a legyőzhetetlen szövege már leírja */
   if (c.text) parts.push(c.text);
   return parts.join(' ');
 }

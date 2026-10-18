@@ -463,6 +463,9 @@ Hősképesség-ötletek a táblázatban (még nem zöldek, nincsenek beépítve)
 ## Javítás: „Újabb ranked” → Mégse beragadás (2026-10-16)
 - Meccs után az „Újabb ranked” gomb a lezárt meccs képernyőjén indította a keresést; ha valaki „Mégse”-t nyomott, a lezárt táblán ragadt, és a zászló sem csinált semmit. Mostantól az „Újabb ranked” előbb a Ranked képernyőre visz, a keresés megszakítása lezárt meccsből a menübe visz, és lezárt meccsen a zászló is a menübe visz.
 
+## Javítás: hiányzó kulcsszó a lapszövegben (2026-10-19, Tomi)
+- A lap szövegdoboza a kulcsszavakat (Pajzs, Sunyulás, Lendület…) magától írja ki, de az **Igézhetetlen** és a **Feltámadás** kimaradt – így Tomi, Amsterdam hőse szövegdoboza üres volt, Bence terrorjánál csak a Lendület látszott. Most kiírja (`textHTML`; eszköznél az Igézhetetlent nem, mert a Vodkása szövege leírja; a Feltámadást csak akkor, ha a lapnak nincs saját szövege – Gabi, a legyőzhetetlen leírja).
+
 ## Javítás: Egy pohár víz a Budapest Parkban (2026-10-18, Peti jelezte)
 - Hiba: ha a Budapest Park volt a pályán (minden lap 1-gyel drágább), a 0-s Egy pohár víz 1 energiába került, így kijátszva +1 −1 = semmit sem adott („elnyomódik és semmi”).
 - Javítás: az Egy pohár víz költségét semmi nem módosítja, mindig 0 (`cardCost`).
