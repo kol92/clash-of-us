@@ -334,6 +334,7 @@ function startTurn(s) {
 
 function cardCost(s, pi, id) {
   const c = CARD[id], p = s.players[pi]; let v = c.cost;
+  if (id === 'a_kor') return 0;   /* Egy pohár víz: mindig ingyenes – a Budapest Park drágítása miatt eddig 1-be került, és nem adott semmit (2026-10-18, Peti) */
   if (locIs(s, 'l_park') && !isReg(s, pi)) v++;
   if (locIs(s, 'l_barhole')) v -= isReg(s, pi) ? 2 : 1;
   if (locIs(s, 'l_munkahely')) v += s.location.owner === pi ? -1 : 1;   // Dávid kánon eseménye

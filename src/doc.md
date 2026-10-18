@@ -463,6 +463,10 @@ Hősképesség-ötletek a táblázatban (még nem zöldek, nincsenek beépítve)
 ## Javítás: „Újabb ranked” → Mégse beragadás (2026-10-16)
 - Meccs után az „Újabb ranked” gomb a lezárt meccs képernyőjén indította a keresést; ha valaki „Mégse”-t nyomott, a lezárt táblán ragadt, és a zászló sem csinált semmit. Mostantól az „Újabb ranked” előbb a Ranked képernyőre visz, a keresés megszakítása lezárt meccsből a menübe visz, és lezárt meccsen a zászló is a menübe visz.
 
+## Javítás: Egy pohár víz a Budapest Parkban (2026-10-18, Peti jelezte)
+- Hiba: ha a Budapest Park volt a pályán (minden lap 1-gyel drágább), a 0-s Egy pohár víz 1 energiába került, így kijátszva +1 −1 = semmit sem adott („elnyomódik és semmi”).
+- Javítás: az Egy pohár víz költségét semmi nem módosítja, mindig 0 (`cardCost`).
+
 ## Tomi, a parti lelke – okosabb italosztás (2026-10-18, Tomi)
 - Az ital továbbra is véletlen, de: a **gyógyító / erősítő** italok (Energiaital, Vodka Kancsó, Vodkása, Mangós Ciroc, Rehab, Koktélarmageddon +5 ága) a **saját oldalra** kerülnek, a **pusztítók** (Dinnyés, Abszint, Tubi, Kancsó Long Island, Tálca shot, Among Us, Koktélarmageddon 5 sebzés, Adios, Akuma) egy véletlen **ellenséges** karakterre.
 - **Gyógyítás:** mindig a legkevesebb életű *sérült* saját karakter vagy a saját hős kapja (ha senki sem sérült: a hős). A Rehab a bénulást is leveszi.
