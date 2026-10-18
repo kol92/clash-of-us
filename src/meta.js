@@ -1048,20 +1048,20 @@ function botDeckFor(hero, lv, rnd = Math.random) {
 }
 // [DECKHELP-END]
 function allDecks() {
-  const starters = Object.entries(DECKS).map(([id, d]) => ({ id, name: d.name, desc: d.desc, hero: d.hero, list: upgradeList(d.list), starter: true }));
+  const starters = Object.entries(DECKS).filter(([, d]) => !d.set || setLive(d.set)).map(([id, d]) => ({ id, name: d.name, desc: d.desc, hero: d.hero, list: upgradeList(d.list), starter: true, set: d.set }));   /* szett-kezdőpakli csak a megjelenéstől */
   return starters.concat(Store.p ? Store.p.decks : []);
 }
 const deckCount = list => Object.values(list).reduce((a, b) => a + b, 0);
-function deckProblem(list, hero) {
+function deckProblem(list, hero, loan) {   /* loan: szett-kezdőpakli – kölcsönpakli, a lapjait nem kell birtokolni (2026-10-18) */
   if (hero !== undefined && !HERO[hero]) return 'Válassz hőst';
   const n = deckCount(list);
   if (n !== DECK_SIZE) return `${n}/${DECK_SIZE} lap`;
   for (const [id, k] of Object.entries(list)) if (k > 0 && CARD[id].off) return `${CARD[id].name}: még nem elérhető`;
-  for (const [id, k] of Object.entries(list)) if (k > owned(id)) return `Hiányzik: ${CARD[id].name}`;
+  if (!loan) for (const [id, k] of Object.entries(list)) if (k > owned(id)) return `Hiányzik: ${CARD[id].name}`;
   for (const id of Object.keys(list)) if (CARD[id].hero && list[id] > 0 && CARD[id].hero !== hero) return `${CARD[id].name}: csak ${HERO[CARD[id].hero].name} paklijába`;
   return null;
 }
-const deckIssue = d => deckProblem(d.list, d.hero || null);
+const deckIssue = d => deckProblem(d.list, d.hero || null, !!(d.starter && d.set));
 function heroPortrait(hid, cls = '') {
   const h = HERO[hid];
   if (!h) return `<span class="hp-img empty ${cls}">?</span>`;

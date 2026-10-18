@@ -123,3 +123,21 @@ A paklisegéd a szettből szinte csak az epikus/legendás lapokat választja (PP
 | Tomi, A. hőse | 45,2 | | | |
 Viszonyítás (régi lapok, ugyanígy mérve): Vajda 50,3 · Tubi 51,4 · Dinnyés 50,5 · Kancsó 48,5 · Csattogós lepke 48,4 · Gyuri 48,0 · Udvarhelyi 47,7 · Akácfa söröző 41,9.
 \* A botok ezeket rosszul játsszák (helyszín, késleltetett vagy helyzeti hatás) – a régi Akácfa is 41,9-et hoz ugyanígy, tehát ezek élőben valószínűleg rendben vannak.
+
+## Amsterdam kezdőpaklik (2026-10-18, a szett megjelenésétől választhatók – most csak a teszt oldalon)
+- Minden hősnek egy új kezdőpakli (`DECKS.ah_<hős>`, `set:'ah'`), 15–17 Amsterdam-lappal + a hős saját Kánonja + néhány régi lap. **Kölcsönpakli:** a lapjait nem kell birtokolni (`deckProblem(..., loan)`), a választóban „🌷 Amsterdam” címke. A szett megjelenése előtt nem látszanak (`allDecks` + `setLive`). A régi kezdőpaklik maradnak; a botok továbbra is a régi kezdőpaklira épülő paklikkal játszanak.
+- Hangolás: `tools/decktune.js` (automata cserék a 47–53% sávba), `tools/decktry.js`, záró mérés: `tools/ahdecks.js` (minden pakli a többi hős régi kezdőpaklija ellen, ±2,1%, és a többi Amsterdam-pakli ellen, ±3%).
+
+| Hős | Pakli | vs régi | vs Amsterdam | Lista |
+|---|---|---|---|---|
+| Barna | Amszterdami roham | 53,8% | 44,3% | Drog kereső kutya ×2, Laci, Amsterdam hőse ×2, PP, a váratlan ×2, Barna, Amsterdam hőse ×2, Varázsgomba ×2, Sasi, Amsterdam hőse ×2, Ati, Amsterdam hőse, Reptéri ellenőrzés, Vöröslámpás negyed, Pifti, Dinnyés Absolute Vodka, Hátad mögött, cápa megesz!, Bong ×2 |
+| Gabi | Ír reggeli | ~50,5% | ~34% | Tomi, Amsterdam hőse ×2, Sasi, Amsterdam hőse ×2, Ati, Amsterdam hőse ×2, Ír kávé ×2, Csend a vihar előtt, Laci, Amsterdam hőse ×2, PP, a váratlan ×2, Ír reggeli, Végh Tomi, Együtt sírtok, együtt nevettek, Bong, Varázsgomba, Elfekvő, Abszint |
+| Krisz | Coffeeshop | 52,3% | 48,9% | Drog kereső kutya ×2, Laci, Amsterdam hőse ×2, PP, a váratlan ×2, Barna, Amsterdam hőse ×2, Sasi, Amsterdam hőse, Ati, Amsterdam hőse, Bong, Reptéri ellenőrzés, Süti, Cigi, Coffee Shop, Pifti ×2, Dinnyés Absolute Vodka, Metamorfózis, Vajda Peti |
+| Tomi | Varázsgombák | 53,0% | 52,9% | Varázsgomba ×2, Napszemüveg ×2, Vajda Peti ×2, High Hawaiians, Barna, Amsterdam hőse ×2, Tomi, Amsterdam hőse, Drog kereső kutya ×2, Laci, Amsterdam hőse ×2, Sasi, Amsterdam hőse ×2, PP, a váratlan ×2, Fehér szarvas bunda, Az összetartás átka |
+| Dávid | Városnézés | 53,9% | 49,3% | Sasi, Amsterdam hőse ×2, Ati, Amsterdam hőse ×2, Laci, Amsterdam hőse ×2, Drog kereső kutya ×2, PP, a váratlan ×2, Barna, Amsterdam hőse ×2, Reptéri ellenőrzés, A munkahely, Vajda Peti ×2, Dinnyés Absolute Vodka ×2, Varázsgomba, Vöröslámpás negyed |
+| Bence | Amszterdam terrorja | 48,9% | 42,9% | Bence, Amsterdam terrorja, Sasi, Amsterdam hőse ×2, Ati, Amsterdam hőse, Barna, Amsterdam hőse ×2, PP, a váratlan ×2, Drog kereső kutya ×2, Végtelen trip, Utcai füst, Varázsgomba ×2, Pifti, Dinnyés Absolute Vodka, Bender, Laci, Amsterdam hőse, Reptéri ellenőrzés, Süti |
+| Milo | Utolsó kör | 53,4% | 58,6% | Drog kereső kutya ×2, Laci, Amsterdam hőse ×2, PP, a váratlan ×2, Barna, Amsterdam hőse ×2, Ati, Amsterdam hőse ×2, Sasi, Amsterdam hőse, Utcai füst, Reptéri ellenőrzés, Varázsgomba, Kovács Bence ×2, Pifti, Gépüzemmód, Ír reggeli, Bong |
+| Laci | Végtelen trip | 50,0% | 59,3% | Isten hozott Amsterdamban, Végtelen trip, Csend a vihar előtt, Reptéri ellenőrzés, Ír kávé ×2, Tomi, Amsterdam hőse, Sasi, Amsterdam hőse ×2, Ati, Amsterdam hőse ×2, Laci, Amsterdam hőse ×2, PP, a váratlan ×2, Drog kereső kutya ×2, Vajda Peti, JBL, Börtönlánc |
+| Sasi | Amszterdami banda | 47,5% | 56,4% | Ati, Amsterdam hőse ×2, Laci, Amsterdam hőse ×2, Drog kereső kutya ×2, PP, a váratlan, Sasi, Amsterdam hőse ×2, Barna, Amsterdam hőse, Varázsgomba ×2, Süti, Bong, Barna vízipipája, Vöröslámpás negyed, Game Over, Gluténbomba, PP ×2 |
+
+Megjegyzés: a Gabi-pakli (lassú, védekező) a gyors Amsterdam-paklik ellen gyengébb; a régi paklik ellen rendben van.

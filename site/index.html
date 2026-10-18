@@ -1111,6 +1111,7 @@ body.ev-hw #scr-menu .fan{filter:drop-shadow(0 0 22px rgba(255,140,40,.35));}
 .ah-news-packs img+img{animation-delay:-1.6s;}
 @keyframes ahFloat{50%{transform:translateY(-8px) rotate(-1.5deg);}}
 @media (prefers-reduced-motion:reduce){.ah-news-packs img{animation:none;}}
+.do-set{font-style:normal;font-size:.78em;font-weight:800;color:#1a3a22;background:linear-gradient(90deg,#9be7a8,#f3d77a);border-radius:.8em;padding:.05em .55em;margin-left:.35em;white-space:nowrap;}
 #testRibbon{position:fixed;left:0;right:0;bottom:0;z-index:9999;display:flex;gap:8px;align-items:center;justify-content:center;padding:3px 8px calc(3px + env(safe-area-inset-bottom));background:repeating-linear-gradient(45deg,#7a1fa2 0 12px,#5b1580 12px 24px);color:#fff;font:800 11px/1.2 system-ui,sans-serif;letter-spacing:.03em;pointer-events:none;}
 #testRibbon button{pointer-events:auto;font:inherit;border:1px solid #fff8;background:#0004;color:#fff;border-radius:6px;padding:2px 6px;}
 /* Laci cipőkanala (2026-10-16): áthelyezhető karakter jelzése és a gomb a nagy nézetben */
@@ -2344,7 +2345,7 @@ body.pf-loading #scr-menu .pb-name::after{content:'';display:inline-block;width:
 <script src="vendor/firebase-auth-compat.js"></script>
 <script src="vendor/firebase-firestore-compat.js"></script>
 <script src="vendor/firebase-database-compat.js"></script>
-<script>window.APP_VERSION = "2026.10.18-1149"; window.APP_BUILD = "2026.10.18-1153";</script>
+<script>window.APP_VERSION = "2026.10.18-1215"; window.APP_BUILD = "2026.10.18-1216";</script>
 <script>// ===== Best of Us – saját szerver (Firebase) =====
 // A játék eredetileg a Claude-os tárolót használta (window.claude.use('db' | 'user' | 'room')).
 // Ez a fájl ugyanazt a felületet adja Firebase-ből, így a játék kódja szinte változatlan maradhat:
@@ -2814,6 +2815,25 @@ const DECKS = {
     list:{ c_veghtomi:1, c_vajda:2, c_gyuri:2, c_fogel:1, c_vera:1, c_rebi:1, c_boros:1, a_abszint:1, a_mangos:1, a_rehab:1, a_dinnyes:1, i_buffalo:1, i_bunda:1, c_davidsofor:1, a_cheddar:1, c_sasimeselo:1, l_korhaz:1, f_jbl:1 } },
   banda: { name:'A banda', hero:'sasi', desc:'Minél többen vagytok lent, annál jobb: Sasi minden körben odacsap, a szülinapon három Pifti is beesik, Zsibrita és a haverok utat nyitnak.',
     list:{ c_pp:2, c_pifti:2, f_gluten:1, c_gyuri:2, c_kovacs:2, c_vajda:2, c_talos:1, c_rebi:1, c_zsibrita:1, a_szulinap:1, c_tzs:1, c_norbi:1, a_dinnyes:2, c_veghtomi:1 } },
+  // ===== Amsterdam Hősei kezdőpaklik (2026-10-18; set:'ah' – a szett megjelenésétől választhatók) =====
+  ah_barna: { set:'ah', name:'Amszterdami roham', hero:'barna', desc:'Olcsó, gyors amszterdami karakterek: a kutya, Laci és PP már az első körben üt, Barna mindegyiket felpörgeti. Gombával és Cigivel a végéig nyomod.',
+    list:{ c_kutya:2, c_ah_laci:2, c_ppvar:2, c_ah_barna:2, i_gomba:2, c_ah_sasi:2, c_ah_ati:1, a_repter:1, l_voros:1, c_pifti:1, a_dinnyes:1, f_capa:1, a_bong:2 } },
+  ah_gabi: { set:'ah', name:'Ír reggeli', hero:'gabi', desc:'Lassú, kényelmes reggel: Tomit nem lehet megcélozni, Sasi falként áll, az Ír kávé pajzsot ad – Gabi közben foltoz, az Ír reggeli pedig mindent visszatölt.',
+    list:{ c_ah_tomi:2, c_ah_sasi:2, c_ah_ati:2, a_irkave:2, a_csend:1, c_ah_laci:2, c_ppvar:2, a_irreggeli:1, c_veghtomi:1, f_egyutt:1, a_bong:1, i_gomba:1, l_elfekvo:1, a_abszint:1 } },
+  ah_krisz: { set:'ah', name:'Coffeeshop', hero:'krisz', desc:'Gyors kezdés, olcsó első lapok: a kutya és PP rögtön bent van, a Bong az ellenfél kezében ég el, a Reptéri ellenőrzés pedig elviszi a legnagyobb ellenfelet.',
+    list:{ c_kutya:2, c_ah_laci:2, c_ppvar:2, c_ah_barna:2, c_ah_sasi:1, c_ah_ati:1, a_bong:1, a_repter:1, a_suti:1, i_cigi:1, l_coffeeshop:1, c_pifti:2, a_dinnyes:1, f_metamorf:1, c_vajda:1 } },
+  ah_tomi: { set:'ah', name:'Varázsgombák', hero:'tomi', desc:'Minden a gombákról szól: a High Hawaiians és Barna telerakja velük a paklit, Tomi eszközei olcsóbbak és életet is adnak – a harmadik gombától már szörnyek nőnek.',
+    list:{ i_gomba:2, i_napszemuveg:2, c_vajda:2, a_hawaiians:1, c_ah_barna:2, c_ah_tomi:1, c_kutya:2, c_ah_laci:2, c_ah_sasi:2, c_ppvar:2, i_bunda:1, f_atok:1 } },
+  ah_david: { set:'ah', name:'Városnézés', hero:'david', desc:'Helyszínről helyszínre Amszterdamban: Vöröslámpás negyed, Coffee Shop, Elfekvő – Dávid törzsvendégként mindenhol jól jár, és minden cserénél húz.',
+    list:{ c_ah_sasi:2, c_ah_ati:2, c_ah_laci:2, c_kutya:2, c_ppvar:2, c_ah_barna:2, a_repter:1, f_munkahely:1, c_vajda:2, a_dinnyes:2, i_gomba:1, l_voros:1 } },
+  ah_bence: { set:'ah', name:'Amszterdam terrorja', hero:'bence', desc:'Bence 24 élete mindent elbír: jöhet a Bong, jöhet a Végtelen trip, a végén pedig maga a terror lép be Lendülettel és Feltámadással.',
+    list:{ c_ah_bence:1, c_ah_sasi:2, c_ah_ati:1, c_ah_barna:2, c_ppvar:2, c_kutya:2, a_trip:1, a_utcaifust:1, i_gomba:2, c_pifti:1, a_dinnyes:1, f_bender:1, c_ah_laci:1, a_repter:1, a_suti:1 } },
+  ah_milo: { set:'ah', name:'Utolsó kör', hero:'milo', desc:'Aki elesik, annak is van haszna: a kutya kidobat egy lapot, Betti és a kis karakterek mind Milo sebzését viszik, az Utcai füst pedig összekeveri az ellenfelet.',
+    list:{ c_kutya:2, c_ah_laci:2, c_ppvar:2, c_ah_barna:2, c_ah_ati:2, c_ah_sasi:1, a_utcaifust:1, a_repter:1, i_gomba:1, c_kovacs:2, c_pifti:1, f_gepuzem:1, a_irreggeli:1, a_bong:1 } },
+  ah_laci: { set:'ah', name:'Végtelen trip', hero:'laci', desc:'Laci minden harmadik körben húz, a pakli pedig tele trükkel: Végtelen trip, Csend a vihar előtt, Reptéri ellenőrzés – és rögtön az első körben Isten hozott Amsterdamban.',
+    list:{ a_welcome:1, a_trip:1, a_csend:1, a_repter:1, a_irkave:2, c_ah_tomi:1, c_ah_sasi:2, c_ah_ati:2, c_ah_laci:2, c_ppvar:2, c_kutya:2, c_vajda:1, f_jbl:1, i_lanc:1 } },
+  ah_sasi: { set:'ah', name:'Amszterdami banda', hero:'sasi', desc:'Minél többen vagytok, annál jobb: Ati hozza Bettit, Laci és a kutya gyorsan lent van, Sasi minden körben odacsap – és ha kell, jön a Game Over.',
+    list:{ c_ah_ati:2, c_ah_laci:2, c_kutya:2, c_ppvar:1, c_ah_sasi:2, c_ah_barna:1, i_gomba:2, a_suti:1, a_bong:1, c_vizipipa:1, l_voros:1, f_gameover:1, f_gluten:1, c_pp:2 } },
 };
 const DECK_OF = hid => Object.keys(DECKS).find(k => DECKS[k].hero === hid);
 
@@ -4203,7 +4223,7 @@ function renderPick() {
   ui.deckOpen = ui.deckOpen || null;
   $('#deckPick').innerHTML = ds.map(d => { const prob = deckIssue(d), h = HERO[d.hero], sel = ui.deck === d.id, open = ui.deckOpen === d.id;
     return `<div class="deck-wrap${sel ? ' sel' : ''}"><button class="deck-opt dp${sel ? ' on' : ''}" data-d="${d.id}" aria-pressed="${sel}" ${prob ? 'disabled' : ''}>${heroPortrait(d.hero, 'do-hero')}
-      <span class="do-txt"><b></b><em>${h ? h.name : 'Nincs hős'}</em><small>${prob ? 'Nem játszható: ' + prob : h ? h.text : ''}</small></span></button>
+      <span class="do-txt"><b></b><em>${h ? h.name : 'Nincs hős'}${d.set === 'ah' ? ' <i class="do-set">🌷 Amsterdam</i>' : ''}</em><small>${prob ? 'Nem játszható: ' + prob : h ? h.text : ''}</small></span></button>
       <button class="dp-more${open ? ' open' : ''}" data-more="${d.id}" aria-expanded="${open}" aria-label="Részletek: ${escH(d.name)}"></button>
       ${open ? `<div class="dp-detail"><p><b>${h ? h.name : ''}:</b> ${h ? h.text : ''}</p><p>${d.starter ? d.desc : 'Saját pakli.'}</p></div>` : ''}</div>`; }).join('');
   $('#deckPick').querySelectorAll('.deck-opt b').forEach((b, i) => b.textContent = ds[i].name);
@@ -6709,20 +6729,20 @@ function botDeckFor(hero, lv, rnd = Math.random) {
 }
 // [DECKHELP-END]
 function allDecks() {
-  const starters = Object.entries(DECKS).map(([id, d]) => ({ id, name: d.name, desc: d.desc, hero: d.hero, list: upgradeList(d.list), starter: true }));
+  const starters = Object.entries(DECKS).filter(([, d]) => !d.set || setLive(d.set)).map(([id, d]) => ({ id, name: d.name, desc: d.desc, hero: d.hero, list: upgradeList(d.list), starter: true, set: d.set }));   /* szett-kezdőpakli csak a megjelenéstől */
   return starters.concat(Store.p ? Store.p.decks : []);
 }
 const deckCount = list => Object.values(list).reduce((a, b) => a + b, 0);
-function deckProblem(list, hero) {
+function deckProblem(list, hero, loan) {   /* loan: szett-kezdőpakli – kölcsönpakli, a lapjait nem kell birtokolni (2026-10-18) */
   if (hero !== undefined && !HERO[hero]) return 'Válassz hőst';
   const n = deckCount(list);
   if (n !== DECK_SIZE) return `${n}/${DECK_SIZE} lap`;
   for (const [id, k] of Object.entries(list)) if (k > 0 && CARD[id].off) return `${CARD[id].name}: még nem elérhető`;
-  for (const [id, k] of Object.entries(list)) if (k > owned(id)) return `Hiányzik: ${CARD[id].name}`;
+  if (!loan) for (const [id, k] of Object.entries(list)) if (k > owned(id)) return `Hiányzik: ${CARD[id].name}`;
   for (const id of Object.keys(list)) if (CARD[id].hero && list[id] > 0 && CARD[id].hero !== hero) return `${CARD[id].name}: csak ${HERO[CARD[id].hero].name} paklijába`;
   return null;
 }
-const deckIssue = d => deckProblem(d.list, d.hero || null);
+const deckIssue = d => deckProblem(d.list, d.hero || null, !!(d.starter && d.set));
 function heroPortrait(hid, cls = '') {
   const h = HERO[hid];
   if (!h) return `<span class="hp-img empty ${cls}">?</span>`;

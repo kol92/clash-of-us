@@ -432,7 +432,7 @@ function renderPick() {
   ui.deckOpen = ui.deckOpen || null;
   $('#deckPick').innerHTML = ds.map(d => { const prob = deckIssue(d), h = HERO[d.hero], sel = ui.deck === d.id, open = ui.deckOpen === d.id;
     return `<div class="deck-wrap${sel ? ' sel' : ''}"><button class="deck-opt dp${sel ? ' on' : ''}" data-d="${d.id}" aria-pressed="${sel}" ${prob ? 'disabled' : ''}>${heroPortrait(d.hero, 'do-hero')}
-      <span class="do-txt"><b></b><em>${h ? h.name : 'Nincs hős'}</em><small>${prob ? 'Nem játszható: ' + prob : h ? h.text : ''}</small></span></button>
+      <span class="do-txt"><b></b><em>${h ? h.name : 'Nincs hős'}${d.set === 'ah' ? ' <i class="do-set">🌷 Amsterdam</i>' : ''}</em><small>${prob ? 'Nem játszható: ' + prob : h ? h.text : ''}</small></span></button>
       <button class="dp-more${open ? ' open' : ''}" data-more="${d.id}" aria-expanded="${open}" aria-label="Részletek: ${escH(d.name)}"></button>
       ${open ? `<div class="dp-detail"><p><b>${h ? h.name : ''}:</b> ${h ? h.text : ''}</p><p>${d.starter ? d.desc : 'Saját pakli.'}</p></div>` : ''}</div>`; }).join('');
   $('#deckPick').querySelectorAll('.deck-opt b').forEach((b, i) => b.textContent = ds[i].name);

@@ -218,6 +218,25 @@ const DECKS = {
     list:{ c_veghtomi:1, c_vajda:2, c_gyuri:2, c_fogel:1, c_vera:1, c_rebi:1, c_boros:1, a_abszint:1, a_mangos:1, a_rehab:1, a_dinnyes:1, i_buffalo:1, i_bunda:1, c_davidsofor:1, a_cheddar:1, c_sasimeselo:1, l_korhaz:1, f_jbl:1 } },
   banda: { name:'A banda', hero:'sasi', desc:'Minél többen vagytok lent, annál jobb: Sasi minden körben odacsap, a szülinapon három Pifti is beesik, Zsibrita és a haverok utat nyitnak.',
     list:{ c_pp:2, c_pifti:2, f_gluten:1, c_gyuri:2, c_kovacs:2, c_vajda:2, c_talos:1, c_rebi:1, c_zsibrita:1, a_szulinap:1, c_tzs:1, c_norbi:1, a_dinnyes:2, c_veghtomi:1 } },
+  // ===== Amsterdam Hősei kezdőpaklik (2026-10-18; set:'ah' – a szett megjelenésétől választhatók) =====
+  ah_barna: { set:'ah', name:'Amszterdami roham', hero:'barna', desc:'Olcsó, gyors amszterdami karakterek: a kutya, Laci és PP már az első körben üt, Barna mindegyiket felpörgeti. Gombával és Cigivel a végéig nyomod.',
+    list:{ c_kutya:2, c_ah_laci:2, c_ppvar:2, c_ah_barna:2, i_gomba:2, c_ah_sasi:2, c_ah_ati:1, a_repter:1, l_voros:1, c_pifti:1, a_dinnyes:1, f_capa:1, a_bong:2 } },
+  ah_gabi: { set:'ah', name:'Ír reggeli', hero:'gabi', desc:'Lassú, kényelmes reggel: Tomit nem lehet megcélozni, Sasi falként áll, az Ír kávé pajzsot ad – Gabi közben foltoz, az Ír reggeli pedig mindent visszatölt.',
+    list:{ c_ah_tomi:2, c_ah_sasi:2, c_ah_ati:2, a_irkave:2, a_csend:1, c_ah_laci:2, c_ppvar:2, a_irreggeli:1, c_veghtomi:1, f_egyutt:1, a_bong:1, i_gomba:1, l_elfekvo:1, a_abszint:1 } },
+  ah_krisz: { set:'ah', name:'Coffeeshop', hero:'krisz', desc:'Gyors kezdés, olcsó első lapok: a kutya és PP rögtön bent van, a Bong az ellenfél kezében ég el, a Reptéri ellenőrzés pedig elviszi a legnagyobb ellenfelet.',
+    list:{ c_kutya:2, c_ah_laci:2, c_ppvar:2, c_ah_barna:2, c_ah_sasi:1, c_ah_ati:1, a_bong:1, a_repter:1, a_suti:1, i_cigi:1, l_coffeeshop:1, c_pifti:2, a_dinnyes:1, f_metamorf:1, c_vajda:1 } },
+  ah_tomi: { set:'ah', name:'Varázsgombák', hero:'tomi', desc:'Minden a gombákról szól: a High Hawaiians és Barna telerakja velük a paklit, Tomi eszközei olcsóbbak és életet is adnak – a harmadik gombától már szörnyek nőnek.',
+    list:{ i_gomba:2, i_napszemuveg:2, c_vajda:2, a_hawaiians:1, c_ah_barna:2, c_ah_tomi:1, c_kutya:2, c_ah_laci:2, c_ah_sasi:2, c_ppvar:2, i_bunda:1, f_atok:1 } },
+  ah_david: { set:'ah', name:'Városnézés', hero:'david', desc:'Helyszínről helyszínre Amszterdamban: Vöröslámpás negyed, Coffee Shop, Elfekvő – Dávid törzsvendégként mindenhol jól jár, és minden cserénél húz.',
+    list:{ c_ah_sasi:2, c_ah_ati:2, c_ah_laci:2, c_kutya:2, c_ppvar:2, c_ah_barna:2, a_repter:1, f_munkahely:1, c_vajda:2, a_dinnyes:2, i_gomba:1, l_voros:1 } },
+  ah_bence: { set:'ah', name:'Amszterdam terrorja', hero:'bence', desc:'Bence 24 élete mindent elbír: jöhet a Bong, jöhet a Végtelen trip, a végén pedig maga a terror lép be Lendülettel és Feltámadással.',
+    list:{ c_ah_bence:1, c_ah_sasi:2, c_ah_ati:1, c_ah_barna:2, c_ppvar:2, c_kutya:2, a_trip:1, a_utcaifust:1, i_gomba:2, c_pifti:1, a_dinnyes:1, f_bender:1, c_ah_laci:1, a_repter:1, a_suti:1 } },
+  ah_milo: { set:'ah', name:'Utolsó kör', hero:'milo', desc:'Aki elesik, annak is van haszna: a kutya kidobat egy lapot, Betti és a kis karakterek mind Milo sebzését viszik, az Utcai füst pedig összekeveri az ellenfelet.',
+    list:{ c_kutya:2, c_ah_laci:2, c_ppvar:2, c_ah_barna:2, c_ah_ati:2, c_ah_sasi:1, a_utcaifust:1, a_repter:1, i_gomba:1, c_kovacs:2, c_pifti:1, f_gepuzem:1, a_irreggeli:1, a_bong:1 } },
+  ah_laci: { set:'ah', name:'Végtelen trip', hero:'laci', desc:'Laci minden harmadik körben húz, a pakli pedig tele trükkel: Végtelen trip, Csend a vihar előtt, Reptéri ellenőrzés – és rögtön az első körben Isten hozott Amsterdamban.',
+    list:{ a_welcome:1, a_trip:1, a_csend:1, a_repter:1, a_irkave:2, c_ah_tomi:1, c_ah_sasi:2, c_ah_ati:2, c_ah_laci:2, c_ppvar:2, c_kutya:2, c_vajda:1, f_jbl:1, i_lanc:1 } },
+  ah_sasi: { set:'ah', name:'Amszterdami banda', hero:'sasi', desc:'Minél többen vagytok, annál jobb: Ati hozza Bettit, Laci és a kutya gyorsan lent van, Sasi minden körben odacsap – és ha kell, jön a Game Over.',
+    list:{ c_ah_ati:2, c_ah_laci:2, c_kutya:2, c_ppvar:1, c_ah_sasi:2, c_ah_barna:1, i_gomba:2, a_suti:1, a_bong:1, c_vizipipa:1, l_voros:1, f_gameover:1, f_gluten:1, c_pp:2 } },
 };
 const DECK_OF = hid => Object.keys(DECKS).find(k => DECKS[k].hero === hid);
 
