@@ -23,7 +23,7 @@ const CARDS = [
   { id:'c_kristof', type:'char', name:'Kristóf', cost:3, atk:2, hp:2, rarity:'r', text:'Kijátszáskor: a kezedbe kerül egy véletlen Ital lap.' },
   { id:'c_sasimeselo', type:'char', name:'Sasi, a mesélő', cost:3, atk:2, hp:2, rarity:'r', text:'Kijátszáskor: húzol egy lapot.' },
   { id:'c_vajda', type:'char', name:'Vajda Peti', cost:3, atk:3, hp:4, rarity:'k', text:'' },
-  { id:'c_tomiparti', type:'char', name:'Tomi, a parti lelke', cost:5, atk:4, hp:4, rarity:'e', text:'Kijátszáskor egy véletlen ellenséges karakterre rányom egy véletlen Ital lapot. Lehet, hogy jól jár vele, lehet, hogy nem!' },
+  { id:'c_tomiparti', type:'char', name:'Tomi, a parti lelke', cost:5, atk:4, hp:4, rarity:'e', text:'Kijátszáskor kioszt egy véletlen Ital lapot: a gyógyító és erősítő italt a saját oldalad kapja (gyógyítást a legsérültebb), a pusztítót egy véletlen ellenséges karakter.' },
   { id:'c_kriszrantott', type:'char', name:'Krisz, a rántott húsok ura', cost:6, atk:4, hp:5, rarity:'e', text:'Kijátszáskor a kezedbe ad egy Rántott hús lapot.' },
   { id:'c_lacifinale', type:'char', name:'Laci, La Grand Finale', cost:6, atk:5, hp:2, rarity:'l', muscle:true, deathGift:'i_ing', text:'Amikor meghal, a kezedbe kerül a Grand Finale ing.' },
   { id:'c_davidsofor', type:'char', name:'Dávid, a sofőr', cost:6, atk:2, hp:8, rarity:'r', sneak:true, taunt:true, text:'Amíg rejtve van, nem provokál – csak miután felfordult.' },
@@ -784,20 +784,42 @@ function playCard(s, pi, hi, t) {
 
 // Tomi, a parti lelke: véletlen Ital véletlen ellenséges karakterre – minden ital a célpontra hat
 const PARTY_POOL = () => CARDS.filter(x => x.drink && !x.variantOf && !x.token && !x.noParty).map(x => x.id);   // noParty: nincs értelme ellenséges karakterre (pl. Espresso Martini)
+/* 2026-10-18 (Tomi): a gyógyító / erősítő italokat a saját oldal kapja, a pusztítókat az ellenség.
+   Gyógyításnál a legkevesebb életű SÉRÜLT saját karakter vagy a saját hős kapja (ha senki sem sérült: a hős). */
+const PARTY_GOOD = { i_energiaital:1, i_vodkakancso:1, i_vodkasa:1, a_mangos:'heal', a_rehab:'heal' };
 function partyDrink(s, pi, si) {
-  const ei = other(pi), e = s.players[ei];
-  const cand = e.board.map((x, k) => x && !isFixed(x) && !isEl(x) ? k : -1).filter(k => k >= 0);
-  const pool = PARTY_POOL(), d = pool[Math.floor(rnd() * pool.length)];
-  if (!cand.length) { ev(s, { t:'party', side:pi, i:si, ts:ei, ti:-1, id:d, none:true }); return; }
-  const j = cand[Math.floor(rnd() * cand.length)], u = e.board[j], c = CARD[d];
+  const ei = other(pi), e = s.players[ei], me = s.players[pi];
+  const pool = PARTY_POOL(), d = pool[Math.floor(rnd() * pool.length)], c = CARD[d];
   let o = null;
-  if (d === 'a_koktel') o = rnd() < 0.5 ? 'buff' : 'dmg';   // Koktélarmageddon: vagy +5 támadás, vagy 5 sebzés
-  ev(s, { t:'party', side:pi, i:si, ts:ei, ti:j, id:d, o, tid:u.id });
-  reveal(s, ei, j);
-  if (c.type === 'item') {   // az ital rákerül (idegen eszközként), a hatásaival együtt
-    u.atk += c.atk || 0; if (c.haste) u.haste = true; if (c.doom) u.doom = true; if (c.muscle) u.muscle = true; if (c.hangover) u.hangover = true;
-    u.items.push(d); (u.foe = u.foe || []).push(d);
-    ev(s, { t:'buff', side:ei, i:j, n:c.atk });
+  if (d === 'a_koktel') o = rnd() < 0.5 ? 'buff' : 'dmg';   // Koktélarmageddon: vagy +5 támadás (saját), vagy 5 sebzés (ellenség)
+  const good = PARTY_GOOD[d] || (d === 'a_koktel' && o === 'buff'), heal = PARTY_GOOD[d] === 'heal';
+  const ts = good ? pi : ei, T = s.players[ts];
+  if (heal) {   // a legsérültebb (legkevesebb életű sérült) saját karakter vagy a hős
+    const opts = T.board.map((x, k) => x && !isFixed(x) && x.hp < x.maxHp ? { k, hp: x.hp } : null).filter(Boolean);
+    if (T.hp < (T.maxHp || 20)) opts.push({ k: -1, hp: T.hp });
+    opts.sort((a, b) => a.hp - b.hp || (a.k === -1 ? 1 : 0) - (b.k === -1 ? 1 : 0));
+    const j = opts.length ? opts[0].k : -1;
+    if (j === -1) {
+      ev(s, { t:'party', side:pi, i:si, ts, ti:-1, hero:true, id:d, o });
+      healHero(s, ts, d === 'a_mangos' ? 4 : 3);
+    } else {
+      const u = T.board[j];
+      ev(s, { t:'party', side:pi, i:si, ts, ti:j, id:d, o, tid:u.id });
+      healUnit(s, ts, j, d === 'a_mangos' ? 4 : 3);
+      if (d === 'a_rehab' && u.stun) { u.stun = 0; ev(s, { t:'unstun', side:ts, i:j }); }
+    }
+    cleanup(s); checkWin(s); return;
+  }
+  const cand = T.board.map((x, k) => x && !isFixed(x) && !isEl(x) ? k : -1).filter(k => k >= 0);
+  if (!cand.length) { ev(s, { t:'party', side:pi, i:si, ts, ti:-1, id:d, none:true }); return; }
+  const j = cand[Math.floor(rnd() * cand.length)], u = T.board[j];
+  ev(s, { t:'party', side:pi, i:si, ts, ti:j, id:d, o, tid:u.id });
+  reveal(s, ts, j);
+  if (c.type === 'item') {   // az ital rákerül, a hatásaival együtt (ellenségen idegen eszközként)
+    u.atk += c.atk || 0; if (c.haste) u.haste = true; if (c.doom) u.doom = true; if (c.muscle) u.muscle = true; if (c.hangover) u.hangover = true; if (c.elusive) u.elusive = true;
+    u.items.push(d); if (ts !== pi) (u.foe = u.foe || []).push(d);
+    ev(s, { t:'buff', side:ts, i:j, n:c.atk });
+    if (d === 'i_vodkasa' && bid(u.id) === 'c_tzs' && !u.shield) { u.shield = true; ev(s, { t:'boon', side:ts, i:j, b:'shield' }); }
   } else switch (d) {
     case 'a_dinnyes': damageUnit(s, ei, j, 3); break;
     case 'a_abszint': damageUnit(s, ei, j, 7); break;
@@ -805,16 +827,14 @@ function partyDrink(s, pi, si) {
     case 'a_kancso': damageUnit(s, ei, j, 3); damageHero(s, ei, 3); break;
     case 'a_talca': damageUnit(s, ei, j, 2); break;
     case 'a_amongus': damageUnit(s, ei, j, 6); break;   // a parti lelke a paprikásat adja neki
-    case 'a_koktel': if (o === 'buff') { u.atk += 5; ev(s, { t:'buff', side:ei, i:j, n:5 }); } else damageUnit(s, ei, j, 5); break;
-    case 'a_mangos': healUnit(s, ei, j, 4); break;
-    case 'a_rehab': healUnit(s, ei, j, 3); if (u.stun) { u.stun = 0; ev(s, { t:'unstun', side:ei, i:j }); } break;
+    case 'a_koktel': if (o === 'buff') { u.atk += 5; ev(s, { t:'buff', side:ts, i:j, n:5 }); } else damageUnit(s, ei, j, 5); break;
     case 'a_adios': u.stun = Math.max(u.stun || 0, 1); ev(s, { t:'stun', side:ei, i:j }); break;
   }
   cleanup(s); checkWin(s);
 }
 const PARTY_FX = { i_energiaital:'+2 támadás', i_akuma:'+5 támadás, de a köre végén meghal', i_vodkakancso:'+4 támadás, utána bénult',
   a_dinnyes:'3 sebzés', a_abszint:'7 sebzés', a_tubi:'6 sebzés (és 3 a te hősödnek)', a_kancso:'3 sebzés neki és 3 a hősének', a_talca:'2 sebzés',
-  a_koktel:'+5 támadás vagy 5 sebzés', a_mangos:'4 életet gyógyul', a_rehab:'3 életet gyógyul, és magához tér', a_adios:'a következő körében bénult', a_amongus:'6 sebzés – a paprikás jutott neki' };
+  a_koktel:'+5 támadás vagy 5 sebzés', a_mangos:'4 életet gyógyul', a_rehab:'3 életet gyógyul, és magához tér', i_vodkasa:'Igézhetetlen lesz', a_adios:'a következő körében bénult', a_amongus:'6 sebzés – a paprikás jutott neki' };
 
 function dropLocation(s, how) {   // a pályán lévő helyszín eltűnik (lecserélik vagy kitiltják)
   const L = s.location; if (!L) return;

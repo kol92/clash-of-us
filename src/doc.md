@@ -463,6 +463,12 @@ Hősképesség-ötletek a táblázatban (még nem zöldek, nincsenek beépítve)
 ## Javítás: „Újabb ranked” → Mégse beragadás (2026-10-16)
 - Meccs után az „Újabb ranked” gomb a lezárt meccs képernyőjén indította a keresést; ha valaki „Mégse”-t nyomott, a lezárt táblán ragadt, és a zászló sem csinált semmit. Mostantól az „Újabb ranked” előbb a Ranked képernyőre visz, a keresés megszakítása lezárt meccsből a menübe visz, és lezárt meccsen a zászló is a menübe visz.
 
+## Tomi, a parti lelke – okosabb italosztás (2026-10-18, Tomi)
+- Az ital továbbra is véletlen, de: a **gyógyító / erősítő** italok (Energiaital, Vodka Kancsó, Vodkása, Mangós Ciroc, Rehab, Koktélarmageddon +5 ága) a **saját oldalra** kerülnek, a **pusztítók** (Dinnyés, Abszint, Tubi, Kancsó Long Island, Tálca shot, Among Us, Koktélarmageddon 5 sebzés, Adios, Akuma) egy véletlen **ellenséges** karakterre.
+- **Gyógyítás:** mindig a legkevesebb életű *sérült* saját karakter vagy a saját hős kapja (ha senki sem sérült: a hős). A Rehab a bénulást is leveszi.
+- Új lapszöveg: „Kijátszáskor kioszt egy véletlen Ital lapot: a gyógyító és erősítő italt a saját oldalad kapja (gyógyítást a legsérültebb), a pusztítót egy véletlen ellenséges karakter.”
+- Mérés (3000 meccs): 48,6% → 52,4%. Teszt: `tools/party_test.js` (3000 véletlen helyzet).
+
 ## Vodkása – új eszköz (ital), Base set (2026-10-18, Tomi)
 - **Vodkása** (`i_vodkasa`) · 1 energia · gyakori · eszköz, ital · „A karakter, akin van, Igézhetetlen lesz. Ha TZS-re teszed, többé nem sebzi a saját hősödet, és Pajzsot is kap.” Kép: a Vodkása tábla (Kalinka + jégkása).
 - Rejtett extra (nincs a lapon): ha TZS-en van, nem mondja, hogy „Anyád vagy!”.
