@@ -739,7 +739,7 @@ function logEvents(evs, snap) {
       case 'push': L(`➡ Egy karakter arrébb tolva`); break;
       case 'misfire': L(`🍺 ${unitName(e.side, e.i)} mellé ütött`); break;
       case 'reveal': if (e.side !== ME) L(`🃏 Felfordult: ${CARD[e.id].name}`); break;
-      case 'party': L(e.none ? `🍸 A parti lelke kiosztott egy italt (${CARD[e.id].name}), de nem volt kire` : `🍸 ${CARD[e.id].name} → ${CARD[e.tid]?.name || 'egy karakter'}`); break;
+      case 'party': L(e.none ? `🍸 A parti lelke kiosztott egy italt (${CARD[e.id].name}), de nem volt kire` : `🍸 ${CARD[e.id].name} → ${e.hero ? 'a hős' : CARD[e.tid]?.name || 'egy karakter'}${e.ts === e.side ? ' (saját)' : ''}`); break;
       case 'drinkgift': case 'gift': L(`🎁 ${e.side === ME ? CARD[e.id].name + ' a kezedbe' : 'Egy lap az ellenfél kezébe'}`); break;
       case 'coin': L(`💧 ${e.side === ME ? 'Kaptál' : 'Az ellenfél kapott'} egy pohár vizet`); break;
       case 'chomp': L(`🦈 A Cápa megette: ${unitName(e.side, e.i)}`); break;
@@ -809,7 +809,7 @@ function openLog() {
 async function partyFx(e) {
   const c = CARD[e.id]; if (!c) return;
   const who = e.side === ME ? 'Tomi, a parti lelke' : 'Az ellenfél parti lelke';
-  const tName = e.tid ? CARD[e.tid].name : '';
+  const tName = e.hero ? `${HERO[S.players[e.ts].heroId]?.name || 'a hős'} (hős)` : e.tid ? CARD[e.tid].name : '';
   const what = e.id === 'a_koktel' ? (e.o === 'buff' ? '+5 támadás' : '5 sebzés') : e.id === 'a_tubi' ? `6 sebzés (és 3 ${e.side === ME ? 'a te hősödnek' : 'a saját hősének'})` : PARTY_FX[e.id] || '';
   const back = document.createElement('div'); back.className = 'played party';
   back.innerHTML = `<div class="wrap"><span class="tag">🥳 ${who} kioszt egy italt…</span><span class="flip rev"><span class="flip-in"><span class="face back"></span><span class="face front">${cardHTML(e.id, { big: true })}</span></span></span><span class="party-to">${e.none ? 'Nincs kire önteni – kárba veszett! 🫗' : `🍸 → <b>${escH(tName)}</b>: ${what}`}</span><span class="skip">Koppints a folytatáshoz</span></div>`;
@@ -822,7 +822,7 @@ async function partyFx(e) {
                       { transform: 'none', opacity: 1 }], { duration: 420, easing: 'cubic-bezier(.2,1.3,.4,1)', fill: 'forwards' }).finished;
   await back.querySelector('.flip-in').animate([{ transform: 'rotateY(180deg)' }, { transform: 'rotateY(0deg)' }], { duration: 520, easing: 'cubic-bezier(.3,.1,.3,1.2)', fill: 'forwards' }).finished;
   to.animate([{ opacity: 0, transform: 'translateY(6px)' }, { opacity: 1, transform: 'none' }], { duration: 260, fill: 'forwards' });
-  const dest = e.none ? null : cellEl(e.ts, e.ti);
+  const dest = e.none ? null : e.hero ? barEl(e.ts) : cellEl(e.ts, e.ti);
   if (dest) dest.classList.add('aim');
   await Promise.race([sleep(1700), new Promise(r => back.addEventListener('pointerdown', r, { once: true }))]);
   back.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 420, fill: 'forwards' });
@@ -834,7 +834,7 @@ async function partyFx(e) {
     dest.classList.remove('aim');
     const boom = document.createElement('div'); boom.className = 'zap-boom party';
     boom.style.left = (r.left + r.width / 2) + 'px'; boom.style.top = (r.top + r.height / 2) + 'px'; $('#layer').appendChild(boom); setTimeout(() => boom.remove(), 650);
-    const u = unitAt(e.ts, e.ti); if (u) fx(u, 'fx-hit');
+    const u = e.hero ? null : unitAt(e.ts, e.ti); if (u && e.ts !== e.side) fx(u, 'fx-hit');
     floatAt(dest, `🍸 ${c.name}`, 'info');
     await sleep(320);
   } else {
