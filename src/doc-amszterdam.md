@@ -1,4 +1,6 @@
-# Amszterdam hősei – első mini-szett (TESZT, a `teszt` ágon)
+# Amsterdam Hősei – első mini-szett (élesítve 2026-10-18, megjelenik 2026-10-19 19:00)
+
+> 2026-10-18: a név a pack feliratát követi: „Amsterdam Hősei”, a lapok „…, Amsterdam hőse”. Az alábbi régebbi bejegyzésekben még „Amszterdam” írásmód szerepelhet. Bolt-sorrend, küldetés-jutalmak, időzár: lásd doc.md.
 
 **Állapot (2026-10-16):** csak a teszt oldalon (https://teszt.bestofus.pages.dev). Élesbe csak Tomi szavára, a `teszt` ág `main`-be olvasztásával kerül. Megjelenés: valamikor októberben.
 

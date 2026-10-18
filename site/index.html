@@ -1087,6 +1087,7 @@ body.ev-hw #scr-menu .fan{filter:drop-shadow(0 0 22px rgba(255,140,40,.35));}
 .weekly .q-rew em{color:#e0c4ff;}
 .q-pack{width:30px;height:46px;background:url('art/ui/sm/pack-base.webp?v=6d0f30d8') center/contain no-repeat;filter:drop-shadow(0 3px 5px rgba(0,0,0,.6));}
 .q-pack.shiny{background-image:url('art/ui/sm/pack-shiny.webp?v=f5621cc4');}
+.q-pack.ah{background-image:url('art/ui/sm/pack-ah.webp?v=199c064a');} .q-pack.shiny.ah{background-image:url('art/ui/sm/pack-ahshiny.webp?v=85d231f6');}
 .q-ok{position:absolute;top:-6px;right:2px;width:22px;height:22px;border-radius:50%;background:var(--green);color:#003321;font-weight:900;display:grid;place-items:center;z-index:1;box-shadow:0 2px 6px rgba(0,0,0,.5);}
 .q-note{font-size:12px;color:var(--mute);line-height:1.45;margin:14px 2px 24px;}
 .q-done-pop{margin-top:8px;padding:8px 12px;border-radius:12px;background:rgba(79,224,166,.14);border:1px solid rgba(79,224,166,.6);font-size:13px;color:#dff;line-height:1.35;}
@@ -2343,7 +2344,7 @@ body.pf-loading #scr-menu .pb-name::after{content:'';display:inline-block;width:
 <script src="vendor/firebase-auth-compat.js"></script>
 <script src="vendor/firebase-firestore-compat.js"></script>
 <script src="vendor/firebase-database-compat.js"></script>
-<script>window.APP_VERSION = "2026.10.18-1145"; window.APP_BUILD = "2026.10.18-1145";</script>
+<script>window.APP_VERSION = "2026.10.18-1149"; window.APP_BUILD = "2026.10.18-1150";</script>
 <script>// ===== Best of Us – saját szerver (Firebase) =====
 // A játék eredetileg a Claude-os tárolót használta (window.claude.use('db' | 'user' | 'room')).
 // Ez a fájl ugyanazt a felületet adja Firebase-ből, így a játék kódja szinte változatlan maradhat:
@@ -2658,7 +2659,7 @@ const CARDS = [
   { id:'i_uto', type:'item', name:'TomiNegan ütője', cost:3, atk:3, hp:0, rarity:'l', muscle:true, text:'' },
   { id:'i_vodkakancso', drink:true, type:'item', name:'Vodka Kancsó', cost:3, atk:4, hp:0, rarity:'r', muscle:true, hangover:true, text:'Utána a következő körödben a karakter bénult: nem támad, és nem üt vissza.' },
   { id:'i_bunda', type:'item', name:'Fehér szarvas bunda', cost:2, atk:0, hp:3, rarity:'r', taunt:true, text:'Gál Zoli benne nem pusztul el a támadása után, és Pajzsot is kap.' },
-  // ===== Amszterdam hősei (első mini-szett, set:'ah', 2026-10-16 – csak a teszt ágon) =====
+  // ===== Amsterdam hősei (első mini-szett, set:'ah', 2026-10-16 – csak a teszt ágon) =====
   { id:'i_gomba', set:'ah', type:'item', name:'Varázsgomba', cost:1, atk:0, hp:0, rarity:'k', gomba:true, text:'+1/+1. Minden további Varázsgomba ugyanazon a karakteren eggyel többet ad: a második +2/+2, a harmadik +3/+3…' },
   { id:'i_cigi', set:'ah', type:'item', name:'Cigi', cost:1, tgt:'enemy', rarity:'k', cigi:true, text:'Egy ellenséges karakterre teszed: −1/−1. Az élete ettől nem mehet 1 alá.' },
   { id:'a_irkave', set:'ah', type:'action', name:'Ír kávé', cost:1, tgt:'own', rarity:'k', text:'Egy saját karaktered Pajzsot kap.' },
@@ -2678,14 +2679,14 @@ const CARDS = [
   { id:'c_vizipipa', set:'ah', type:'char', name:'Barna vízipipája', cost:1, atk:0, hp:2, rarity:'e', enemySide:true, noAttack:true, text:'Az ellenfél oldalára teszed le. Nem támad. Amelyik karakter elpusztítja, +2/+2-t kap.' },
   { id:'a_trip', set:'ah', type:'action', name:'Végtelen trip', cost:3, tgt:'own', rarity:'l', opts:['Múltba: visszakapja a lerakáskori értékeit', 'Jövőbe: egy körre eltűnik, és +3/+3-mal tér vissza'], text:'Egy karakteredet elküldöd a múltba (visszakapja a lerakáskori értékeit, minden más hatás lekerül róla) vagy a jövőbe (eltűnik, a következő köröd elején +3/+3-mal visszatér; ha nincs hely, végleg eltűnik).' },
   { id:'c_ppvar', set:'ah', type:'char', name:'PP, a váratlan', cost:2, atk:3, hp:1, rarity:'e', sneak:true, text:'Ha egy karakter megtámadja, 2-vel kisebb sebzést okoz neki.' },
-  { id:'a_welcome', set:'ah', type:'action', name:'Isten hozott Amszterdamban', cost:1, tgt:'none', rarity:'k', openingHand:true, text:'Keverj öt véletlen Amszterdam hősei lapot a paklidba. Mindig a kezdő kezedben van (hacsak le nem cseréled).' },
-  { id:'c_ah_sasi', set:'ah', type:'char', name:'Sasi, Amszterdam hőse', cost:4, atk:2, hp:6, rarity:'k', haste:true, text:'' },
-  { id:'c_ah_tomi', set:'ah', type:'char', name:'Tomi, Amszterdam hőse', cost:3, atk:1, hp:4, rarity:'k', elusive:true, text:'' },
-  { id:'c_ah_barna', set:'ah', type:'char', name:'Barna, Amszterdam hőse', cost:3, atk:3, hp:2, rarity:'k', text:'Kijátszáskor keverj egy Varázsgomba lapot a paklidba.' },
-  { id:'c_ah_laci', set:'ah', type:'char', name:'Laci, Amszterdam hőse', cost:2, atk:2, hp:2, rarity:'k', text:'Kijátszáskor két Ír kávé kerül a kezedbe.' },
-  { id:'c_ah_ati', set:'ah', type:'char', name:'Ati, Amszterdam hőse', cost:5, atk:3, hp:4, rarity:'k', text:'Kijátszáskor maga mellé idéz egy 2/2-es Bettit.' },
-  { id:'c_betti', set:'ah', type:'char', name:'Betti', cost:0, atk:2, hp:2, rarity:'k', token:true, text:'Ati, Amszterdam hőse idézi meg.' },
-  { id:'c_ah_bence', set:'ah', type:'char', name:'Bence, Amszterdam terrorja', cost:6, atk:4, hp:5, rarity:'l', haste:true, revive:true, text:'' },
+  { id:'a_welcome', set:'ah', type:'action', name:'Isten hozott Amsterdamban', cost:1, tgt:'none', rarity:'k', openingHand:true, text:'Keverj öt véletlen Amsterdam Hősei lapot a paklidba. Mindig a kezdő kezedben van (hacsak le nem cseréled).' },
+  { id:'c_ah_sasi', set:'ah', type:'char', name:'Sasi, Amsterdam hőse', cost:4, atk:2, hp:6, rarity:'k', haste:true, text:'' },
+  { id:'c_ah_tomi', set:'ah', type:'char', name:'Tomi, Amsterdam hőse', cost:3, atk:1, hp:4, rarity:'k', elusive:true, text:'' },
+  { id:'c_ah_barna', set:'ah', type:'char', name:'Barna, Amsterdam hőse', cost:3, atk:3, hp:2, rarity:'k', text:'Kijátszáskor keverj egy Varázsgomba lapot a paklidba.' },
+  { id:'c_ah_laci', set:'ah', type:'char', name:'Laci, Amsterdam hőse', cost:2, atk:2, hp:2, rarity:'k', text:'Kijátszáskor két Ír kávé kerül a kezedbe.' },
+  { id:'c_ah_ati', set:'ah', type:'char', name:'Ati, Amsterdam hőse', cost:5, atk:3, hp:4, rarity:'k', text:'Kijátszáskor maga mellé idéz egy 2/2-es Bettit.' },
+  { id:'c_betti', set:'ah', type:'char', name:'Betti', cost:0, atk:2, hp:2, rarity:'k', token:true, text:'Ati, Amsterdam hőse idézi meg.' },
+  { id:'c_ah_bence', set:'ah', type:'char', name:'Bence, Amsterdam terrorja', cost:6, atk:4, hp:5, rarity:'l', haste:true, revive:true, text:'' },
   // Bolti eszköz (2026-10-16): csak a Boltban kapható, packból nem jön
   { id:'i_cipo', type:'item', name:'Laci cipőkanala', cost:1, atk:0, hp:0, rarity:'k', shopOnly:true, price:100, mover:true, text:'Amelyik karakterre ráteszed, azt a körödben egyszer áthelyezheted a táblán (üres helyre, vagy helycserével).' },
   { id:'i_aranylanc', type:'item', name:'Tomi nyaklánca', cost:3, atk:2, hp:3, rarity:'l', text:'' },
@@ -4218,7 +4219,7 @@ $('#rkBotRow input').onchange = e => { if (Store.p) { Store.p.rkBot = e.target.c
 // ---- gyűjtemény-szűrő (Astra UI): név, típus, ritkaság, költség, megvan/hiányzik ----
 const CF = { q: '', type: new Set(), rar: new Set(), cost: new Set(), own: '', set: new Set() };
 /* szettek (2026-10-16): a lap `set` mezője (engine.js), ha nincs: Base set */
-const CF_SETS_ALL = [['base', 'Base set'], ['hw', 'Halloween'], ['ah', 'Amszterdam hősei']];
+const CF_SETS_ALL = [['base', 'Base set'], ['hw', 'Halloween'], ['ah', 'Amsterdam Hősei']];
 const cfSets = () => CF_SETS_ALL.filter(([k]) => setLive(k));
 const cardSet = c => c.set || 'base';
 const CF_TYPES = [['char', 'Karakter'], ['action', 'Akció'], ['item', 'Eszköz'], ['loc', 'Helyszín']];
@@ -4522,7 +4523,7 @@ function logEvents(evs, snap) {
       case 'futureback': L(`🌀 <b class="lc" data-lc="${e.id}">${escH(CARD[e.id].name)}</b> visszatért a jövőből: +3/+3`); break;
       case 'futuregone': L(`🌀 <b class="lc" data-lc="${e.id}">${escH(CARD[e.id].name)}</b> nem talált helyet – végleg a jövőben maradt`); break;
       case 'past': L(`🌀 ${unitName(e.side, e.i)} a múltba utazott: visszakapta a lerakáskori értékeit`); break;
-      case 'welcome': L(`🌷 ${who(e.side)} paklijába 5 véletlen Amszterdam hősei lap került`); break;
+      case 'welcome': L(`🌷 ${who(e.side)} paklijába 5 véletlen Amsterdam Hősei lap került`); break;
       case 'chain': L(`⛓ ${unitName(e.side, e.i)}: Börtönlánc, 1 sebzés`); break;
       case 'smoke': L(`💨 Utcai füst: ${e.side === ME ? 'a karaktereid' : 'az ellenfél karakterei'} elrejtőztek és összekeveredtek`); break;
       case 'gameover': L(`💀 GAME OVER: ${who(e.side)} maximum élete 10 lett – az ellenfél összes karaktere elpusztul, a hőse 5 sebzést kap`); break;
@@ -4708,7 +4709,7 @@ async function animateEvents(evs) {
       case 'future': floatAt(anchor, '🌀 A jövőbe!', 'info'); hold = Math.max(hold, 800); break;
       case 'futureback': floatAt(anchor, '🌀 Vissza! +3/+3', 'buff'); hold = Math.max(hold, 800); break;
       case 'past': floatAt(anchor, '🌀 A múltba!', 'info'); hold = Math.max(hold, 800); break;
-      case 'welcome': floatAt(anchor, '🌷 +5 Amszterdam-lap a pakliba!', 'info'); hold = Math.max(hold, 900); break;
+      case 'welcome': floatAt(anchor, '🌷 +5 Amsterdam-lap a pakliba!', 'info'); hold = Math.max(hold, 900); break;
       case 'chain': floatAt(anchor, '⛓', 'dmg'); hold = Math.max(hold, 350); break;
       case 'smoke': floatAt(anchor, '💨 Utcai füst!', 'info'); hold = Math.max(hold, 800); break;
       case 'gameover': floatAt(anchor, '💀 GAME OVER', 'dmg'); hold = Math.max(hold, 1000); break;
@@ -5665,7 +5666,7 @@ const ECON = { goldPlain: 0.005, goldShiny: 0.05, goldDupe: 100, heroFaChance: 0
 const PLAYABLE = CARDS.filter(c => !c.token && !c.off);   // off: kánon esemény lap, amíg nincs hozzá grafika – sehol nem látszik
 const SETS = { base: { name: 'Base set', cards: PLAYABLE.filter(c => !c.set && !c.variantOf && !c.passOnly && !c.eventOnly && !c.shopOnly).map(c => c.id) },
   /* Amszterdam hősei (első mini-szett, 2026-10-16, teszt ág): saját booster és Shiny booster, csak ennek a szettnek a lapjaival */
-  ah: { name: 'Amszterdam hősei', short: 'Amszterdam', cards: PLAYABLE.filter(c => c.set === 'ah' && !c.variantOf).map(c => c.id) } };   // passOnly: csak a Season Passból; eventOnly: csak eventből; shopOnly: csak a Boltból
+  ah: { name: 'Amsterdam Hősei', short: 'Amsterdam', cards: PLAYABLE.filter(c => c.set === 'ah' && !c.variantOf).map(c => c.id) } };   // passOnly: csak a Season Passból; eventOnly: csak eventből; shopOnly: csak a Boltból
 const VARIANT_CHANCE = 0.2;   // ha az alaplap jön, 1 az 5-höz eséllyel a ritkább változata lesz belőle
 const DECK_SIZE = 20;
 const maxCopies = id => CARD[id].rarity === 'l' ? 1 : 2;
@@ -6018,7 +6019,7 @@ function renderProfileBar() {
   try { applyBack(); } catch (e) {}
   renderQuestBadge(); renderPassBadge(); try { renderRankTile(); } catch (e) {} try { renderEventTile(); } catch (e) {} try { if (chestWeeklyCheck()) Store.p.chestNew = true; } catch (e) {} try { if (!$('#scr-menu').hidden) { dayGiftCheck(); backAwardCheck(); deckLinkCheck(); evGiftCheck(); ahNewsCheck(); chestPopup(); } } catch (e) {}
   const wb = $('#wheelBadge'); if (wb) wb.hidden = !wheelReady();
-  const badge = $('#shopBadge'); if (badge) badge.hidden = !freePackReady() && !(p.giftPacks > 0) && !(p.faPacks > 0) && !(p.shinyPacks > 0) && !(p.chests > 0);
+  const badge = $('#shopBadge'); if (badge) badge.hidden = !freePackReady() && !(p.giftPacks > 0) && !(p.faPacks > 0) && !(p.shinyPacks > 0) && !(p.ahPacks > 0) && !(p.ahShinyPacks > 0) && !(p.chests > 0);
 }
 
 // ---- jutalom meccs végén ----
@@ -6208,11 +6209,13 @@ async function buyPack(setId, free) {
   if (free === 'fa') { if (!(p.faPacks > 0)) return; p.faPacks--; }
   else if (free === 'gift') { if (!(p.giftPacks > 0)) return; p.giftPacks--; }
   else if (free === 'shinyGift') { if (!(p.shinyPacks > 0)) return; p.shinyPacks--; }
+  else if (free === 'ahGift') { if (!(p.ahPacks > 0)) return; p.ahPacks--; }   /* Amsterdam Hősei ajándék (küldetés) */
+  else if (free === 'ahShinyGift') { if (!(p.ahShinyPacks > 0)) return; p.ahShinyPacks--; }
   else if (free === 'shiny') { if (p.coins < ECON.shinyPrice) { toast('Nincs elég coinod'); return; } p.coins -= ECON.shinyPrice; }
   else if (free) { if (!freePackReady()) return; p.freeDate = today(); }
   else { if (p.coins < ECON.packPrice) { toast('Nincs elég coinod'); return; } p.coins -= ECON.packPrice; }
   p.packs++;
-  const shinyMode = free === 'shiny' || free === 'shinyGift';
+  const shinyMode = free === 'shiny' || free === 'shinyGift' || free === 'ahShinyGift';
   const cards = openPackRoll(setId, free === 'fa', shinyMode);
   const conv = { coins: 0 };   // a lapok duplikátumai megmaradnak (cserélhetők, vagy a Gyűjteményben kézzel beválthatók)
   for (const c of cards) if (!c.hero && !c.isNew) c.have = owned(c.id);
@@ -6363,6 +6366,8 @@ function renderShop() {
   const gifts = [
     p.faPacks > 0 ? `<button class="btn primary gift fa" id="faPack">✨ Full Art ajándék pack${p.faPacks > 1 ? ` (${p.faPacks})` : ''}</button>` : '',
     p.giftPacks > 0 ? `<button class="btn primary gift" id="giftPack">🎁 Ajándék pack bontása${p.giftPacks > 1 ? ` (${p.giftPacks})` : ''}</button>` : '',
+    p.ahPacks > 0 ? `<button class="btn primary gift" id="giftAh">🌷 Amsterdam pack bontása${p.ahPacks > 1 ? ` (${p.ahPacks})` : ''}</button>` : '',
+    p.ahShinyPacks > 0 ? `<button class="btn primary shiny-btn" id="giftAhShiny">🌷 Amsterdam Shiny pack${p.ahShinyPacks > 1 ? ` (${p.ahShinyPacks})` : ''}</button>` : '',
     p.shinyPacks > 0 ? `<button class="btn primary shiny-btn" id="giftShiny">🎁 Ajándék Shiny pack${p.shinyPacks > 1 ? ` (${p.shinyPacks})` : ''}</button>` : '',
     `<button class="btn primary" id="freePack" ${free ? '' : 'disabled'}>${free ? '🎁 Napi ingyen pack' : 'Mai ingyen pack elhasználva'}</button>`].join('');
   $('#shopBody').innerHTML = `
@@ -6371,10 +6376,10 @@ function renderShop() {
     <div class="lbl shop-lbl">Boosterek</div>
     <div class="shop-gifts">${gifts}</div>
     <div class="shop-grid">
-      ${shopPanelHTML({ attr: 'data-pack="base"', img: 'art/ui/pack-base.webp?v=d38f1f0c', contain: true, name: SETS.base.name, sub: '3 lap', price: ECON.packPrice, have: false })}
-      ${shopPanelHTML({ attr: 'data-pack="shiny"', img: 'art/ui/pack-shiny.webp?v=ca07ac74', contain: true, name: 'Shiny pack', sub: '1 biztos különleges', price: ECON.shinyPrice, have: false, holo: true })}
       ${setLive('ah') ? `${shopPanelHTML({ attr: 'data-pack="ah"', img: 'art/ui/pack-ah.webp?v=920fcfff', contain: true, name: SETS.ah.name, sub: 'Új szett · 3 lap', price: ECON.packPrice, have: false })}
-      ${shopPanelHTML({ attr: 'data-pack="ahshiny"', img: 'art/ui/pack-ahshiny.webp?v=66d11276', contain: true, name: 'Amszterdam Shiny', sub: '1 biztos Full Art', price: ECON.shinyPrice, have: false, holo: true })}` : ''}
+      ${shopPanelHTML({ attr: 'data-pack="ahshiny"', img: 'art/ui/pack-ahshiny.webp?v=66d11276', contain: true, name: 'Amsterdam Shiny', sub: '1 biztos Full Art', price: ECON.shinyPrice, have: false, holo: true })}` : ''}
+      ${shopPanelHTML({ attr: 'data-pack="base"', img: 'art/ui/pack-base.webp?v=d38f1f0c', contain: true, name: SETS.base.name, sub: '3 lap', price: ECON.packPrice, have: false })}
+      ${shopPanelHTML({ attr: 'data-pack="shiny"', img: 'art/ui/pack-shiny.webp?v=ca07ac74', contain: true, name: 'Shiny pack', sub: '1 biztos különleges', price: ECON.shinyPrice, have: false, holo: true })}   
     </div>
     ${chestPanelHTML()}
     <details class="pack-info-more"><summary>Mi van a packokban?</summary>
@@ -6402,6 +6407,8 @@ function renderShop() {
   if ($('#giftPack')) $('#giftPack').onclick = () => buyPack('base', 'gift');
   if ($('#faPack')) $('#faPack').onclick = () => buyPack('base', 'fa');
   if ($('#giftShiny')) $('#giftShiny').onclick = () => buyPack('base', 'shinyGift');
+  if ($('#giftAh')) $('#giftAh').onclick = () => buyPack('ah', 'ahGift');
+  if ($('#giftAhShiny')) $('#giftAhShiny').onclick = () => buyPack('ah', 'ahShinyGift');
 }
 function packHTML(setId, o = {}) {
   return `<div class="pack pk set-${setId}${o.shiny ? ' shiny' : ''}" role="img" aria-label="Best of Us – ${o.shiny ? 'Shiny ' : ''}${SETS[setId].name} booster pack">
@@ -7021,10 +7028,11 @@ function questsOnMatch(m) {
   const step = (pool, q, reward) => {
     if (q.done) return;
     q.prog = Math.min(qDef(pool, q.id).goal, q.prog + (qDef(pool, q.id).f(m, q) || 0));
-    if (q.prog >= qDef(pool, q.id).goal) { q.done = true; reward(); got.push({ txt: qText(pool, q), rew: pool === Q_WEEKLY ? '1 Shiny pack' : '1 pack', weekly: pool === Q_WEEKLY }); }
+    if (q.prog >= qDef(pool, q.id).goal) { q.done = true; reward(); got.push({ txt: qText(pool, q), rew: setLive('ah') ? (pool === Q_WEEKLY ? '1 Amsterdam Shiny pack' : '1 Amsterdam pack') : (pool === Q_WEEKLY ? '1 Shiny pack' : '1 pack'), weekly: pool === Q_WEEKLY }); }
   };
-  for (const q of Q.daily) step(Q_DAILY, q, () => { p.giftPacks = (p.giftPacks || 0) + 1; });
-  step(Q_WEEKLY, Q.weekly, () => { p.shinyPacks = (p.shinyPacks || 0) + 1; });
+  /* 2026-10-19 19:00-tól (Tomi): a napi küldetés Amsterdam packot, a heti Amsterdam Shiny packot ad */
+  for (const q of Q.daily) step(Q_DAILY, q, () => { if (setLive('ah')) p.ahPacks = (p.ahPacks || 0) + 1; else p.giftPacks = (p.giftPacks || 0) + 1; });
+  step(Q_WEEKLY, Q.weekly, () => { if (setLive('ah')) p.ahShinyPacks = (p.ahShinyPacks || 0) + 1; else p.shinyPacks = (p.shinyPacks || 0) + 1; });
   save(); renderQuestBadge();
   return got;
 }
@@ -7044,9 +7052,9 @@ function renderQuests() {
   const hrs = ms => { const h = Math.floor(ms / 3600000), m = Math.floor(ms % 3600000 / 60000); return h >= 24 ? `${Math.floor(h / 24)} nap ${h % 24} óra` : `${h} óra ${m} perc`; };
   $('#questBody').innerHTML = `
     <div class="lbl">Napi küldetések <small>· új feladatok ${hrs(mid - now)} múlva</small></div>
-    ${Q.daily.map(q => row(Q_DAILY, q, '<span class="q-pack"></span><em>1 pack</em>', 'daily')).join('')}
+    ${Q.daily.map(q => row(Q_DAILY, q, setLive('ah') ? '<span class="q-pack ah"></span><em>1 Amsterdam</em>' : '<span class="q-pack"></span><em>1 pack</em>', 'daily')).join('')}
     <div class="lbl">Heti küldetés <small>· hétfő 0:01-kor frissül (${hrs(weekEnds() - now)})</small></div>
-    ${row(Q_WEEKLY, Q.weekly, '<span class="q-pack shiny"></span><em>1 Shiny</em>', 'weekly')}
+    ${row(Q_WEEKLY, Q.weekly, setLive('ah') ? '<span class="q-pack shiny ah"></span><em>1 Amsterdam Shiny</em>' : '<span class="q-pack shiny"></span><em>1 Shiny</em>', 'weekly')}
     <p class="q-note">A haladás meccs végén számít (a bot elleni meccseken). A jutalom teljesítéskor azonnal jóváíródik, a Boosterek menüben bonthatod ki.</p>`;
 }
 

@@ -448,7 +448,7 @@ $('#rkBotRow input').onchange = e => { if (Store.p) { Store.p.rkBot = e.target.c
 // ---- gyűjtemény-szűrő (Astra UI): név, típus, ritkaság, költség, megvan/hiányzik ----
 const CF = { q: '', type: new Set(), rar: new Set(), cost: new Set(), own: '', set: new Set() };
 /* szettek (2026-10-16): a lap `set` mezője (engine.js), ha nincs: Base set */
-const CF_SETS_ALL = [['base', 'Base set'], ['hw', 'Halloween'], ['ah', 'Amszterdam hősei']];
+const CF_SETS_ALL = [['base', 'Base set'], ['hw', 'Halloween'], ['ah', 'Amsterdam Hősei']];
 const cfSets = () => CF_SETS_ALL.filter(([k]) => setLive(k));
 const cardSet = c => c.set || 'base';
 const CF_TYPES = [['char', 'Karakter'], ['action', 'Akció'], ['item', 'Eszköz'], ['loc', 'Helyszín']];
@@ -752,7 +752,7 @@ function logEvents(evs, snap) {
       case 'futureback': L(`🌀 <b class="lc" data-lc="${e.id}">${escH(CARD[e.id].name)}</b> visszatért a jövőből: +3/+3`); break;
       case 'futuregone': L(`🌀 <b class="lc" data-lc="${e.id}">${escH(CARD[e.id].name)}</b> nem talált helyet – végleg a jövőben maradt`); break;
       case 'past': L(`🌀 ${unitName(e.side, e.i)} a múltba utazott: visszakapta a lerakáskori értékeit`); break;
-      case 'welcome': L(`🌷 ${who(e.side)} paklijába 5 véletlen Amszterdam hősei lap került`); break;
+      case 'welcome': L(`🌷 ${who(e.side)} paklijába 5 véletlen Amsterdam Hősei lap került`); break;
       case 'chain': L(`⛓ ${unitName(e.side, e.i)}: Börtönlánc, 1 sebzés`); break;
       case 'smoke': L(`💨 Utcai füst: ${e.side === ME ? 'a karaktereid' : 'az ellenfél karakterei'} elrejtőztek és összekeveredtek`); break;
       case 'gameover': L(`💀 GAME OVER: ${who(e.side)} maximum élete 10 lett – az ellenfél összes karaktere elpusztul, a hőse 5 sebzést kap`); break;
@@ -938,7 +938,7 @@ async function animateEvents(evs) {
       case 'future': floatAt(anchor, '🌀 A jövőbe!', 'info'); hold = Math.max(hold, 800); break;
       case 'futureback': floatAt(anchor, '🌀 Vissza! +3/+3', 'buff'); hold = Math.max(hold, 800); break;
       case 'past': floatAt(anchor, '🌀 A múltba!', 'info'); hold = Math.max(hold, 800); break;
-      case 'welcome': floatAt(anchor, '🌷 +5 Amszterdam-lap a pakliba!', 'info'); hold = Math.max(hold, 900); break;
+      case 'welcome': floatAt(anchor, '🌷 +5 Amsterdam-lap a pakliba!', 'info'); hold = Math.max(hold, 900); break;
       case 'chain': floatAt(anchor, '⛓', 'dmg'); hold = Math.max(hold, 350); break;
       case 'smoke': floatAt(anchor, '💨 Utcai füst!', 'info'); hold = Math.max(hold, 800); break;
       case 'gameover': floatAt(anchor, '💀 GAME OVER', 'dmg'); hold = Math.max(hold, 1000); break;
