@@ -1519,13 +1519,32 @@ function showPassReveal(got) {
   o.onclick = e => { if (e.target.closest('[data-x]')) o.remove(); };
   $('#layer').appendChild(o);
 }
+// Season Pass: minden átvett jutalom felfedéssel (2026-10-18, Tomi – „legyen meg a reward érzés”, mint a Halloween eventnél)
+function passRevealData(r, got) {
+  const big = (img, n, cap) => `<div class="spr-big"><img src="${img}" alt="">${n > 1 ? `<b class="spr-x">×${n}</b>` : ''}<em>${cap}</em></div>`;
+  if (got && got.coinsInstead) return { inner: `<div class="spr-big"><span class="coin spr-coin"></span><em>+${got.coinsInstead} coin</em></div>`, label: '+ Coin!', name: `${got.coinsInstead} coin`, sub: 'Ez a lap már megvolt, ezért coint kaptál helyette.' };
+  if (got && got.port) { const P = PORTRAITS[got.port], h = HERO[P.hero]; return { inner: heroCardHTML(h, { big: true, port: got.port }), label: 'Új skin!', name: P.name, sub: `${h.name} mostantól ezt viseli, mindig Full Artban – a Gyűjteményben a hősre koppintva visszaválthatsz.` }; }
+  if (got && got.goldHero) { const h = HERO[got.goldHero]; return { inner: heroCardHTML(h, { big: true, gold: true, foil: true }), label: 'Arany hős!', name: `Arany ${h.name}`, sub: 'Mostantól ezt viseli – a Gyűjteményben a hősre koppintva visszaválthatsz.' }; }
+  if (got && got.hero) { const h = HERO[got.hero]; return { inner: heroCardHTML(h, { big: true, foil: true }), label: 'Full Art hős!', name: h.name, sub: 'Bekerült a gyűjteményedbe.' }; }
+  if (got && got.id) return { inner: cardHTML(got.id, { big: true, foil: true }), label: 'Új lap!', name: CARD[got.id].name, sub: `${CARD[got.id].variantOf ? 'Különleges változat, Full Art – 2 példány' : 'Full Art'} · bekerült a gyűjteményedbe` };
+  if (r.coins) return { inner: `<div class="spr-big"><span class="coin spr-coin"></span><em>+${r.coins}</em></div>`, label: '+ Coin!', name: `${r.coins} coin`, sub: 'Jóváírtuk a coinjaid közé.' };
+  if (r.packs) return { inner: big('art/ui/pack-base.webp', r.packs, ''), label: r.packs > 1 ? 'Új packok!' : 'Új pack!', name: `${r.packs} Base set booster`, sub: 'A Boltban, az ajándékok között bonthatod ki.' };
+  if (r.shiny) return { inner: big('art/ui/pack-shiny.webp', r.shiny, ''), label: 'Shiny pack!', name: `${r.shiny} Shiny pack`, sub: 'A Boltban, az ajándékok között bonthatod ki.' };
+  if (r.fa) return { inner: `<div class="spr-fa">${big('art/ui/pack-base.webp', r.fa, '')}</div>`, label: 'Full Art pack!', name: `${r.fa} Full Art pack`, sub: 'Minden lapja Full Art – a Boltban bonthatod ki.' };
+  return null;
+}
+function passReveal(r, got) {
+  const d = passRevealData(r, got); if (!d) { toast(`+${rewLabel(r)}`); return Promise.resolve(); }
+  if (got && (got.port || got.goldHero)) renderMenuFan();
+  return rewardRevealShow({ theme: 'sp', myst: `<img class="spr-myst" src="${(BACKS[myBack()] || BACKS.base).src}" alt="Rejtett jutalom">`, ...d });
+}
 function claimTier(i) {
   const p = Store.p, s = curSeason() || SEASONS.find(x => x.id === p.pass?.season); if (!s) return;
   const P = p.pass; if (P.claimed.includes(i) || passLevel(P.xp) < i + 1) return;
   const r = s.tiers[i];
   const finish = hero => {
     const got = grantRew(p, r, hero); P.claimed.push(i); save(); renderPass(); renderProfileBar();
-    if (got) showPassReveal(got); else toast(`+${rewLabel(r)}`);
+    passReveal(r, got);
   };
   if (r.heroPick) pickHero(null, finish, 'Válaszd ki a Full Art hősödet', 'Ennek a hősnek a Full Art változatát kapod meg. A már meglévőket ✨ jelzi.');
   else if (r.goldPick) pickHero(null, finish, 'Válaszd ki az Arany hősödet', 'Ennek a hősnek az Arany változatát kapod meg (ha már megvan, helyette coint).');
@@ -1537,14 +1556,18 @@ function claimAll() {
   for (let i = 0; i < Math.min(lv, s.tiers.length); i++) {
     if (P.claimed.includes(i)) continue;
     if (s.tiers[i].heroPick || s.tiers[i].goldPick) { hero = i; continue; }   // a hőst külön kell kiválasztani
-    const got = grantRew(p, s.tiers[i]); P.claimed.push(i); n++; if (got) shown = got;
+    const got = grantRew(p, s.tiers[i]); P.claimed.push(i); n++; shown = shown || []; shown.push([s.tiers[i], got]);
   }
   const ex = Math.max(0, lv - s.tiers.length - (P.extra || 0));
   if (ex) { p.giftPacks = (p.giftPacks || 0) + ex; P.extra = (P.extra || 0) + ex; n += ex; }
   save(); renderPass(); renderProfileBar();
-  if (n) toast(`${n} jutalom átvéve`);
-  if (shown) showPassReveal(shown);
-  if (hero >= 0) setTimeout(() => claimTier(hero), shown ? 0 : 300);
+  (async () => {   /* egyenként felfedjük őket (max. 6, a többi egy összesítőben) */
+    const L = shown || [];
+    for (const [r, got] of L.slice(0, 6)) await passReveal(r, got);
+    if (L.length > 6) toast(`+ még ${L.length - 6} jutalom: ${L.slice(6).map(([r, g]) => g && g.coinsInstead ? `${g.coinsInstead} coin` : rewLabel(r)).join(', ')}`);
+    if (ex) toast(`+${ex} ajándék pack (a 30. szint fölött)`);
+    if (hero >= 0) setTimeout(() => claimTier(hero), 300);
+  })();
 }
 function renderPass() {
   const p = Store.p; if (!p) return;
@@ -1682,8 +1705,12 @@ async function evRewardReveal(e, got) {
   else if (got.back) { const b = BACKS[got.back]; inner = `<img class="evr-back" src="${b.src}" alt="${b.name} hátlap">`; label = 'Új hátlap!'; name = `${b.name} hátlap`; sub = 'Már ezt használod – az ellenfeleid is ezt látják. A Gyűjteményben a 🃏 Hátlap gombbal válthatsz.'; }
   else { evShowGot(got, e); return; }
   if (got.port) renderMenuFan();
-  const o = document.createElement('div'); o.className = 'overlay opening ev-reveal';
-  o.innerHTML = `<div class="rare-show hw"><div class="rare-rays big hw"></div><div class="rare-card"><img class="evr-myst" src="art/ui/ev-hw-myst.webp" alt="Rejtett jutalom"></div>
+  return rewardRevealShow({ theme: 'hw', myst: '<img class="evr-myst" src="art/ui/ev-hw-myst.webp" alt="Rejtett jutalom">', inner, label, name, sub });
+}
+// közös jutalom-felfedés (Halloween event, Season Pass): rejtett lap → rázkódás → villanás + szikrák → a jutalom
+async function rewardRevealShow({ theme, myst, inner, label, name, sub }) {
+  const o = document.createElement('div'); o.className = `overlay opening ev-reveal rr-${theme}`;
+  o.innerHTML = `<div class="rare-show ${theme}"><div class="rare-rays big ${theme}"></div><div class="rare-card">${myst}</div>
     <div class="rare-banner" hidden>${label}</div><div class="rare-name" hidden>${escH(name)}</div><div class="var-sub" hidden>${sub}</div><div class="op-hint">Koppints a felfedéshez</div></div>`;
   $('#layer').appendChild(o);
   const show = o.querySelector('.rare-show'), card = o.querySelector('.rare-card'), hint = o.querySelector('.op-hint');
@@ -1695,9 +1722,9 @@ async function evRewardReveal(e, got) {
   card.getAnimations().forEach(a => a.cancel());
   await card.animate([0, -3, 3, -5, 5, -7, 7, 0].map((x, k) => ({ transform: `translate(${x}px,${k % 2 ? 1 : -1}px) scale(${1 + k * 0.02})` })), { duration: 800, easing: 'ease-in' }).finished;
   const r = card.getBoundingClientRect(), cx = r.left + r.width / 2, cy = r.top + r.height / 2;
-  const flash = document.createElement('div'); flash.className = 'rare-flash hw'; o.appendChild(flash);
+  const flash = document.createElement('div'); flash.className = 'rare-flash ' + theme; o.appendChild(flash);
   flash.animate([{ opacity: 0 }, { opacity: .7, offset: .15 }, { opacity: 0 }], { duration: 900, fill: 'forwards' }).finished.then(() => flash.remove());
-  const cols = ['#ffb347', '#ff7a00', '#c77dff', '#ffe08a', '#ffffff'];
+  const cols = theme === 'sp' ? ['#ffd34d', '#ffe9a8', '#5fd0ff', '#ffffff', '#f5b400'] : ['#ffb347', '#ff7a00', '#c77dff', '#ffe08a', '#ffffff'];
   for (let k = 0; k < 44; k++) {
     const sp = document.createElement('i'); sp.className = 'rare-spark';
     const a = Math.random() * Math.PI * 2, d = 90 + Math.random() * 170, sz = 4 + Math.random() * 7;
