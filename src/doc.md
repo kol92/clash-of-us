@@ -463,6 +463,9 @@ Hősképesség-ötletek a táblázatban (még nem zöldek, nincsenek beépítve)
 ## Javítás: „Újabb ranked” → Mégse beragadás (2026-10-16)
 - Meccs után az „Újabb ranked” gomb a lezárt meccs képernyőjén indította a keresést; ha valaki „Mégse”-t nyomott, a lezárt táblán ragadt, és a zászló sem csinált semmit. Mostantól az „Újabb ranked” előbb a Ranked képernyőre visz, a keresés megszakítása lezárt meccsből a menübe visz, és lezárt meccsen a zászló is a menübe visz.
 
+## Reptéri ellenőrzés a Cápán (2026-10-19, Tomi)
+- A Reptéri ellenőrzés mostantól a Cápát is célozhatja (eddig kizárta, mert „rögzített” lap). Ha a nálad úszó Cápát átteszed a túloldalra, átáll: azé lesz, aki áttette – az ő köre elején úszik, és az ellenfél karaktereit eszi; a hátralévő úszásai megmaradnak. Védekezésre és visszatámadásra is jó.
+
 ## Javítás: hiányzó kulcsszó a lapszövegben (2026-10-19, Tomi)
 - A lap szövegdoboza a kulcsszavakat (Pajzs, Sunyulás, Lendület…) magától írja ki, de az **Igézhetetlen** és a **Feltámadás** kimaradt – így Tomi, Amsterdam hőse szövegdoboza üres volt, Bence terrorjánál csak a Lendület látszott. Most kiírja (`textHTML`; eszköznél az Igézhetetlent nem, mert a Vodkása szövege leírja; a Feltámadást csak akkor, ha a lapnak nincs saját szövege – Gabi, a legyőzhetetlen leírja).
 
