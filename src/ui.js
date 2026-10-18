@@ -221,6 +221,9 @@ const ART = {
   c_kriszrantott: { src:'art/kriszrantott.webp', av:'58% 22%', pos:'56% 22%' },
   a_rantott: { src:'art/rantott.webp', av:'45% 40%', pos:'50% 38%' },
   c_tomiparti: { src:'art/tomiparti.webp', av:'47% 26%', pos:'47% 24%' },
+  c_tomiparti2: { src:'art/tomiparti2.webp', av:'58% 20%', pos:'58% 18%' },
+  c_laszy2: { src:'art/laszy2.webp', av:'63% 22%', pos:'62% 20%' },
+  c_sasi2: { src:'art/toma2.webp', av:'52% 22%', pos:'52% 20%' },
   a_espresso: { src:'art/espresso.webp', av:'52% 40%', pos:'52% 40%' },
   a_amongus: { src:'art/amongus.webp', av:'50% 62%', pos:'50% 58%' },
   c_alvari: { src:'art/alvari.webp', av:'50% 30%', pos:'50% 30%' },
@@ -1456,7 +1459,7 @@ function burstAt(x, y, big) {
 async function attackAnim(pi, i, u) {
   const el = unitAt(pi, i); if (!el) { await runFx(() => attackLane(S, i)); return; }
   // Laszy: előre eldől, hogy mellé üt-e, így a saját célpontja felé lendül
-  const mf = u.id === 'c_laszy' ? (u.nextMisfire = laszyRoll(S, pi, i)) : null;
+  const mf = bid(u.id) === 'c_laszy' ? (u.nextMisfire = laszyRoll(S, pi, i)) : null;
   if (mf) return misfireAnim(pi, i, el, mf);
   const foe = other(pi), tj = tauntAt(S, foe), j = tj >= 0 ? tj : i, opp = S.players[foe].board[j];
   const toHero = tj < 0 && (!opp || u.id === 'c_nyiti' || isInv(opp));

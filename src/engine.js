@@ -157,6 +157,7 @@ const CARDS = [
   { id:'l_korhaz', type:'loc', name:'Siófoki Kórház', cost:1, rarity:'k', text:'Minden karakter 1 életet gyógyul a gazdája körének végén.' },
 ];
 /* Arany lapok (Amszterdam hősei, 2026-10-17): az alaplap arany változata – ugyanaz a hatás, csak boosterből (0,5% / Shiny 5%) */
+for (const b of ['c_tomiparti', 'c_laszy', 'c_sasi']) CARDS.push({ ...CARDS.find(c => c.id === b), id:b + '2', variantOf:b });   /* 2026-10-18: új packból jövő változatok (Tomi) */
 for (const b of ['a_welcome', 'a_hawaiians', 'f_gameover']) CARDS.push({ ...CARDS.find(c => c.id === b), id:b + '_g', variantOf:b, goldVar:true });
 /* Bong (Amszterdam hősei): minden továbbadáskor 1-gyel drágább token-példány (legfeljebb 10) */
 for (let n = 2; n <= 10; n++) CARDS.push({ ...CARDS.find(c => c.id === 'a_bong'), id:'a_bong' + n, cost:n, bong:n, token:true, rarity:'r' });
@@ -935,7 +936,7 @@ function strike(s, i) {
   ev(s, { t:'attack', side:pi, i });
   if ((CARD[u.id].variantOf || u.id) === 'c_tzs') damageHero(s, pi, 1);
   if (a <= 0 || s.winner != null) return;
-  const mf = u.id !== 'c_laszy' ? null : ('nextMisfire' in u ? u.nextMisfire : laszyRoll(s, pi, i));
+  const mf = bid(u.id) !== 'c_laszy' ? null : ('nextMisfire' in u ? u.nextMisfire : laszyRoll(s, pi, i));
   delete u.nextMisfire;
   if (mf) {
     const pick = mf;
