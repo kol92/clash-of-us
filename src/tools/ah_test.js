@@ -71,7 +71,7 @@ ok(rc('k') === 13 && rc('r') === 6 && rc('e') === 4 && rc('l') === 3, `ritkaság
 { const s = G(); const d0 = s.players[0].deck.length; play(s, 0, 'a_hawaiians', { k: 'none' });
   ok(s.players[0].deck.filter(x => x === 'i_gomba').length === 5 && s.players[0].deck.length === d0 + 5, 'High Hawaiians: 5 Varázsgomba a pakliba');
   play(s, 0, 'c_ah_barna', { k: 'slot', side: 0, i: 0 }); ok(s.players[0].deck.filter(x => x === 'i_gomba').length === 6, 'Barna: +1 Varázsgomba a pakliba');
-  play(s, 0, 'c_ah_laci', { k: 'slot', side: 0, i: 1 }); ok(s.players[0].hand.filter(h => h.id === 'a_irkave').length === 2, 'Laci: 2 Ír kávé a kézbe');
+  play(s, 0, 'c_ah_laci', { k: 'slot', side: 0, i: 1 }); ok(s.players[0].hand.filter(h => h.id === 'a_irkave').length === 1, 'Laci: 1 Ír kávé a kézbe');
   play(s, 0, 'c_ah_ati', { k: 'slot', side: 0, i: 2 }); ok(s.players[0].board[3] && s.players[0].board[3].id === 'c_betti', 'Ati: Betti mellé (jobbra)'); }
 // --- Reptéri ellenőrzés ---
 { const s = G(); U(s, 1, 1, 'c_vajda'); U(s, 0, 0, 'c_kovacs');

@@ -2344,7 +2344,7 @@ body.pf-loading #scr-menu .pb-name::after{content:'';display:inline-block;width:
 <script src="vendor/firebase-auth-compat.js"></script>
 <script src="vendor/firebase-firestore-compat.js"></script>
 <script src="vendor/firebase-database-compat.js"></script>
-<script>window.APP_VERSION = "2026.10.18-1251"; window.APP_BUILD = "2026.10.18-1259";</script>
+<script>window.APP_VERSION = "2026.10.18-1346"; window.APP_BUILD = "2026.10.18-1346";</script>
 <script>// ===== Best of Us – saját szerver (Firebase) =====
 // A játék eredetileg a Claude-os tárolót használta (window.claude.use('db' | 'user' | 'room')).
 // Ez a fájl ugyanazt a felületet adja Firebase-ből, így a játék kódja szinte változatlan maradhat:
@@ -2683,10 +2683,10 @@ const CARDS = [
   { id:'c_ah_sasi', set:'ah', type:'char', name:'Sasi, Amsterdam hőse', cost:4, atk:2, hp:6, rarity:'k', haste:true, text:'' },
   { id:'c_ah_tomi', set:'ah', type:'char', name:'Tomi, Amsterdam hőse', cost:3, atk:1, hp:4, rarity:'k', elusive:true, text:'' },
   { id:'c_ah_barna', set:'ah', type:'char', name:'Barna, Amsterdam hőse', cost:3, atk:3, hp:2, rarity:'k', text:'Kijátszáskor keverj egy Varázsgomba lapot a paklidba.' },
-  { id:'c_ah_laci', set:'ah', type:'char', name:'Laci, Amsterdam hőse', cost:2, atk:2, hp:2, rarity:'k', text:'Kijátszáskor két Ír kávé kerül a kezedbe.' },
+  { id:'c_ah_laci', set:'ah', type:'char', name:'Laci, Amsterdam hőse', cost:2, atk:2, hp:2, rarity:'k', text:'Kijátszáskor egy Ír kávé kerül a kezedbe.' },
   { id:'c_ah_ati', set:'ah', type:'char', name:'Ati, Amsterdam hőse', cost:5, atk:3, hp:4, rarity:'k', text:'Kijátszáskor maga mellé idéz egy 2/2-es Bettit.' },
   { id:'c_betti', set:'ah', type:'char', name:'Betti', cost:0, atk:2, hp:2, rarity:'k', token:true, text:'Ati, Amsterdam hőse idézi meg.' },
-  { id:'c_ah_bence', set:'ah', type:'char', name:'Bence, Amsterdam terrorja', cost:6, atk:4, hp:5, rarity:'l', haste:true, revive:true, text:'' },
+  { id:'c_ah_bence', set:'ah', type:'char', name:'Bence, Amsterdam terrorja', cost:6, atk:3, hp:5, rarity:'l', haste:true, revive:true, text:'' },
   // Bolti eszköz (2026-10-16): csak a Boltban kapható, packból nem jön
   { id:'i_cipo', type:'item', name:'Laci cipőkanala', cost:1, atk:0, hp:0, rarity:'k', shopOnly:true, price:100, mover:true, text:'Amelyik karakterre ráteszed, azt a körödben egyszer áthelyezheted a táblán (üres helyre, vagy helycserével).' },
   { id:'i_aranylanc', type:'item', name:'Tomi nyaklánca', cost:3, atk:2, hp:3, rarity:'l', text:'' },
@@ -3067,7 +3067,7 @@ function playCard(s, pi, hi, t) {
     }
     if (bid(c.id) === 'c_sasimeselo') draw(s, pi);
     if (c.id === 'c_ah_barna') { p.deck.push('i_gomba'); shuffle(p.deck); ev(s, { t:'shuffled', side:pi, i:t.i, n:1, id:'i_gomba' }); }
-    if (c.id === 'c_ah_laci') { ev(s, { t:'gift', side:pi, i:t.i, id:'a_irkave' }); addToHand(s, pi, 'a_irkave'); addToHand(s, pi, 'a_irkave'); }
+    if (c.id === 'c_ah_laci') { ev(s, { t:'gift', side:pi, i:t.i, id:'a_irkave' }); addToHand(s, pi, 'a_irkave'); }   /* 2026-10-18: kettő helyett egy */
     if (c.id === 'c_ah_ati') {   /* Betti maga mellé (előbb jobbra, aztán balra, különben bárhova) */
       const os = openSlots(s, pi), spots = [t.i + 1, t.i - 1].filter(j => os.includes(j)), j = spots.length ? spots[0] : os.length ? os[0] : -1;
       if (j >= 0) { p.board[j] = makeUnit(s, 'c_betti', pi); ev(s, { t:'summon', side:pi, i:j, id:'c_betti' }); }
