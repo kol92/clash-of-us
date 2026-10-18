@@ -463,6 +463,9 @@ Hősképesség-ötletek a táblázatban (még nem zöldek, nincsenek beépítve)
 ## Javítás: „Újabb ranked” → Mégse beragadás (2026-10-16)
 - Meccs után az „Újabb ranked” gomb a lezárt meccs képernyőjén indította a keresést; ha valaki „Mégse”-t nyomott, a lezárt táblán ragadt, és a zászló sem csinált semmit. Mostantól az „Újabb ranked” előbb a Ranked képernyőre visz, a keresés megszakítása lezárt meccsből a menübe visz, és lezárt meccsen a zászló is a menübe visz.
 
+## Napi ingyen pack → Amsterdam Hősei (2026-10-18, Tomi)
+- Kedd 2026-10-20 0:00-tól (Budapest) a bolti napi ingyen pack Amsterdam Hősei pack (`AH_FREE_FROM`, `freePackSet()` a meta.js-ben); hétfőn, a szett indulása napján még Base set. Gomb: „🌷 Napi ingyen Amsterdam pack”.
+
 ## Dávid megújul: új Törzsvendég + „Bocsi, de vezetek” (2026-10-18, Tomi döntése)
 - **Miért:** egyre több a helyszín, a régi Törzsvendég (helyszínenként külön kedvezmény) követhetetlen lett, és Dávid gyenge volt (más paklikkal ~40,6%). A Munkahely Kánon esemény „nagyon rossz” volt → teljesen kivezetve (`off:true`).
 - **Új passzív (a „G” ötlet):** a köre végén, ha van bármilyen helyszín a pályán, egy véletlen saját karaktere végleg +1/+1-et kap. Mérés közben ez volt a legjobb a 7 ötletből.

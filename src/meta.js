@@ -120,6 +120,8 @@ function rollHeroFa(p) {
 const owned = id => { const e = Store.p?.coll[id]; return e ? e.n + e.f : 0; };
 const ownsFoil = id => (Store.p?.coll[id]?.f || 0) > 0;
 const earnedToday = () => Store.p && Store.p.earned.date === today() ? Store.p.earned.amt : 0;
+const AH_FREE_FROM = Date.UTC(2026, 9, 19, 22, 0, 0);   /* kedd 2026-10-20 0:00 (Budapest) – a napi ingyen pack innentől Amsterdam Hősei */
+const freePackSet = () => (setLive('ah') && Date.now() >= AH_FREE_FROM) ? 'ah' : 'base';
 const freePackReady = () => !!Store.p && Store.p.freeDate !== today();
 
 // ---- mentés: felhő (Claude-fiók) vagy ez az eszköz ----
@@ -709,7 +711,7 @@ function renderShop() {
     p.ahPacks > 0 ? `<button class="btn primary gift" id="giftAh">🌷 Amsterdam pack bontása${p.ahPacks > 1 ? ` (${p.ahPacks})` : ''}</button>` : '',
     p.ahShinyPacks > 0 ? `<button class="btn primary shiny-btn" id="giftAhShiny">🌷 Amsterdam Shiny pack${p.ahShinyPacks > 1 ? ` (${p.ahShinyPacks})` : ''}</button>` : '',
     p.shinyPacks > 0 ? `<button class="btn primary shiny-btn" id="giftShiny">🎁 Ajándék Shiny pack${p.shinyPacks > 1 ? ` (${p.shinyPacks})` : ''}</button>` : '',
-    `<button class="btn primary" id="freePack" ${free ? '' : 'disabled'}>${free ? '🎁 Napi ingyen pack' : 'Mai ingyen pack elhasználva'}</button>`].join('');
+    `<button class="btn primary" id="freePack" ${free ? '' : 'disabled'}>${free ? (freePackSet() === 'ah' ? '🌷 Napi ingyen Amsterdam pack' : '🎁 Napi ingyen pack') : 'Mai ingyen pack elhasználva'}</button>`].join('');
   $('#shopBody').innerHTML = `
     <div class="wallet"><span class="coin" aria-hidden="true"></span><b>${p.coins}</b><small>coin</small></div>
     ${limited ? '<button class="lim-jump" data-jump><img src="art/ui/ic-timer.webp" alt="" aria-hidden="true"> Limitált lapok és portrék – lejjebb ↓</button>' : ''}
@@ -742,7 +744,7 @@ function renderShop() {
     if (Store.p.coins < pr) return toast(`Nincs elég coinod (${Store.p.coins}/${pr})`);
     buyPack(k.startsWith('ah') ? 'ah' : 'base', sh ? 'shiny' : false); });
   const jb = $('#shopBody').querySelector('[data-jump]'); if (jb) jb.onclick = () => $('#shopBody .shop-limited')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  $('#freePack').onclick = () => buyPack('base', true);
+  $('#freePack').onclick = () => buyPack(freePackSet(), true);
   if ($('#chestBtn')) $('#chestBtn').onclick = () => buyChest();
   if ($('#giftPack')) $('#giftPack').onclick = () => buyPack('base', 'gift');
   if ($('#faPack')) $('#faPack').onclick = () => buyPack('base', 'fa');
