@@ -2344,7 +2344,7 @@ body.pf-loading #scr-menu .pb-name::after{content:'';display:inline-block;width:
 <script src="vendor/firebase-auth-compat.js"></script>
 <script src="vendor/firebase-firestore-compat.js"></script>
 <script src="vendor/firebase-database-compat.js"></script>
-<script>window.APP_VERSION = "2026.10.18-1350"; window.APP_BUILD = "2026.10.18-1350";</script>
+<script>window.APP_VERSION = "2026.10.18-1537"; window.APP_BUILD = "2026.10.18-1537";</script>
 <script>// ===== Best of Us – saját szerver (Firebase) =====
 // A játék eredetileg a Claude-os tárolót használta (window.claude.use('db' | 'user' | 'room')).
 // Ez a fájl ugyanazt a felületet adja Firebase-ből, így a játék kódja szinte változatlan maradhat:
@@ -7926,7 +7926,7 @@ async function pvpJoin(id, dk) {
     const lease = await ref.acquire({ holder: Store.uid, ttlMs: 5000 });
     if (!lease.acquired) { toast('Épp más is csatlakozik, próbáld újra'); return false; }
     const snap = await ref.get(); const d = snap.exists ? snap.data() : null;
-    if (!d || d.status !== 'open' || d.guest) { toast('Ezt a kihívást már elfogadta valaki'); return false; }
+    if (!d || d.status !== 'open' || d.guest) { toast(d ? 'Ezt a kihívást már elfogadta valaki' : 'Ez a keresés közben megszűnt'); return false; }
     const guest = pvpMe(dk), first = Math.random() < .5 ? 0 : 1;
     PVP.id = id; seedRng(pvpHash(id + ':start'));
     const s = newGame(d.host.hero, { ...d.host.list }, guest.hero, { ...guest.list }, first, { mulligan: true, foils: [d.host.cos?.foilN || {}, guest.cos?.foilN || {}] });
@@ -7934,7 +7934,10 @@ async function pvpJoin(id, dk) {
     s.names = [d.host.name, guest.name];
     s.cos = [d.host.cos || { heroFa: false, foils: [] }, guest.cos];
     const upd = { parts: [d.host.uid, Store.uid], guest, status: 'mull', first, v: 0, state: pvpClean(s), mulled: [false, false], updated: Date.now(), mullAt: Date.now(), afk: [0, 0] };
-    await ref.update(upd);
+    /* 2026-10-18: tranzakcióban – ha a gazda közben lezárta (bothoz ment / Mégse), nem lépünk be egy halott meccsbe */
+    const ok = await Store.db.runTransaction(async tx => { const sn = await tx.get(ref); const x = sn.exists ? sn.data() : null;
+      if (!x || x.status !== 'open' || x.guest) return false; tx.update(ref, upd); return true; });
+    if (!ok) { PVP.id = null; toast('Ez a keresés közben megszűnt'); return false; }
     pvpEnter(id, { id, ...d, ...upd });
     return true;
   } catch { toast('Nem sikerült csatlakozni'); return false; }
@@ -8193,7 +8196,13 @@ async function pvpSearchTick() {
     return;
   }
   if (PVP.ranked && PVP.rkBot && now - PVP.searchT0 > 20000 && !PVP.friendTo) {   // ranked: 20 mp után bot
-    const dk = PVP.searchDeck; pvpStopSearch(true); rankedBot(dk); return;
+    /* 2026-10-18 javítás: előbb atomian lezárjuk a saját keresésünket – ha közben valaki csatlakozott, az élő meccsbe lépünk, nem a bothoz */
+    const dk = PVP.searchDeck; clearInterval(PVP.hb); PVP.hb = null;
+    const r = await pvpCloseSearch(PVP.searching);
+    if (!PVP.searchDeck && !r.joined) return;   /* közben Mégse */
+    if (r.joined) { pvpStopSearch(); pvpEnter(r.joined.id, r.joined); return; }
+    if (r.err) { if (PVP.searchDeck) PVP.hb = setInterval(pvpSearchTick, 4000); return; }
+    PVP.searching = null; pvpStopSearch(true); rankedBot(dk); return;
   }
   if (!mine && !PVP.creating && !PVP.searching) {
     PVP.creating = true;
@@ -8204,9 +8213,25 @@ async function pvpSearchTick() {
   } else if (mine) { PVP.friendSeen = true; pvpDoc(mine.id).update({ seen: now }).catch(() => {}); }
   else if (PVP.friendTo && PVP.searching && PVP.friendSeen) { toast(`${PVP.friendTo.name} most nem ér rá`); pvpStopSearch(); }   // elutasította (törölte a kihívást)
 }
+// a saját nyitott keresés lezárása tranzakcióban: { closed } = töröltük; { joined: doc } = valaki már csatlakozott; { err } = nem sikerült
+async function pvpCloseSearch(id) {
+  if (!id) return { closed: true };
+  const ref = pvpDoc(id);
+  try {
+    const r = await Store.db.runTransaction(async tx => {
+      const sn = await tx.get(ref); if (!sn.exists) return { closed: true };
+      const d = sn.data();
+      if (d.status === 'open' && !d.guest) { tx.delete(ref); return { closed: true }; }
+      return { joined: { id, ...d } };
+    });
+    if (r.joined && !r.joined.state) { const sn = await ref.get(); if (sn.exists) r.joined = { id, ...sn.data() }; }
+    return r;
+  } catch (e) { return { err: true }; }
+}
 function pvpStopSearch(cancel) {
   clearInterval(PVP.hb); clearInterval(PVP.searchClock); PVP.hb = null;
-  if (cancel && PVP.searching) { const d = PVP.list.find(x => x.id === PVP.searching); if (!d || d.status === 'open') pvpDoc(PVP.searching).delete().catch(() => {}); }
+  if (cancel && PVP.searching) { const sid = PVP.searching;   /* tranzakcióval: ha közben valaki csatlakozott, nem töröljük alóla – a meccs a PvP-listában folytatható */
+    pvpCloseSearch(sid).then(r => { if (r.joined && r.joined.status === 'mull') toast('Közben csatlakozott valaki – a meccset a PvP menüben folytathatod'); }); }
   PVP.searching = null; PVP.searchDeck = null; PVP.friendTo = null; PVP.friendSeen = false; PVP.ranked = false;
   $('#layer .pv-search')?.remove(); pvpPresence();
   // ha egy lezárt meccs képernyőjén maradt (pl. „Újabb ranked” → Mégse), vigyük vissza a menübe
