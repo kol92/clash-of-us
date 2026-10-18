@@ -46,7 +46,7 @@
     async add(d) { const r = this.doc(); await r.set(d); return r; }
   }
   const fsObj = { settings() {}, doc: p => new DocumentReference(p), collection: p => new Query(p),
-    async runTransaction(fn) { const tx = { get: r => r.get(), update: (r, d) => { tx.w.push(() => r.update(d)); }, set: (r, d) => { tx.w.push(() => r.set(d)); }, w: [] }; const res = await fn(tx); for (const w of tx.w) await w(); return res; } };
+    async runTransaction(fn) { const tx = { get: r => r.get(), update: (r, d) => { tx.w.push(() => r.update(d)); }, set: (r, d) => { tx.w.push(() => r.set(d)); }, delete: r => { tx.w.push(() => r.delete()); }, w: [] }; const res = await fn(tx); for (const w of tx.w) await w(); return res; } };
   // ---------- realtime database ----------
   const RL = () => JSON.parse(localStorage.getItem('fbrt') || '{}'), RS = o => { localStorage.setItem('fbrt', JSON.stringify(o)); notify(); };
   const getP = (o, p) => p.split('/').filter(Boolean).reduce((a, k) => a && a[k], o);

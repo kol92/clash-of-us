@@ -1519,13 +1519,32 @@ function showPassReveal(got) {
   o.onclick = e => { if (e.target.closest('[data-x]')) o.remove(); };
   $('#layer').appendChild(o);
 }
+// Season Pass: minden átvett jutalom felfedéssel (2026-10-18, Tomi – „legyen meg a reward érzés”, mint a Halloween eventnél)
+function passRevealData(r, got) {
+  const big = (img, n, cap) => `<div class="spr-big"><img src="${img}" alt="">${n > 1 ? `<b class="spr-x">×${n}</b>` : ''}<em>${cap}</em></div>`;
+  if (got && got.coinsInstead) return { inner: `<div class="spr-big"><span class="coin spr-coin"></span><em>+${got.coinsInstead} coin</em></div>`, label: '+ Coin!', name: `${got.coinsInstead} coin`, sub: 'Ez a lap már megvolt, ezért coint kaptál helyette.' };
+  if (got && got.port) { const P = PORTRAITS[got.port], h = HERO[P.hero]; return { inner: heroCardHTML(h, { big: true, port: got.port }), label: 'Új skin!', name: P.name, sub: `${h.name} mostantól ezt viseli, mindig Full Artban – a Gyűjteményben a hősre koppintva visszaválthatsz.` }; }
+  if (got && got.goldHero) { const h = HERO[got.goldHero]; return { inner: heroCardHTML(h, { big: true, gold: true, foil: true }), label: 'Arany hős!', name: `Arany ${h.name}`, sub: 'Mostantól ezt viseli – a Gyűjteményben a hősre koppintva visszaválthatsz.' }; }
+  if (got && got.hero) { const h = HERO[got.hero]; return { inner: heroCardHTML(h, { big: true, foil: true }), label: 'Full Art hős!', name: h.name, sub: 'Bekerült a gyűjteményedbe.' }; }
+  if (got && got.id) return { inner: cardHTML(got.id, { big: true, foil: true }), label: 'Új lap!', name: CARD[got.id].name, sub: `${CARD[got.id].variantOf ? 'Különleges változat, Full Art – 2 példány' : 'Full Art'} · bekerült a gyűjteményedbe` };
+  if (r.coins) return { inner: `<div class="spr-big"><span class="coin spr-coin"></span><em>+${r.coins}</em></div>`, label: '+ Coin!', name: `${r.coins} coin`, sub: 'Jóváírtuk a coinjaid közé.' };
+  if (r.packs) return { inner: big('art/ui/pack-base.webp', r.packs, ''), label: r.packs > 1 ? 'Új packok!' : 'Új pack!', name: `${r.packs} Base set booster`, sub: 'A Boltban, az ajándékok között bonthatod ki.' };
+  if (r.shiny) return { inner: big('art/ui/pack-shiny.webp', r.shiny, ''), label: 'Shiny pack!', name: `${r.shiny} Shiny pack`, sub: 'A Boltban, az ajándékok között bonthatod ki.' };
+  if (r.fa) return { inner: `<div class="spr-fa">${big('art/ui/pack-base.webp', r.fa, '')}</div>`, label: 'Full Art pack!', name: `${r.fa} Full Art pack`, sub: 'Minden lapja Full Art – a Boltban bonthatod ki.' };
+  return null;
+}
+function passReveal(r, got) {
+  const d = passRevealData(r, got); if (!d) { toast(`+${rewLabel(r)}`); return Promise.resolve(); }
+  if (got && (got.port || got.goldHero)) renderMenuFan();
+  return rewardRevealShow({ theme: 'sp', myst: `<img class="spr-myst" src="${(BACKS[myBack()] || BACKS.base).src}" alt="Rejtett jutalom">`, ...d });
+}
 function claimTier(i) {
   const p = Store.p, s = curSeason() || SEASONS.find(x => x.id === p.pass?.season); if (!s) return;
   const P = p.pass; if (P.claimed.includes(i) || passLevel(P.xp) < i + 1) return;
   const r = s.tiers[i];
   const finish = hero => {
     const got = grantRew(p, r, hero); P.claimed.push(i); save(); renderPass(); renderProfileBar();
-    if (got) showPassReveal(got); else toast(`+${rewLabel(r)}`);
+    passReveal(r, got);
   };
   if (r.heroPick) pickHero(null, finish, 'Válaszd ki a Full Art hősödet', 'Ennek a hősnek a Full Art változatát kapod meg. A már meglévőket ✨ jelzi.');
   else if (r.goldPick) pickHero(null, finish, 'Válaszd ki az Arany hősödet', 'Ennek a hősnek az Arany változatát kapod meg (ha már megvan, helyette coint).');
@@ -1537,14 +1556,18 @@ function claimAll() {
   for (let i = 0; i < Math.min(lv, s.tiers.length); i++) {
     if (P.claimed.includes(i)) continue;
     if (s.tiers[i].heroPick || s.tiers[i].goldPick) { hero = i; continue; }   // a hőst külön kell kiválasztani
-    const got = grantRew(p, s.tiers[i]); P.claimed.push(i); n++; if (got) shown = got;
+    const got = grantRew(p, s.tiers[i]); P.claimed.push(i); n++; shown = shown || []; shown.push([s.tiers[i], got]);
   }
   const ex = Math.max(0, lv - s.tiers.length - (P.extra || 0));
   if (ex) { p.giftPacks = (p.giftPacks || 0) + ex; P.extra = (P.extra || 0) + ex; n += ex; }
   save(); renderPass(); renderProfileBar();
-  if (n) toast(`${n} jutalom átvéve`);
-  if (shown) showPassReveal(shown);
-  if (hero >= 0) setTimeout(() => claimTier(hero), shown ? 0 : 300);
+  (async () => {   /* egyenként felfedjük őket (max. 6, a többi egy összesítőben) */
+    const L = shown || [];
+    for (const [r, got] of L.slice(0, 6)) await passReveal(r, got);
+    if (L.length > 6) toast(`+ még ${L.length - 6} jutalom: ${L.slice(6).map(([r, g]) => g && g.coinsInstead ? `${g.coinsInstead} coin` : rewLabel(r)).join(', ')}`);
+    if (ex) toast(`+${ex} ajándék pack (a 30. szint fölött)`);
+    if (hero >= 0) setTimeout(() => claimTier(hero), 300);
+  })();
 }
 function renderPass() {
   const p = Store.p; if (!p) return;
@@ -1682,8 +1705,12 @@ async function evRewardReveal(e, got) {
   else if (got.back) { const b = BACKS[got.back]; inner = `<img class="evr-back" src="${b.src}" alt="${b.name} hátlap">`; label = 'Új hátlap!'; name = `${b.name} hátlap`; sub = 'Már ezt használod – az ellenfeleid is ezt látják. A Gyűjteményben a 🃏 Hátlap gombbal válthatsz.'; }
   else { evShowGot(got, e); return; }
   if (got.port) renderMenuFan();
-  const o = document.createElement('div'); o.className = 'overlay opening ev-reveal';
-  o.innerHTML = `<div class="rare-show hw"><div class="rare-rays big hw"></div><div class="rare-card"><img class="evr-myst" src="art/ui/ev-hw-myst.webp" alt="Rejtett jutalom"></div>
+  return rewardRevealShow({ theme: 'hw', myst: '<img class="evr-myst" src="art/ui/ev-hw-myst.webp" alt="Rejtett jutalom">', inner, label, name, sub });
+}
+// közös jutalom-felfedés (Halloween event, Season Pass): rejtett lap → rázkódás → villanás + szikrák → a jutalom
+async function rewardRevealShow({ theme, myst, inner, label, name, sub }) {
+  const o = document.createElement('div'); o.className = `overlay opening ev-reveal rr-${theme}`;
+  o.innerHTML = `<div class="rare-show ${theme}"><div class="rare-rays big ${theme}"></div><div class="rare-card">${myst}</div>
     <div class="rare-banner" hidden>${label}</div><div class="rare-name" hidden>${escH(name)}</div><div class="var-sub" hidden>${sub}</div><div class="op-hint">Koppints a felfedéshez</div></div>`;
   $('#layer').appendChild(o);
   const show = o.querySelector('.rare-show'), card = o.querySelector('.rare-card'), hint = o.querySelector('.op-hint');
@@ -1695,9 +1722,9 @@ async function evRewardReveal(e, got) {
   card.getAnimations().forEach(a => a.cancel());
   await card.animate([0, -3, 3, -5, 5, -7, 7, 0].map((x, k) => ({ transform: `translate(${x}px,${k % 2 ? 1 : -1}px) scale(${1 + k * 0.02})` })), { duration: 800, easing: 'ease-in' }).finished;
   const r = card.getBoundingClientRect(), cx = r.left + r.width / 2, cy = r.top + r.height / 2;
-  const flash = document.createElement('div'); flash.className = 'rare-flash hw'; o.appendChild(flash);
+  const flash = document.createElement('div'); flash.className = 'rare-flash ' + theme; o.appendChild(flash);
   flash.animate([{ opacity: 0 }, { opacity: .7, offset: .15 }, { opacity: 0 }], { duration: 900, fill: 'forwards' }).finished.then(() => flash.remove());
-  const cols = ['#ffb347', '#ff7a00', '#c77dff', '#ffe08a', '#ffffff'];
+  const cols = theme === 'sp' ? ['#ffd34d', '#ffe9a8', '#5fd0ff', '#ffffff', '#f5b400'] : ['#ffb347', '#ff7a00', '#c77dff', '#ffe08a', '#ffffff'];
   for (let k = 0; k < 44; k++) {
     const sp = document.createElement('i'); sp.className = 'rare-spark';
     const a = Math.random() * Math.PI * 2, d = 90 + Math.random() * 170, sz = 4 + Math.random() * 7;
@@ -2252,7 +2279,7 @@ async function pvpJoin(id, dk) {
     const lease = await ref.acquire({ holder: Store.uid, ttlMs: 5000 });
     if (!lease.acquired) { toast('Épp más is csatlakozik, próbáld újra'); return false; }
     const snap = await ref.get(); const d = snap.exists ? snap.data() : null;
-    if (!d || d.status !== 'open' || d.guest) { toast('Ezt a kihívást már elfogadta valaki'); return false; }
+    if (!d || d.status !== 'open' || d.guest) { toast(d ? 'Ezt a kihívást már elfogadta valaki' : 'Ez a keresés közben megszűnt'); return false; }
     const guest = pvpMe(dk), first = Math.random() < .5 ? 0 : 1;
     PVP.id = id; seedRng(pvpHash(id + ':start'));
     const s = newGame(d.host.hero, { ...d.host.list }, guest.hero, { ...guest.list }, first, { mulligan: true, foils: [d.host.cos?.foilN || {}, guest.cos?.foilN || {}] });
@@ -2260,7 +2287,10 @@ async function pvpJoin(id, dk) {
     s.names = [d.host.name, guest.name];
     s.cos = [d.host.cos || { heroFa: false, foils: [] }, guest.cos];
     const upd = { parts: [d.host.uid, Store.uid], guest, status: 'mull', first, v: 0, state: pvpClean(s), mulled: [false, false], updated: Date.now(), mullAt: Date.now(), afk: [0, 0] };
-    await ref.update(upd);
+    /* 2026-10-18: tranzakcióban – ha a gazda közben lezárta (bothoz ment / Mégse), nem lépünk be egy halott meccsbe */
+    const ok = await Store.db.runTransaction(async tx => { const sn = await tx.get(ref); const x = sn.exists ? sn.data() : null;
+      if (!x || x.status !== 'open' || x.guest) return false; tx.update(ref, upd); return true; });
+    if (!ok) { PVP.id = null; toast('Ez a keresés közben megszűnt'); return false; }
     pvpEnter(id, { id, ...d, ...upd });
     return true;
   } catch { toast('Nem sikerült csatlakozni'); return false; }
@@ -2519,7 +2549,13 @@ async function pvpSearchTick() {
     return;
   }
   if (PVP.ranked && PVP.rkBot && now - PVP.searchT0 > 20000 && !PVP.friendTo) {   // ranked: 20 mp után bot
-    const dk = PVP.searchDeck; pvpStopSearch(true); rankedBot(dk); return;
+    /* 2026-10-18 javítás: előbb atomian lezárjuk a saját keresésünket – ha közben valaki csatlakozott, az élő meccsbe lépünk, nem a bothoz */
+    const dk = PVP.searchDeck; clearInterval(PVP.hb); PVP.hb = null;
+    const r = await pvpCloseSearch(PVP.searching);
+    if (!PVP.searchDeck && !r.joined) return;   /* közben Mégse */
+    if (r.joined) { pvpStopSearch(); pvpEnter(r.joined.id, r.joined); return; }
+    if (r.err) { if (PVP.searchDeck) PVP.hb = setInterval(pvpSearchTick, 4000); return; }
+    PVP.searching = null; pvpStopSearch(true); rankedBot(dk); return;
   }
   if (!mine && !PVP.creating && !PVP.searching) {
     PVP.creating = true;
@@ -2530,9 +2566,25 @@ async function pvpSearchTick() {
   } else if (mine) { PVP.friendSeen = true; pvpDoc(mine.id).update({ seen: now }).catch(() => {}); }
   else if (PVP.friendTo && PVP.searching && PVP.friendSeen) { toast(`${PVP.friendTo.name} most nem ér rá`); pvpStopSearch(); }   // elutasította (törölte a kihívást)
 }
+// a saját nyitott keresés lezárása tranzakcióban: { closed } = töröltük; { joined: doc } = valaki már csatlakozott; { err } = nem sikerült
+async function pvpCloseSearch(id) {
+  if (!id) return { closed: true };
+  const ref = pvpDoc(id);
+  try {
+    const r = await Store.db.runTransaction(async tx => {
+      const sn = await tx.get(ref); if (!sn.exists) return { closed: true };
+      const d = sn.data();
+      if (d.status === 'open' && !d.guest) { tx.delete(ref); return { closed: true }; }
+      return { joined: { id, ...d } };
+    });
+    if (r.joined && !r.joined.state) { const sn = await ref.get(); if (sn.exists) r.joined = { id, ...sn.data() }; }
+    return r;
+  } catch (e) { return { err: true }; }
+}
 function pvpStopSearch(cancel) {
   clearInterval(PVP.hb); clearInterval(PVP.searchClock); PVP.hb = null;
-  if (cancel && PVP.searching) { const d = PVP.list.find(x => x.id === PVP.searching); if (!d || d.status === 'open') pvpDoc(PVP.searching).delete().catch(() => {}); }
+  if (cancel && PVP.searching) { const sid = PVP.searching;   /* tranzakcióval: ha közben valaki csatlakozott, nem töröljük alóla – a meccs a PvP-listában folytatható */
+    pvpCloseSearch(sid).then(r => { if (r.joined && r.joined.status === 'mull') toast('Közben csatlakozott valaki – a meccset a PvP menüben folytathatod'); }); }
   PVP.searching = null; PVP.searchDeck = null; PVP.friendTo = null; PVP.friendSeen = false; PVP.ranked = false;
   $('#layer .pv-search')?.remove(); pvpPresence();
   // ha egy lezárt meccs képernyőjén maradt (pl. „Újabb ranked” → Mégse), vigyük vissza a menübe

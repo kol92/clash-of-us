@@ -463,6 +463,14 @@ Hősképesség-ötletek a táblázatban (még nem zöldek, nincsenek beépítve)
 ## Javítás: „Újabb ranked” → Mégse beragadás (2026-10-16)
 - Meccs után az „Újabb ranked” gomb a lezárt meccs képernyőjén indította a keresést; ha valaki „Mégse”-t nyomott, a lezárt táblán ragadt, és a zászló sem csinált semmit. Mostantól az „Újabb ranked” előbb a Ranked képernyőre visz, a keresés megszakítása lezárt meccsből a menübe visz, és lezárt meccsen a zászló is a menübe visz.
 
+## Season Pass: jutalom-felfedés (2026-10-18, Tomi)
+- Minden átvett Season Pass jutalom ugyanazzal az animációval nyílik, mint a Halloween eventé (közös `rewardRevealShow`, arany–kék „sp” téma): a saját hátlapod jelenik meg rejtett lapként, rázkódik, villan, és előbukkan a jutalom (pack, coin, lap, skin, hős) felirattal.
+- „Mindet átveszem”: egymás után felfedi őket (legfeljebb 6, a többit egy összesítő üzenet írja ki), a hősválasztós szint a végén jön.
+
+## Javítás: ranked – az egyik fél bot ellen, a másik élő meccsben (2026-10-18, Tomi + haver)
+- **Hiba:** a ranked keresés 20 mp után botra vált. A váltás a helyi (néha pár másodperccel elavult) listát nézte: ha a másik játékos épp akkor csatlakozott, a kereső fél bot ellen kezdett és törölte a közös meccset, a csatlakozó pedig egy halott meccsben várt (az ellenfél „nem lépett”).
+- **Javítás:** a botra váltás és a Mégse is tranzakcióban zárja le a keresést (`pvpCloseSearch`): ha közben valaki csatlakozott, az élő meccsbe lép. A csatlakozás is tranzakciós (`pvpJoin`): törölt / lezárt keresésbe nem lehet belépni. Két géppel szimulálva (régi kód: hiba előjön, új: mindketten ugyanabban a meccsben).
+
 ## Napi ingyen pack → Amsterdam Hősei (2026-10-18, Tomi)
 - Kedd 2026-10-20 0:00-tól (Budapest) a bolti napi ingyen pack Amsterdam Hősei pack (`AH_FREE_FROM`, `freePackSet()` a meta.js-ben); hétfőn, a szett indulása napján még Base set. Gomb: „🌷 Napi ingyen Amsterdam pack”.
 
