@@ -66,10 +66,14 @@
   };
   function loginError(e) {
     if (!loginEl || !e) return;
-    const m = ERR[e.code] ?? ('Nem sikerült: ' + (e.code || e.message || e));
+    const m = e.code === 'x' ? e.message : ERR[e.code] ?? ('Nem sikerült: ' + (e.code || e.message || e));
     const el = loginEl.querySelector('.lg-err'); el.hidden = !m; el.textContent = m;
   }
   const standalone = () => matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+  /* 2026-10-18: beépített böngészők (Messenger, Facebook, Instagram, Android WebView) – ezekben a Google-belépés nem működik */
+  const UA = navigator.userAgent || '', isAndroid = /Android/i.test(UA);
+  const inApp = /FBAN|FBAV|FB_IAB|FBIOS|Messenger|Instagram|MicroMessenger|Line\/|; wv\)/i.test(UA);
+  const chromeUrl = () => 'intent://' + location.host + location.pathname + location.search + '#Intent;scheme=https;package=com.android.chrome;end';
   function showLogin() {
     if (loginEl) return;
     const o = loginEl = document.createElement('div'); o.className = 'overlay login';
@@ -77,6 +81,7 @@
         <div class="lg-logo" aria-hidden="true"></div>
         <h2>Best of Us</h2>
         <p>Lépj be, hogy a gyűjteményed a felhőben legyen, és bármelyik telefonodon folytathasd.</p>
+        ${inApp ? `<div class="lg-inapp"><b>⚠️ Beépített böngészőben vagy</b> (pl. Messengerből nyitottad meg). Itt a Google-belépés nem működik.${isAndroid ? '<a class="btn primary" href="' + chromeUrl() + '">Megnyitás Chrome-ban</a>' : '<span>Koppints a jobb felső ⋯ / megosztás gombra, és válaszd a <b>Megnyitás Safariban</b> lehetőséget.</span>'}<small>Vagy lépj be lent e-maillel.</small></div>` : ''}
         <button type="button" class="btn primary lg-google"><span class="g">G</span> Belépés Google-lel</button>
         <div class="lg-or"><span>vagy e-maillel</span></div>
         <label class="fld"><span>E-mail</span><input type="email" name="em" autocomplete="email" inputmode="email" required></label>
@@ -90,13 +95,16 @@
     const busy = on => f.querySelectorAll('button').forEach(b => b.disabled = on);
     o.querySelector('.lg-google').onclick = async () => {
       const prov = new firebase.auth.GoogleAuthProvider(); prov.setCustomParameters({ prompt: 'select_account' });
+      if (inApp) return loginError({ code: 'x', message: isAndroid ? 'Itt a Google-belépés nem működik – nyomd meg fent a „Megnyitás Chrome-ban” gombot, vagy lépj be e-maillel.' : 'Itt a Google-belépés nem működik – nyisd meg Safariban, vagy lépj be e-maillel.' });
+      if (standalone() && isAndroid) { busy(true); try { await auth.signInWithRedirect(prov); } catch (e) { loginError(e); busy(false); } return; }   /* telepített app Androidon: a felugró ablak néha nem ad választ */
       busy(true);
+      const stuck = setTimeout(() => { busy(false); loginError({ code: 'x', message: 'Nem jött válasz a Google-től. Próbáld újra, vagy lépj be e-maillel.' }); }, 30000);
       try { await auth.signInWithPopup(prov); }
       catch (e) {
         if (['auth/popup-blocked', 'auth/operation-not-supported-in-this-environment', 'auth/web-storage-unsupported'].includes(e.code) || standalone()) {
           try { await auth.signInWithRedirect(prov); return; } catch (e2) { loginError(e2); }
         } else loginError(e);
-      } finally { busy(false); }
+      } finally { clearTimeout(stuck); busy(false); }
     };
     f.onsubmit = async e => {
       e.preventDefault();
