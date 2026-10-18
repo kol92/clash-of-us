@@ -222,8 +222,8 @@ const DECKS = {
   // ===== Amsterdam Hősei kezdőpaklik (2026-10-18; set:'ah' – a szett megjelenésétől választhatók) =====
   ah_barna: { set:'ah', name:'Amszterdami roham', hero:'barna', desc:'Olcsó, gyors amszterdami karakterek: a kutya, Laci és PP már az első körben üt, Barna mindegyiket felpörgeti. Gombával és Cigivel a végéig nyomod.',
     list:{ c_kutya:2, c_ah_laci:2, c_ppvar:2, c_ah_barna:2, i_gomba:2, c_ah_sasi:2, c_ah_ati:1, a_repter:1, l_voros:1, c_pifti:1, a_dinnyes:1, f_capa:1, a_bong:2 } },
-  ah_gabi: { set:'ah', name:'Ír reggeli', hero:'gabi', desc:'Lassú, kényelmes reggel: Tomit nem lehet megcélozni, Sasi falként áll, az Ír kávé pajzsot ad – Gabi közben foltoz, az Ír reggeli pedig mindent visszatölt.',
-    list:{ c_ah_tomi:2, c_ah_sasi:2, c_ah_ati:2, a_irkave:2, a_csend:1, c_ah_laci:2, c_ppvar:2, a_irreggeli:1, c_veghtomi:1, f_egyutt:1, a_bong:1, i_gomba:1, l_elfekvo:1, a_abszint:1 } },
+  ah_gabi: { set:'ah', name:'Ír reggeli', hero:'gabi', desc:'Kényelmes reggel, erős fallal: Tomit nem lehet megcélozni, Sasi és Végh Tomi tartja a frontot, a kutya és Barna nyomást csinál – Gabi közben foltoz.',
+    list:{ c_ah_tomi:2, c_ah_sasi:2, c_ah_ati:2, a_irkave:1, a_csend:1, c_ah_laci:2, c_ppvar:2, c_kutya:2, c_ah_barna:2, c_veghtomi:1, f_egyutt:1, i_gomba:1, a_abszint:1 } },
   ah_krisz: { set:'ah', name:'Coffeeshop', hero:'krisz', desc:'Gyors kezdés, olcsó első lapok: a kutya és PP rögtön bent van, a Bong az ellenfél kezében ég el, a Reptéri ellenőrzés pedig elviszi a legnagyobb ellenfelet.',
     list:{ c_kutya:2, c_ah_laci:2, c_ppvar:2, c_ah_barna:2, c_ah_sasi:1, c_ah_ati:1, a_bong:1, a_repter:1, a_suti:1, i_cigi:1, l_coffeeshop:1, c_pifti:2, a_dinnyes:1, f_metamorf:1, c_vajda:1 } },
   ah_tomi: { set:'ah', name:'Varázsgombák', hero:'tomi', desc:'Minden a gombákról szól: a High Hawaiians és Barna telerakja velük a paklit, Tomi eszközei olcsóbbak és életet is adnak – a harmadik gombától már szörnyek nőnek.',
