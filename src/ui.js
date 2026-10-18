@@ -108,6 +108,8 @@ function textHTML(c) {
   if (c.taunt) parts.push('<b>Provokáció</b>.');
   if (c.muscle) parts.push('<b>Izom</b>.');
   if (c.invis) parts.push('<b>Láthatatlan</b>.');
+  if (c.elusive && c.type !== 'item') parts.push('<b>Igézhetetlen</b>.');   /* 2026-10-19: eddig hiányzott (Tomi, A. hőse üres volt) */
+  if (c.revive && !c.text) parts.push('<b>Feltámadás</b>.');   /* Bence terrorja; Gabi, a legyőzhetetlen szövege már leírja */
   if (c.text) parts.push(c.text);
   return parts.join(' ');
 }
