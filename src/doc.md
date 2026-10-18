@@ -642,7 +642,10 @@ Hősképesség-ötletek a táblázatban (még nem zöldek, nincsenek beépítve)
 - A lap szettje az `engine.js`-ben a `set` mező (`set:'hw'`), ha nincs: Base set. A Halloween szett most: Álarcos bál, Polaroid emlékek, Tomi Halloweeni bulija. Új szettnél: `CF_SETS` (ui.js) + a lapokon `set:'…'`.
 - Laci cipőkanala (bolti lap) a Base setben van.
 
-## Amszterdam hősei – első tematikus miniszett (élesítve 2026-10-18, megjelenik 2026-10-19 19:00)
+## Amsterdam Hősei – első tematikus miniszett (élesítve 2026-10-18, megjelenik 2026-10-19 19:00)
 - 26 lap + 3 arany változat, két új kulcsszó (Igézhetetlen, Feltámadás), saját booster (50 coin) és Shiny booster (250 coin) a Boltban, Game Over = az első közös Kánon esemény. **A teljes leírás, a lapok, a mérések: `src/doc-amszterdam.md`** (a Projectben: `claude/amszterdam-hosei.md`).
 - **Időzár:** a kód már kint van, de a szett lapjai **2026-10-19 19:00-ig (budapesti idő)** sehol nem látszanak élesben: se a Boltban, se a gyűjteményben és a szett-szűrőben, se a bot-paklikban, se a Halloween-buli lapkészletében (`SET_RELEASE` / `setLive` / `cardOn`, ui.js eleje). 19:00-kor magától megjelenik (a nyitva hagyott appban a következő újrarajzoláskor / indításkor). A teszt oldalon mindig látszik.
 - **Előzetes:** a megjelenésig minden játékos naponta egyszer (vasárnap és hétfőn) egy ablakot lát a két boosterrel: „A Best of Us TCG első tematikus miniszettje, az „Amsterdam Hősei” hétfőn érkezik 19:00 órakor!”. Megjelenés után egyszer (egy hétig) „Megérkezett…” ablak „Irány a Bolt” gombbal. (`ahNewsCheck`, `p.news`; a menü ablak-láncában a Halloween-ajándék után, a heti láda előtt.)
+- **Név (2026-10-18, Tomi):** a pack feliratát követjük: a szett neve **„Amsterdam Hősei”**, a lapoké „…, Amsterdam hőse”, „Bence, Amsterdam terrorja”, „Isten hozott Amsterdamban”. (A Base set régi lapja, „Bence, Amszterdam hőse” változatlan.)
+- **Bolt (megjelenéstől):** az Amsterdam Hősei és az Amsterdam Shiny pack **elöl**, utánuk a Base set packok.
+- **Küldetések (megjelenéstől, `setLive('ah')`):** a napi küldetés **1 Amsterdam packot**, a heti **1 Amsterdam Shiny packot** ad (`p.ahPacks` / `p.ahShinyPacks`, a Boltban „🌷 Amsterdam pack bontása” / „🌷 Amsterdam Shiny pack” gomb; `buyPack('ah', 'ahGift' | 'ahShinyGift')`). Előtte a régi Base set pack / Shiny pack jár. A napi ingyen pack Base set maradt.

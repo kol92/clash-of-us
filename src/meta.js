@@ -5,7 +5,7 @@ const ECON = { goldPlain: 0.005, goldShiny: 0.05, goldDupe: 100, heroFaChance: 0
 const PLAYABLE = CARDS.filter(c => !c.token && !c.off);   // off: kánon esemény lap, amíg nincs hozzá grafika – sehol nem látszik
 const SETS = { base: { name: 'Base set', cards: PLAYABLE.filter(c => !c.set && !c.variantOf && !c.passOnly && !c.eventOnly && !c.shopOnly).map(c => c.id) },
   /* Amszterdam hősei (első mini-szett, 2026-10-16, teszt ág): saját booster és Shiny booster, csak ennek a szettnek a lapjaival */
-  ah: { name: 'Amszterdam hősei', short: 'Amszterdam', cards: PLAYABLE.filter(c => c.set === 'ah' && !c.variantOf).map(c => c.id) } };   // passOnly: csak a Season Passból; eventOnly: csak eventből; shopOnly: csak a Boltból
+  ah: { name: 'Amsterdam Hősei', short: 'Amsterdam', cards: PLAYABLE.filter(c => c.set === 'ah' && !c.variantOf).map(c => c.id) } };   // passOnly: csak a Season Passból; eventOnly: csak eventből; shopOnly: csak a Boltból
 const VARIANT_CHANCE = 0.2;   // ha az alaplap jön, 1 az 5-höz eséllyel a ritkább változata lesz belőle
 const DECK_SIZE = 20;
 const maxCopies = id => CARD[id].rarity === 'l' ? 1 : 2;
@@ -358,7 +358,7 @@ function renderProfileBar() {
   try { applyBack(); } catch (e) {}
   renderQuestBadge(); renderPassBadge(); try { renderRankTile(); } catch (e) {} try { renderEventTile(); } catch (e) {} try { if (chestWeeklyCheck()) Store.p.chestNew = true; } catch (e) {} try { if (!$('#scr-menu').hidden) { dayGiftCheck(); backAwardCheck(); deckLinkCheck(); evGiftCheck(); ahNewsCheck(); chestPopup(); } } catch (e) {}
   const wb = $('#wheelBadge'); if (wb) wb.hidden = !wheelReady();
-  const badge = $('#shopBadge'); if (badge) badge.hidden = !freePackReady() && !(p.giftPacks > 0) && !(p.faPacks > 0) && !(p.shinyPacks > 0) && !(p.chests > 0);
+  const badge = $('#shopBadge'); if (badge) badge.hidden = !freePackReady() && !(p.giftPacks > 0) && !(p.faPacks > 0) && !(p.shinyPacks > 0) && !(p.ahPacks > 0) && !(p.ahShinyPacks > 0) && !(p.chests > 0);
 }
 
 // ---- jutalom meccs végén ----
@@ -548,11 +548,13 @@ async function buyPack(setId, free) {
   if (free === 'fa') { if (!(p.faPacks > 0)) return; p.faPacks--; }
   else if (free === 'gift') { if (!(p.giftPacks > 0)) return; p.giftPacks--; }
   else if (free === 'shinyGift') { if (!(p.shinyPacks > 0)) return; p.shinyPacks--; }
+  else if (free === 'ahGift') { if (!(p.ahPacks > 0)) return; p.ahPacks--; }   /* Amsterdam Hősei ajándék (küldetés) */
+  else if (free === 'ahShinyGift') { if (!(p.ahShinyPacks > 0)) return; p.ahShinyPacks--; }
   else if (free === 'shiny') { if (p.coins < ECON.shinyPrice) { toast('Nincs elég coinod'); return; } p.coins -= ECON.shinyPrice; }
   else if (free) { if (!freePackReady()) return; p.freeDate = today(); }
   else { if (p.coins < ECON.packPrice) { toast('Nincs elég coinod'); return; } p.coins -= ECON.packPrice; }
   p.packs++;
-  const shinyMode = free === 'shiny' || free === 'shinyGift';
+  const shinyMode = free === 'shiny' || free === 'shinyGift' || free === 'ahShinyGift';
   const cards = openPackRoll(setId, free === 'fa', shinyMode);
   const conv = { coins: 0 };   // a lapok duplikátumai megmaradnak (cserélhetők, vagy a Gyűjteményben kézzel beválthatók)
   for (const c of cards) if (!c.hero && !c.isNew) c.have = owned(c.id);
@@ -703,6 +705,8 @@ function renderShop() {
   const gifts = [
     p.faPacks > 0 ? `<button class="btn primary gift fa" id="faPack">✨ Full Art ajándék pack${p.faPacks > 1 ? ` (${p.faPacks})` : ''}</button>` : '',
     p.giftPacks > 0 ? `<button class="btn primary gift" id="giftPack">🎁 Ajándék pack bontása${p.giftPacks > 1 ? ` (${p.giftPacks})` : ''}</button>` : '',
+    p.ahPacks > 0 ? `<button class="btn primary gift" id="giftAh">🌷 Amsterdam pack bontása${p.ahPacks > 1 ? ` (${p.ahPacks})` : ''}</button>` : '',
+    p.ahShinyPacks > 0 ? `<button class="btn primary shiny-btn" id="giftAhShiny">🌷 Amsterdam Shiny pack${p.ahShinyPacks > 1 ? ` (${p.ahShinyPacks})` : ''}</button>` : '',
     p.shinyPacks > 0 ? `<button class="btn primary shiny-btn" id="giftShiny">🎁 Ajándék Shiny pack${p.shinyPacks > 1 ? ` (${p.shinyPacks})` : ''}</button>` : '',
     `<button class="btn primary" id="freePack" ${free ? '' : 'disabled'}>${free ? '🎁 Napi ingyen pack' : 'Mai ingyen pack elhasználva'}</button>`].join('');
   $('#shopBody').innerHTML = `
@@ -711,10 +715,10 @@ function renderShop() {
     <div class="lbl shop-lbl">Boosterek</div>
     <div class="shop-gifts">${gifts}</div>
     <div class="shop-grid">
-      ${shopPanelHTML({ attr: 'data-pack="base"', img: 'art/ui/pack-base.webp', contain: true, name: SETS.base.name, sub: '3 lap', price: ECON.packPrice, have: false })}
-      ${shopPanelHTML({ attr: 'data-pack="shiny"', img: 'art/ui/pack-shiny.webp', contain: true, name: 'Shiny pack', sub: '1 biztos különleges', price: ECON.shinyPrice, have: false, holo: true })}
       ${setLive('ah') ? `${shopPanelHTML({ attr: 'data-pack="ah"', img: 'art/ui/pack-ah.webp', contain: true, name: SETS.ah.name, sub: 'Új szett · 3 lap', price: ECON.packPrice, have: false })}
-      ${shopPanelHTML({ attr: 'data-pack="ahshiny"', img: 'art/ui/pack-ahshiny.webp', contain: true, name: 'Amszterdam Shiny', sub: '1 biztos Full Art', price: ECON.shinyPrice, have: false, holo: true })}` : ''}
+      ${shopPanelHTML({ attr: 'data-pack="ahshiny"', img: 'art/ui/pack-ahshiny.webp', contain: true, name: 'Amsterdam Shiny', sub: '1 biztos Full Art', price: ECON.shinyPrice, have: false, holo: true })}` : ''}
+      ${shopPanelHTML({ attr: 'data-pack="base"', img: 'art/ui/pack-base.webp', contain: true, name: SETS.base.name, sub: '3 lap', price: ECON.packPrice, have: false })}
+      ${shopPanelHTML({ attr: 'data-pack="shiny"', img: 'art/ui/pack-shiny.webp', contain: true, name: 'Shiny pack', sub: '1 biztos különleges', price: ECON.shinyPrice, have: false, holo: true })}   
     </div>
     ${chestPanelHTML()}
     <details class="pack-info-more"><summary>Mi van a packokban?</summary>
@@ -742,6 +746,8 @@ function renderShop() {
   if ($('#giftPack')) $('#giftPack').onclick = () => buyPack('base', 'gift');
   if ($('#faPack')) $('#faPack').onclick = () => buyPack('base', 'fa');
   if ($('#giftShiny')) $('#giftShiny').onclick = () => buyPack('base', 'shinyGift');
+  if ($('#giftAh')) $('#giftAh').onclick = () => buyPack('ah', 'ahGift');
+  if ($('#giftAhShiny')) $('#giftAhShiny').onclick = () => buyPack('ah', 'ahShinyGift');
 }
 function packHTML(setId, o = {}) {
   return `<div class="pack pk set-${setId}${o.shiny ? ' shiny' : ''}" role="img" aria-label="Best of Us – ${o.shiny ? 'Shiny ' : ''}${SETS[setId].name} booster pack">
@@ -1361,10 +1367,11 @@ function questsOnMatch(m) {
   const step = (pool, q, reward) => {
     if (q.done) return;
     q.prog = Math.min(qDef(pool, q.id).goal, q.prog + (qDef(pool, q.id).f(m, q) || 0));
-    if (q.prog >= qDef(pool, q.id).goal) { q.done = true; reward(); got.push({ txt: qText(pool, q), rew: pool === Q_WEEKLY ? '1 Shiny pack' : '1 pack', weekly: pool === Q_WEEKLY }); }
+    if (q.prog >= qDef(pool, q.id).goal) { q.done = true; reward(); got.push({ txt: qText(pool, q), rew: setLive('ah') ? (pool === Q_WEEKLY ? '1 Amsterdam Shiny pack' : '1 Amsterdam pack') : (pool === Q_WEEKLY ? '1 Shiny pack' : '1 pack'), weekly: pool === Q_WEEKLY }); }
   };
-  for (const q of Q.daily) step(Q_DAILY, q, () => { p.giftPacks = (p.giftPacks || 0) + 1; });
-  step(Q_WEEKLY, Q.weekly, () => { p.shinyPacks = (p.shinyPacks || 0) + 1; });
+  /* 2026-10-19 19:00-tól (Tomi): a napi küldetés Amsterdam packot, a heti Amsterdam Shiny packot ad */
+  for (const q of Q.daily) step(Q_DAILY, q, () => { if (setLive('ah')) p.ahPacks = (p.ahPacks || 0) + 1; else p.giftPacks = (p.giftPacks || 0) + 1; });
+  step(Q_WEEKLY, Q.weekly, () => { if (setLive('ah')) p.ahShinyPacks = (p.ahShinyPacks || 0) + 1; else p.shinyPacks = (p.shinyPacks || 0) + 1; });
   save(); renderQuestBadge();
   return got;
 }
@@ -1384,9 +1391,9 @@ function renderQuests() {
   const hrs = ms => { const h = Math.floor(ms / 3600000), m = Math.floor(ms % 3600000 / 60000); return h >= 24 ? `${Math.floor(h / 24)} nap ${h % 24} óra` : `${h} óra ${m} perc`; };
   $('#questBody').innerHTML = `
     <div class="lbl">Napi küldetések <small>· új feladatok ${hrs(mid - now)} múlva</small></div>
-    ${Q.daily.map(q => row(Q_DAILY, q, '<span class="q-pack"></span><em>1 pack</em>', 'daily')).join('')}
+    ${Q.daily.map(q => row(Q_DAILY, q, setLive('ah') ? '<span class="q-pack ah"></span><em>1 Amsterdam</em>' : '<span class="q-pack"></span><em>1 pack</em>', 'daily')).join('')}
     <div class="lbl">Heti küldetés <small>· hétfő 0:01-kor frissül (${hrs(weekEnds() - now)})</small></div>
-    ${row(Q_WEEKLY, Q.weekly, '<span class="q-pack shiny"></span><em>1 Shiny</em>', 'weekly')}
+    ${row(Q_WEEKLY, Q.weekly, setLive('ah') ? '<span class="q-pack shiny ah"></span><em>1 Amsterdam Shiny</em>' : '<span class="q-pack shiny"></span><em>1 Shiny</em>', 'weekly')}
     <p class="q-note">A haladás meccs végén számít (a bot elleni meccseken). A jutalom teljesítéskor azonnal jóváíródik, a Boosterek menüben bonthatod ki.</p>`;
 }
 
