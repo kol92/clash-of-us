@@ -132,7 +132,8 @@ const CARDS = [
   { id:'f_jbl', type:'action', name:'JBL', cost:6, rarity:'l', finisher:true, hero:'laci', tgt:'ownSlot', text:'Lerakod a JBL hangfalat (0/4). A köröd végén 1 sebzést okoz minden ellenséges karakternek és az ellenfél hősének. Amíg él, az ellenfél két szélső helye zárva van, és legfeljebb 2 karaktere lehet. Ha kijátszáskor 2-nél több karaktere van, a szélső helyeken állók elpusztulnak.' },
   { id:'f_metamorf', type:'action', name:'Metamorfózis', cost:6, rarity:'l', finisher:true, hero:'krisz', text:'Krisz Baszóvá változik, és 12 élete lesz. Baszó minden köröd végén a karaktereid után 3-at üt: mindig a legbalra álló ellenséges karaktert, ha nincs ilyen, az ellenfél hősét. Neki nem lehet visszaütni.' },
   { id:'f_atok', type:'action', name:'Az összetartás átka', cost:6, rarity:'l', finisher:true, hero:'tomi', tgt:'grave', text:'Két véletlen karakter visszatér a temetődből a pályára, +1/+1-gyel, és mindkettő kap egy-egy véletlen erőt: Izom, Láthatatlan, Provokáció, Pajzs, Sunyulás vagy Lendület.' },
-  { id:'f_munkahely', type:'action', name:'A munkahely', cost:6, rarity:'l', finisher:true, hero:'david', text:'Húzol 2 lapot, és kijátssza a Munkahely helyszínt: a te lapjaid 1-gyel olcsóbbak, az ellenfélé 1-gyel drágábbak. Ha a Munkahely eltűnik, Dávid 5 életet gyógyul.' },
+  { id:'f_vezetek', type:'action', name:'Bocsi, de vezetek', cost:6, rarity:'l', finisher:true, hero:'david', tgt:'none', text:'A játék végéig minden karakter, amit kijátszol, +1/+1-et és egy véletlen képességet kap: Lendület, Provokáció vagy Pajzs.' },
+  { id:'f_munkahely', off:true, type:'action', name:'A munkahely', cost:6, rarity:'l', finisher:true, hero:'david', text:'Húzol 2 lapot, és kijátssza a Munkahely helyszínt: a te lapjaid 1-gyel olcsóbbak, az ellenfélé 1-gyel drágábbak. Ha a Munkahely eltűnik, Dávid 5 életet gyógyul.' },
   { id:'f_gepuzem', type:'action', name:'Gépüzemmód', cost:6, rarity:'l', finisher:true, hero:'milo', text:'Ha Milo meghalna, egyszer visszatér 10 élettel.' },
   { id:'f_capa', type:'action', name:'Hátad mögött, cápa megesz!', cost:6, rarity:'l', finisher:true, hero:'barna', text:'Megidéz egy 9/9-es Cápát, amely azonnal megeszi az ellenfél egy véletlen karakterét, és a helyére áll (ha nincs ellenséges karakter, a jobb szélre kerül). 4 körön át a köröd elején egyet úszik afelé a karakter felé, akit az ellenfél utoljára lerakott, és megeszi, aki az útjába kerül. Nem támad, Láthatatlan: a támadások átmennek rajta.' },
   { id:'f_gluten', type:'action', name:'Gluténbomba', cost:6, rarity:'l', finisher:true, hero:'sasi', opts:['5 sebzés + 5 gyógyulás', '8 sebzés, de te is kapsz 8-at'], text:'Válassz: 5 sebzés az ellenfél hősének és 5 életet gyógyulsz, vagy 8 sebzés az ellenfél hősének, de te is kapsz 8-at.' },
@@ -166,7 +167,7 @@ const HEROES = [
   { id:'gabi', name:'Gabi', hue:165, text:'A köröd végén a legsérültebb karaktered 1 életet gyógyul. Ha nincs sérült karaktered, a hősöd gyógyul.' },
   { id:'krisz', name:'Krisz', hue:210, text:'A meccsen az első két kijátszott lapod 1-gyel olcsóbb.' },
   { id:'tomi', name:'Tomi', hue:45, text:'Az eszközeid +1 életet is adnak, és a körödben az első eszközöd 1-gyel olcsóbb.' },
-  { id:'david', name:'Dávid', hue:305, text:'Törzsvendég: minden helyszín neki kedvez, bárki rakta le. Ha lecserél egy helyszínt, húz egy lapot. Kórház: 2-t gyógyít. Barhole: 2-vel olcsóbb. Budapest Park: nem drágít. Morrison’s 2: nem sebzi. Akácfa: őt nem sebzi jobban. Laciverse: neki is +1 támadás.' },
+  { id:'david', name:'Dávid', hue:305, text:'Törzsvendég: ha a köröd végén van helyszín a pályán (bárki rakta le), egy véletlen karaktered végleg +1/+1-et kap.', oldText:'Törzsvendég: minden helyszín neki kedvez, bárki rakta le. Ha lecserél egy helyszínt, húz egy lapot. Kórház: 2-t gyógyít. Barhole: 2-vel olcsóbb. Budapest Park: nem drágít. Morrison’s 2: nem sebzi. Akácfa: őt nem sebzi jobban. Laciverse: neki is +1 támadás.' },
   { id:'bence', name:'Bence', hue:0, text:'24 élettel kezd 20 helyett.' },
   { id:'milo', name:'Milo', hue:95, text:'Ha egy karaktered meghal, 1 sebzést okoz az ellenfél hősének.' },
   { id:'laci', name:'Laci', hue:255, text:'Minden harmadik körödben húzol egy extra lapot.' },
@@ -176,7 +177,7 @@ const HERO = Object.fromEntries(HEROES.map(h => [h.id, h]));
 // passzív képességek → hős
 const PASSIVE = { firstCharAtk:'barna', endHeal:'gabi', firstTwo:'krisz', itemHp:'tomi', regular:'david', bigHp:'bence', deathPing:'milo', extraDraw:'laci', teamPing:'sasi' };
 const has = (p, key) => p.heroId === PASSIVE[key];
-const isReg = (s, side) => has(s.players[side], 'regular');
+const isReg = (s, side) => false;   /* Dávid régi, helyszínenként eltérő kedvezményei 2026-10-18-tól megszűntek (új Törzsvendég: lásd finishTurn) */
 // JBL hangfal: amíg az egyik oldalon él, a másik oldal két szélső helye zárva, és ott legfeljebb 2 karakter lehet
 const jblOn = (s, side) => s.players[side].board.some(u => u && u.id === 'c_jbl');
 const closedLane = (s, side, j) => (j === 0 || j === LANES - 1) && jblOn(s, 1 - side);
@@ -208,8 +209,8 @@ const DECKS = {
     list:{ c_miloivo:1, c_laczko:1, c_kristof:1, c_pp:2, c_gyuri:2, c_vajda:2, a_dinnyes:2, a_cheddar:1, f_metamorf:1, c_vera:1, a_rehab:1, c_amszterdam:1, a_abszint:1, i_vodkakancso:1, i_energiaital:1, c_rebi:1 } },
   felszereles: { name:'Felszerelés', hero:'tomi', desc:'Minden karakterre jut valami: napszemüveg, bunda, vodkás kancsó – Tomi eszközei plusz életet adnak, és körönként az első olcsóbb.',
     list:{ c_pifti:2, c_gyuri:2, c_talos:1, c_rebi:1, c_sasi:1, i_napszemuveg:2, i_kabala:2, i_borkabat:1, i_vodkakancso:1, i_buffalo:1, i_lepke:1, a_cheddar:1, f_atok:1, i_bunda:1, c_zoli:1, c_vajda:1 } },
-  kocsmatura: { name:'Kocsmatúra', hero:'david', desc:'Helyszínről helyszínre: Dávid törzsvendég, minden kocsma neki kedvez – a Budapest Park csak az ellenfelet drágítja. A sofőr, Dávid lefordítva érkezik, aztán mindenkit magára húz.',
-    list:{ f_munkahely:1, c_gyuri:2, c_vajda:2, c_veghtomi:2, l_akacfa:1, l_barhole:1, l_korhaz:1, l_park:1, c_davidsofor:1, a_dinnyes:2, a_abszint:1, c_boros:1, c_rebi:1, c_sasi:1, c_zsibrita:1, c_kristof:1 } },
+  kocsmatura: { name:'Kocsmatúra', hero:'david', desc:'Helyszínről helyszínre: amíg van kocsma a pályán, Dávid törzsvendégként minden körben erősíti egy emberét. A sofőr, Dávid lefordítva érkezik, aztán mindenkit magára húz – a végén pedig: Bocsi, de vezetek.',
+    list:{ f_vezetek:1, c_gyuri:2, c_vajda:2, c_veghtomi:2, l_akacfa:1, l_barhole:1, l_korhaz:1, l_park:1, c_davidsofor:1, a_dinnyes:2, a_abszint:1, c_boros:1, c_rebi:1, c_sasi:1, c_zsibrita:1, c_kristof:1 } },
   mindentbele: { name:'Mindent bele', hero:'bence', desc:'Bence 24 élete elbírja: TZS önsebzése ide bátran jöhet, és ha Bence, Amszterdam hőse elesik, még gyógyít is egyet.',
     list:{ c_tzs:1, c_zoli:2, c_gyuri:2, c_kovacs:2, c_vajda:2, c_sasi:1, f_bender:1, a_dinnyes:2, c_rebi:1, a_abszint:1, i_buffalo:1, c_veghtomi:1, a_cheddar:1, c_amszterdam:1, c_talos:1 } },
   kamikaze: { name:'Kamikaze', hero:'milo', desc:'Olcsó karakterek, akik szívesen kiesnek: Milo minden halálért megsebzi az ellenfelet, Kovács Bence még utoljára odacsap.',
@@ -453,6 +454,10 @@ function playCard(s, pi, hi, t) {
     else { p.board[t.i] = u; p.lastPlaced = u.uid; }   // a Cápa erre vadászik
     if (has(p, 'firstCharAtk') && !p.charThisTurn && c.id !== 'c_korso' && !c.enemySide && c.cost <= 2) { u.atk += 1; ev(s, { t:'passive', side:pi, k:'firstCharAtk', id:c.id }); ev(s, { t:'buff', side:pi, i:t.i }); }
     p.charThisTurn = true;
+    if (p.driver && !c.enemySide && p.board[t.i] === u) {   /* Bocsi, de vezetek */
+      const b = ['haste', 'taunt', 'shield'][Math.floor(rnd() * 3)];
+      u.atk += 1; u.hp += 1; u.maxHp += 1; giveBoon(u, b); ev(s, { t:'buff', side:pi, i:t.i, n:1 }); ev(s, { t:'boon', side:pi, i:t.i, b });
+    }
     if (bid(c.id) === 'c_pp') {   // Query idézése: előbb jobbra, aztán balra, ha ott nincs hely, bárhova
       const os = openSlots(s, pi), spots = [t.i + 1, t.i - 1].filter(j => os.includes(j));
       const j = spots.length ? spots[0] : os.length ? os[0] : -1;
@@ -730,6 +735,7 @@ function playCard(s, pi, hi, t) {
         ids.forEach((id, k) => { const u = makeUnit(s, id, pi); u.atk += 1; u.hp += 1; u.maxHp += 1; u.owner = pi; p.board[sl[k]] = u; ev(s, { t:'rise', side:pi, i:sl[k], id });
           const b = bo.splice(Math.floor(rnd() * bo.length), 1)[0]; giveBoon(u, b); ev(s, { t:'boon', side:pi, i:sl[k], b }); });
         break; }
+      case 'f_vezetek': p.driver = true; ev(s, { t:'driver', side:pi, i:-1 }); break;   /* Bocsi, de vezetek: innentől minden kijátszott karakter erősödik */
       case 'f_munkahely': draw(s, pi); if (s.winner == null) draw(s, pi); dropLocation(s, 'loc'); s.location = { id:'l_munkahely', owner:pi }; ev(s, { t:'summon', side:pi, i:-1, id:'l_munkahely' }); break;
       case 'f_gepuzem': p.machine = 1; ev(s, { t:'machineon', side:pi, i:-1 }); break;
       case 'f_capa': {   // a cápa egy véletlen ellenséges karakter helyére érkezik, és megeszi; ha nincs kit, a jobb szélre
@@ -1024,6 +1030,10 @@ function finishTurn(s) {
     const h = p.hand[k], c = CARD[h.id]; if (!c.bong) continue;
     p.hand.splice(k, 1); bury(s, pi, 'a_bong', 'bong'); ev(s, { t:'bongburn', side:pi, i:-1, n:c.cost }); damageHero(s, pi, c.cost, true);
   }
+  if (s.location && has(p, 'regular') && s.winner == null) {   /* Dávid – Törzsvendég (2026-10-18): helyszín a pályán → egy véletlen karaktere végleg +1/+1 */
+    const c = p.board.map((u, i) => u && !isFixed(u) ? i : -1).filter(i => i >= 0);
+    if (c.length) { const i = c[Math.floor(rnd() * c.length)], u = p.board[i]; u.atk += 1; u.hp += 1; u.maxHp += 1; ev(s, { t:'passive', side:pi, k:'regular', id:u.id }); ev(s, { t:'buff', side:pi, i, n:1 }); }
+  }
   p.locked = false;   // az Adios Motherfucker! bénítása a megbénított játékos körének végén jár le
   if (s.winner == null && has(p, 'endHeal')) {
     ev(s, { t:'passive', side:pi, k:'endHeal' });
@@ -1093,6 +1103,7 @@ function evalState(s, me) {
   if (s.location && s.location.owner === me) v += 1.0;
   if (locIs(s, 'l_munkahely')) v += s.location.owner === me ? 4 : -4;   // Munkahely: tartós energiaelőny
   if (E.locked) v += 3; if (P.locked) v -= 3;
+  if (P.driver) v += 5; if (E.driver) v -= 5;   /* Bocsi, de vezetek: minden további karakter erősebb */
   if (P.baszo) v += 6; if (E.baszo) v -= 6;          // Baszó minden körben üt 3-at
   if (P.machine === 1) v += 7; if (E.machine === 1) v -= 7;   // Gépüzemmód: tartalék 10 élet
   return v;

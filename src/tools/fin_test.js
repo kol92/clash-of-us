@@ -39,12 +39,18 @@ give(s, 0, 'f_atok'); E.playCard(s, 0, 0, { k: 'none' });
 ok(ids(s.players[0].board).split(' ').filter(x => x !== '-').sort().join() === ['c_gyuri:3/3', 'c_vajda:4/5'].sort().join(), 'Átok: két karakter vissza +2/+2 (' + ids(s.players[0].board) + ')');
 ok(!s.players[0].grave.some(g => g.id === 'c_vajda' || g.id === 'c_gyuri'), 'Átok: kikerültek a temetőből');
 s = G('tomi', 'bence'); give(s, 0, 'f_atok'); ok(!E.canPlay(s, 0, 0), 'Átok: üres temetőnél nem játszható');
-// Munkahely
-s = G('david', 'bence'); give(s, 0, 'f_munkahely'); E.playCard(s, 0, 0, { k: 'none' });
-ok(s.location && s.location.id === 'l_munkahely', 'Munkahely a pályán');
-ok(E.cardCost(s, 0, 'c_vajda') === 2 && E.cardCost(s, 1, 'c_vajda') === 4, 'Munkahely: Dávidnak olcsóbb, ellenfélnek drágább');
-s.players[0].hp = 10; s.active = 1; s.players[1].hand.unshift({ uid: 7, id: 'a_kitiltva' }); s.players[1].energy = 6; E.playCard(s, 1, 0, { k: 'none' });
-ok(!s.location && s.players[0].hp === 15, 'Munkahely kitiltva → Dávid +5 élet');
+// Bocsi, de vezetek (Dávid új Kánonja, 2026-10-18 – a Munkahely helyett)
+s = G('david', 'bence'); give(s, 0, 'f_vezetek'); E.playCard(s, 0, 0, { k: 'none' });
+ok(s.players[0].driver, 'Bocsi, de vezetek: bekapcsolt');
+{ const bb = s.players[0].board; const sl = bb.findIndex(x => !x); give(s, 0, 'c_vajda'); E.playCard(s, 0, 0, { k: 'slot', side: 0, i: sl }); const u = bb[sl];
+  ok(u && u.atk === 4 && u.maxHp === 5 && ['haste', 'taunt', 'shield'].includes(u.boon), 'Bocsi, de vezetek: a kijátszott karakter +1/+1 és Lendület/Provokáció/Pajzs (' + (u && u.boon) + ')'); }
+ok(E.CARD.f_munkahely.off, 'A munkahely kivezetve (off)');
+// Törzsvendég (Dávid új képessége): helyszín a pályán → a köre végén egy véletlen karaktere +1/+1
+s = G('david', 'bence'); s.players[0].board = [null, null, null, null]; give(s, 0, 'c_vajda'); E.playCard(s, 0, 0, { k: 'slot', side: 0, i: 1 }); s.location = { id: 'l_korhaz', owner: 1 };
+{ const u = s.players[0].board[1], a0 = u.atk; E.runEndTurn(s); ok(u.atk === a0 + 1, 'Törzsvendég: az ellenfél helyszínénél is +1/+1 a kör végén'); }
+s = G('david', 'bence'); s.players[0].board = [null, null, null, null]; give(s, 0, 'c_vajda'); E.playCard(s, 0, 0, { k: 'slot', side: 0, i: 1 }); s.location = null;
+{ const u = s.players[0].board[1], a0 = u.atk; E.runEndTurn(s); ok(u.atk === a0, 'Törzsvendég: helyszín nélkül nincs bónusz'); }
+s = G('david', 'bence'); s.location = { id: 'l_barhole', owner: 1 }; ok(E.cardCost(s, 0, 'c_vajda') === 2, 'Barhole Dávidnak is csak 1-gyel olcsóbb (a régi kivétel megszűnt)');
 // Gépüzemmód
 s = G('milo', 'bence'); give(s, 0, 'f_gepuzem'); E.playCard(s, 0, 0, { k: 'none' }); s.active = 1; s.players[1].hand.unshift({ uid: 8, id: 'a_dinnyes' }); s.players[0].hp = 2;
 E.playCard(s, 1, 0, { k: 'hero', side: 0, i: -1 }); ok(s.winner == null && s.players[0].hp === 10, 'Gépüzemmód: Milo visszatér 10 élettel');
@@ -62,7 +68,7 @@ s = G('sasi', 'bence'); give(s, 0, 'f_gluten'); ok(E.targetsFor(s, 0, 'f_gluten'
 E.playCard(s, 0, 0, { k: 'none', o: 0 }); ok(s.players[1].hp === 19 && s.players[0].hp === 15, 'Gluténbomba 1: 5 sebzés + 5 gyógyulás (Bence 24)');
 s = G('sasi', 'bence'); give(s, 0, 'f_gluten'); E.playCard(s, 0, 0, { k: 'none', o: 1 }); ok(s.players[1].hp === 16 && s.players[0].hp === 12, 'Gluténbomba 2: 8 + 8');
 // rejtettség
-ok(E.CARDS.filter(c => c.finisher).every(c => !c.off), 'minden kánon esemény aktív');
+ok(E.CARDS.filter(c => c.finisher && c.id !== 'f_munkahely').every(c => !c.off), 'minden kánon esemény aktív (a kivezetett Munkahelyen kívül)');
 console.log(fails ? fails + ' HIBA' : 'MINDEN RENDBEN');
 // JBL hangfal köröd végi sebzése
 { const s2 = G('laci', 'bence'); const eb2 = s2.players[1].board; eb2[1] = U('c_vajda'); eb2[2] = U('c_pifti');

@@ -22,7 +22,7 @@ function starterCollection() {
   return coll;
 }
 // Később bekerült gyakori lapok: a meglévő profilok is megkapják (gv = kiosztási verzió)
-const STARTER_ADDS = { 2: ['a_delfin', 'i_varazsho', 'i_lepke'], 3: ['a_rehab'], 4: ['c_pp'], 5: ['c_nfc'], 6: ['a_cheddar'], 7: ['c_vajda', 'c_veghtomi'], 8: ['c_kovacs'], 9: ['a_kitiltva'], 10: ['a_haver'], 11: PLAYABLE.filter(c => c.rarity === 'r' && !c.variantOf && !c.set).map(c => c.id), 12: ['c_sasimeselo'], 13: ['c_norbi'], 14: ['c_udvarhelyi'], 15: ['c_molnar'], 16: CARDS.filter(c => c.finisher && !c.set).map(c => c.id), 17: ['c_barnaelet'], 18: ['c_amszterdam'], 19: ['c_davidsofor'], 20: ['a_szulinap'], 21: ['c_atiuldozott'], 22: ['c_alvari'], 23: ['a_amongus'], 24: ['a_espresso'] };   // 16: mindenki megkapja mind a 9 Kánon esemény lapot   // 12: Laci új kezdőpaklijához   // 11: minden ritka lapból 1 (a kezdőpaklikhoz)
+const STARTER_ADDS = { 2: ['a_delfin', 'i_varazsho', 'i_lepke'], 3: ['a_rehab'], 4: ['c_pp'], 5: ['c_nfc'], 6: ['a_cheddar'], 7: ['c_vajda', 'c_veghtomi'], 8: ['c_kovacs'], 9: ['a_kitiltva'], 10: ['a_haver'], 11: PLAYABLE.filter(c => c.rarity === 'r' && !c.variantOf && !c.set).map(c => c.id), 12: ['c_sasimeselo'], 13: ['c_norbi'], 14: ['c_udvarhelyi'], 15: ['c_molnar'], 16: CARDS.filter(c => c.finisher && !c.set).map(c => c.id), 17: ['c_barnaelet'], 18: ['c_amszterdam'], 19: ['c_davidsofor'], 20: ['a_szulinap'], 21: ['c_atiuldozott'], 22: ['c_alvari'], 23: ['a_amongus'], 24: ['a_espresso'], 25: ['f_vezetek'] };   // 25: Dávid új Kánonja (2026-10-18, a Munkahely helyett)   // 16: mindenki megkapja mind a 9 Kánon esemény lapot   // 12: Laci új kezdőpaklijához   // 11: minden ritka lapból 1 (a kezdőpaklikhoz)
 const GRANT_V = Math.max(1, ...Object.keys(STARTER_ADDS).map(Number));
 // Ajándékok: minden profil egyszer kapja meg (a meglévők a következő megnyitáskor, az újak létrehozáskor)
 const GIFTS = [{ id: 'g-2026-09-28', packs: 1 }, { id: 'g-2026-09-28b', packs: 5 },
@@ -204,6 +204,7 @@ function migrate(p) {
     if (!CARD[id]) continue; const e = p.coll[id] || (p.coll[id] = { n: 0, f: 0 }); if (e.n + e.f < (CARD[id].rarity === 'k' ? 2 : 1)) e.n = (CARD[id].rarity === 'k' ? 2 : 1) - e.f;
   }
   if ((p.gv || 1) < GRANT_V) p._dirty = true;
+  for (const d of p.decks || []) if (d.list && d.list.f_munkahely) { d.list.f_vezetek = (d.list.f_vezetek || 0) + d.list.f_munkahely; delete d.list.f_munkahely; p._dirty = true; }   /* 2026-10-18: a Munkahely megszűnt → Bocsi, de vezetek */
   const g = applyGifts(p); if (g) { p._dirty = true; Store.giftMsg = g.msg; }
   if (p.faPacks > 0) { p.shinyPacks = (p.shinyPacks || 0) + p.faPacks; Store.faMsg = `A ${p.faPacks} Full Art packod Shiny packká alakult`; p.faPacks = 0; p._dirty = true; }
   const dc = { coins: 0 };   // lapokat már nem váltunk be automatikusan (csere miatt) – csak kézzel, a Gyűjteményben

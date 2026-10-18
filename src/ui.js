@@ -248,6 +248,7 @@ const ART = {
   f_capa:     { src:'art/f_capa.webp', av:'50% 28%', pos:'50% 26%' },
   c_capa:     { src:'art/capa.webp', av:'62% 26%', pos:'60% 26%' },
   f_gluten:   { src:'art/f_gluten.webp', av:'55% 26%', pos:'55% 26%' },
+  f_vezetek:  { src:'art/f_vezetek.webp', av:'30% 22%', pos:'35% 25%' },
   f_munkahely:{ src:'art/f_munkahely.webp', av:'50% 55%', pos:'50% 55%' },
   l_munkahely:{ src:'art/f_munkahely.webp', av:'50% 55%', pos:'50% 55%' },
   c_molnar: { src:'art/molnar.webp', pos:'50% 22%' },
@@ -709,7 +710,7 @@ function logEvents(evs, snap) {
         L(secret ? `🃏 ${who(e.side)} lerakott egy rejtett lapot` : `▶ ${who(e.side)} kijátszotta: <b class="lc" data-lc="${e.id}">${escH(c.name)}</b>${opt}${tg}`); break; }
       case 'passive': {   // hős-képesség (2026-10-13): látszódjon, miért sebződött / gyógyult / húzott
         const hn = HERO[S.players[e.side].heroId]?.name || 'Hős', w = e.side === ME ? `A hősöd (${hn})` : hn;
-        const PT = { deathPing: 'meghalt egy karaktere → 1 sebzés az ellenfél hősének', teamPing: 'legalább 2 karaktere áll a táblán → 1 sebzés az ellenfél hősének',
+        const PT = { regular: `van helyszín a pályán → ${e.id ? `<b class="lc" data-lc="${e.id}">${escH(CARD[e.id].name)}</b>` : 'egy karaktere'} végleg +1/+1`, deathPing: 'meghalt egy karaktere → 1 sebzés az ellenfél hősének', teamPing: 'legalább 2 karaktere áll a táblán → 1 sebzés az ellenfél hősének',
                      endHeal: 'a köre végén 1 életet gyógyít', extraDraw: 'minden 3. körében húz egy extra lapot', firstCharAtk: `+1 támadás: ${e.id ? `<b class="lc" data-lc="${e.id}">${escH(CARD[e.id].name)}</b>` : 'az első karaktere'}` };
         L(`✨ ${w} képessége: ${PT[e.k] || ''}`); break; }
       case 'locfx': if (e.id === 'l_voros') { L(`📍 <b class="lc" data-lc="${e.id}">${escH(CARD[e.id].name)}</b>: ${e.side === ME ? 'egy karaktered' : 'az ellenfél egyik karaktere'} végleg +1 támadást kap`); break; }
@@ -753,6 +754,7 @@ function logEvents(evs, snap) {
       case 'futuregone': L(`🌀 <b class="lc" data-lc="${e.id}">${escH(CARD[e.id].name)}</b> nem talált helyet – végleg a jövőben maradt`); break;
       case 'past': L(`🌀 ${unitName(e.side, e.i)} a múltba utazott: visszakapta a lerakáskori értékeit`); break;
       case 'welcome': L(`🌷 ${who(e.side)} paklijába 5 véletlen Amsterdam Hősei lap került`); break;
+      case 'driver': L(`🚗 Bocsi, de vezetek: ${e.side === ME ? 'mostantól minden kijátszott karaktered' : 'mostantól az ellenfél minden karaktere'} +1/+1-et és egy véletlen képességet kap`); break;
       case 'chain': L(`⛓ ${unitName(e.side, e.i)}: Börtönlánc, 1 sebzés`); break;
       case 'smoke': L(`💨 Utcai füst: ${e.side === ME ? 'a karaktereid' : 'az ellenfél karakterei'} elrejtőztek és összekeveredtek`); break;
       case 'gameover': L(`💀 GAME OVER: ${who(e.side)} maximum élete 10 lett – az ellenfél összes karaktere elpusztul, a hőse 5 sebzést kap`); break;
