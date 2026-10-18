@@ -414,7 +414,7 @@ function targetsFor(s, pi, id) {
       }
       else if (c.tgt === 'airport') {   /* Reptéri ellenőrzés: bármelyik (nem rögzített, nem Igézhetetlen) karakter át a túloldal egy üres helyére */
         for (const sd of [pi, ei]) { const os = other(sd);
-          s.players[sd].board.forEach((u, i) => { if (!u || isFixed(u) || isEl(u)) return;
+          s.players[sd].board.forEach((u, i) => { if (!u || (isFixed(u) && u.id !== 'c_capa') || isEl(u)) return;   /* 2026-10-19: a Cápa is áttehető (Tomi) */
             s.players[os].board.forEach((x, j) => { if (!x && !closedLane(s, os, j)) T.push({ k:'unit', side:sd, i, t2:{ k: os === pi ? 'slot' : 'eslot', side:os, i:j } }); }); }); }
       }
       else if (c.tgt === 'swap') {   // saját karakter + másik saját karakter (csere) vagy saját üres hely (átlépés)
@@ -606,6 +606,7 @@ function playCard(s, pi, hi, t) {
         const oldFoe = [...(u.foe || [])], foe = [];   /* az eszközök gazdája marad, aki rátette (mint Alekosz lopásánál) */
         for (const id of u.items) { const x = oldFoe.indexOf(id); if (x >= 0) oldFoe.splice(x, 1); else foe.push(id); }
         u.foe = foe; u.fresh = true; u.hidden = false;
+        if (u.id === 'c_capa') u.owner = other(os);   /* a Cápa átáll: aki áttette, azé lesz – az ő köre elején úszik, a túloldalt eszi (a hátralévő úszásai maradnak) */
         dst.board[j] = u;
         ev(s, { t:'airport', side:os, i:j, from:t.i, fs:sd, id:u.id }); }
         break;
