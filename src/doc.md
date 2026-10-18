@@ -463,6 +463,11 @@ Hősképesség-ötletek a táblázatban (még nem zöldek, nincsenek beépítve)
 ## Javítás: „Újabb ranked” → Mégse beragadás (2026-10-16)
 - Meccs után az „Újabb ranked” gomb a lezárt meccs képernyőjén indította a keresést; ha valaki „Mégse”-t nyomott, a lezárt táblán ragadt, és a zászló sem csinált semmit. Mostantól az „Újabb ranked” előbb a Ranked képernyőre visz, a keresés megszakítása lezárt meccsből a menübe visz, és lezárt meccsen a zászló is a menübe visz.
 
+## Új packos változat-lapok: Tomi, a parti lelke · Laszy · Toma (2026-10-18, Tomi)
+- Három új „✦ Ritka variáns” (`c_tomiparti2`, `c_laszy2`, `c_sasi2`; ugyanaz a hatás, más kép): Tomi liftes szelfi, Laszy a boltban, Toma Nightwish-pólóban, epres shotokkal.
+- Ugyanúgy jönnek, mint a zöld Rehab: Base set packban az alaplap helyén kis eséllyel (`VARIANT_CHANCE`), Shiny packban a különleges hely változat-sorsolásán (`ECON.shinyVariant`) – most már 4 változat közül, nem csak a Rehabból.
+- Javítás közben: Laszy félrelövése a lap-azonosítót nézte, így a változatára is kiterjesztve (`bid(u.id)`).
+
 ## Season Pass: jutalom-felfedés (2026-10-18, Tomi)
 - Minden átvett Season Pass jutalom ugyanazzal az animációval nyílik, mint a Halloween eventé (közös `rewardRevealShow`, arany–kék „sp” téma): a saját hátlapod jelenik meg rejtett lapként, rázkódik, villan, és előbukkan a jutalom (pack, coin, lap, skin, hős) felirattal.
 - „Mindet átveszem”: egymás után felfedi őket (legfeljebb 6, a többit egy összesítő üzenet írja ki), a hősválasztós szint a végén jön.

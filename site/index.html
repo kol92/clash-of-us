@@ -2358,7 +2358,7 @@ body.pf-loading #scr-menu .pb-name::after{content:'';display:inline-block;width:
 <script src="vendor/firebase-auth-compat.js"></script>
 <script src="vendor/firebase-firestore-compat.js"></script>
 <script src="vendor/firebase-database-compat.js"></script>
-<script>window.APP_VERSION = "2026.10.18-1539"; window.APP_BUILD = "2026.10.18-1539";</script>
+<script>window.APP_VERSION = "2026.10.18-1550"; window.APP_BUILD = "2026.10.18-1550";</script>
 <script>// ===== Best of Us – saját szerver (Firebase) =====
 // A játék eredetileg a Claude-os tárolót használta (window.claude.use('db' | 'user' | 'room')).
 // Ez a fájl ugyanazt a felületet adja Firebase-ből, így a játék kódja szinte változatlan maradhat:
@@ -2767,6 +2767,7 @@ const CARDS = [
   { id:'l_korhaz', type:'loc', name:'Siófoki Kórház', cost:1, rarity:'k', text:'Minden karakter 1 életet gyógyul a gazdája körének végén.' },
 ];
 /* Arany lapok (Amszterdam hősei, 2026-10-17): az alaplap arany változata – ugyanaz a hatás, csak boosterből (0,5% / Shiny 5%) */
+for (const b of ['c_tomiparti', 'c_laszy', 'c_sasi']) CARDS.push({ ...CARDS.find(c => c.id === b), id:b + '2', variantOf:b });   /* 2026-10-18: új packból jövő változatok (Tomi) */
 for (const b of ['a_welcome', 'a_hawaiians', 'f_gameover']) CARDS.push({ ...CARDS.find(c => c.id === b), id:b + '_g', variantOf:b, goldVar:true });
 /* Bong (Amszterdam hősei): minden továbbadáskor 1-gyel drágább token-példány (legfeljebb 10) */
 for (let n = 2; n <= 10; n++) CARDS.push({ ...CARDS.find(c => c.id === 'a_bong'), id:'a_bong' + n, cost:n, bong:n, token:true, rarity:'r' });
@@ -3526,7 +3527,7 @@ function strike(s, i) {
   ev(s, { t:'attack', side:pi, i });
   if ((CARD[u.id].variantOf || u.id) === 'c_tzs') damageHero(s, pi, 1);
   if (a <= 0 || s.winner != null) return;
-  const mf = u.id !== 'c_laszy' ? null : ('nextMisfire' in u ? u.nextMisfire : laszyRoll(s, pi, i));
+  const mf = bid(u.id) !== 'c_laszy' ? null : ('nextMisfire' in u ? u.nextMisfire : laszyRoll(s, pi, i));
   delete u.nextMisfire;
   if (mf) {
     const pick = mf;
@@ -4017,6 +4018,9 @@ const ART = {
   c_kriszrantott: { src:'art/kriszrantott.webp?v=1b89215302acb952', av:'58% 22%', pos:'56% 22%' },
   a_rantott: { src:'art/rantott.webp?v=ce888fe848453ef6', av:'45% 40%', pos:'50% 38%' },
   c_tomiparti: { src:'art/tomiparti.webp?v=b7bb907f03a864ac', av:'47% 26%', pos:'47% 24%' },
+  c_tomiparti2: { src:'art/tomiparti2.webp?v=6a4dd12df51c382f', av:'58% 20%', pos:'58% 18%' },
+  c_laszy2: { src:'art/laszy2.webp?v=bb4f3cb40062ddeb', av:'63% 22%', pos:'62% 20%' },
+  c_sasi2: { src:'art/toma2.webp?v=ca416605c05b5d6a', av:'52% 22%', pos:'52% 20%' },
   a_espresso: { src:'art/espresso.webp?v=51b0d097bdb328f5', av:'52% 40%', pos:'52% 40%' },
   a_amongus: { src:'art/amongus.webp?v=d851a28e0a755143', av:'50% 62%', pos:'50% 58%' },
   c_alvari: { src:'art/alvari.webp?v=1fa1af15528dd5e4', av:'50% 30%', pos:'50% 30%' },
@@ -5252,7 +5256,7 @@ function burstAt(x, y, big) {
 async function attackAnim(pi, i, u) {
   const el = unitAt(pi, i); if (!el) { await runFx(() => attackLane(S, i)); return; }
   // Laszy: előre eldől, hogy mellé üt-e, így a saját célpontja felé lendül
-  const mf = u.id === 'c_laszy' ? (u.nextMisfire = laszyRoll(S, pi, i)) : null;
+  const mf = bid(u.id) === 'c_laszy' ? (u.nextMisfire = laszyRoll(S, pi, i)) : null;
   if (mf) return misfireAnim(pi, i, el, mf);
   const foe = other(pi), tj = tauntAt(S, foe), j = tj >= 0 ? tj : i, opp = S.players[foe].board[j];
   const toHero = tj < 0 && (!opp || u.id === 'c_nyiti' || isInv(opp));
