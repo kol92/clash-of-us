@@ -463,6 +463,13 @@ Hősképesség-ötletek a táblázatban (még nem zöldek, nincsenek beépítve)
 ## Javítás: „Újabb ranked” → Mégse beragadás (2026-10-16)
 - Meccs után az „Újabb ranked” gomb a lezárt meccs képernyőjén indította a keresést; ha valaki „Mégse”-t nyomott, a lezárt táblán ragadt, és a zászló sem csinált semmit. Mostantól az „Újabb ranked” előbb a Ranked képernyőre visz, a keresés megszakítása lezárt meccsből a menübe visz, és lezárt meccsen a zászló is a menübe visz.
 
+## Vodkása – új eszköz (ital), Base set (2026-10-18, Tomi)
+- **Vodkása** (`i_vodkasa`) · 1 energia · gyakori · eszköz, ital · „A karakter, akin van, Igézhetetlen lesz. Ha TZS-re teszed, többé nem sebzi a saját hősödet, és Pajzsot is kap.” Kép: a Vodkása tábla (Kalinka + jégkása).
+- Rejtett extra (nincs a lapon): ha TZS-en van, nem mondja, hogy „Anyád vagy!”.
+- Ha az eszköz lekerül (pl. STOP), az Igézhetetlenség is megszűnik. Italként a véletlen italos hatásokba is bekerül (Kristóf, Tomi, a parti lelke).
+- Kiosztás: mindenki kap 2-t (kiosztási verzió 26); packból is jön (Base set). Teszt: `tools/vodkasa_test.js`.
+- Mérés (kezdőpaklikba 1–2 költségű lap helyére, 3000 meccs): 42,1% – Napszemüveg 47,5%, Csattogós lepke 49,9%. A bot az Igézhetetlenséget alig értékeli, élőben (eltávolítás ellen) többet ér.
+
 ## TZS beszól (2026-10-18, Tomi)
 - Amikor TZS (vagy a változata) támad, egy szövegbuborék jelenik meg fölötte: **„Anyád vagy!”** (~2 mp; a saját lapnál fölötte, az ellenfélénél alatta). `sayBubble()` a ui.js-ben, az `attackAnim` hívja – PvP-ben mindkét játékos látja. Más lapokhoz is használható.
 

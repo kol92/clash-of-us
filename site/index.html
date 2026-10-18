@@ -2363,7 +2363,7 @@ body.pf-loading #scr-menu .pb-name::after{content:'';display:inline-block;width:
 <script src="vendor/firebase-auth-compat.js"></script>
 <script src="vendor/firebase-firestore-compat.js"></script>
 <script src="vendor/firebase-database-compat.js"></script>
-<script>window.APP_VERSION = "2026.10.18-1712"; window.APP_BUILD = "2026.10.18-1712";</script>
+<script>window.APP_VERSION = "2026.10.18-1759"; window.APP_BUILD = "2026.10.18-1759";</script>
 <script>// ===== Best of Us – saját szerver (Firebase) =====
 // A játék eredetileg a Claude-os tárolót használta (window.claude.use('db' | 'user' | 'room')).
 // Ez a fájl ugyanazt a felületet adja Firebase-ből, így a játék kódja szinte változatlan maradhat:
@@ -2716,6 +2716,7 @@ const CARDS = [
   { id:'c_ah_bence', set:'ah', type:'char', name:'Bence, Amsterdam terrorja', cost:6, atk:3, hp:5, rarity:'l', haste:true, revive:true, text:'' },
   // Bolti eszköz (2026-10-16): csak a Boltban kapható, packból nem jön
   { id:'i_cipo', type:'item', name:'Laci cipőkanala', cost:1, atk:0, hp:0, rarity:'k', shopOnly:true, price:100, mover:true, text:'Amelyik karakterre ráteszed, azt a körödben egyszer áthelyezheted a táblán (üres helyre, vagy helycserével).' },
+  { id:'i_vodkasa', drink:true, type:'item', name:'Vodkása', cost:1, atk:0, hp:0, rarity:'k', elusive:true, text:'A karakter, akin van, Igézhetetlen lesz. Ha TZS-re teszed, többé nem sebzi a saját hősödet, és Pajzsot is kap.' },   /* 2026-10-18 */
   { id:'i_aranylanc', type:'item', name:'Tomi nyaklánca', cost:3, atk:2, hp:3, rarity:'l', text:'' },
   // --- Akciók ---
   { id:'a_dinnyes', drink:true, type:'action', name:'Dinnyés Absolute Vodka', cost:1, tgt:'enemyOrHero', rarity:'k', text:'3 sebzés egy ellenséges karakternek vagy az ellenfél hősének.' },
@@ -3158,6 +3159,8 @@ function playCard(s, pi, hi, t) {
     u.items.push(c.id);
     ev(s, { t:'buff', side:pi, i:t.i, n: c.gomba ? u.items.filter(x => CARD[x] && CARD[x].gomba).length : undefined });
     // Fehér szarvas bunda Gál Zolin: Pajzsot is kap (2026-10-12)
+    if (c.elusive) u.elusive = true;   /* Vodkása: Igézhetetlen */
+    if (c.id === 'i_vodkasa' && bid(u.id) === 'c_tzs' && !u.shield) { u.shield = true; ev(s, { t:'boon', side:pi, i:t.i, b:'shield' }); }
     if (c.id === 'i_bunda' && bid(u.id) === 'c_zoli' && !u.shield) { u.shield = true; ev(s, { t:'boon', side:pi, i:t.i, b:'shield' }); }
     if (c.selfDmg) damageHero(s, pi, c.selfDmg);
   } else if (c.type === 'loc') {
@@ -3304,6 +3307,7 @@ function playCard(s, pi, hi, t) {
             if (c.doom) u.doom = false;
             if (c.muscle && !base.muscle) u.muscle = false;
             if (c.taunt && !base.taunt) u.taunt = false;
+            if (c.elusive && !base.elusive && !u.items.some(x => x !== id && CARD[x].elusive && !own.includes(x))) u.elusive = false;
             bury(s, ei, id, 'item');
           }
           u.items = keep;
@@ -3538,7 +3542,7 @@ function strike(s, i) {
   reveal(s, pi, i);
   const a = effAtk(s, pi, i);
   ev(s, { t:'attack', side:pi, i });
-  if ((CARD[u.id].variantOf || u.id) === 'c_tzs') damageHero(s, pi, 1);
+  if (bid(u.id) === 'c_tzs' && !(u.items || []).includes('i_vodkasa')) damageHero(s, pi, 1);   /* Vodkása mellett nem sebzi a saját hősét */
   if (a <= 0 || s.winner != null) return;
   const mf = bid(u.id) !== 'c_laszy' ? null : ('nextMisfire' in u ? u.nextMisfire : laszyRoll(s, pi, i));
   delete u.nextMisfire;
@@ -4031,6 +4035,7 @@ const ART = {
   c_kriszrantott: { src:'art/kriszrantott.webp?v=1b89215302acb952', av:'58% 22%', pos:'56% 22%' },
   a_rantott: { src:'art/rantott.webp?v=ce888fe848453ef6', av:'45% 40%', pos:'50% 38%' },
   c_tomiparti: { src:'art/tomiparti.webp?v=b7bb907f03a864ac', av:'47% 26%', pos:'47% 24%' },
+  i_vodkasa: { src:'art/vodkasa.webp?v=4928c309a56330ff', av:'45% 45%', pos:'45% 40%' },
   c_tomiparti2: { src:'art/tomiparti2.webp?v=6a4dd12df51c382f', av:'58% 20%', pos:'58% 18%' },
   c_laszy2: { src:'art/laszy2.webp?v=bb4f3cb40062ddeb', av:'63% 22%', pos:'62% 20%' },
   c_sasi2: { src:'art/toma2.webp?v=ca416605c05b5d6a', av:'52% 22%', pos:'52% 20%' },
@@ -5278,7 +5283,7 @@ function sayBubble(el, txt, pi) {
 }
 async function attackAnim(pi, i, u) {
   const el = unitAt(pi, i); if (!el) { await runFx(() => attackLane(S, i)); return; }
-  if (bid(u.id) === 'c_tzs') sayBubble(el, 'Anyád vagy!', pi);   /* 2026-10-18, Tomi: TZS beszól, amikor támad */
+  if (bid(u.id) === 'c_tzs' && !(u.items || []).includes('i_vodkasa')) sayBubble(el, 'Anyád vagy!', pi);   /* Vodkással elhallgat */   /* 2026-10-18, Tomi: TZS beszól, amikor támad */
   // Laszy: előre eldől, hogy mellé üt-e, így a saját célpontja felé lendül
   const mf = bid(u.id) === 'c_laszy' ? (u.nextMisfire = laszyRoll(S, pi, i)) : null;
   if (mf) return misfireAnim(pi, i, el, mf);
@@ -5738,7 +5743,7 @@ function starterCollection() {
   return coll;
 }
 // Később bekerült gyakori lapok: a meglévő profilok is megkapják (gv = kiosztási verzió)
-const STARTER_ADDS = { 2: ['a_delfin', 'i_varazsho', 'i_lepke'], 3: ['a_rehab'], 4: ['c_pp'], 5: ['c_nfc'], 6: ['a_cheddar'], 7: ['c_vajda', 'c_veghtomi'], 8: ['c_kovacs'], 9: ['a_kitiltva'], 10: ['a_haver'], 11: PLAYABLE.filter(c => c.rarity === 'r' && !c.variantOf && !c.set).map(c => c.id), 12: ['c_sasimeselo'], 13: ['c_norbi'], 14: ['c_udvarhelyi'], 15: ['c_molnar'], 16: CARDS.filter(c => c.finisher && !c.set).map(c => c.id), 17: ['c_barnaelet'], 18: ['c_amszterdam'], 19: ['c_davidsofor'], 20: ['a_szulinap'], 21: ['c_atiuldozott'], 22: ['c_alvari'], 23: ['a_amongus'], 24: ['a_espresso'], 25: ['f_vezetek'] };   // 25: Dávid új Kánonja (2026-10-18, a Munkahely helyett)   // 16: mindenki megkapja mind a 9 Kánon esemény lapot   // 12: Laci új kezdőpaklijához   // 11: minden ritka lapból 1 (a kezdőpaklikhoz)
+const STARTER_ADDS = { 2: ['a_delfin', 'i_varazsho', 'i_lepke'], 3: ['a_rehab'], 4: ['c_pp'], 5: ['c_nfc'], 6: ['a_cheddar'], 7: ['c_vajda', 'c_veghtomi'], 8: ['c_kovacs'], 9: ['a_kitiltva'], 10: ['a_haver'], 11: PLAYABLE.filter(c => c.rarity === 'r' && !c.variantOf && !c.set).map(c => c.id), 12: ['c_sasimeselo'], 13: ['c_norbi'], 14: ['c_udvarhelyi'], 15: ['c_molnar'], 16: CARDS.filter(c => c.finisher && !c.set).map(c => c.id), 17: ['c_barnaelet'], 18: ['c_amszterdam'], 19: ['c_davidsofor'], 20: ['a_szulinap'], 21: ['c_atiuldozott'], 22: ['c_alvari'], 23: ['a_amongus'], 24: ['a_espresso'], 25: ['f_vezetek'], 26: ['i_vodkasa'] };   // 26: Vodkása (2026-10-18, gyakori → mindenki kap 2-t)   // 25: Dávid új Kánonja (2026-10-18, a Munkahely helyett)   // 16: mindenki megkapja mind a 9 Kánon esemény lapot   // 12: Laci új kezdőpaklijához   // 11: minden ritka lapból 1 (a kezdőpaklikhoz)
 const GRANT_V = Math.max(1, ...Object.keys(STARTER_ADDS).map(Number));
 // Ajándékok: minden profil egyszer kapja meg (a meglévők a következő megnyitáskor, az újak létrehozáskor)
 const GIFTS = [{ id: 'g-2026-09-28', packs: 1 }, { id: 'g-2026-09-28b', packs: 5 },
