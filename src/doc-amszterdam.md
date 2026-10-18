@@ -28,9 +28,9 @@
 - **Sasi, Amszterdam hőse** (c_ah_sasi) · 4 · 2/6 · gyakori · Lendület
 - **Tomi, Amszterdam hőse** (c_ah_tomi) · 3 · 1/4 · gyakori · Igézhetetlen
 - **Barna, Amszterdam hőse** (c_ah_barna) · 3 · 3/2 · gyakori · kijátszáskor egy Varázsgomba a paklidba
-- **Laci, Amszterdam hőse** (c_ah_laci) · 2 · 2/2 · gyakori · kijátszáskor két Ír kávé a kezedbe
+- **Laci, Amszterdam hőse** (c_ah_laci) · 2 · 2/2 · gyakori · kijátszáskor **egy** Ír kávé a kezedbe (2026-10-18: kettő helyett egy, Tomi)
 - **Ati, Amszterdam hőse** (c_ah_ati) · 5 · 3/4 · gyakori · kijátszáskor maga mellé idéz egy 2/2-es **Bettit** (c_betti, token, nem gyűjthető; előbb jobbra, aztán balra, különben bárhova)
-- **Bence, Amszterdam terrorja** (c_ah_bence) · 6 · 4/5 · legendás · Lendület, Feltámadás
+- **Bence, Amszterdam terrorja** (c_ah_bence) · 6 · **3/5** · legendás · Lendület, Feltámadás (2026-10-18: 4/5 → 3/5, Tomi)
 - **Barna vízipipája** (c_vizipipa) · 1 · 0/2 · epikus · az **ellenfél oldalára** teszed le (te választod az üres helyét). Nem támad. Amelyik karakter támadással elpusztítja, +2/+2-t kap (a Pajzs nem véd ellene, nincs). Ha az ellenfél visszaküldi a kezébe (Vera, Csend), ő teheti le a te oldaladra. A bot „csalinak” értékeli (annak jó, aki üti).
 - **PP, a váratlan** (c_ppvar) · 2 · 3/1 · epikus · Sunyulás; ha egy karakter megtámadja, 2-vel kisebb sebzést okoz neki (a 2 támadású nem sebzi, a 3-as 1-et üt). Amikor PP támad, a visszaütés normál. Nem kulcsszó, a Süti nem veszi el (a Sunyulást igen).
 - **Drog kereső kutya** (c_kutya) · 2 · 2/1 · ritka · Sunyulás; halálakor az ellenfél eldob egy véletlen lapot a kezéből
@@ -101,6 +101,13 @@ Megjegyzés: a bot a helyzeti lapokat (helyszínek, Süti, Utcai füst, Bong, a 
 
 **2. Hősök változatos paklikkal** (paklisegéd a lapkészlet véletlen 75%-ából, hősönként ~800 meccs, ±3,5%) – Amszterdammal / nélküle: Tomi 58,1/55,6 · Barna 55,1/52,6 · Bence 52,1/51,1 · Gabi 51,9/54,8 · Milo 51,9/50,9 · Sasi 50,8/53,1 · Krisz 46,4/48,5 · Laci 43,6/44,1 · Dávid 40,1/39,3. A szett nem tolja el a hősöket; Dávid és Laci a szettől függetlenül gyenge a „nem kezdőpaklis” paklikkal (a hős-képességük a kezdőpakli lapjaira épít).
 A paklisegéd a szettből szinte csak az epikus/legendás lapokat választja (PP 29%, vízipipa 28%, Végtelen trip 18% a paklik közül) – a gyakoriakat a ritkaság-súlyozás miatt alig.
+
+**Gyengítések (2026-10-18, Tomi döntése)** – kezdőpaklikba téve, 3000 meccs/lap:
+- Bence, A. terrorja 4/5 → 3/5: 55,6% → **51,4%** ✔
+- Laci, A. hőse 2 → 1 Ír kávé: 57,3% → **55,7%** (2 energiás helyen; a többi 2-es lap 47–52%). Kipróbálva még: 1/2-es statokkal 50,0%, 3 energiával 51,3%, 2/1-gyel 54,2% – Tomi döntésére vár.
+- Game Over (még nem módosítva): most 62,8%; 3 sebzés a hősnek 59,6%; **hős-sebzés nélkül 53,8%**.
+- Reptéri ellenőrzés (még nem módosítva): most 55,1%; csak ≤4 energiás karakter 55,0%; csak ≤4 támadású 54,6%; **az áttett karakter −2 támadás 52,3%**.
+(A 6 energia a maximum, ezért drágítás nem opció ezeknél.)
 
 **3. „Csak Amszterdam” pakli** (a szett + Kánon, a kezdőpaklik ellen): 16–34% – a szett magában nem pakli, a Base set lapjaival keverve működik (ez egy 25 lapos mini-szettnél várható).
 
