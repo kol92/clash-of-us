@@ -1,5 +1,10 @@
 /* TESZT OLDAL (teszt ág): minden, ami nem az éles cím, teszt mód – lásd meta.js testBanner / bootProfile */
 const TEST_MODE = typeof location !== 'undefined' && location.hostname !== 'bestofus.pages.dev';
+/* Szettek megjelenése (2026-10-18): az Amszterdam hősei 2026-10-19 (hétfő) 19:00-kor (budapesti idő) jelenik meg élesben – addig minden lapja rejtve.
+   A teszt oldalon mindig látszik. setLive(id) / cardOn(lap): ezt nézi a gyűjtemény, a bolt, a szett-szűrő, a bot-paklik és a Halloween-buli lap-készlete. */
+const SET_RELEASE = { ah: Date.UTC(2026, 9, 19, 17, 0, 0) };
+const setLive = id => TEST_MODE || !SET_RELEASE[id] || Date.now() >= SET_RELEASE[id];
+const cardOn = c => !c.set || setLive(c.set);
 // ===== Clash of Us – felület =====
 let ME = 0, BOT = 1;   // PvP-ben a vendégnél felcserélődik: mindig te vagy lent
 const $ = q => document.querySelector(q);
@@ -443,7 +448,8 @@ $('#rkBotRow input').onchange = e => { if (Store.p) { Store.p.rkBot = e.target.c
 // ---- gyűjtemény-szűrő (Astra UI): név, típus, ritkaság, költség, megvan/hiányzik ----
 const CF = { q: '', type: new Set(), rar: new Set(), cost: new Set(), own: '', set: new Set() };
 /* szettek (2026-10-16): a lap `set` mezője (engine.js), ha nincs: Base set */
-const CF_SETS = [['base', 'Base set'], ['hw', 'Halloween'], ...(TEST_MODE ? [['ah', 'Amszterdam hősei']] : [])];
+const CF_SETS_ALL = [['base', 'Base set'], ['hw', 'Halloween'], ['ah', 'Amszterdam hősei']];
+const cfSets = () => CF_SETS_ALL.filter(([k]) => setLive(k));
 const cardSet = c => c.set || 'base';
 const CF_TYPES = [['char', 'Karakter'], ['action', 'Akció'], ['item', 'Eszköz'], ['loc', 'Helyszín']];
 const CF_RARS = [['k', 'Gyakori'], ['r', 'Ritka'], ['e', 'Epikus'], ['l', 'Legendás'], ['d', 'Gyémánt']];
@@ -453,6 +459,7 @@ const costKey = c => c.cost <= 1 ? '0-1' : c.cost >= 6 ? '6+' : String(c.cost);
 const cfNorm = t => String(t).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 function cfMatch(c) {
   if (CF.q && !cfNorm(c.name + ' ' + (c.text || '')).includes(cfNorm(CF.q))) return false;
+  if (!cardOn(c)) return false;   /* még meg nem jelent szett */
   if (CF.set.size && !CF.set.has(cardSet(c))) return false;
   if (CF.type.size && !CF.type.has(c.type)) return false;
   if (CF.rar.size && !CF.rar.has(rarKey(c))) return false;
@@ -464,7 +471,7 @@ function renderCollFilters() {
   const el = $('#collFilters'); if (!el) return;
   const chip = (grp, val, inner, on, label) => `<button class="cf-chip${on ? ' on' : ''}" data-cf="${grp}" data-v="${val}" aria-pressed="${on}" aria-label="${label}">${inner}</button>`;
   el.innerHTML = `<label class="cf-search"><span class="sr-only">Keresés</span><input id="cfQ" type="search" placeholder="Keresés…" value="${escH(CF.q)}" autocomplete="off"></label>
-    <div class="cf-row">${CF_SETS.map(([k, n]) => chip('set', k, `<span class="lbl-t">${k === 'hw' ? '🎃 ' : k === 'ah' ? '🌷 ' : ''}${n}</span>`, CF.set.has(k), n + ' szett')).join('')}</div>
+    <div class="cf-row">${cfSets().map(([k, n]) => chip('set', k, `<span class="lbl-t">${k === 'hw' ? '🎃 ' : k === 'ah' ? '🌷 ' : ''}${n}</span>`, CF.set.has(k), n + ' szett')).join('')}</div>
     <div class="cf-row">${CF_TYPES.map(([k, n]) => chip('type', k, `<img src="art/ui/ic-type-${k}.webp" alt=""><span class="lbl-t">${n}</span>`, CF.type.has(k), n)).join('')}</div>
     <div class="cf-row">${CF_RARS.map(([k, n]) => chip('rar', k, `<i class="rar r-${k}"></i>`, CF.rar.has(k), n)).join('')}
       ${chip('own', 'have', '<img src="art/ui/ic-owned.webp" alt="">', CF.own === 'have', 'Megvan')}${chip('own', 'miss', '<img src="art/ui/ic-missing.webp" alt="">', CF.own === 'miss', 'Hiányzik')}</div>
@@ -485,9 +492,9 @@ function renderColl(bodyOnly) {
   const heroOk = !(CF.type.size || CF.rar.size || CF.cost.size || CF.own || (CF.set.size && !CF.set.has('base'))) && HEROES.some(heroQ);
   const groups = [['Hősök', null], ['Karakterek', 'char'], ['Eszközök', 'item'], ['Akciók', 'action'], ['Helyszínek', 'loc']]
     .filter(([, type]) => type ? PLAYABLE.some(c => c.type === type && cfMatch(c)) : heroOk);
-  const have = PLAYABLE.filter(c => owned(c.id) > 0).length, foils = PLAYABLE.filter(c => ownsFoil(c.id)).length;
+  const PL = PLAYABLE.filter(cardOn), have = PL.filter(c => owned(c.id) > 0).length, foils = PL.filter(c => ownsFoil(c.id)).length;
   const dup = typeof dupeList === 'function' && Store.p ? dupeList(Store.p) : { out: [] };
-  $('#collBody').innerHTML = `<p class="coll-sum">${have}/${PLAYABLE.length} különböző lap · ${foils} Full Art változat</p>` + (groups.length ? '' : '<p class="cf-empty">Nincs a szűrésnek megfelelő lap.</p>') +
+  $('#collBody').innerHTML = `<p class="coll-sum">${have}/${PL.length} különböző lap · ${foils} Full Art változat</p>` + (groups.length ? '' : '<p class="cf-empty">Nincs a szűrésnek megfelelő lap.</p>') +
     `<button class="btn bk-btn" id="bkBtn">🃏 Hátlap: ${BACKS[myBack()].name}</button>` +
     (dup.out.length ? `<button class="btn dupe-btn" id="dupeBtn">♻️ ${dup.out.reduce((s, x) => s + x.n + x.f, 0)} fölösleges lap beváltása · +${dup.coins} coin</button>` : '') + groups.map(([t, type]) => `<div class="lbl">${t}</div><div class="coll-grid">${
     type ? PLAYABLE.filter(c => c.type === type && cfMatch(c)).sort((a, b) => a.cost - b.cost).map(c => {

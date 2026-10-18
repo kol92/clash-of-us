@@ -356,7 +356,7 @@ function renderProfileBar() {
   const ss = $('#saveState'); if (ss) ss.textContent = window.APP_MODE ? '👤 Fiók' : Store.mode === 'cloud' ? '☁️ Felhőben mentve' : '📱 Ezen az eszközön mentve';
   el.querySelector('.pb-name').textContent = p.name;
   try { applyBack(); } catch (e) {}
-  renderQuestBadge(); renderPassBadge(); try { renderRankTile(); } catch (e) {} try { renderEventTile(); } catch (e) {} try { if (chestWeeklyCheck()) Store.p.chestNew = true; } catch (e) {} try { if (!$('#scr-menu').hidden) { dayGiftCheck(); backAwardCheck(); deckLinkCheck(); evGiftCheck(); chestPopup(); } } catch (e) {}
+  renderQuestBadge(); renderPassBadge(); try { renderRankTile(); } catch (e) {} try { renderEventTile(); } catch (e) {} try { if (chestWeeklyCheck()) Store.p.chestNew = true; } catch (e) {} try { if (!$('#scr-menu').hidden) { dayGiftCheck(); backAwardCheck(); deckLinkCheck(); evGiftCheck(); ahNewsCheck(); chestPopup(); } } catch (e) {}
   const wb = $('#wheelBadge'); if (wb) wb.hidden = !wheelReady();
   const badge = $('#shopBadge'); if (badge) badge.hidden = !freePackReady() && !(p.giftPacks > 0) && !(p.faPacks > 0) && !(p.shinyPacks > 0) && !(p.chests > 0);
 }
@@ -460,6 +460,7 @@ function chestWeeklyCheck() {
   return true;
 }
 function chestPopup() {
+  try { if (ahNewsCheck()) return; } catch (e) {}   /* előbb az Amszterdam-hír (ha még nem látta), utána a láda */
   const p = Store.p; if (!p || !(p.chestNew) || $('#layer .overlay') || (typeof S !== 'undefined' && S)) return;
   const o = document.createElement('div'); o.className = 'overlay';
   o.innerHTML = `<div class="modal acct-box chest-pop"><h3>🧰 Megérkezett a heti ládád!</h3><img class="chest-pop-img" src="art/ui/chest-closed.webp" alt="Heti láda" onerror="imgRetry(this)">
@@ -712,14 +713,14 @@ function renderShop() {
     <div class="shop-grid">
       ${shopPanelHTML({ attr: 'data-pack="base"', img: 'art/ui/pack-base.webp', contain: true, name: SETS.base.name, sub: '3 lap', price: ECON.packPrice, have: false })}
       ${shopPanelHTML({ attr: 'data-pack="shiny"', img: 'art/ui/pack-shiny.webp', contain: true, name: 'Shiny pack', sub: '1 biztos különleges', price: ECON.shinyPrice, have: false, holo: true })}
-      ${TEST_MODE ? `${shopPanelHTML({ attr: 'data-pack="ah"', img: 'art/ui/pack-ah.webp', contain: true, name: SETS.ah.name, sub: 'Új szett · 3 lap', price: ECON.packPrice, have: false })}
+      ${setLive('ah') ? `${shopPanelHTML({ attr: 'data-pack="ah"', img: 'art/ui/pack-ah.webp', contain: true, name: SETS.ah.name, sub: 'Új szett · 3 lap', price: ECON.packPrice, have: false })}
       ${shopPanelHTML({ attr: 'data-pack="ahshiny"', img: 'art/ui/pack-ahshiny.webp', contain: true, name: 'Amszterdam Shiny', sub: '1 biztos Full Art', price: ECON.shinyPrice, have: false, holo: true })}` : ''}
     </div>
     ${chestPanelHTML()}
     <details class="pack-info-more"><summary>Mi van a packokban?</summary>
       <p><b>${SETS.base.name}:</b> 3 véletlen lap a teljes alapkészletből, legalább egy ritka vagy jobb.</p>
       <p><b>🧰 Heti láda:</b> minden hétfőn 0:01-kor jár egy ingyen; ha már kinyitottad, ${CHEST.price} coinért vehetsz még. 10 lap: 1 biztos epikus vagy legendás, 1 biztos Full Art, a többi véletlen. 0,5% eséllyel egy ritka hős-portré is lehet benne.</p>
-      ${TEST_MODE ? `<p><b>${SETS.ah.name}:</b> 3 lap csak az új szettből (${SETS.ah.cards.length} lap), legalább egy ritka vagy jobb. A Shiny változatban a legjobb lap biztosan Full Art. ★ Arany lap (Isten hozott Amszterdamban, High Hawaiians vagy Game Over aranyban): ${String(ECON.goldPlain * 100).replace('.', ',')}% · Shiny packban ${ECON.goldShiny * 100}%. Hős-lap és arany hős nincs benne.</p>` : ''}
+      ${setLive('ah') ? `<p><b>${SETS.ah.name}:</b> 3 lap csak az új szettből (${SETS.ah.cards.length} lap), legalább egy ritka vagy jobb. A Shiny változatban a legjobb lap biztosan Full Art. ★ Arany lap (Isten hozott Amszterdamban, High Hawaiians vagy Game Over aranyban): ${String(ECON.goldPlain * 100).replace('.', ',')}% · Shiny packban ${ECON.goldShiny * 100}%. Hős-lap és arany hős nincs benne.</p>` : ''}
       <p><b>Shiny pack:</b> 3 lap, amiből egy biztosan különleges: Full Art lap, Full Art hős vagy ritka változat-lap. ${ECON.goldShiny * 100}% eséllyel ✦ Arany hős is lehet benne.</p></details>
     ${limited}
     <div class="odds"><div class="lbl">Esélyek laponként</div>
@@ -1016,7 +1017,7 @@ function deckHelperFill(list0, hero, own) {
 const BOT_DECK = { 1: { swaps: 3, rar: 'kr' }, 2: { share: 0.7, rar: 'kre' }, 3: { share: 0.75, noLeg: true } };
 function botDeckFor(hero, lv, rnd = Math.random) {
   const stK = Object.keys(DECKS).find(k => DECKS[k].hero === hero); if (!stK) return null;
-  const pool = CARDS.filter(c => !c.token && !c.off && !c.passOnly && !c.eventOnly && !c.shopOnly && !c.wheelOnly && !c.variantOf && !c.finisher && (!c.hero || c.hero === hero));
+  const pool = CARDS.filter(c => !c.token && !c.off && !c.passOnly && !c.eventOnly && !c.shopOnly && !c.wheelOnly && !c.variantOf && !c.finisher && (!c.hero || c.hero === hero) && !(c.set && typeof setLive === 'function' && !setLive(c.set)));   /* bot: meg nem jelent szett nélkül */
   const cap = id => CARD[id].rarity === 'l' ? 1 : 2;
   if (lv >= 4 || (BOT_DECK[lv] && BOT_DECK[lv].share)) {
     const cf = BOT_DECK[lv] || {}, sh = lv >= 4 ? 1 : cf.share, keep = new Set(pool.filter(c => (cf.rar ? cf.rar.includes(c.rarity) : (!cf.noLeg || c.rarity !== 'l')) && rnd() < sh).map(c => c.id));
@@ -1825,6 +1826,23 @@ function evTeaserModal(e, gift) {
   $('#layer').appendChild(o);
 }
 // egyszeri ajándék az event előzetesekor / alatt: 1 Shiny pack (Tomi, 2026-10-15)
+/* Amszterdam hősei (2026-10-18): előzetes naponta egyszer a megjelenésig, utána egyszeri „megérkezett” ablak */
+function ahNewsCheck() {
+  const p = Store.p; if (!p || p.onboard || TEST_MODE || (typeof S !== 'undefined' && S) || $('#layer .overlay') || $('#scr-menu').hidden) return false;
+  const live = setLive('ah'), key = live ? 'ah-launch' : 'ah-teaser-' + today();
+  p.news = p.news || []; if (p.news.includes(key)) return false;
+  if (live && Date.now() > SET_RELEASE.ah + 7 * 864e5) return false;   /* egy hét után már nem jelenik meg */
+  p.news.push(key); save();
+  const o = document.createElement('div'); o.className = 'overlay';
+  o.innerHTML = `<div class="modal acct-box ah-news">
+    <p class="ah-news-t">${live ? 'Megérkezett a Best of Us TCG első tematikus miniszettje: az „Amsterdam Hősei”!' : 'A Best of Us TCG első tematikus miniszettje, az „Amsterdam Hősei” hétfőn érkezik 19:00 órakor!'}</p>
+    <div class="ah-news-packs"><img src="art/ui/pack-ah.webp" alt="Amsterdam Hősei booster"><img src="art/ui/pack-ahshiny.webp" alt="Amsterdam Hősei Shiny booster"></div>
+    ${live ? `<p class="live">26 új lap, két új képesség (Igézhetetlen, Feltámadás), és saját booster a Boltban.</p><button class="btn primary" data-shop>Irány a Bolt</button><button class="btn ghost" data-x>Később</button>` : '<button class="btn primary" data-x>Alig várom!</button>'}</div>`;
+  o.onclick = ev => { if (ev.target.closest('[data-shop]')) { o.remove(); renderShop(); show('scr-shop'); return; }
+    if (ev.target.closest('[data-x]') || ev.target === o) { o.remove(); setTimeout(() => { try { chestPopup(); } catch (er) {} }, 200); } };
+  $('#layer').appendChild(o);
+  return true;
+}
 function evGiftCheck() {
   const p = Store.p, e = curEvent(); if (!p || p.onboard || !e || e.draft || (typeof S !== 'undefined' && S) || $('#layer .overlay')) return;
   if (new Date() >= e.end) return;

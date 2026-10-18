@@ -621,7 +621,7 @@ function playCard(s, pi, hi, t) {
         for (const id of ids) p.deck.push(id);
         shuffle(p.deck); ev(s, { t:'polaroid', side:pi, i:-1, n:ids.length }); break; }
       case 'a_hwparty': {   // minden (nem rögzített) karakter helyére egy véletlen karakter; a régi a temetőbe, az eszközei is
-        const pool = CARDS.filter(x => x.type === 'char' && !x.token && !x.variantOf && !x.fixed && !x.off).map(x => x.id);
+        const pool = CARDS.filter(x => x.type === 'char' && !x.token && !x.variantOf && !x.fixed && !x.off && !(x.set && typeof setLive === 'function' && !setLive(x.set))).map(x => x.id);   /* még meg nem jelent szett lapjai nem jönnek */
         const ch = [];
         for (const side of [pi, ei]) { const B = s.players[side].board;
           for (let j = 0; j < LANES; j++) { const u = B[j]; if (!u || isFixed(u)) continue;

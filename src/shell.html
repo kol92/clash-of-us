@@ -1088,6 +1088,13 @@ body.ev-hw #scr-menu .fan{filter:drop-shadow(0 0 22px rgba(255,140,40,.35));}
 .pk.set-ah.shiny .pk-sheen,.pk.set-ah.shiny .pk-holo{-webkit-mask-image:url('art/ui/sm/pack-ahshiny.webp');mask-image:url('art/ui/sm/pack-ahshiny.webp');}
 .kwt{display:inline-grid;place-items:center;width:17px;height:17px;border-radius:50%;font-size:10px;line-height:1;background:#10202ccc;border:1px solid #9fd3ff88;margin-left:1px;}
 .kwt.rv{border-color:#ffd27a99;} .kwt.nk{border-color:#e0a36b99;}
+.ah-news{text-align:center;}
+.ah-news-t{font-family:var(--title,inherit);font-weight:900;font-size:19px;line-height:1.3;color:#ffe9a8;margin:4px 6px 10px;text-shadow:0 2px 8px rgba(0,0,0,.6);}
+.ah-news-packs{display:flex;justify-content:center;gap:10px;margin:2px 0 12px;}
+.ah-news-packs img{width:42%;max-width:170px;height:auto;filter:drop-shadow(0 8px 18px rgba(0,0,0,.6));animation:ahFloat 3.2s ease-in-out infinite;}
+.ah-news-packs img+img{animation-delay:-1.6s;}
+@keyframes ahFloat{50%{transform:translateY(-8px) rotate(-1.5deg);}}
+@media (prefers-reduced-motion:reduce){.ah-news-packs img{animation:none;}}
 #testRibbon{position:fixed;left:0;right:0;bottom:0;z-index:9999;display:flex;gap:8px;align-items:center;justify-content:center;padding:3px 8px calc(3px + env(safe-area-inset-bottom));background:repeating-linear-gradient(45deg,#7a1fa2 0 12px,#5b1580 12px 24px);color:#fff;font:800 11px/1.2 system-ui,sans-serif;letter-spacing:.03em;pointer-events:none;}
 #testRibbon button{pointer-events:auto;font:inherit;border:1px solid #fff8;background:#0004;color:#fff;border-radius:6px;padding:2px 6px;}
 /* Laci cipőkanala (2026-10-16): áthelyezhető karakter jelzése és a gomb a nagy nézetben */

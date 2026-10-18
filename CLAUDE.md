@@ -107,6 +107,11 @@ Csak build (kitétel nélkül): `cd src && python3 build-app.py ""` → `src/dis
 - **Szettek:** a lap `set` mezője (`'hw'` = Halloween, alap: Base set), gyűjtemény-szűrő: `CF_SETS` / `cardSet` (ui.js).
 - **Tesztek:** `tools/hw_test.js` (Halloween-lapok, Álarcos bál, Cápa + Sasi), `tools/mosh_test.js`.
 
+## Amszterdam hősei (2026-10-18)
+- Élesben, **időzárral**: 2026-10-19 19:00-tól látszik (`SET_RELEASE` a ui.js elején, `setLive(setId)`, `cardOn(lap)`). Leírás: `src/doc-amszterdam.md`, teszt: `tools/ah_test.js`, nagy mérés: `tools/bigsim.js`.
+- Új szett felvételének mintája: lapokon `set:'xx'`, `SETS.xx` (meta.js, saját pack), `CF_SETS_ALL` (ui.js), `SET_RELEASE.xx`, pack-kép `art/ui/pack-xx.webp`, arany változat `goldVar` (+`variantOf`).
+- Nyitott döntések (Tomi): a 4 túl erős lap (Game Over 60%, Bence terrorja 57,5%, Laci 55,9%, Reptéri 55,8%) és az „Isten hozott” húzás-kapcsolója (`CARD.a_welcome.drawN`).
+
 ## Jelenlegi állapot és teendők (2026-10-16 este, account-váltáskor)
 
 - **Halloween event fut** (`EVENTS` hw26): 2026-10-15 19:00 – 11-02 (vége 11-03 0:00), jutalmak 11-09-ig vehetők át, utána maguktól jóváíródnak. A menü-háttér és a zene csak az event alatt él, utána magától visszaáll.

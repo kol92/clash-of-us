@@ -1103,6 +1103,13 @@ body.ev-hw #scr-menu .fan{filter:drop-shadow(0 0 22px rgba(255,140,40,.35));}
 .pk.set-ah.shiny .pk-sheen,.pk.set-ah.shiny .pk-holo{-webkit-mask-image:url('art/ui/sm/pack-ahshiny.webp?v=85d231f6');mask-image:url('art/ui/sm/pack-ahshiny.webp?v=85d231f6');}
 .kwt{display:inline-grid;place-items:center;width:17px;height:17px;border-radius:50%;font-size:10px;line-height:1;background:#10202ccc;border:1px solid #9fd3ff88;margin-left:1px;}
 .kwt.rv{border-color:#ffd27a99;} .kwt.nk{border-color:#e0a36b99;}
+.ah-news{text-align:center;}
+.ah-news-t{font-family:var(--title,inherit);font-weight:900;font-size:19px;line-height:1.3;color:#ffe9a8;margin:4px 6px 10px;text-shadow:0 2px 8px rgba(0,0,0,.6);}
+.ah-news-packs{display:flex;justify-content:center;gap:10px;margin:2px 0 12px;}
+.ah-news-packs img{width:42%;max-width:170px;height:auto;filter:drop-shadow(0 8px 18px rgba(0,0,0,.6));animation:ahFloat 3.2s ease-in-out infinite;}
+.ah-news-packs img+img{animation-delay:-1.6s;}
+@keyframes ahFloat{50%{transform:translateY(-8px) rotate(-1.5deg);}}
+@media (prefers-reduced-motion:reduce){.ah-news-packs img{animation:none;}}
 #testRibbon{position:fixed;left:0;right:0;bottom:0;z-index:9999;display:flex;gap:8px;align-items:center;justify-content:center;padding:3px 8px calc(3px + env(safe-area-inset-bottom));background:repeating-linear-gradient(45deg,#7a1fa2 0 12px,#5b1580 12px 24px);color:#fff;font:800 11px/1.2 system-ui,sans-serif;letter-spacing:.03em;pointer-events:none;}
 #testRibbon button{pointer-events:auto;font:inherit;border:1px solid #fff8;background:#0004;color:#fff;border-radius:6px;padding:2px 6px;}
 /* Laci cipőkanala (2026-10-16): áthelyezhető karakter jelzése és a gomb a nagy nézetben */
@@ -2336,7 +2343,7 @@ body.pf-loading #scr-menu .pb-name::after{content:'';display:inline-block;width:
 <script src="vendor/firebase-auth-compat.js"></script>
 <script src="vendor/firebase-firestore-compat.js"></script>
 <script src="vendor/firebase-database-compat.js"></script>
-<script>window.APP_VERSION = "2026.10.17-1654"; window.APP_BUILD = "2026.10.18-0714";</script>
+<script>window.APP_VERSION = "2026.10.18-1145"; window.APP_BUILD = "2026.10.18-1145";</script>
 <script>// ===== Best of Us – saját szerver (Firebase) =====
 // A játék eredetileg a Claude-os tárolót használta (window.claude.use('db' | 'user' | 'room')).
 // Ez a fájl ugyanazt a felületet adja Firebase-ből, így a játék kódja szinte változatlan maradhat:
@@ -3209,7 +3216,7 @@ function playCard(s, pi, hi, t) {
         for (const id of ids) p.deck.push(id);
         shuffle(p.deck); ev(s, { t:'polaroid', side:pi, i:-1, n:ids.length }); break; }
       case 'a_hwparty': {   // minden (nem rögzített) karakter helyére egy véletlen karakter; a régi a temetőbe, az eszközei is
-        const pool = CARDS.filter(x => x.type === 'char' && !x.token && !x.variantOf && !x.fixed && !x.off).map(x => x.id);
+        const pool = CARDS.filter(x => x.type === 'char' && !x.token && !x.variantOf && !x.fixed && !x.off && !(x.set && typeof setLive === 'function' && !setLive(x.set))).map(x => x.id);   /* még meg nem jelent szett lapjai nem jönnek */
         const ch = [];
         for (const side of [pi, ei]) { const B = s.players[side].board;
           for (let j = 0; j < LANES; j++) { const u = B[j]; if (!u || isFixed(u)) continue;
@@ -3763,6 +3770,11 @@ function botChoose(real, lvl = 2) {
 if (typeof module !== 'undefined') module.exports = { whyNot, preAttack, isEl, canMove, moveTargets, moveUnit, BOT_LV, baszoStrike, sharkSwim, atiFlee, openSlots, closedLane, CARDS_ALL: CARDS, DECK_OF, LANES, MAX_HALF, mulligan, botMulligan, beginGame, CARDS, CARD, HEROES, HERO, DECKS, newGame, playCard, canPlay, targetsFor, cardCost, attackLane, finishTurn, runEndTurn, botChoose, canAttack, effAtk };
 /* TESZT OLDAL (teszt ág): minden, ami nem az éles cím, teszt mód – lásd meta.js testBanner / bootProfile */
 const TEST_MODE = typeof location !== 'undefined' && location.hostname !== 'bestofus.pages.dev';
+/* Szettek megjelenése (2026-10-18): az Amszterdam hősei 2026-10-19 (hétfő) 19:00-kor (budapesti idő) jelenik meg élesben – addig minden lapja rejtve.
+   A teszt oldalon mindig látszik. setLive(id) / cardOn(lap): ezt nézi a gyűjtemény, a bolt, a szett-szűrő, a bot-paklik és a Halloween-buli lap-készlete. */
+const SET_RELEASE = { ah: Date.UTC(2026, 9, 19, 17, 0, 0) };
+const setLive = id => TEST_MODE || !SET_RELEASE[id] || Date.now() >= SET_RELEASE[id];
+const cardOn = c => !c.set || setLive(c.set);
 // ===== Clash of Us – felület =====
 let ME = 0, BOT = 1;   // PvP-ben a vendégnél felcserélődik: mindig te vagy lent
 const $ = q => document.querySelector(q);
@@ -4206,7 +4218,8 @@ $('#rkBotRow input').onchange = e => { if (Store.p) { Store.p.rkBot = e.target.c
 // ---- gyűjtemény-szűrő (Astra UI): név, típus, ritkaság, költség, megvan/hiányzik ----
 const CF = { q: '', type: new Set(), rar: new Set(), cost: new Set(), own: '', set: new Set() };
 /* szettek (2026-10-16): a lap `set` mezője (engine.js), ha nincs: Base set */
-const CF_SETS = [['base', 'Base set'], ['hw', 'Halloween'], ...(TEST_MODE ? [['ah', 'Amszterdam hősei']] : [])];
+const CF_SETS_ALL = [['base', 'Base set'], ['hw', 'Halloween'], ['ah', 'Amszterdam hősei']];
+const cfSets = () => CF_SETS_ALL.filter(([k]) => setLive(k));
 const cardSet = c => c.set || 'base';
 const CF_TYPES = [['char', 'Karakter'], ['action', 'Akció'], ['item', 'Eszköz'], ['loc', 'Helyszín']];
 const CF_RARS = [['k', 'Gyakori'], ['r', 'Ritka'], ['e', 'Epikus'], ['l', 'Legendás'], ['d', 'Gyémánt']];
@@ -4216,6 +4229,7 @@ const costKey = c => c.cost <= 1 ? '0-1' : c.cost >= 6 ? '6+' : String(c.cost);
 const cfNorm = t => String(t).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 function cfMatch(c) {
   if (CF.q && !cfNorm(c.name + ' ' + (c.text || '')).includes(cfNorm(CF.q))) return false;
+  if (!cardOn(c)) return false;   /* még meg nem jelent szett */
   if (CF.set.size && !CF.set.has(cardSet(c))) return false;
   if (CF.type.size && !CF.type.has(c.type)) return false;
   if (CF.rar.size && !CF.rar.has(rarKey(c))) return false;
@@ -4227,7 +4241,7 @@ function renderCollFilters() {
   const el = $('#collFilters'); if (!el) return;
   const chip = (grp, val, inner, on, label) => `<button class="cf-chip${on ? ' on' : ''}" data-cf="${grp}" data-v="${val}" aria-pressed="${on}" aria-label="${label}">${inner}</button>`;
   el.innerHTML = `<label class="cf-search"><span class="sr-only">Keresés</span><input id="cfQ" type="search" placeholder="Keresés…" value="${escH(CF.q)}" autocomplete="off"></label>
-    <div class="cf-row">${CF_SETS.map(([k, n]) => chip('set', k, `<span class="lbl-t">${k === 'hw' ? '🎃 ' : k === 'ah' ? '🌷 ' : ''}${n}</span>`, CF.set.has(k), n + ' szett')).join('')}</div>
+    <div class="cf-row">${cfSets().map(([k, n]) => chip('set', k, `<span class="lbl-t">${k === 'hw' ? '🎃 ' : k === 'ah' ? '🌷 ' : ''}${n}</span>`, CF.set.has(k), n + ' szett')).join('')}</div>
     <div class="cf-row">${CF_TYPES.map(([k, n]) => chip('type', k, `<img src="art/ui/ic-type-${k}.webp" alt=""><span class="lbl-t">${n}</span>`, CF.type.has(k), n)).join('')}</div>
     <div class="cf-row">${CF_RARS.map(([k, n]) => chip('rar', k, `<i class="rar r-${k}"></i>`, CF.rar.has(k), n)).join('')}
       ${chip('own', 'have', '<img src="art/ui/ic-owned.webp?v=db13b2f4" alt="">', CF.own === 'have', 'Megvan')}${chip('own', 'miss', '<img src="art/ui/ic-missing.webp?v=a815545d" alt="">', CF.own === 'miss', 'Hiányzik')}</div>
@@ -4248,9 +4262,9 @@ function renderColl(bodyOnly) {
   const heroOk = !(CF.type.size || CF.rar.size || CF.cost.size || CF.own || (CF.set.size && !CF.set.has('base'))) && HEROES.some(heroQ);
   const groups = [['Hősök', null], ['Karakterek', 'char'], ['Eszközök', 'item'], ['Akciók', 'action'], ['Helyszínek', 'loc']]
     .filter(([, type]) => type ? PLAYABLE.some(c => c.type === type && cfMatch(c)) : heroOk);
-  const have = PLAYABLE.filter(c => owned(c.id) > 0).length, foils = PLAYABLE.filter(c => ownsFoil(c.id)).length;
+  const PL = PLAYABLE.filter(cardOn), have = PL.filter(c => owned(c.id) > 0).length, foils = PL.filter(c => ownsFoil(c.id)).length;
   const dup = typeof dupeList === 'function' && Store.p ? dupeList(Store.p) : { out: [] };
-  $('#collBody').innerHTML = `<p class="coll-sum">${have}/${PLAYABLE.length} különböző lap · ${foils} Full Art változat</p>` + (groups.length ? '' : '<p class="cf-empty">Nincs a szűrésnek megfelelő lap.</p>') +
+  $('#collBody').innerHTML = `<p class="coll-sum">${have}/${PL.length} különböző lap · ${foils} Full Art változat</p>` + (groups.length ? '' : '<p class="cf-empty">Nincs a szűrésnek megfelelő lap.</p>') +
     `<button class="btn bk-btn" id="bkBtn">🃏 Hátlap: ${BACKS[myBack()].name}</button>` +
     (dup.out.length ? `<button class="btn dupe-btn" id="dupeBtn">♻️ ${dup.out.reduce((s, x) => s + x.n + x.f, 0)} fölösleges lap beváltása · +${dup.coins} coin</button>` : '') + groups.map(([t, type]) => `<div class="lbl">${t}</div><div class="coll-grid">${
     type ? PLAYABLE.filter(c => c.type === type && cfMatch(c)).sort((a, b) => a.cost - b.cost).map(c => {
@@ -6002,7 +6016,7 @@ function renderProfileBar() {
   const ss = $('#saveState'); if (ss) ss.textContent = window.APP_MODE ? '👤 Fiók' : Store.mode === 'cloud' ? '☁️ Felhőben mentve' : '📱 Ezen az eszközön mentve';
   el.querySelector('.pb-name').textContent = p.name;
   try { applyBack(); } catch (e) {}
-  renderQuestBadge(); renderPassBadge(); try { renderRankTile(); } catch (e) {} try { renderEventTile(); } catch (e) {} try { if (chestWeeklyCheck()) Store.p.chestNew = true; } catch (e) {} try { if (!$('#scr-menu').hidden) { dayGiftCheck(); backAwardCheck(); deckLinkCheck(); evGiftCheck(); chestPopup(); } } catch (e) {}
+  renderQuestBadge(); renderPassBadge(); try { renderRankTile(); } catch (e) {} try { renderEventTile(); } catch (e) {} try { if (chestWeeklyCheck()) Store.p.chestNew = true; } catch (e) {} try { if (!$('#scr-menu').hidden) { dayGiftCheck(); backAwardCheck(); deckLinkCheck(); evGiftCheck(); ahNewsCheck(); chestPopup(); } } catch (e) {}
   const wb = $('#wheelBadge'); if (wb) wb.hidden = !wheelReady();
   const badge = $('#shopBadge'); if (badge) badge.hidden = !freePackReady() && !(p.giftPacks > 0) && !(p.faPacks > 0) && !(p.shinyPacks > 0) && !(p.chests > 0);
 }
@@ -6106,6 +6120,7 @@ function chestWeeklyCheck() {
   return true;
 }
 function chestPopup() {
+  try { if (ahNewsCheck()) return; } catch (e) {}   /* előbb az Amszterdam-hír (ha még nem látta), utána a láda */
   const p = Store.p; if (!p || !(p.chestNew) || $('#layer .overlay') || (typeof S !== 'undefined' && S)) return;
   const o = document.createElement('div'); o.className = 'overlay';
   o.innerHTML = `<div class="modal acct-box chest-pop"><h3>🧰 Megérkezett a heti ládád!</h3><img class="chest-pop-img" src="art/ui/chest-closed.webp?v=49695505" alt="Heti láda" onerror="imgRetry(this)">
@@ -6358,14 +6373,14 @@ function renderShop() {
     <div class="shop-grid">
       ${shopPanelHTML({ attr: 'data-pack="base"', img: 'art/ui/pack-base.webp?v=d38f1f0c', contain: true, name: SETS.base.name, sub: '3 lap', price: ECON.packPrice, have: false })}
       ${shopPanelHTML({ attr: 'data-pack="shiny"', img: 'art/ui/pack-shiny.webp?v=ca07ac74', contain: true, name: 'Shiny pack', sub: '1 biztos különleges', price: ECON.shinyPrice, have: false, holo: true })}
-      ${TEST_MODE ? `${shopPanelHTML({ attr: 'data-pack="ah"', img: 'art/ui/pack-ah.webp?v=920fcfff', contain: true, name: SETS.ah.name, sub: 'Új szett · 3 lap', price: ECON.packPrice, have: false })}
+      ${setLive('ah') ? `${shopPanelHTML({ attr: 'data-pack="ah"', img: 'art/ui/pack-ah.webp?v=920fcfff', contain: true, name: SETS.ah.name, sub: 'Új szett · 3 lap', price: ECON.packPrice, have: false })}
       ${shopPanelHTML({ attr: 'data-pack="ahshiny"', img: 'art/ui/pack-ahshiny.webp?v=66d11276', contain: true, name: 'Amszterdam Shiny', sub: '1 biztos Full Art', price: ECON.shinyPrice, have: false, holo: true })}` : ''}
     </div>
     ${chestPanelHTML()}
     <details class="pack-info-more"><summary>Mi van a packokban?</summary>
       <p><b>${SETS.base.name}:</b> 3 véletlen lap a teljes alapkészletből, legalább egy ritka vagy jobb.</p>
       <p><b>🧰 Heti láda:</b> minden hétfőn 0:01-kor jár egy ingyen; ha már kinyitottad, ${CHEST.price} coinért vehetsz még. 10 lap: 1 biztos epikus vagy legendás, 1 biztos Full Art, a többi véletlen. 0,5% eséllyel egy ritka hős-portré is lehet benne.</p>
-      ${TEST_MODE ? `<p><b>${SETS.ah.name}:</b> 3 lap csak az új szettből (${SETS.ah.cards.length} lap), legalább egy ritka vagy jobb. A Shiny változatban a legjobb lap biztosan Full Art. ★ Arany lap (Isten hozott Amszterdamban, High Hawaiians vagy Game Over aranyban): ${String(ECON.goldPlain * 100).replace('.', ',')}% · Shiny packban ${ECON.goldShiny * 100}%. Hős-lap és arany hős nincs benne.</p>` : ''}
+      ${setLive('ah') ? `<p><b>${SETS.ah.name}:</b> 3 lap csak az új szettből (${SETS.ah.cards.length} lap), legalább egy ritka vagy jobb. A Shiny változatban a legjobb lap biztosan Full Art. ★ Arany lap (Isten hozott Amszterdamban, High Hawaiians vagy Game Over aranyban): ${String(ECON.goldPlain * 100).replace('.', ',')}% · Shiny packban ${ECON.goldShiny * 100}%. Hős-lap és arany hős nincs benne.</p>` : ''}
       <p><b>Shiny pack:</b> 3 lap, amiből egy biztosan különleges: Full Art lap, Full Art hős vagy ritka változat-lap. ${ECON.goldShiny * 100}% eséllyel ✦ Arany hős is lehet benne.</p></details>
     ${limited}
     <div class="odds"><div class="lbl">Esélyek laponként</div>
@@ -6662,7 +6677,7 @@ function deckHelperFill(list0, hero, own) {
 const BOT_DECK = { 1: { swaps: 3, rar: 'kr' }, 2: { share: 0.7, rar: 'kre' }, 3: { share: 0.75, noLeg: true } };
 function botDeckFor(hero, lv, rnd = Math.random) {
   const stK = Object.keys(DECKS).find(k => DECKS[k].hero === hero); if (!stK) return null;
-  const pool = CARDS.filter(c => !c.token && !c.off && !c.passOnly && !c.eventOnly && !c.shopOnly && !c.wheelOnly && !c.variantOf && !c.finisher && (!c.hero || c.hero === hero));
+  const pool = CARDS.filter(c => !c.token && !c.off && !c.passOnly && !c.eventOnly && !c.shopOnly && !c.wheelOnly && !c.variantOf && !c.finisher && (!c.hero || c.hero === hero) && !(c.set && typeof setLive === 'function' && !setLive(c.set)));   /* bot: meg nem jelent szett nélkül */
   const cap = id => CARD[id].rarity === 'l' ? 1 : 2;
   if (lv >= 4 || (BOT_DECK[lv] && BOT_DECK[lv].share)) {
     const cf = BOT_DECK[lv] || {}, sh = lv >= 4 ? 1 : cf.share, keep = new Set(pool.filter(c => (cf.rar ? cf.rar.includes(c.rarity) : (!cf.noLeg || c.rarity !== 'l')) && rnd() < sh).map(c => c.id));
@@ -7471,6 +7486,23 @@ function evTeaserModal(e, gift) {
   $('#layer').appendChild(o);
 }
 // egyszeri ajándék az event előzetesekor / alatt: 1 Shiny pack (Tomi, 2026-10-15)
+/* Amszterdam hősei (2026-10-18): előzetes naponta egyszer a megjelenésig, utána egyszeri „megérkezett” ablak */
+function ahNewsCheck() {
+  const p = Store.p; if (!p || p.onboard || TEST_MODE || (typeof S !== 'undefined' && S) || $('#layer .overlay') || $('#scr-menu').hidden) return false;
+  const live = setLive('ah'), key = live ? 'ah-launch' : 'ah-teaser-' + today();
+  p.news = p.news || []; if (p.news.includes(key)) return false;
+  if (live && Date.now() > SET_RELEASE.ah + 7 * 864e5) return false;   /* egy hét után már nem jelenik meg */
+  p.news.push(key); save();
+  const o = document.createElement('div'); o.className = 'overlay';
+  o.innerHTML = `<div class="modal acct-box ah-news">
+    <p class="ah-news-t">${live ? 'Megérkezett a Best of Us TCG első tematikus miniszettje: az „Amsterdam Hősei”!' : 'A Best of Us TCG első tematikus miniszettje, az „Amsterdam Hősei” hétfőn érkezik 19:00 órakor!'}</p>
+    <div class="ah-news-packs"><img src="art/ui/pack-ah.webp?v=920fcfff" alt="Amsterdam Hősei booster"><img src="art/ui/pack-ahshiny.webp?v=66d11276" alt="Amsterdam Hősei Shiny booster"></div>
+    ${live ? `<p class="live">26 új lap, két új képesség (Igézhetetlen, Feltámadás), és saját booster a Boltban.</p><button class="btn primary" data-shop>Irány a Bolt</button><button class="btn ghost" data-x>Később</button>` : '<button class="btn primary" data-x>Alig várom!</button>'}</div>`;
+  o.onclick = ev => { if (ev.target.closest('[data-shop]')) { o.remove(); renderShop(); show('scr-shop'); return; }
+    if (ev.target.closest('[data-x]') || ev.target === o) { o.remove(); setTimeout(() => { try { chestPopup(); } catch (er) {} }, 200); } };
+  $('#layer').appendChild(o);
+  return true;
+}
 function evGiftCheck() {
   const p = Store.p, e = curEvent(); if (!p || p.onboard || !e || e.draft || (typeof S !== 'undefined' && S) || $('#layer .overlay')) return;
   if (new Date() >= e.end) return;
