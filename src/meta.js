@@ -555,7 +555,7 @@ async function buyPack(setId, free) {
   const cards = openPackRoll(setId, free === 'fa', shinyMode);
   const conv = { coins: 0 };   // a lapok duplikátumai megmaradnak (cserélhetők, vagy a Gyűjteményben kézzel beválthatók)
   for (const c of cards) if (!c.hero && !c.isNew) c.have = owned(c.id);
-  for (const c of cards) if (c.gold && p.heroGold[c.hero] > 1) { p.heroGold[c.hero]--; p.coins += ECON.goldDupe; conv.coins += ECON.goldDupe; c.dupe = ECON.goldDupe; }
+  for (const c of cards) if (c.gold && c.hero && (p.heroGold || {})[c.hero] > 1) {   /* csak arany HŐS (az arany lap sima gyűjteményi lap) – 2026-10-18 javítás */ p.heroGold[c.hero]--; p.coins += ECON.goldDupe; conv.coins += ECON.goldDupe; c.dupe = ECON.goldDupe; }
   for (const c of cards) if (c.hero && !c.gold && p.heroFa[c.hero] > 1) { p.heroFa[c.hero]--; p.coins += DUPE_COIN_RARE; conv.coins += DUPE_COIN_RARE; c.dupe = DUPE_COIN_RARE; }
   await save(); renderProfileBar(); renderShop();
   await packOpening(setId, cards, { shiny: shinyMode });
@@ -879,8 +879,8 @@ async function goldReveal(o, f, c) {
   // 3) bemutató: a lap forogva középre száll, óriás arany felirat, folyamatos aranyeső
   const show = document.createElement('div'); show.className = 'rare-show gold';
   show.innerHTML = `<div class="rare-rays big gold"></div><div class="gold-rain"></div><div class="rare-card">${pcHTML(c, { big: true, foil: true })}</div>
-    <div class="rare-banner gold-banner">ARANY HŐS</div><div class="gold-sub">A legritkább lap a játékban</div>
-    <div class="rare-name">${HERO[c.hero].name}${c.isNew ? ' · Új!' : c.dupe ? ` · már megvolt: +${c.dupe} coin` : ''}</div><div class="op-hint" style="visibility:hidden">Koppints a folytatáshoz</div>`;
+    <div class="rare-banner gold-banner">${c.hero ? 'ARANY HŐS' : 'ARANY LAP'}</div><div class="gold-sub">${c.hero ? 'A legritkább lap a játékban' : `Az ${SETS[CARD[c.id].set]?.name || ''} legritkább lapja`}</div>
+    <div class="rare-name">${c.hero ? HERO[c.hero].name : CARD[c.id].name}${c.isNew ? ' · Új!' : c.dupe ? ` · már megvolt: +${c.dupe} coin` : ''}</div><div class="op-hint" style="visibility:hidden">Koppints a folytatáshoz</div>`;
   layer.appendChild(show);
   const rain = show.querySelector('.gold-rain');
   for (let k = 0; k < 46; k++) { const d = document.createElement('i'); d.className = k % 4 ? 'gr-flake' : 'gr-coin';
