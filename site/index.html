@@ -1413,6 +1413,9 @@ body.ev-hw #scr-menu .fan{filter:drop-shadow(0 0 22px rgba(255,140,40,.35));}
 .login-box .fld{text-align:left;}
 .lg-google{display:flex;align-items:center;justify-content:center;gap:10px;}
 .lg-google .g{display:inline-grid;place-items:center;width:24px;height:24px;border-radius:50%;background:#fff;color:#4285f4;font-family:Arial,sans-serif;font-weight:900;font-size:15px;}
+.say-bubble{--sy:-100%;position:fixed;z-index:60;pointer-events:none;white-space:nowrap;padding:8px 14px;border-radius:16px;background:#fff;color:#1a1a1a;font-weight:900;font-size:16px;box-shadow:0 6px 18px rgba(0,0,0,.55);transform:translate(-50%,var(--sy));}
+.say-bubble::after{content:'';position:absolute;left:50%;bottom:-9px;margin-left:-9px;border:9px solid transparent;border-bottom:0;border-top-color:#fff;}
+.say-bubble.down{--sy:0%;} .say-bubble.down::after{bottom:auto;top:-9px;border-top:0;border-bottom:9px solid #fff;border-top-color:transparent;}
 .lg-inapp{display:grid;gap:8px;padding:10px 12px;border-radius:14px;background:rgba(255,180,60,.12);border:1px solid rgba(255,180,60,.45);color:#ffe2b0;font-size:13px;line-height:1.35;text-align:left;}
 .lg-inapp b{color:#ffd28a;} .lg-inapp small{color:var(--mute);} .lg-inapp a{text-decoration:none;}
 .lg-or{display:flex;align-items:center;gap:10px;color:var(--mute);font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;}
@@ -2360,7 +2363,7 @@ body.pf-loading #scr-menu .pb-name::after{content:'';display:inline-block;width:
 <script src="vendor/firebase-auth-compat.js"></script>
 <script src="vendor/firebase-firestore-compat.js"></script>
 <script src="vendor/firebase-database-compat.js"></script>
-<script>window.APP_VERSION = "2026.10.18-1550"; window.APP_BUILD = "2026.10.18-1644";</script>
+<script>window.APP_VERSION = "2026.10.18-1712"; window.APP_BUILD = "2026.10.18-1712";</script>
 <script>// ===== Best of Us – saját szerver (Firebase) =====
 // A játék eredetileg a Claude-os tárolót használta (window.claude.use('db' | 'user' | 'room')).
 // Ez a fájl ugyanazt a felületet adja Firebase-ből, így a játék kódja szinte változatlan maradhat:
@@ -5263,8 +5266,19 @@ function burstAt(x, y, big) {
   b.style.left = x + 'px'; b.style.top = y + 'px';
   $('#layer').appendChild(b); setTimeout(() => b.remove(), 600);
 }
+// szövegbuborék egy lap fölött (pl. TZS: „Anyád vagy!”) – a saját lapnál fölötte, az ellenfélénél alatta, hogy ne lógjon ki
+function sayBubble(el, txt, pi) {
+  const r = el.getBoundingClientRect(), b = document.createElement('div');
+  b.className = 'say-bubble' + (pi === ME ? '' : ' down'); b.textContent = txt;
+  b.style.left = Math.max(70, Math.min(innerWidth - 70, r.left + r.width / 2)) + 'px';
+  b.style.top = (pi === ME ? r.top - 8 : r.bottom + 8) + 'px';
+  $('#layer').appendChild(b);
+  b.animate([{ opacity: 0, transform: 'translate(-50%, var(--sy)) scale(.4)' }, { opacity: 1, transform: 'translate(-50%, var(--sy)) scale(1.08)', offset: .12 }, { opacity: 1, transform: 'translate(-50%, var(--sy)) scale(1)', offset: .2 }, { opacity: 1, transform: 'translate(-50%, var(--sy)) scale(1)', offset: .85 }, { opacity: 0, transform: 'translate(-50%, var(--sy)) scale(.9)' }],
+    { duration: 1900, easing: 'ease-out', fill: 'forwards' }).finished.then(() => b.remove());
+}
 async function attackAnim(pi, i, u) {
   const el = unitAt(pi, i); if (!el) { await runFx(() => attackLane(S, i)); return; }
+  if (bid(u.id) === 'c_tzs') sayBubble(el, 'Anyád vagy!', pi);   /* 2026-10-18, Tomi: TZS beszól, amikor támad */
   // Laszy: előre eldől, hogy mellé üt-e, így a saját célpontja felé lendül
   const mf = bid(u.id) === 'c_laszy' ? (u.nextMisfire = laszyRoll(S, pi, i)) : null;
   if (mf) return misfireAnim(pi, i, el, mf);

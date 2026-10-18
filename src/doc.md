@@ -463,6 +463,9 @@ Hősképesség-ötletek a táblázatban (még nem zöldek, nincsenek beépítve)
 ## Javítás: „Újabb ranked” → Mégse beragadás (2026-10-16)
 - Meccs után az „Újabb ranked” gomb a lezárt meccs képernyőjén indította a keresést; ha valaki „Mégse”-t nyomott, a lezárt táblán ragadt, és a zászló sem csinált semmit. Mostantól az „Újabb ranked” előbb a Ranked képernyőre visz, a keresés megszakítása lezárt meccsből a menübe visz, és lezárt meccsen a zászló is a menübe visz.
 
+## TZS beszól (2026-10-18, Tomi)
+- Amikor TZS (vagy a változata) támad, egy szövegbuborék jelenik meg fölötte: **„Anyád vagy!”** (~2 mp; a saját lapnál fölötte, az ellenfélénél alatta). `sayBubble()` a ui.js-ben, az `attackAnim` hívja – PvP-ben mindkét játékos látja. Más lapokhoz is használható.
+
 ## Belépés: Messenger / beépített böngésző, Android app (2026-10-18, Gourry jelezte)
 - Tünet: Android telefonon a belépés gomb „semmit nem csinál”. Valószínű ok: a link a Messengerből nyílt meg (beépített böngésző – ott a Google tiltja a belépést, a felugró ablak csendben elhal), vagy a telepített appban a Google-ablak nem ad választ.
 - Javítás (`app/backend.js`): beépített böngészőt felismer (Messenger, Facebook, Instagram, Android WebView) → figyelmeztetés + „Megnyitás Chrome-ban” gomb (Androidon intent-link), iPhone-on Safari-tipp; a Google gomb itt magyarázatot ír. Telepített Android appban egyből átirányításos Google-belépés. Ha a Google 30 mp-ig nem válaszol, a gombok újra nyomhatók, és hibaüzenet jön. (Mellékesen: az „Elfelejtett jelszó” üres e-mailnél eddig „Nem sikerült: x”-et írt – javítva.)

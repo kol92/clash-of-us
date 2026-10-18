@@ -1456,8 +1456,19 @@ function burstAt(x, y, big) {
   b.style.left = x + 'px'; b.style.top = y + 'px';
   $('#layer').appendChild(b); setTimeout(() => b.remove(), 600);
 }
+// szövegbuborék egy lap fölött (pl. TZS: „Anyád vagy!”) – a saját lapnál fölötte, az ellenfélénél alatta, hogy ne lógjon ki
+function sayBubble(el, txt, pi) {
+  const r = el.getBoundingClientRect(), b = document.createElement('div');
+  b.className = 'say-bubble' + (pi === ME ? '' : ' down'); b.textContent = txt;
+  b.style.left = Math.max(70, Math.min(innerWidth - 70, r.left + r.width / 2)) + 'px';
+  b.style.top = (pi === ME ? r.top - 8 : r.bottom + 8) + 'px';
+  $('#layer').appendChild(b);
+  b.animate([{ opacity: 0, transform: 'translate(-50%, var(--sy)) scale(.4)' }, { opacity: 1, transform: 'translate(-50%, var(--sy)) scale(1.08)', offset: .12 }, { opacity: 1, transform: 'translate(-50%, var(--sy)) scale(1)', offset: .2 }, { opacity: 1, transform: 'translate(-50%, var(--sy)) scale(1)', offset: .85 }, { opacity: 0, transform: 'translate(-50%, var(--sy)) scale(.9)' }],
+    { duration: 1900, easing: 'ease-out', fill: 'forwards' }).finished.then(() => b.remove());
+}
 async function attackAnim(pi, i, u) {
   const el = unitAt(pi, i); if (!el) { await runFx(() => attackLane(S, i)); return; }
+  if (bid(u.id) === 'c_tzs') sayBubble(el, 'Anyád vagy!', pi);   /* 2026-10-18, Tomi: TZS beszól, amikor támad */
   // Laszy: előre eldől, hogy mellé üt-e, így a saját célpontja felé lendül
   const mf = bid(u.id) === 'c_laszy' ? (u.nextMisfire = laszyRoll(S, pi, i)) : null;
   if (mf) return misfireAnim(pi, i, el, mf);
