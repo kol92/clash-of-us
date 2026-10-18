@@ -112,6 +112,9 @@ Csak build (kitétel nélkül): `cd src && python3 build-app.py ""` → `src/dis
 - Új szett felvételének mintája: lapokon `set:'xx'`, `SETS.xx` (meta.js, saját pack), `CF_SETS_ALL` (ui.js), `SET_RELEASE.xx`, pack-kép `art/ui/pack-xx.webp`, arany változat `goldVar` (+`variantOf`).
 - Nyitott döntések (Tomi): a 4 túl erős lap (Game Over 60%, Bence terrorja 57,5%, Laci 55,9%, Reptéri 55,8%) és az „Isten hozott” húzás-kapcsolója (`CARD.a_welcome.drawN`).
 
+## Dávid (2026-10-18)
+- Új Törzsvendég (köre végén helyszín esetén véletlen saját karakter +1/+1, `finishTurn`), új Kánon `f_vezetek` (Bocsi, de vezetek, `p.driver`). A Munkahely (`f_munkahely`) `off:true`, a `migrate()` cseréli a paklikban. A teszt ágon az `ah_david` pakliban is cserélni kell.
+
 ## Jelenlegi állapot és teendők (2026-10-16 este, account-váltáskor)
 
 - **Halloween event fut** (`EVENTS` hw26): 2026-10-15 19:00 – 11-02 (vége 11-03 0:00), jutalmak 11-09-ig vehetők át, utána maguktól jóváíródnak. A menü-háttér és a zene csak az event alatt él, utána magától visszaáll.
