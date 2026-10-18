@@ -93,6 +93,7 @@ const CARDS = [
   { id:'c_ah_bence', set:'ah', type:'char', name:'Bence, Amsterdam terrorja', cost:6, atk:3, hp:5, rarity:'l', haste:true, revive:true, text:'' },
   // Bolti eszköz (2026-10-16): csak a Boltban kapható, packból nem jön
   { id:'i_cipo', type:'item', name:'Laci cipőkanala', cost:1, atk:0, hp:0, rarity:'k', shopOnly:true, price:100, mover:true, text:'Amelyik karakterre ráteszed, azt a körödben egyszer áthelyezheted a táblán (üres helyre, vagy helycserével).' },
+  { id:'i_vodkasa', drink:true, type:'item', name:'Vodkása', cost:1, atk:0, hp:0, rarity:'k', elusive:true, text:'A karakter, akin van, Igézhetetlen lesz. Ha TZS-re teszed, többé nem sebzi a saját hősödet, és Pajzsot is kap.' },   /* 2026-10-18 */
   { id:'i_aranylanc', type:'item', name:'Tomi nyaklánca', cost:3, atk:2, hp:3, rarity:'l', text:'' },
   // --- Akciók ---
   { id:'a_dinnyes', drink:true, type:'action', name:'Dinnyés Absolute Vodka', cost:1, tgt:'enemyOrHero', rarity:'k', text:'3 sebzés egy ellenséges karakternek vagy az ellenfél hősének.' },
@@ -554,6 +555,8 @@ function playCard(s, pi, hi, t) {
     u.items.push(c.id);
     ev(s, { t:'buff', side:pi, i:t.i, n: c.gomba ? u.items.filter(x => CARD[x] && CARD[x].gomba).length : undefined });
     // Fehér szarvas bunda Gál Zolin: Pajzsot is kap (2026-10-12)
+    if (c.elusive) u.elusive = true;   /* Vodkása: Igézhetetlen */
+    if (c.id === 'i_vodkasa' && bid(u.id) === 'c_tzs' && !u.shield) { u.shield = true; ev(s, { t:'boon', side:pi, i:t.i, b:'shield' }); }
     if (c.id === 'i_bunda' && bid(u.id) === 'c_zoli' && !u.shield) { u.shield = true; ev(s, { t:'boon', side:pi, i:t.i, b:'shield' }); }
     if (c.selfDmg) damageHero(s, pi, c.selfDmg);
   } else if (c.type === 'loc') {
@@ -700,6 +703,7 @@ function playCard(s, pi, hi, t) {
             if (c.doom) u.doom = false;
             if (c.muscle && !base.muscle) u.muscle = false;
             if (c.taunt && !base.taunt) u.taunt = false;
+            if (c.elusive && !base.elusive && !u.items.some(x => x !== id && CARD[x].elusive && !own.includes(x))) u.elusive = false;
             bury(s, ei, id, 'item');
           }
           u.items = keep;
@@ -934,7 +938,7 @@ function strike(s, i) {
   reveal(s, pi, i);
   const a = effAtk(s, pi, i);
   ev(s, { t:'attack', side:pi, i });
-  if ((CARD[u.id].variantOf || u.id) === 'c_tzs') damageHero(s, pi, 1);
+  if (bid(u.id) === 'c_tzs' && !(u.items || []).includes('i_vodkasa')) damageHero(s, pi, 1);   /* Vodkása mellett nem sebzi a saját hősét */
   if (a <= 0 || s.winner != null) return;
   const mf = bid(u.id) !== 'c_laszy' ? null : ('nextMisfire' in u ? u.nextMisfire : laszyRoll(s, pi, i));
   delete u.nextMisfire;

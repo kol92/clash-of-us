@@ -221,6 +221,7 @@ const ART = {
   c_kriszrantott: { src:'art/kriszrantott.webp', av:'58% 22%', pos:'56% 22%' },
   a_rantott: { src:'art/rantott.webp', av:'45% 40%', pos:'50% 38%' },
   c_tomiparti: { src:'art/tomiparti.webp', av:'47% 26%', pos:'47% 24%' },
+  i_vodkasa: { src:'art/vodkasa.webp', av:'45% 45%', pos:'45% 40%' },
   c_tomiparti2: { src:'art/tomiparti2.webp', av:'58% 20%', pos:'58% 18%' },
   c_laszy2: { src:'art/laszy2.webp', av:'63% 22%', pos:'62% 20%' },
   c_sasi2: { src:'art/toma2.webp', av:'52% 22%', pos:'52% 20%' },
@@ -1468,7 +1469,7 @@ function sayBubble(el, txt, pi) {
 }
 async function attackAnim(pi, i, u) {
   const el = unitAt(pi, i); if (!el) { await runFx(() => attackLane(S, i)); return; }
-  if (bid(u.id) === 'c_tzs') sayBubble(el, 'Anyád vagy!', pi);   /* 2026-10-18, Tomi: TZS beszól, amikor támad */
+  if (bid(u.id) === 'c_tzs' && !(u.items || []).includes('i_vodkasa')) sayBubble(el, 'Anyád vagy!', pi);   /* Vodkással elhallgat */   /* 2026-10-18, Tomi: TZS beszól, amikor támad */
   // Laszy: előre eldől, hogy mellé üt-e, így a saját célpontja felé lendül
   const mf = bid(u.id) === 'c_laszy' ? (u.nextMisfire = laszyRoll(S, pi, i)) : null;
   if (mf) return misfireAnim(pi, i, el, mf);
