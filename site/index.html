@@ -1022,6 +1022,8 @@ body.ev-hw #scr-menu .fan{filter:drop-shadow(0 0 22px rgba(255,140,40,.35));}
 .hp-list .hero-row .hp-img{width:46px;height:54px;}
 .ed-left .ed-filter{display:flex;flex-wrap:wrap;overflow:visible;gap:3px;}
 .ed-left .ed-filter button{flex:1 1 auto;}
+.ed-filter.ed-sets{margin-top:-4px;}
+.ed-left .ed-filter.ed-sets{position:static;}
 .newtag.dupetag{background:linear-gradient(135deg,#ffe27a,#f0a400);color:#3a2400;}
 
 .cell.picked,.hbar.picked{outline:3px solid #ff5d6c;outline-offset:-2px;box-shadow:0 0 18px rgba(255,93,108,.7);}
@@ -2283,6 +2285,7 @@ body.pf-loading #scr-menu .pb-name::after{content:'';display:inline-block;width:
       <div class="ed-left">
         <div class="seg ed-filter" id="edFilter" role="group" aria-label="Szűrés">
           <button data-f="all">Mind</button><button data-f="char">Karakter</button><button data-f="action">Akció</button><button data-f="item">Eszköz</button><button data-f="loc">Helyszín</button></div>
+        <div class="seg ed-filter ed-sets" id="edSetFilter" role="group" aria-label="Szűrés szettre"></div>
         <div class="ed-helprow"><button class="btn small ed-help" id="edHelp">🪄 Segíts!</button></div>
         <p class="ed-tip">Koppints egy lapra, hogy a paklihoz add. Nyomd hosszan a részletekért.</p>
         <div class="ed-pool" id="edPool"></div>
@@ -2369,7 +2372,7 @@ body.pf-loading #scr-menu .pb-name::after{content:'';display:inline-block;width:
 <script src="vendor/firebase-auth-compat.js"></script>
 <script src="vendor/firebase-firestore-compat.js"></script>
 <script src="vendor/firebase-database-compat.js"></script>
-<script>window.APP_VERSION = "2026.10.19-2117"; window.APP_BUILD = "2026.10.19-2117";</script>
+<script>window.APP_VERSION = "2026.10.19-2118"; window.APP_BUILD = "2026.10.19-2118";</script>
 <script>// ===== Best of Us – saját szerver (Firebase) =====
 // A játék eredetileg a Claude-os tárolót használta (window.claude.use('db' | 'user' | 'room')).
 // Ez a fájl ugyanazt a felületet adja Firebase-ből, így a játék kódja szinte változatlan maradhat:
@@ -6916,7 +6919,7 @@ function openEditor(deckId, heroId) {
   ED.readonly = !!src?.starter;
   ED.deck = src ? { id: src.id, name: src.name, hero: src.hero || null, list: { ...src.list }, starter: src.starter }
                : { id: 'd' + Date.now().toString(36), name: `${HERO[heroId]?.name || 'Saját'} pakli ${Store.p.decks.length + 1}`, hero: heroId || null, list: {} };
-  ED.isNew = !src; ED.filter = 'all'; ED.undo = null;
+  ED.isNew = !src; ED.filter = 'all'; ED.set = 'all'; ED.undo = null;
   show('scr-edit'); renderEditor();
 }
 function renderEditor() {
@@ -6937,14 +6940,16 @@ function renderEditor() {
         <span class="er-cost">${cardCostBase(id)}</span><span class="er-name">${c.name}</span><span class="er-n">${c.rarity === 'l' ? '★' : k > 1 ? '×' + k : ''}</span></button>`;
     }).join('')
     : `<p class="ed-empty">${ED.readonly ? 'Üres pakli.' : 'Még üres. Koppints a bal oldali lapokra, és itt jelennek meg.'}</p>`;
-  const pool = PLAYABLE.filter(c => owned(c.id) > 0 && (!c.hero || c.hero === d.hero) && (ED.filter === 'all' || c.type === ED.filter))   // kánon eseményt csak a saját hőse kap
+  const pool = PLAYABLE.filter(c => owned(c.id) > 0 && (!c.hero || c.hero === d.hero) && (ED.filter === 'all' || c.type === ED.filter) && (!ED.set || ED.set === 'all' || cardSet(c) === ED.set))   // kánon eseményt csak a saját hőse kap; szett-szűrő (2026-10-19)
                     .sort((a, b) => a.cost - b.cost || a.name.localeCompare(b.name, 'hu'));
   $('#edPool').innerHTML = pool.map(c => {
     const inDeck = d.list[c.id] || 0, cap = Math.min(maxCopies(c.id) - (sameCount(d.list, c.id) - inDeck), owned(c.id));
     return `<button class="ed-card${inDeck >= cap || n >= DECK_SIZE ? ' full' : ''}${inDeck ? ' in' : ''}" data-add="${c.id}" ${ED.readonly ? 'disabled' : ''}>
       ${cardHTML(c.id, { foil: ownsFoil(c.id) })}<span class="ed-own">${inDeck ? `${inDeck}/${cap} a pakliban` : `${cap} db`}</span></button>`;
-  }).join('') || '<p class="ed-empty">Ebből a fajtából nincs még lapod.</p>';
+  }).join('') || `<p class="ed-empty">${ED.set && ED.set !== 'all' ? 'Ebből a szettből és fajtából' : 'Ebből a fajtából'} nincs még lapod.</p>`;
   document.querySelectorAll('#edFilter button').forEach(b => b.setAttribute('aria-pressed', b.dataset.f === ED.filter));
+  { const sets = cfSets(); if (ED.set && ED.set !== 'all' && !sets.some(([k]) => k === ED.set)) ED.set = 'all';
+    $('#edSetFilter').innerHTML = [['all', 'Minden szett'], ...sets].map(([k, n]) => `<button data-s="${k}" aria-pressed="${(ED.set || 'all') === k}">${k === 'hw' ? '🎃 ' : k === 'ah' ? '🌷 ' : ''}${k === 'ah' ? 'Amsterdam' : n}</button>`).join(''); }
   $('#edSave').hidden = ED.readonly; $('#edDelete').hidden = ED.readonly || ED.isNew; $('#edCopy').hidden = !ED.readonly;
   $('#edHelp').parentNode.hidden = ED.readonly;
   $('#edHelp').textContent = ED.undo ? '↶ Visszavonás' : n >= DECK_SIZE ? '🪄 Kész a pakli' : `🪄 Segíts! (+${DECK_SIZE - n} lap)`;
@@ -6984,6 +6989,7 @@ $('#edList').addEventListener('click', e => {
   const d = ED.deck.list, id = b.dataset.rm; d[id]--; if (!d[id]) delete d[id]; ED.undo = null; renderEditor();
 });
 $('#edFilter').addEventListener('click', e => { const b = e.target.closest('[data-f]'); if (b) { ED.filter = b.dataset.f; renderEditor(); } });
+$('#edSetFilter').addEventListener('click', e => { const b = e.target.closest('[data-s]'); if (b) { ED.set = b.dataset.s; renderEditor(); } });
 $('#edName').addEventListener('input', e => { if (!ED.readonly) ED.deck.name = e.target.value.slice(0, 24); });
 $('#edSave').onclick = async () => {
   const d = ED.deck; d.name = (d.name || '').trim() || 'Névtelen pakli';

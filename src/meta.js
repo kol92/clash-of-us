@@ -1125,7 +1125,7 @@ function openEditor(deckId, heroId) {
   ED.readonly = !!src?.starter;
   ED.deck = src ? { id: src.id, name: src.name, hero: src.hero || null, list: { ...src.list }, starter: src.starter }
                : { id: 'd' + Date.now().toString(36), name: `${HERO[heroId]?.name || 'Saját'} pakli ${Store.p.decks.length + 1}`, hero: heroId || null, list: {} };
-  ED.isNew = !src; ED.filter = 'all'; ED.undo = null;
+  ED.isNew = !src; ED.filter = 'all'; ED.set = 'all'; ED.undo = null;
   show('scr-edit'); renderEditor();
 }
 function renderEditor() {
@@ -1146,14 +1146,16 @@ function renderEditor() {
         <span class="er-cost">${cardCostBase(id)}</span><span class="er-name">${c.name}</span><span class="er-n">${c.rarity === 'l' ? '★' : k > 1 ? '×' + k : ''}</span></button>`;
     }).join('')
     : `<p class="ed-empty">${ED.readonly ? 'Üres pakli.' : 'Még üres. Koppints a bal oldali lapokra, és itt jelennek meg.'}</p>`;
-  const pool = PLAYABLE.filter(c => owned(c.id) > 0 && (!c.hero || c.hero === d.hero) && (ED.filter === 'all' || c.type === ED.filter))   // kánon eseményt csak a saját hőse kap
+  const pool = PLAYABLE.filter(c => owned(c.id) > 0 && (!c.hero || c.hero === d.hero) && (ED.filter === 'all' || c.type === ED.filter) && (!ED.set || ED.set === 'all' || cardSet(c) === ED.set))   // kánon eseményt csak a saját hőse kap; szett-szűrő (2026-10-19)
                     .sort((a, b) => a.cost - b.cost || a.name.localeCompare(b.name, 'hu'));
   $('#edPool').innerHTML = pool.map(c => {
     const inDeck = d.list[c.id] || 0, cap = Math.min(maxCopies(c.id) - (sameCount(d.list, c.id) - inDeck), owned(c.id));
     return `<button class="ed-card${inDeck >= cap || n >= DECK_SIZE ? ' full' : ''}${inDeck ? ' in' : ''}" data-add="${c.id}" ${ED.readonly ? 'disabled' : ''}>
       ${cardHTML(c.id, { foil: ownsFoil(c.id) })}<span class="ed-own">${inDeck ? `${inDeck}/${cap} a pakliban` : `${cap} db`}</span></button>`;
-  }).join('') || '<p class="ed-empty">Ebből a fajtából nincs még lapod.</p>';
+  }).join('') || `<p class="ed-empty">${ED.set && ED.set !== 'all' ? 'Ebből a szettből és fajtából' : 'Ebből a fajtából'} nincs még lapod.</p>`;
   document.querySelectorAll('#edFilter button').forEach(b => b.setAttribute('aria-pressed', b.dataset.f === ED.filter));
+  { const sets = cfSets(); if (ED.set && ED.set !== 'all' && !sets.some(([k]) => k === ED.set)) ED.set = 'all';
+    $('#edSetFilter').innerHTML = [['all', 'Minden szett'], ...sets].map(([k, n]) => `<button data-s="${k}" aria-pressed="${(ED.set || 'all') === k}">${k === 'hw' ? '🎃 ' : k === 'ah' ? '🌷 ' : ''}${k === 'ah' ? 'Amsterdam' : n}</button>`).join(''); }
   $('#edSave').hidden = ED.readonly; $('#edDelete').hidden = ED.readonly || ED.isNew; $('#edCopy').hidden = !ED.readonly;
   $('#edHelp').parentNode.hidden = ED.readonly;
   $('#edHelp').textContent = ED.undo ? '↶ Visszavonás' : n >= DECK_SIZE ? '🪄 Kész a pakli' : `🪄 Segíts! (+${DECK_SIZE - n} lap)`;
@@ -1193,6 +1195,7 @@ $('#edList').addEventListener('click', e => {
   const d = ED.deck.list, id = b.dataset.rm; d[id]--; if (!d[id]) delete d[id]; ED.undo = null; renderEditor();
 });
 $('#edFilter').addEventListener('click', e => { const b = e.target.closest('[data-f]'); if (b) { ED.filter = b.dataset.f; renderEditor(); } });
+$('#edSetFilter').addEventListener('click', e => { const b = e.target.closest('[data-s]'); if (b) { ED.set = b.dataset.s; renderEditor(); } });
 $('#edName').addEventListener('input', e => { if (!ED.readonly) ED.deck.name = e.target.value.slice(0, 24); });
 $('#edSave').onclick = async () => {
   const d = ED.deck; d.name = (d.name || '').trim() || 'Névtelen pakli';
