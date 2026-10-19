@@ -2404,7 +2404,7 @@ body.pf-loading #scr-menu .pb-name::after{content:'';display:inline-block;width:
 <script src="vendor/firebase-auth-compat.js"></script>
 <script src="vendor/firebase-firestore-compat.js"></script>
 <script src="vendor/firebase-database-compat.js"></script>
-<script>window.APP_VERSION = "2026.10.19-2238"; window.APP_BUILD = "2026.10.20-0030";</script>
+<script>window.APP_VERSION = "2026.10.19-2238"; window.APP_BUILD = "2026.10.20-0038";</script>
 <script>// ===== Best of Us – saját szerver (Firebase) =====
 // A játék eredetileg a Claude-os tárolót használta (window.claude.use('db' | 'user' | 'room')).
 // Ez a fájl ugyanazt a felületet adja Firebase-ből, így a játék kódja szinte változatlan maradhat:
@@ -6217,10 +6217,10 @@ function rollRarity() {
 }
 /* ---- GOD PACK (2026-10-20, Tomi): minden pack 0,5% eséllyel – 5 lap 3 helyett, mind Full Art, egyikük legalább arany.
    Titok: sehol nincs kiírva (esélyek közt sem), csak aki kinyitja, látja. Teszt oldalon (TEST_MODE) az első bontás eszközönként biztosan God pack. */
-function godForce() { if (!TEST_MODE) return false; try { if (localStorage.getItem('bou_god_t1') === '1') return false; localStorage.setItem('bou_god_t1', '1'); return true; } catch { return false; } }
+function godForce() { if (!TEST_MODE) return false; try { if (localStorage.getItem('bou_god_t2') === '1') return false; localStorage.setItem('bou_god_t2', '1'); return true; } catch { return false; } }
 function godPackRoll(setId) {
   const p = Store.p, pool = SETS[setId].cards, order = { k: 0, r: 1, e: 2, l: 3 };
-  const rars = [rollRarity(), rollRarity(), 'e', 'l'].sort((a, b) => order[a] - order[b]);   // legalább egy epikus és egy legendás
+  const rars = [rollRarity(), 'e', 'l'].sort((a, b) => order[a] - order[b]);   // legalább egy epikus és egy legendás
   p.sinceEpic = 0;
   const out = rars.map(rar => {
     let ids = pool.filter(id => CARD[id].rarity === rar);
@@ -6229,6 +6229,14 @@ function godPackRoll(setId) {
     const e = p.coll[id] || (p.coll[id] = { n: 0, f: 0 }); e.f++;
     return { id, foil: true, isNew };
   });
+  /* 2026-10-20 (Tomi): + egy ritka változat (skin), ami még NINCS meg a játékosnak – előbb a packból jövő változatok, aztán a többi (bolti / passos), végső esetben bármelyik packos */
+  const vOk = v => v.variantOf && !v.goldVar && !v.wheelOnly && !v.eventOnly && !v.off && !v.diamond && ART[v.id];
+  const packV = CARDS.filter(v => vOk(v) && !v.passOnly && !v.shopOnly), anyV = CARDS.filter(vOk);
+  const vPool = [packV.filter(v => !owned(v.id)), anyV.filter(v => !owned(v.id)), packV].find(a => a.length) || [];
+  if (vPool.length) { const id = vPool[Math.floor(Math.random() * vPool.length)].id, isNew = !owned(id);
+    const e = p.coll[id] || (p.coll[id] = { n: 0, f: 0 }); e.f++; out.splice(1, 0, { id, foil: true, isNew, skin: true }); }
+  else { const ids = pool.filter(id => CARD[id].rarity === 'r'), id = ids[Math.floor(Math.random() * ids.length)];
+    const e = p.coll[id] || (p.coll[id] = { n: 0, f: 0 }); e.f++; out.splice(1, 0, { id, foil: true, isNew: e.f === 1 }); }
   const setGold = setId !== 'base' ? CARDS.filter(v => v.goldVar && v.set === setId).map(v => v.id) : [];
   if (setGold.length) { const id = setGold[Math.floor(Math.random() * setGold.length)], isNew = owned(id) === 0;
     const e = p.coll[id] || (p.coll[id] = { n: 0, f: 0 }); e.n++; out.push({ id, foil: false, gold: true, isNew }); }
@@ -6703,7 +6711,7 @@ async function godIntro(o, pk, packEl) {
     s.className = k % 5 ? 'rare-spark' : 'god-star'; s.style.cssText = `left:${mx}px;top:${my}px;width:${sz}px;height:${sz}px;background:${c};box-shadow:0 0 ${sz * 2}px ${c}`; layer.appendChild(s);
     s.animate([{ transform: 'translate(-50%,-50%) scale(1) rotate(0deg)', opacity: 1 }, { transform: `translate(calc(-50% + ${Math.cos(a) * d}px), calc(-50% + ${Math.sin(a) * d}px)) scale(.3) rotate(${360 + Math.random() * 360}deg)`, opacity: 0 }],
       { duration: 1000 + Math.random() * 1000, delay: 120, easing: 'cubic-bezier(.1,.7,.3,1)', fill: 'both' }); }
-  const t = document.createElement('div'); t.className = 'god-title'; t.innerHTML = `<div class="god-word">GOD PACK</div><div class="god-sub">5 lap · mind Full Art · és valami arany…</div><div class="op-hint" style="visibility:hidden">Koppints a folytatáshoz</div>`; layer.appendChild(t);
+  const t = document.createElement('div'); t.className = 'god-title'; t.innerHTML = `<div class="god-word">GOD PACK</div><div class="op-hint" style="visibility:hidden">Koppints a folytatáshoz</div>`; layer.appendChild(t);
   t.querySelector('.god-word').animate([{ transform: 'scale(4)', opacity: 0, letterSpacing: '.6em', filter: 'blur(12px)' }, { transform: 'scale(.92)', opacity: 1, letterSpacing: '.04em', filter: 'blur(0)', offset: .7 }, { transform: 'scale(1)', opacity: 1, letterSpacing: '.04em', filter: 'blur(0)' }],
     { duration: 900, delay: 350, easing: 'cubic-bezier(.2,1.2,.4,1)', fill: 'backwards' });
   t.querySelector('.god-sub').animate([{ opacity: 0, transform: 'translateY(12px)' }, { opacity: 1, transform: 'none' }], { duration: 500, delay: 1200, fill: 'backwards' });
