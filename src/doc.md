@@ -463,6 +463,9 @@ Hősképesség-ötletek a táblázatban (még nem zöldek, nincsenek beépítve)
 ## Javítás: „Újabb ranked” → Mégse beragadás (2026-10-16)
 - Meccs után az „Újabb ranked” gomb a lezárt meccs képernyőjén indította a keresést; ha valaki „Mégse”-t nyomott, a lezárt táblán ragadt, és a zászló sem csinált semmit. Mostantól az „Újabb ranked” előbb a Ranked képernyőre visz, a keresés megszakítása lezárt meccsből a menübe visz, és lezárt meccsen a zászló is a menübe visz.
 
+## Heti láda: minden szett lapjai (2026-10-19, Tomi)
+- A heti láda lapjai mostantól minden megjelent szett közös készletéből jönnek (`rollCardSlot`: Base set + Amsterdam Hősei, később az új szettek is maguktól) – a ritkaság-esélyek nem változtak; mérve ~28% Amsterdam lap. Az event-lapok (Halloween) nem kerülnek a ládába, az arany változatok sem.
+
 ## Amsterdam Hősei limitált küldetések (2026-10-19, Tomi)
 - 2026-10-19 19:00-tól **2 hétig** (11-02 19:00-ig, `AHQ_END`) a Küldetések képernyő tetején: Nyerj 1 meccset · Játssz 1 meccset legalább 3 Amsterdam lappal · Okozz összesen 100 sebzést az ellenfél hősének · Nyerj 1 meccset legalább 3 Amsterdam lappal · Nyerj 1 ranked meccset · Játssz egy PvP meccset egy barátod ellen · Játssz 1 meccset legalább 10 Amsterdam lappal → egyenként **2 Amsterdam booster**; **Teljesítsd az összeset → 5 booster** (összesen 19).
 - Egyszeriek (nem napiak), a haladás a meccs végén számít – bot, ranked és PvP meccsen is; a jutalom azonnal jóváíródik (`AHQ`, `ahqOnMatch`, állapot `p.ahq`). Az Amsterdam-lapok száma a meccs paklijából (`S.myList` / `S.pvp.list`, az arany változat is számít); „barát” = elfogadott barát a PvP-ellenfél (`S.pvp.opp`). Season Pass XP-t nem adnak.

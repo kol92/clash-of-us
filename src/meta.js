@@ -426,7 +426,10 @@ const CHEST = { cards: 10, portChance: 0.005, price: 500 };
 // ha egy kép nem töltődik be (pl. kitétel közben rossz válasz ragadt a telefon gyorsítótárában), egyszer újrakérjük a netről, más címmel
 function imgRetry(el) { if (el.dataset.retry === el.src) return; const u = el.src + (el.src.includes('?') ? '&' : '?') + 'r=' + Date.now(); el.dataset.retry = u; el.src = u; }
 function rollCardSlot(p, rar, foil) {
-  const pool = SETS.base.cards.filter(id => CARD[id].rarity === rar);
+  /* 2026-10-19 (Tomi): a heti ládában minden megjelent szett lapjai lehetnek (Base set + Amsterdam Hősei…); az event-lapok nem */
+  const all = Object.keys(SETS).filter(k => setLive(k)).flatMap(k => SETS[k].cards);
+  let pool = all.filter(id => CARD[id].rarity === rar);
+  if (!pool.length) pool = SETS.base.cards.filter(id => CARD[id].rarity === rar);
   let id = pool[Math.floor(Math.random() * pool.length)];
   const vars = CARDS.filter(v => v.variantOf === id && !v.passOnly && !v.shopOnly && !v.wheelOnly && !v.goldVar);
   if (vars.length && Math.random() < VARIANT_CHANCE) id = vars[Math.floor(Math.random() * vars.length)].id;
