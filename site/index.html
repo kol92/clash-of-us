@@ -2367,7 +2367,7 @@ body.pf-loading #scr-menu .pb-name::after{content:'';display:inline-block;width:
 <script src="vendor/firebase-auth-compat.js"></script>
 <script src="vendor/firebase-firestore-compat.js"></script>
 <script src="vendor/firebase-database-compat.js"></script>
-<script>window.APP_VERSION = "2026.10.19-1512"; window.APP_BUILD = "2026.10.19-1512";</script>
+<script>window.APP_VERSION = "2026.10.19-1512"; window.APP_BUILD = "2026.10.19-1513";</script>
 <script>// ===== Best of Us – saját szerver (Firebase) =====
 // A játék eredetileg a Claude-os tárolót használta (window.claude.use('db' | 'user' | 'room')).
 // Ez a fájl ugyanazt a felületet adja Firebase-ből, így a játék kódja szinte változatlan maradhat:
@@ -6145,7 +6145,7 @@ function renderProfileBar() {
   const ss = $('#saveState'); if (ss) ss.textContent = window.APP_MODE ? '👤 Fiók' : Store.mode === 'cloud' ? '☁️ Felhőben mentve' : '📱 Ezen az eszközön mentve';
   el.querySelector('.pb-name').textContent = p.name;
   try { applyBack(); } catch (e) {}
-  renderQuestBadge(); renderPassBadge(); try { renderRankTile(); } catch (e) {} try { renderEventTile(); } catch (e) {} try { if (chestWeeklyCheck()) Store.p.chestNew = true; } catch (e) {} try { if (!$('#scr-menu').hidden) { dayGiftCheck(); backAwardCheck(); deckLinkCheck(); evGiftCheck(); ahNewsCheck(); chestPopup(); } } catch (e) {}
+  renderQuestBadge(); renderPassBadge(); try { renderRankTile(); } catch (e) {} try { renderEventTile(); } catch (e) {} try { if (chestWeeklyCheck()) Store.p.chestNew = true; } catch (e) {} try { ahLaunchGift(); } catch (e) {} try { if (!$('#scr-menu').hidden) { dayGiftCheck(); backAwardCheck(); deckLinkCheck(); evGiftCheck(); ahNewsCheck(); chestPopup(); } } catch (e) {}
   const wb = $('#wheelBadge'); if (wb) wb.hidden = !wheelReady();
   const badge = $('#shopBadge'); if (badge) badge.hidden = !freePackReady() && !(p.giftPacks > 0) && !(p.faPacks > 0) && !(p.shinyPacks > 0) && !(p.ahPacks > 0) && !(p.ahShinyPacks > 0) && !(p.chests > 0);
 }
@@ -7667,6 +7667,13 @@ function evTeaserModal(e, gift) {
 }
 // egyszeri ajándék az event előzetesekor / alatt: 1 Shiny pack (Tomi, 2026-10-15)
 /* Amszterdam hősei (2026-10-18): előzetes naponta egyszer a megjelenésig, utána egyszeri „megérkezett” ablak */
+/* Amsterdam Hősei megjelenés (2026-10-19 19:00, Tomi): mindenki kap 3 ingyen Amsterdam boostert, profilonként egyszer */
+const AH_LAUNCH_PACKS = 3;
+function ahLaunchGift() {
+  const p = Store.p; if (!p || p.onboard || !setLive('ah') || TEST_MODE) return;
+  p.gifts = p.gifts || []; if (p.gifts.includes('ah-launch-packs')) return;
+  p.gifts.push('ah-launch-packs'); p.ahPacks = (p.ahPacks || 0) + AH_LAUNCH_PACKS; p._dirty = true; save();
+}
 function ahNewsCheck() {
   const p = Store.p; if (!p || p.onboard || TEST_MODE || (typeof S !== 'undefined' && S) || $('#layer .overlay') || $('#scr-menu').hidden) return false;
   const live = setLive('ah'), key = live ? 'ah-launch' : 'ah-teaser-' + today();
@@ -7677,7 +7684,7 @@ function ahNewsCheck() {
   o.innerHTML = `<div class="modal acct-box ah-news">
     <p class="ah-news-t">${live ? 'Megérkezett a Best of Us TCG első tematikus miniszettje: az „Amsterdam Hősei”!' : `A Best of Us TCG első tematikus miniszettje, az „Amsterdam Hősei” ${new Date(SET_RELEASE.ah).toDateString() === new Date().toDateString() ? 'ma' : 'hétfőn'} érkezik 19:00 órakor!`}</p>
     <div class="ah-news-packs"><img src="art/ui/pack-ah.webp?v=920fcfff" alt="Amsterdam Hősei booster"><img src="art/ui/pack-ahshiny.webp?v=66d11276" alt="Amsterdam Hősei Shiny booster"></div>
-    ${live ? `<p class="live">26 új lap, két új képesség (Igézhetetlen, Feltámadás), saját booster a Boltban – és minden hősnek egy Amsterdam kölcsönpakli, amit ${LOAN_MAX} meccsig kipróbálhatsz.</p><button class="btn primary" data-shop>Irány a Bolt</button><button class="btn ghost" data-x>Később</button>` : '<button class="btn primary" data-x>Alig várom!</button>'}</div>`;
+    ${live ? `<p class="live">🎁 <b>Ajándékba kaptál ${AH_LAUNCH_PACKS} Amsterdam boostert</b> – a Boltban bonthatod ki! 26 új lap, két új képesség (Igézhetetlen, Feltámadás), saját booster a Boltban – és minden hősnek egy Amsterdam kölcsönpakli, amit ${LOAN_MAX} meccsig kipróbálhatsz.</p><button class="btn primary" data-shop>Irány a Bolt</button><button class="btn ghost" data-x>Később</button>` : '<button class="btn primary" data-x>Alig várom!</button>'}</div>`;
   o.onclick = ev => { if (ev.target.closest('[data-shop]')) { o.remove(); renderShop(); show('scr-shop'); return; }
     if (ev.target.closest('[data-x]') || ev.target === o) { o.remove(); setTimeout(() => { try { chestPopup(); } catch (er) {} }, 200); } };
   $('#layer').appendChild(o);
