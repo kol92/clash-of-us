@@ -463,6 +463,10 @@ Hősképesség-ötletek a táblázatban (még nem zöldek, nincsenek beépítve)
 ## Javítás: „Újabb ranked” → Mégse beragadás (2026-10-16)
 - Meccs után az „Újabb ranked” gomb a lezárt meccs képernyőjén indította a keresést; ha valaki „Mégse”-t nyomott, a lezárt táblán ragadt, és a zászló sem csinált semmit. Mostantól az „Újabb ranked” előbb a Ranked képernyőre visz, a keresés megszakítása lezárt meccsből a menübe visz, és lezárt meccsen a zászló is a menübe visz.
 
+## Csere: szűrés és keresés (2026-10-19, Tomi)
+- A barát-csere ablakában (`frTradeModal`) mindkét lépésben van keresőmező (név + lapszöveg, ékezetfüggetlen) és szűrő: szett (Base / Halloween / Amsterdam), fajta; az 1. lépésben (mit kérsz) ritkaság és Sima / Full Art is. Állapot: `TF`, csak a rácsot rajzolja újra (a keresőmező fókusza megmarad).
+- A 2. lépés (mit adsz érte) fejlécében kiírva: „csak X ritkaságú lapot adhatsz érte”. Kereséskor a többi lapod is megjelenik szürkén „Epikus – ezért nem adható” felirattal – Tomi esete: a PP, a váratlan (epikus) nem jött fel, mert gyakori/ritka lapért kínálta volna.
+
 ## Dinnyés Absolute Vodka: saját karakterre is (2026-10-19, Tomi)
 - Új szöveg: „3 sebzés egy karakternek (akár a sajátodnak is) vagy az ellenfél hősének.” (`tgt:'anyOrHero'`, mint a Sasi ütésénél). Ok: a nálad álló Barna vízipipáját eddig nem tudtad leszedni vele (az a te térfeleden áll, nem számított ellenségnek). Igézhetetlent továbbra sem céloz; a saját hősödet nem. Tomi, a parti lelke italaként változatlan (ellenséget sebez). A bot szinte sosem lövi a saját karakterét (1500 meccsből 1×, ~2000 vodkából).
 
