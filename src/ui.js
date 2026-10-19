@@ -933,7 +933,7 @@ async function animateEvents(evs) {
       case 'heroatk': break;   // a lendülést a baszoAnim már lejátszotta
       case 'chomp': await chompFx(e); break;
       case 'coin': floatAt(anchor, e.side === ME ? '💧 Második vagy: kaptál egy pohár vizet' : '💧 Az ellenfél kapott egy pohár vizet', 'info'); hold = Math.max(hold, 900);
-        if (e.side === ME && !S.tut && Store.p && !Store.p.tips?.water) await waterTip();
+        if (e.side === ME && !S.tut && Store.p && !Store.p.tips?.water) { if (S.pvp) waterTip(); else await waterTip(); }   /* PvP-ben nem állítja meg a lépések lejátszását (2026-10-19) */
         break;
       case 'swim': floatAt(anchor, e.dir > 0 ? '🦈 →' : '🦈 ←', 'info'); hold = Math.max(hold, 350); break;
       case 'nocounter': floatAt(anchor, 'Baszót nem lehet visszaütni!', 'info'); hold = Math.max(hold, 500); break;
