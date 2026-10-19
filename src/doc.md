@@ -463,6 +463,9 @@ Hősképesség-ötletek a táblázatban (még nem zöldek, nincsenek beépítve)
 ## Javítás: „Újabb ranked” → Mégse beragadás (2026-10-16)
 - Meccs után az „Újabb ranked” gomb a lezárt meccs képernyőjén indította a keresést; ha valaki „Mégse”-t nyomott, a lezárt táblán ragadt, és a zászló sem csinált semmit. Mostantól az „Újabb ranked” előbb a Ranked képernyőre visz, a keresés megszakítása lezárt meccsből a menübe visz, és lezárt meccsen a zászló is a menübe visz.
 
+## Reptéri ellenőrzés: magyarázat, ha nem tehető át (2026-10-19, Peti: „csak saját karakterre működik”)
+- Ellenőrizve: motorban és felületen is működik ellenséges karakterre (két lépés: ellenséges karakter → a saját üres helyed). Valószínű ok: tele volt a saját tábla (a lap csak üres helyre hozhat át), vagy Igézhetetlen volt a célpont. Eddig erről semmi nem szólt – most üzenet jelzi (`repterWhy`): „Nincs üres helyed – …” / „… Igézhetetlen – nem tehető át” / „Az ellenfélnél nincs üres hely…”, koppintásnál és húzásnál is.
+
 ## Javítás: halál-animáció támadás közben (2026-10-19, Peti jelezte)
 - Ha egy karakter a saját támadásában halt meg (pl. Lendülettel lerakott karakter, akit a visszaütés megöl), a támadás „forwards” animációja és a leszállás effektje felülírta a halál-animációt: a lap félúton megállt, majd egyszerre eltűnt. Most a halálnál minden korábbi effektet leveszünk (a támadás animációját lezárjuk, nem töröljük, így a rá váró kód nem kap hibát) – a lap rendesen elhalványul, elfordul, lecsúszik.
 

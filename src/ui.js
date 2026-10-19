@@ -1357,6 +1357,7 @@ function pickTarget(side, i) {
   const m = all.filter(t => t.side === side && t.i === i && (i === -1 ? t.k === 'hero' : t.k !== 'hero'));
   if (m.some(t => t.t2)) { ui.pend = [{ side, i }]; render(); return true; }
   if (m.length) { doPlay(ui.sel, m[0]); return true; }
+  repterWhy(S.players[ME].hand[ui.sel].id, side, i);
   return false;
 }
 $('#scr-game').addEventListener('click', e => {
@@ -1823,10 +1824,18 @@ window.addEventListener('resize', () => { if (S && !$('#scr-game').hidden) rende
 
 
 // ---------- húzás a kézből (Hearthstone-stílus) ----------
+// Reptéri ellenőrzés: ha egy karakterre nem tehető, mondjuk meg, miért (2026-10-19, Peti: „csak saját karakterre működik”)
+function repterWhy(id, side, i) {
+  if (bid(id) !== 'a_repter' || i < 0) return;
+  const u = S.players[side]?.board[i]; if (!u) return;
+  const os = side === ME ? BOT : ME;
+  if (isEl(u)) return toast(`${CARD[u.id].name} Igézhetetlen – nem tehető át`);
+  if (!S.players[os].board.some((x, j) => !x && !closedLane(S, os, j))) toast(side === BOT ? 'Nincs üres helyed – a Reptéri ellenőrzés csak üres helyre hozhatja át az ellenfél karakterét' : 'Az ellenfélnél nincs üres hely, ahová átkerülhetne');
+}
 function dropOnCell(hi, side, i) {
   const all = targetsFor(S, ME, S.players[ME].hand[hi].id);
   const m = all.filter(t => t.side === side && t.i === i);
-  if (!m.length) return false;
+  if (!m.length) { repterWhy(S.players[ME].hand[hi].id, side, i); return false; }
   if (m.some(t => t.t2)) { ui.pend = [{ side, i }]; return 'pend'; }
   doPlay(hi, m[0]); return 'played';
 }
@@ -1900,6 +1909,7 @@ function beginDrag(e, hi, el, opt = {}) {
       if (start.needsTarget) {
         const c = cellUnder(ev.clientX, ev.clientY);
         if (c) res = c.classList.contains('hbar') ? dropOnCell(start.hi, c === $('#pBar') ? ME : BOT, -1) : dropOnCell(start.hi, +c.dataset.side, +c.dataset.i);
+        else { const raw = document.elementFromPoint(ev.clientX, ev.clientY)?.closest('.cell[data-side]'); if (raw) repterWhy(S.players[ME].hand[start.hi]?.id, +raw.dataset.side, +raw.dataset.i); }
       } else if (ev.clientY < $('#hand').getBoundingClientRect().top - 10) { doPlay(start.hi, { k:'none' }); res = 'played'; }
     }
     if (res === 'pend') render();
