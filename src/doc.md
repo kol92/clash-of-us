@@ -470,7 +470,7 @@ Hősképesség-ötletek a táblázatban (még nem zöldek, nincsenek beépítve)
 - A 2. ranked szezontól (10-23) Arany és Legenda között: **Smaragd 5–1** (t 15–19) és **Gyémánt 5–1** (t 20–24), Legenda t=25. Az 1. ranked szezon (`s2`) a régi skálán fut végig (Legenda = 15) – `rkLegOf(szezon)`, `rkLeg()`, `rkNameL`, `rkTierClsL`.
 - Smaragdban és Gyémántban 5 csillag kell fokozatonként; Aranytól felfelé nincs sorozatbónusz (`rkHard`); liga-esésvédelem: Smaragd 5 és Gyémánt 5 alá sem lehet visszaesni; Aranytól Mester bot.
 - Lépcsőjutalmak (`RK_REWARDS_S2`): Bronz 4: 2 pack · Ezüst 5: 2 Shiny · Arany 5: 1000 coin · **Smaragd 5: 3 Shiny · Gyémánt 5: 2000 coin** (javaslat, Tomi átírhatja) · Legenda: Legenda hátlap. Az 1. szezon jutalmai (`RK_REWARDS_S1`) változatlanok.
-- Címer: `art/ui/rank-emerald.webp`, `rank-diamond.webp` (az arany és ezüst címer átszínezve). A ranked oldal szabályleírása szezontól függően írja ki a ligákat és a szezon végét.
+- Címer: `art/ui/rank-emerald.webp` (arany keret, smaragd), `rank-diamond.webp` (ezüst keret, kék gyémánt) – Tomi küldte 2026-10-19 este (előtte átszínezett ideiglenes képek). A ranked oldal szabályleírása szezontól függően írja ki a ligákat és a szezon végét.
 
 ## Ranked szezonok a Season Passtól függetlenül + top 3 szezonjutalom (2026-10-19, Tomi)
 - `RK_SEASONS` (meta.js): **1. ranked szezon** (id `s2`, hogy a meglévő rangok megmaradjanak) 2026-10-12 – **2026-10-23 (péntek) 0:00**; **2. ranked szezon** (`r2`) 10-23 0:00 – 11-11 0:00. A következő ranked szezont ide kell felvenni.
