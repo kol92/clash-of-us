@@ -80,7 +80,7 @@ function cardHelpHTML(id, u) {
   if (c.sneak || u?.hidden) add('sneak');
   if (c.stun || u?.stun || /bén/i.test(c.text)) add('stun');
   if (u && u.fresh && !u.haste && !u.stun) add('fresh');
-  if (u && (u.doom || u.expire != null)) add('doom');
+  if (u && (u.doom || u.doomFoe != null || u.expire != null)) add('doom');
   if (c.invis || u?.invis) add('invis');
   if ((c.elusive && !u?.noKw) || u?.elusive) add('elusive');
   if (c.revive && !u?.noKw && !u?.revived) add('revive');

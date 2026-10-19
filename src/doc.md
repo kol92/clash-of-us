@@ -463,6 +463,9 @@ Hősképesség-ötletek a táblázatban (még nem zöldek, nincsenek beépítve)
 ## Javítás: „Újabb ranked” → Mégse beragadás (2026-10-16)
 - Meccs után az „Újabb ranked” gomb a lezárt meccs képernyőjén indította a keresést; ha valaki „Mégse”-t nyomott, a lezárt táblán ragadt, és a zászló sem csinált semmit. Mostantól az „Újabb ranked” előbb a Ranked képernyőre visz, a keresés megszakítása lezárt meccsből a menübe visz, és lezárt meccsen a zászló is a menübe visz.
 
+## Tomi, a parti lelke: Akuma az ellenségen (2026-10-19, Tomi)
+- Hiba volt: az Akuma (+5 támadás, „a köre végén meghal”) pusztító italként az ellenséghez került, de a gazdája saját körének végéig élt, így előbb még ütött vele +5-tel – valójában erősítés lett. Most: ha a parti lelke Akumát ad ellenséges karakternek, az **még ugyanannak a körnek a végén meghal** (`u.doomFoe = pi`, a `runEndTurn` a túloldalt is nézi), a gazdája nem támadhat vele. Felirat: „+5 támadás, de ennek a körnek a végén meghal”. Teszt: `tools/party_test.js` (AKUMA OK).
+
 ## Csere: szűrés és keresés (2026-10-19, Tomi)
 - A barát-csere ablakában (`frTradeModal`) mindkét lépésben van keresőmező (név + lapszöveg, ékezetfüggetlen) és szűrő: szett (Base / Halloween / Amsterdam), fajta; az 1. lépésben (mit kérsz) ritkaság és Sima / Full Art is. Állapot: `TF`, csak a rácsot rajzolja újra (a keresőmező fókusza megmarad).
 - A 2. lépés (mit adsz érte) fejlécében kiírva: „csak X ritkaságú lapot adhatsz érte”. Kereséskor a többi lapod is megjelenik szürkén „Epikus – ezért nem adható” felirattal – Tomi esete: a PP, a váratlan (epikus) nem jött fel, mert gyakori/ritka lapért kínálta volna.

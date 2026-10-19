@@ -27,3 +27,15 @@ for (let k = 0; k < 3000; k++) {
 }
 console.log('italok:', JSON.stringify(seen));
 console.log(fails ? 'HIBÁK: ' + fails : 'PARTI LELKE OK');
+// Akuma az ellenségen (2026-10-19): még a parti lelke körének végén meghal – a gazdája nem üthet vele
+{ let n = 0, bad = 0;
+  for (let k = 0; k < 4000 && n < 30; k++) {
+    const s = E.newGame('tomi', E.DECK_OF('tomi'), 'gabi', E.DECK_OF('gabi'), 0); s.active = 0;
+    const me = s.players[0], op = s.players[1]; me.energy = me.maxEnergy = 10; me.board = [null, null, null, null]; op.board = [null, null, null, null];
+    s.active = 1; op.energy = 10; op.hand.unshift({ uid: 70000 + k, id: 'c_vajda' }); E.playCard(s, 1, 0, { k: 'slot', side: 1, i: 2 }); s.active = 0;
+    s.events = []; me.hand.unshift({ uid: 99999, id: 'c_tomiparti' }); E.playCard(s, 0, 0, { k: 'slot', side: 0, i: 0 });
+    const e = s.events.find(x => x.t === 'party'); if (!e || e.id !== 'i_akuma') continue; n++;
+    const u = op.board[2]; if (!u || u.doomFoe !== 0) bad++;
+    E.runEndTurn(s); if (op.board[2]) bad++; }
+  ok(n > 0 && !bad, `Akuma ellenségen: ${n} eset, ${bad} hiba`); console.log('Akuma ellenségen:', n, 'eset, hibás:', bad); }
+console.log(fails ? 'HIBÁK: ' + fails : 'AKUMA OK');
