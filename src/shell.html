@@ -1057,6 +1057,13 @@ body.ev-hw #scr-menu .fan{filter:drop-shadow(0 0 22px rgba(255,140,40,.35));}
 
 /* ---------- küldetések ---------- */
 .m-quests{grid-template-columns:48px 1fr auto auto;min-height:70px;}
+.m-quests.ah-hot{position:relative;box-shadow:0 0 0 2px rgba(110,220,140,.75),0 0 18px rgba(80,210,120,.45);animation:ahHot 2.2s ease-in-out infinite;}
+.m-quests.ah-hot .m-txt small{color:#bff5cf;}
+.m-quests .ah-q{color:#8ff0a8;font-weight:800;}
+.m-quests.ah-hot .m-txt small{font-size:12px;line-height:1.25;}
+.m-quests.ah-new::after{content:"ÚJ!";position:absolute;top:9px;right:44px;z-index:3;padding:2px 8px;border-radius:8px;font:900 11px/1.2 var(--display);color:#08321a;background:linear-gradient(180deg,#b8ffc9,#3fcf6e);box-shadow:0 2px 8px rgba(0,0,0,.45);transform:rotate(4deg);}
+@keyframes ahHot{0%,100%{box-shadow:0 0 0 2px rgba(110,220,140,.6),0 0 12px rgba(80,210,120,.3)}50%{box-shadow:0 0 0 2px rgba(140,255,170,.95),0 0 26px rgba(80,230,130,.7)}}
+@media (prefers-reduced-motion:reduce){.m-quests.ah-hot{animation:none}}
 .m-ic.quests{font-size:32px;line-height:1;text-align:center;filter:drop-shadow(0 2px 4px rgba(0,0,0,.6));}
 .q-badge{font-family:var(--display);font-size:16px;color:#3a2400;background:linear-gradient(180deg,#ffe79a,#f0a400);padding:2px 9px;border-radius:9px;}
 .lbl small{font-weight:700;letter-spacing:.02em;text-transform:none;color:var(--mute);}
