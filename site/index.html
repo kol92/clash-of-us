@@ -2379,7 +2379,7 @@ body.pf-loading #scr-menu .pb-name::after{content:'';display:inline-block;width:
 <script src="vendor/firebase-auth-compat.js"></script>
 <script src="vendor/firebase-firestore-compat.js"></script>
 <script src="vendor/firebase-database-compat.js"></script>
-<script>window.APP_VERSION = "2026.10.19-2138"; window.APP_BUILD = "2026.10.19-2138";</script>
+<script>window.APP_VERSION = "2026.10.19-2225"; window.APP_BUILD = "2026.10.19-2225";</script>
 <script>// ===== Best of Us – saját szerver (Firebase) =====
 // A játék eredetileg a Claude-os tárolót használta (window.claude.use('db' | 'user' | 'room')).
 // Ez a fájl ugyanazt a felületet adja Firebase-ből, így a játék kódja szinte változatlan maradhat:
@@ -2735,7 +2735,7 @@ const CARDS = [
   { id:'i_vodkasa', drink:true, type:'item', name:'Vodkása', cost:1, atk:0, hp:0, rarity:'k', elusive:true, text:'A karakter, akin van, Igézhetetlen lesz. Ha TZS-re teszed, többé nem sebzi a saját hősödet, és Pajzsot is kap.' },   /* 2026-10-18 */
   { id:'i_aranylanc', type:'item', name:'Tomi nyaklánca', cost:3, atk:2, hp:3, rarity:'l', text:'' },
   // --- Akciók ---
-  { id:'a_dinnyes', drink:true, type:'action', name:'Dinnyés Absolute Vodka', cost:1, tgt:'enemyOrHero', rarity:'k', text:'3 sebzés egy ellenséges karakternek vagy az ellenfél hősének.' },
+  { id:'a_dinnyes', drink:true, type:'action', name:'Dinnyés Absolute Vodka', cost:1, tgt:'anyOrHero', rarity:'k', text:'3 sebzés egy karakternek (akár a sajátodnak is) vagy az ellenfél hősének.' },   /* 2026-10-19: saját térfélre is (Tomi) – pl. a nálad álló vízipipa */
   { id:'a_cheddar', type:'action', name:'Cheddar sajtkrém leves', cost:2, tgt:'none', rarity:'k', text:'Húzol 2 lapot.' },
   { id:'a_gyros', type:'action', name:'Musztafa Gyros Tál', cost:5, tgt:'none', rarity:'r', text:'Eldobod az összes kézben lévő lapodat, majd húzol 4 lapot.' },
   { id:'a_kitiltva', type:'action', name:'Ki vagy tiltva!', cost:2, tgt:'none', rarity:'k', text:'Eltünteted a pályán lévő helyszínt, és húzol egy lapot.' },
@@ -3213,7 +3213,7 @@ function playCard(s, pi, hi, t) {
       addToHand(s, ei, nx);
     }
     switch (bid(c.id)) {   /* változat-lap (pl. arany) = az alaplap hatása */
-      case 'a_dinnyes': if (t.k === 'hero') damageHero(s, ei, 3); else damageUnit(s, ei, t.i, 3); break;
+      case 'a_dinnyes': if (t.k === 'hero') damageHero(s, ei, 3); else damageUnit(s, t.side ?? ei, t.i, 3); break;
       case 'a_gyros': {
         const n = p.hand.length;
         for (const h of p.hand) bury(s, pi, h.id, 'discard');

@@ -463,6 +463,9 @@ Hősképesség-ötletek a táblázatban (még nem zöldek, nincsenek beépítve)
 ## Javítás: „Újabb ranked” → Mégse beragadás (2026-10-16)
 - Meccs után az „Újabb ranked” gomb a lezárt meccs képernyőjén indította a keresést; ha valaki „Mégse”-t nyomott, a lezárt táblán ragadt, és a zászló sem csinált semmit. Mostantól az „Újabb ranked” előbb a Ranked képernyőre visz, a keresés megszakítása lezárt meccsből a menübe visz, és lezárt meccsen a zászló is a menübe visz.
 
+## Dinnyés Absolute Vodka: saját karakterre is (2026-10-19, Tomi)
+- Új szöveg: „3 sebzés egy karakternek (akár a sajátodnak is) vagy az ellenfél hősének.” (`tgt:'anyOrHero'`, mint a Sasi ütésénél). Ok: a nálad álló Barna vízipipáját eddig nem tudtad leszedni vele (az a te térfeleden áll, nem számított ellenségnek). Igézhetetlent továbbra sem céloz; a saját hősödet nem. Tomi, a parti lelke italaként változatlan (ellenséget sebez). A bot szinte sosem lövi a saját karakterét (1500 meccsből 1×, ~2000 vodkából).
+
 ## Bolti ritka variáns: Pifti, a király (2026-10-19, Tomi)
 - `c_piftikiraly2` – a **Pifti, a király** (epikus, 4 energia, 4/2, „Kijátszáskor 5 Pifti haverja lapot kever a paklidba.”) változata, új képpel (Parlament), **100 coin**, 2 példány jár; csak a Boltban, a limitált kínálatban (a következő rotációig, 10-29). Packból nem jön, nem cserélhető (mint a többi bolti változat).
 - Javítva aznap este: először tévesen a sima Pifti (`c_pifti3`) változataként került ki – aki addig megvette, annak a `migrate()` a gyűjteményben és a paklikban is `c_piftikiraly2`-re cseréli (darabszám és Full Art megmarad).
