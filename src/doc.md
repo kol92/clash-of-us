@@ -466,6 +466,7 @@ Hősképesség-ötletek a táblázatban (még nem zöldek, nincsenek beépítve)
 ## Amsterdam Hősei limitált küldetések (2026-10-19, Tomi)
 - 2026-10-19 19:00-tól **2 hétig** (11-02 19:00-ig, `AHQ_END`) a Küldetések képernyő tetején: Nyerj 1 meccset · Játssz 1 meccset legalább 3 Amsterdam lappal · Okozz összesen 100 sebzést az ellenfél hősének · Nyerj 1 meccset legalább 3 Amsterdam lappal · Nyerj 1 ranked meccset · Játssz egy PvP meccset egy barátod ellen · Játssz 1 meccset legalább 10 Amsterdam lappal → egyenként **2 Amsterdam booster**; **Teljesítsd az összeset → 5 booster** (összesen 19).
 - Egyszeriek (nem napiak), a haladás a meccs végén számít – bot, ranked és PvP meccsen is; a jutalom azonnal jóváíródik (`AHQ`, `ahqOnMatch`, állapot `p.ahq`). Az Amsterdam-lapok száma a meccs paklijából (`S.myList` / `S.pvp.list`, az arany változat is számít); „barát” = elfogadott barát a PvP-ellenfél (`S.pvp.opp`). Season Pass XP-t nem adnak.
+- **Jelzés a főmenüben:** amíg él és nincs mind kész, a Küldetések csempe zölden pulzál, alcíme „🌷 Limitált Amsterdam küldetések · N/8 kész”, és egy „ÚJ!” címke van rajta, amíg a játékos egyszer meg nem nyitja a Küldetéseket (`p.ahqSeen`).
 
 ## Pakliszerkesztő: szűrés szettre (2026-10-19, játékos-panasz)
 - A pakliszerkesztő lapkészlete fölött a fajta-szűrő (Mind / Karakter / Akció / Eszköz / Helyszín) alatt új sor: **Minden szett · Base set · 🎃 Halloween · 🌷 Amsterdam** (csak a megjelent szettek, `cfSets()`); a kettő együtt is használható (`ED.set`, `cardSet`).

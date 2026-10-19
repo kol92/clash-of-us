@@ -1428,6 +1428,11 @@ function renderQuestBadge() {
   const b = $('#questBadge'); if (!b || !Store.p) return;
   const Q = ensureQuests(Store.p), n = Q.daily.filter(q => q.done).length + (Q.weekly.done ? 1 : 0);
   b.textContent = `${n}/4`;
+  /* Amsterdam limitált küldetések jelzése a menüben (2026-10-19, Tomi) */
+  const tile = $('#goQuests'), sm = tile?.querySelector('.m-txt small'); if (!tile || !sm) return;
+  const st = ahqState(Store.p), nd = AHQ.filter(q => st.done.includes(q.id)).length, on = ahqLive() && nd < AHQ.length;
+  tile.classList.toggle('ah-hot', on); tile.classList.toggle('ah-new', on && !Store.p.ahqSeen);
+  sm.innerHTML = on ? `🌷 <span class="ah-q">Limitált Amsterdam küldetések</span> · ${nd}/${AHQ.length} kész` : '3 napi + 1 heti feladat';
 }
 function renderQuests() {
   const p = Store.p; if (!p) return;
@@ -2682,7 +2687,7 @@ $('#goPvp').onclick = () => { if (needProfile()) return; if (TEST_MODE) return t
 $('#goShop').onclick = () => { if (needProfile()) return; renderShop(); show('scr-shop'); };
 $('#goDecks').onclick = () => { if (needProfile()) return; renderDecks(); show('scr-decks'); };
 $('#goWheel').onclick = () => { if (needProfile()) return; openWheel(); };
-$('#goQuests').onclick = () => { if (needProfile()) return; renderQuests(); show('scr-quests'); };
+$('#goQuests').onclick = () => { if (needProfile()) return; if (ahqLive() && !Store.p.ahqSeen) { Store.p.ahqSeen = true; save(); renderQuestBadge(); } renderQuests(); show('scr-quests'); };
 
 bootProfile();
 
