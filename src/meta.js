@@ -162,7 +162,7 @@ function testBanner() {   /* teszt oldal jelzése + profil újramásolása */
 /* TESZT OLDAL (2026-10-16, Tomi kérése): ezek a profilok (név szerint, kisbetűvel) a teszt oldalon minden gyűjthető lapot megkapnak
    (legendásból 1, a többiből 2 példány; bolti, Pass-, event- és változat-lapokkal együtt). Minden betöltéskor lefut, így az új lapokat is megkapják.
    Csak a teszt oldal helyi profil-másolatát érinti – az éles adatokhoz nem nyúl. */
-const TEST_ALL_CARDS = ['btppictures'];
+const TEST_ALL_CARDS = ['btppictures', 'deanteszt'];   /* teszt oldalon minden lapot megkapnak (név szerint, kisbetűvel) */
 function testGrantAll(p) {
   let n = 0;
   for (const c of PLAYABLE) { if (c.token || c.off) continue;
