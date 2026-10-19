@@ -1111,6 +1111,7 @@ body.ev-hw #scr-menu .fan{filter:drop-shadow(0 0 22px rgba(255,140,40,.35));}
 .ah-news-packs img+img{animation-delay:-1.6s;}
 @keyframes ahFloat{50%{transform:translateY(-8px) rotate(-1.5deg);}}
 @media (prefers-reduced-motion:reduce){.ah-news-packs img{animation:none;}}
+.deck-wrap.loan-out .deck-opt{opacity:.55;filter:grayscale(.6);}
 .do-set{font-style:normal;font-size:.78em;font-weight:800;color:#1a3a22;background:linear-gradient(90deg,#9be7a8,#f3d77a);border-radius:.8em;padding:.05em .55em;margin-left:.35em;white-space:nowrap;}
 #testRibbon{position:fixed;left:0;right:0;bottom:0;z-index:9999;display:flex;gap:8px;align-items:center;justify-content:center;padding:3px 8px calc(3px + env(safe-area-inset-bottom));background:repeating-linear-gradient(45deg,#7a1fa2 0 12px,#5b1580 12px 24px);color:#fff;font:800 11px/1.2 system-ui,sans-serif;letter-spacing:.03em;pointer-events:none;}
 #testRibbon button{pointer-events:auto;font:inherit;border:1px solid #fff8;background:#0004;color:#fff;border-radius:6px;padding:2px 6px;}
@@ -2364,7 +2365,7 @@ body.pf-loading #scr-menu .pb-name::after{content:'';display:inline-block;width:
 <script src="vendor/firebase-auth-compat.js"></script>
 <script src="vendor/firebase-firestore-compat.js"></script>
 <script src="vendor/firebase-database-compat.js"></script>
-<script>window.APP_VERSION = "2026.10.19-0010"; window.APP_BUILD = "2026.10.19-0010";</script>
+<script>window.APP_VERSION = "2026.10.19-1215"; window.APP_BUILD = "2026.10.19-1228";</script>
 <script>// ===== Best of Us – saját szerver (Firebase) =====
 // A játék eredetileg a Claude-os tárolót használta (window.claude.use('db' | 'user' | 'room')).
 // Ez a fájl ugyanazt a felületet adja Firebase-ből, így a játék kódja szinte változatlan maradhat:
@@ -2854,7 +2855,7 @@ const DECKS = {
     list:{ c_kutya:2, c_ah_laci:2, c_ppvar:2, c_ah_barna:2, c_ah_sasi:1, c_ah_ati:1, a_bong:1, a_repter:1, a_suti:1, i_cigi:1, l_coffeeshop:1, c_pifti:2, a_dinnyes:1, f_metamorf:1, c_vajda:1 } },
   ah_tomi: { set:'ah', name:'Varázsgombák', hero:'tomi', desc:'Minden a gombákról szól: a High Hawaiians és Barna telerakja velük a paklit, Tomi eszközei olcsóbbak és életet is adnak – a harmadik gombától már szörnyek nőnek.',
     list:{ i_gomba:2, i_napszemuveg:2, c_vajda:2, a_hawaiians:1, c_ah_barna:2, c_ah_tomi:1, c_kutya:2, c_ah_laci:2, c_ah_sasi:2, c_ppvar:2, i_bunda:1, f_atok:1 } },
-  ah_david: { set:'ah', name:'Városnézés', hero:'david', desc:'Helyszínről helyszínre Amszterdamban: Vöröslámpás negyed, Coffee Shop, Elfekvő – Dávid törzsvendégként mindenhol jól jár, és minden cserénél húz.',
+  ah_david: { set:'ah', name:'Városnézés', hero:'david', desc:'Helyszínről helyszínre Amszterdamban: amíg helyszín van a pályán, Dávid törzsvendégként minden köre végén erősít valakit – a végén pedig jön a Bocsi, de vezetek.',
     list:{ c_ah_sasi:2, c_ah_ati:2, c_ah_laci:2, c_kutya:2, c_ppvar:2, c_ah_barna:2, a_repter:1, f_vezetek:1, c_vajda:2, a_dinnyes:2, i_gomba:1, l_voros:1 } },
   ah_bence: { set:'ah', name:'Amszterdam terrorja', hero:'bence', desc:'Bence 24 élete mindent elbír: jöhet a Bong, jöhet a Végtelen trip, a végén pedig maga a terror lép be Lendülettel és Feltámadással.',
     list:{ c_ah_bence:1, c_ah_sasi:2, c_ah_ati:1, c_ah_barna:2, c_ppvar:2, c_kutya:2, a_trip:1, a_utcaifust:1, i_gomba:2, c_pifti:1, a_dinnyes:1, f_bender:1, c_ah_laci:1, a_repter:1, a_suti:1 } },
@@ -3221,7 +3222,7 @@ function playCard(s, pi, hi, t) {
         reveal(s, ei, t.i);
         Object.assign(u, { noKw:true, haste:false, shield:false, taunt:false, muscle:false, invis:false, elusive:false, hidden:false }); delete u.boon;
         ev(s, { t:'silence', side:ei, i:t.i }); break; }
-      case 'a_hawaiians': for (let k = 0; k < 5; k++) p.deck.push('i_gomba'); shuffle(p.deck); ev(s, { t:'shuffled', side:pi, i:-1, n:5, id:'i_gomba' }); break;
+      case 'a_hawaiians': for (let k = 0; k < 5; k++) p.deck.push('i_gomba'); shuffle(p.deck); p.welc = (p.welc || 0) + 5;   /* a bot is értékelje (2026-10-19) */ ev(s, { t:'shuffled', side:pi, i:-1, n:5, id:'i_gomba' }); break;
       case 'a_repter': if (t.t2) {
         const sd = t.side, os = t.t2.side, j = t.t2.i, src = s.players[sd], dst = s.players[os], u = src.board[t.i];
         if (!u || dst.board[j]) break;
@@ -4294,13 +4295,14 @@ function renderPick() {
   if (!ds.some(d => d.id === ui.deck && !deckIssue(d))) ui.deck = 'roham';
   ui.deckOpen = ui.deckOpen || null;
   $('#deckPick').innerHTML = ds.map(d => { const prob = deckIssue(d), h = HERO[d.hero], sel = ui.deck === d.id, open = ui.deckOpen === d.id;
-    return `<div class="deck-wrap${sel ? ' sel' : ''}"><button class="deck-opt dp${sel ? ' on' : ''}" data-d="${d.id}" aria-pressed="${sel}" ${prob ? 'disabled' : ''}>${heroPortrait(d.hero, 'do-hero')}
-      <span class="do-txt"><b></b><em>${h ? h.name : 'Nincs hős'}${d.set === 'ah' ? ' <i class="do-set">🌷 Amsterdam</i>' : ''}</em><small>${prob ? 'Nem játszható: ' + prob : h ? h.text : ''}</small></span></button>
+    const lo = isLoan(d) && loanLeft(d) <= 0;
+    return `<div class="deck-wrap${sel ? ' sel' : ''}${lo ? ' loan-out' : ''}"><button class="deck-opt dp${sel ? ' on' : ''}" data-d="${d.id}" ${lo ? 'data-loanout="1"' : ''} aria-pressed="${sel}" ${prob && !lo ? 'disabled' : ''}>${heroPortrait(d.hero, 'do-hero')}
+      <span class="do-txt"><b></b><em>${h ? h.name : 'Nincs hős'}${d.set === 'ah' ? ` <i class="do-set">🌷 Kölcsön · ${lo ? 'lejárt' : `még ${loanLeft(d)} meccs`}</i>` : ''}</em><small>${prob ? 'Nem játszható: ' + prob : h ? h.text : ''}</small></span></button>
       <button class="dp-more${open ? ' open' : ''}" data-more="${d.id}" aria-expanded="${open}" aria-label="Részletek: ${escH(d.name)}"></button>
       ${open ? `<div class="dp-detail"><p><b>${h ? h.name : ''}:</b> ${h ? h.text : ''}</p><p>${d.starter ? d.desc : 'Saját pakli.'}</p></div>` : ''}</div>`; }).join('');
   $('#deckPick').querySelectorAll('.deck-opt b').forEach((b, i) => b.textContent = ds[i].name);
 }
-$('#deckPick').onclick = e => { const m = e.target.closest('[data-more]'); if (m) { ui.deckOpen = ui.deckOpen === m.dataset.more ? null : m.dataset.more; renderPick(); return; } const b = e.target.closest('[data-d]'); if (b) { ui.deck = b.dataset.d; renderPick(); } };
+$('#deckPick').onclick = e => { const m = e.target.closest('[data-more]'); if (m) { ui.deckOpen = ui.deckOpen === m.dataset.more ? null : m.dataset.more; renderPick(); return; } const b = e.target.closest('[data-d]'); if (b && b.dataset.loanout) { loanOutModal(); return; } if (b) { ui.deck = b.dataset.d; renderPick(); } };
 $('#startBtn').onclick = () => { const d = allDecks().find(x => x.id === ui.deck); if (!d || deckIssue(d)) return;
   if (ui.pick?.done) { const P = ui.pick; ui.pick = null; show(P.back || 'scr-menu'); if (P.back === 'scr-ranked') renderRanked(); P.done(d); return; }
   startMatch(d.hero, ui.deck); };
@@ -5557,6 +5559,7 @@ function vsIntro() {
   });
 }
 function startMatch(heroId, deckId, opt = {}) {
+  if (typeof loanUse === 'function') loanUse(deckId);   /* Amsterdam kölcsönpakli: 3 meccs (2026-10-19) */
   const others = HEROES.filter(h => h.id !== heroId);
   const bh = others[Math.floor(Math.random() * others.length)].id;
   const bd = DECK_OF(bh) || Object.keys(DECKS)[0];   // a bot a saját hősének kezdőpaklijával játszik
@@ -6829,7 +6832,24 @@ function deckProblem(list, hero, loan) {   /* loan: szett-kezdőpakli – kölcs
   for (const id of Object.keys(list)) if (CARD[id].hero && list[id] > 0 && CARD[id].hero !== hero) return `${CARD[id].name}: csak ${HERO[CARD[id].hero].name} paklijába`;
   return null;
 }
-const deckIssue = d => deckProblem(d.list, d.hero || null, !!(d.starter && d.set));
+/* Kölcsönpakli (szett-kezdőpakli, 2026-10-19, Tomi): paklinként 3 meccs, utána lejár */
+const LOAN_MAX = 3;
+const isLoan = d => !!(d && d.starter && d.set);
+const loanLeft = d => LOAN_MAX - ((Store.p?.loan || {})[d.id] || 0);
+const deckIssue = d => isLoan(d) && loanLeft(d) <= 0 ? 'lejárt a kölcsönpakli' : deckProblem(d.list, d.hero || null, isLoan(d));
+function loanUse(deckId, matchKey) {   /* meccs indulásakor számol (kilépéssel sem lehet megúszni); matchKey: PvP-ben meccsenként egyszer */
+  const p = Store.p, d = allDecks().find(x => x.id === deckId); if (!p || !isLoan(d)) return;
+  if (matchKey) { p.loanM = p.loanM || []; if (p.loanM.includes(matchKey)) return; p.loanM = [...p.loanM.slice(-20), matchKey]; }
+  p.loan = { ...(p.loan || {}), [d.id]: ((p.loan || {})[d.id] || 0) + 1 }; save();
+  const left = loanLeft(d);
+  setTimeout(() => toast(left > 0 ? `🌷 Kölcsönpakli: még ${left} meccs ezzel a paklival` : '🌷 Ez az utolsó kölcsönmeccs ezzel a paklival!'), 1200);
+}
+function loanOutModal() {
+  const o = document.createElement('div'); o.className = 'overlay';
+  o.innerHTML = `<div class="modal"><h3>🌷 Ezek csak kölcsön paklik voltak!</h3><p class="live">Az Amsterdam Hősei kezdőpaklikat ${LOAN_MAX}-${LOAN_MAX} meccsig próbálhattad ki. Gyűjtsd össze a lapjaikat <b>Amsterdam packokból</b>, és rakd össze a saját változatodat a <b>Paklik</b> menüben (a kölcsönpaklit megnyitva a <b>Másolat</b> gombbal ki is indulhatsz belőle).</p><button class="btn primary" data-x>Értem</button></div>`;
+  o.onclick = e => { if (e.target.closest('[data-x]') || e.target === o) o.remove(); };
+  $('#layer').appendChild(o);
+}
 function heroPortrait(hid, cls = '') {
   const h = HERO[hid];
   if (!h) return `<span class="hp-img empty ${cls}">?</span>`;
@@ -6843,7 +6863,7 @@ function renderDecks() {
       const prob = deckIssue(d), h = HERO[d.hero];
       return `<button class="deck-card" data-deck="${d.id}">
         ${heroPortrait(d.hero, 'dc-hero')}
-        <span class="dc-txt"><b></b><em>${h ? h.name : 'Nincs hős'}</em><small>${d.starter ? 'Kezdőpakli · nem szerkeszthető' : prob ? prob : 'Játékra kész'}</small></span>
+        <span class="dc-txt"><b></b><em>${h ? h.name : 'Nincs hős'}</em><small>${isLoan(d) ? (loanLeft(d) > 0 ? `🌷 Kölcsönpakli · még ${loanLeft(d)} meccs` : '🌷 Kölcsönpakli · lejárt') : d.starter ? 'Kezdőpakli · nem szerkeszthető' : prob ? prob : 'Játékra kész'}</small></span>
         <span class="dc-go">${d.starter ? 'Megnéz' : 'Szerkeszt'}</span></button>`;
     }).join('')}</div>`;
   $('#decksBody').querySelectorAll('.deck-card').forEach((b, i) => b.querySelector('b').textContent = ds[i].name);
@@ -7637,9 +7657,9 @@ function ahNewsCheck() {
   p.news.push(key); save();
   const o = document.createElement('div'); o.className = 'overlay';
   o.innerHTML = `<div class="modal acct-box ah-news">
-    <p class="ah-news-t">${live ? 'Megérkezett a Best of Us TCG első tematikus miniszettje: az „Amsterdam Hősei”!' : 'A Best of Us TCG első tematikus miniszettje, az „Amsterdam Hősei” hétfőn érkezik 19:00 órakor!'}</p>
+    <p class="ah-news-t">${live ? 'Megérkezett a Best of Us TCG első tematikus miniszettje: az „Amsterdam Hősei”!' : `A Best of Us TCG első tematikus miniszettje, az „Amsterdam Hősei” ${new Date(SET_RELEASE.ah).toDateString() === new Date().toDateString() ? 'ma' : 'hétfőn'} érkezik 19:00 órakor!`}</p>
     <div class="ah-news-packs"><img src="art/ui/pack-ah.webp?v=920fcfff" alt="Amsterdam Hősei booster"><img src="art/ui/pack-ahshiny.webp?v=66d11276" alt="Amsterdam Hősei Shiny booster"></div>
-    ${live ? `<p class="live">26 új lap, két új képesség (Igézhetetlen, Feltámadás), és saját booster a Boltban.</p><button class="btn primary" data-shop>Irány a Bolt</button><button class="btn ghost" data-x>Később</button>` : '<button class="btn primary" data-x>Alig várom!</button>'}</div>`;
+    ${live ? `<p class="live">26 új lap, két új képesség (Igézhetetlen, Feltámadás), saját booster a Boltban – és minden hősnek egy Amsterdam kölcsönpakli, amit ${LOAN_MAX} meccsig kipróbálhatsz.</p><button class="btn primary" data-shop>Irány a Bolt</button><button class="btn ghost" data-x>Később</button>` : '<button class="btn primary" data-x>Alig várom!</button>'}</div>`;
   o.onclick = ev => { if (ev.target.closest('[data-shop]')) { o.remove(); renderShop(); show('scr-shop'); return; }
     if (ev.target.closest('[data-x]') || ev.target === o) { o.remove(); setTimeout(() => { try { chestPopup(); } catch (er) {} }, 200); } };
   $('#layer').appendChild(o);
@@ -8032,7 +8052,7 @@ function renderPvp() {
 function pvpPickDeck(title, done, opt = {}) {   // ugyanaz a pakliválasztó képernyő, mint a bot elleni meccsnél
   openDeckPick({ title: title.replace(/<[^>]*>/g, ''), note: opt.note || 'Válaszd ki, melyik paklival játszol. A hőst a pakli határozza meg.', btn: opt.btn || 'Ezzel játszom', done, ...opt });
 }
-const pvpMe = dk => ({ ver: window.APP_VERSION || '', uid: Store.uid, name: Store.p.name || 'Játékos', hero: dk.hero, deckName: dk.name, list: { ...dk.list },
+const pvpMe = dk => ({ ver: window.APP_VERSION || '', uid: Store.uid, name: Store.p.name || 'Játékos', hero: dk.hero, deckName: dk.name, deckId: dk.id || null, list: { ...dk.list },
   cos: { back: myBack(), heroGold: heroSkin(dk.hero) === 'gold', heroFa: heroSkin(dk.hero) === 'fa', port: isPort(heroSkin(dk.hero)) ? heroSkin(dk.hero) : null, foils: Object.keys(dk.list).filter(id => ownsFoil(id)), foilN: myFoils(dk.list) } });   // amit az ellenfél is lát: Full Art hős és lapok
 async function pvpCreate(dk) {
   try { await Store.db.collection('pvp').add({ parts: [Store.uid], status: 'open', created: Date.now(), updated: Date.now(), host: pvpMe(dk), guest: null, v: 0 }); toast('Kihívás létrehozva – szólj a haveroknak!'); }
@@ -8064,6 +8084,7 @@ async function pvpJoin(id, dk) {
 function pvpEnter(id, fresh) {
   const d = fresh || PVP.list.find(x => x.id === id); if (!d || !d.state) { toast('Betöltés…'); return; }
   const side = pvpSideOf(d);
+  { const mine = side === 0 ? d.host : d.guest; if (mine?.deckId && d.status === 'mull') loanUse(mine.deckId, 'pvp:' + id); }   /* kölcsönpakli-számláló */
   ME = side; BOT = 1 - side;
   PVP.id = id; PVP.v = d.v; PVP.queue = []; PVP.running = false;
   S = { ...JSON.parse(JSON.stringify(d.state)), events: [], pvp: { id, side, live: !!d.live, ranked: !!d.ranked } };
