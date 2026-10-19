@@ -1036,6 +1036,7 @@ body.ev-hw #scr-menu .fan{filter:drop-shadow(0 0 22px rgba(255,140,40,.35));}
 .unit .uname.long,.unit:not(.facedown) .uname.long{font-size:8px;line-height:1.05;}
 .card.framed:not(.big) .name.xl,.card.foil:not(.big) .name.xl{font-size:.58em;}
 .unit .uname.xl,.unit:not(.facedown) .uname.xl{font-size:7px;line-height:1.05;}
+.unit.fa:not(.facedown) .uname{left:2%;right:2%;padding-left:20%;padding-right:20%;}   /* 2026-10-19: Full Art egységnél a 26%-os oldalmargó + a 22%-os belső margó összeszorította a nevet (Drog kereső kutya 3 sorban) */
 .card.foil:not(.big) .name.long{padding-left:17%;padding-right:17%;}
 
 /* ---------- Shiny pack ---------- */
@@ -2367,7 +2368,7 @@ body.pf-loading #scr-menu .pb-name::after{content:'';display:inline-block;width:
 <script src="vendor/firebase-auth-compat.js"></script>
 <script src="vendor/firebase-firestore-compat.js"></script>
 <script src="vendor/firebase-database-compat.js"></script>
-<script>window.APP_VERSION = "2026.10.19-1921"; window.APP_BUILD = "2026.10.19-1921";</script>
+<script>window.APP_VERSION = "2026.10.19-1921"; window.APP_BUILD = "2026.10.19-2056";</script>
 <script>// ===== Best of Us – saját szerver (Firebase) =====
 // A játék eredetileg a Claude-os tárolót használta (window.claude.use('db' | 'user' | 'room')).
 // Ez a fájl ugyanazt a felületet adja Firebase-ből, így a játék kódja szinte változatlan maradhat:

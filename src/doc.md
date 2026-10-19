@@ -463,6 +463,9 @@ Hősképesség-ötletek a táblázatban (még nem zöldek, nincsenek beépítve)
 ## Javítás: „Újabb ranked” → Mégse beragadás (2026-10-16)
 - Meccs után az „Újabb ranked” gomb a lezárt meccs képernyőjén indította a keresést; ha valaki „Mégse”-t nyomott, a lezárt táblán ragadt, és a zászló sem csinált semmit. Mostantól az „Újabb ranked” előbb a Ranked képernyőre visz, a keresés megszakítása lezárt meccsből a menübe visz, és lezárt meccsen a zászló is a menübe visz.
 
+## Javítás: Full Art lap neve a táblán (2026-10-19 20:54, Tomi)
+- A táblán a Full Art egységeknél egy későbbi CSS-szabály (26%-os oldalmargó) és a Full Art saját 22%-os belső margója együtt összeszorította a nevet – a „Drog kereső kutya” három sorba tört és rácsúszott a statokra. Full Art egységnél most csak a belső margó marad (`.unit.fa:not(.facedown) .uname`).
+
 ## Javítás: arany (és Kánon keretes) lap a packbontásban (2026-10-19 19:17, Tomi)
 - A packbontás felfordítható lapjainál a lapszélesség CSS-változója (`--fw`) ütközött az arany / Kánon keret ugyanilyen nevű változójával (keret-szélesség 115,5%) – az arany lap túl nagy lett, a neve és a szövege 1–2 px-es betűvel íródott ki (üres névtábla). A felfordítható lap változója mostantól `--flw` (shell.html). Ugyanez érintette volna a packból jövő Kánon lapot (Game Over) is.
 
