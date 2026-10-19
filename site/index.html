@@ -2372,7 +2372,7 @@ body.pf-loading #scr-menu .pb-name::after{content:'';display:inline-block;width:
 <script src="vendor/firebase-auth-compat.js"></script>
 <script src="vendor/firebase-firestore-compat.js"></script>
 <script src="vendor/firebase-database-compat.js"></script>
-<script>window.APP_VERSION = "2026.10.19-2118"; window.APP_BUILD = "2026.10.19-2118";</script>
+<script>window.APP_VERSION = "2026.10.19-2123"; window.APP_BUILD = "2026.10.19-2123";</script>
 <script>// ===== Best of Us – saját szerver (Firebase) =====
 // A játék eredetileg a Claude-os tárolót használta (window.claude.use('db' | 'user' | 'room')).
 // Ez a fájl ugyanazt a felületet adja Firebase-ből, így a játék kódja szinte változatlan maradhat:
@@ -5584,7 +5584,7 @@ function startMatch(heroId, deckId, opt = {}) {
   const lv = opt.ranked ? rkBotLv() : (opt.lv || botLvPref());   // bot-szint: rankedben a rangtól függ
   let botList = null; try { botList = botDeckFor(bh, lv); } catch (e) {}   // a bot paklija szintenként más, és meccsenként változik (2026-10-16)
   S = newGame(heroId, { ...mine }, bh, botList || bd, first, { mulligan: true, foils: [0, 1].map(k => k === ME ? myFoils(mine) : {}) }); S.events = [];
-  S.botLv = lv;
+  S.botLv = lv; S.myList = { ...mine };   /* Amsterdam-küldetésekhez: a pakli lapjai */
   if (lv === 4) { S.players[BOT].hp += 6; S.players[BOT].maxHp += 6; }   // Mester bot: nyílt előny, +6 élettel kezd (a VS képernyő kiírja)
   if (opt.ranked) { S.ranked = true; const r = ensureRank(Store.p); if (r) { r.pend = Date.now(); save(); } }   // ha bezárja az appot, vereségnek számít
   ui.sel = null; busy = true; ui.handSeen = null; ui.botHandN = null; ui.flying = new Set(); show('scr-game');
@@ -5668,7 +5668,7 @@ function endMatch() {
   const kill = S.killShot && S.reason !== 'time' ? `<span class="ko-why">🏁 Döntő csapás: ${S.killShot}</span>` : '';
   const aw = awardMatch(draw ? 'draw' : win ? 'win' : 'loss');
   if (S.ranked && !S.rkDone) { S.rkDone = true; S.rkRes = rankOnMatch(draw ? 'draw' : win ? 'win' : 'loss'); }
-  const qd = S.qDone ? [] : questsOnMatch({ win, hero: S.players[ME].heroId, ...(S.qs || { actions: 0, items: 0, chars: 0, locs: 0, big: 0, heroDmg: 0, kills: 0 }) });
+  const qd = S.qDone ? [] : questsOnMatch({ win, hero: S.players[ME].heroId, ah: ahCount(S.myList), ranked: !!S.ranked, ...(S.qs || { actions: 0, items: 0, chars: 0, locs: 0, big: 0, heroDmg: 0, kills: 0 }) });
   const px = S.qDone ? null : passOnMatch(draw ? 'draw' : win ? 'win' : 'loss', qd);
   if (!S.qDone) try { S.evRes = eventOnMatch({ win, ranked: !!S.ranked, lv: S.botLv || 2, hero: S.players[ME].heroId, ...(S.qs || { actions: 0, items: 0, chars: 0, locs: 0, big: 0, heroDmg: 0, kills: 0 }) }); } catch (e) {}
   S.qDone = true;
@@ -7179,6 +7179,30 @@ function ensureQuests(p) {
   return Q;
 }
 // meccs végén: a meccs statisztikái alapján halad; teljesítéskor azonnal jóváírja a jutalmat
+/* Amsterdam Hősei limitált küldetések (2026-10-19, Tomi): a megjelenéstől 2 hétig; egyenként 2 Amsterdam booster, az utolsó 5 */
+const AHQ_END = SET_RELEASE.ah + 14 * 864e5;
+const AHQ = [
+  { id: 'win1',   t: 'Nyerj 1 meccset', goal: 1, f: m => m.win ? 1 : 0 },
+  { id: 'play3',  t: 'Játssz 1 meccset legalább 3 Amsterdam Hősei lappal a paklidban', goal: 1, f: m => m.ah >= 3 ? 1 : 0 },
+  { id: 'dmg100', t: 'Okozz összesen 100 sebzést az ellenfél hősének', goal: 100, f: m => m.heroDmg || 0 },
+  { id: 'win3',   t: 'Nyerj 1 meccset legalább 3 Amsterdam Hősei lappal a paklidban', goal: 1, f: m => m.win && m.ah >= 3 ? 1 : 0 },
+  { id: 'rk',     t: 'Nyerj 1 ranked meccset', goal: 1, f: m => m.win && m.ranked ? 1 : 0 },
+  { id: 'fr',     t: 'Játssz egy PvP meccset egy barátod ellen', goal: 1, f: m => m.friend ? 1 : 0 },
+  { id: 'play10', t: 'Játssz 1 meccset legalább 10 Amsterdam Hősei lappal a paklidban', goal: 1, f: m => m.ah >= 10 ? 1 : 0 },
+  { id: 'all',    t: 'Teljesítsd az összes Amsterdam Hősei küldetést', goal: 7, all: true, rew: 5 },
+];
+const ahqLive = () => setLive('ah') && Date.now() < AHQ_END;
+const ahCount = list => Object.entries(list || {}).reduce((a, [id, n]) => a + (CARD[id]?.set === 'ah' ? n : 0), 0);
+function ahqState(p) { p.ahq = p.ahq || { prog: {}, done: [] }; return p.ahq; }
+function ahqOnMatch(m, got) {   /* a meccs végén: haladás + jutalom (azonnal jóváírva, mint a napi küldetésnél) */
+  const p = Store.p; if (!p || !ahqLive()) return;
+  const st = ahqState(p);
+  const finish = q => { st.done.push(q.id); const n = q.rew || 2; p.ahPacks = (p.ahPacks || 0) + n; got.push({ txt: q.t, rew: `${n} Amsterdam booster`, ah: true }); };
+  for (const q of AHQ) { if (q.all || st.done.includes(q.id)) continue;
+    st.prog[q.id] = Math.min(q.goal, (st.prog[q.id] || 0) + (q.f(m) || 0)); if (st.prog[q.id] >= q.goal) finish(q); }
+  const fin = AHQ.find(q => q.all); st.prog.all = AHQ.filter(q => !q.all && st.done.includes(q.id)).length;
+  if (!st.done.includes(fin.id) && st.prog.all >= fin.goal) finish(fin);
+}
 function questsOnMatch(m) {
   const p = Store.p; if (!p) return [];
   const Q = ensureQuests(p), got = [];
@@ -7190,6 +7214,7 @@ function questsOnMatch(m) {
   /* 2026-10-19 19:00-tól (Tomi): a napi küldetés Amsterdam packot, a heti Amsterdam Shiny packot ad */
   for (const q of Q.daily) step(Q_DAILY, q, () => { if (setLive('ah')) p.ahPacks = (p.ahPacks || 0) + 1; else p.giftPacks = (p.giftPacks || 0) + 1; });
   step(Q_WEEKLY, Q.weekly, () => { if (setLive('ah')) p.ahShinyPacks = (p.ahShinyPacks || 0) + 1; else p.shinyPacks = (p.shinyPacks || 0) + 1; });
+  try { ahqOnMatch(m, got); } catch (e) {}
   save(); renderQuestBadge();
   return got;
 }
@@ -7207,12 +7232,17 @@ function renderQuests() {
       <div class="q-rew">${q.done ? '<span class="q-ok">✓</span>' : ''}${rew}</div></div>`; };
   const now = new Date(), mid = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
   const hrs = ms => { const h = Math.floor(ms / 3600000), m = Math.floor(ms % 3600000 / 60000); return h >= 24 ? `${Math.floor(h / 24)} nap ${h % 24} óra` : `${h} óra ${m} perc`; };
-  $('#questBody').innerHTML = `
+  const st = ahqState(p), ahRow = q => { const pr = st.prog[q.id] || 0, dn = st.done.includes(q.id);
+    return `<div class="q-row ah${q.all ? ' weekly' : ' daily'}${dn ? ' done' : ''}"><div class="q-main"><b>${q.t}</b>
+      <div class="q-bar"><i style="width:${Math.min(100, pr / q.goal * 100)}%"></i><span>${Math.min(pr, q.goal)}/${q.goal}</span></div></div>
+      <div class="q-rew">${dn ? '<span class="q-ok">✓</span>' : ''}<span class="q-pack ah"></span><em>${q.rew || 2} Amsterdam</em></div></div>`; };
+  const ahBlock = ahqLive() ? `<div class="lbl">🌷 Amsterdam Hősei – limitált küldetések <small>· még ${hrs(AHQ_END - now)}</small></div>${AHQ.map(ahRow).join('')}` : '';
+  $('#questBody').innerHTML = `${ahBlock}
     <div class="lbl">Napi küldetések <small>· új feladatok ${hrs(mid - now)} múlva</small></div>
     ${Q.daily.map(q => row(Q_DAILY, q, setLive('ah') ? '<span class="q-pack ah"></span><em>1 Amsterdam</em>' : '<span class="q-pack"></span><em>1 pack</em>', 'daily')).join('')}
     <div class="lbl">Heti küldetés <small>· hétfő 0:01-kor frissül (${hrs(weekEnds() - now)})</small></div>
     ${row(Q_WEEKLY, Q.weekly, setLive('ah') ? '<span class="q-pack shiny ah"></span><em>1 Amsterdam Shiny</em>' : '<span class="q-pack shiny"></span><em>1 Shiny</em>', 'weekly')}
-    <p class="q-note">A haladás meccs végén számít (a bot elleni meccseken). A jutalom teljesítéskor azonnal jóváíródik, a Boosterek menüben bonthatod ki.</p>`;
+    <p class="q-note">A haladás meccs végén számít${ahqLive() ? ' (az Amsterdam-küldetéseknél a PvP és a ranked meccs is)' : ' (a bot elleni meccseken)'}. A jutalom teljesítéskor azonnal jóváíródik, a Boosterek menüben bonthatod ki.</p>`;
 }
 
 // ---- Season Pass (ingyenes) ----
@@ -7304,7 +7334,7 @@ function passOnMatch(result, quests) {
   const s = curSeason(); if (!s) return null;
   const P = ensurePass(p), before = passLevel(P.xp);
   let gain = PASS_XP[result] || 0;
-  for (const q of quests) gain += q.weekly ? PASS_XP.weekly : PASS_XP.daily;
+  for (const q of quests) { if (q.ah) continue; gain += q.weekly ? PASS_XP.weekly : PASS_XP.daily; }   /* az Amsterdam-küldetés nem ad XP-t */
   P.xp += gain; save(); renderPassBadge();
   const lv = passLevel(P.xp);
   return { gain, lv, up: lv > before, inLv: P.xp % PASS_XP.perLevel };
@@ -8124,7 +8154,7 @@ function pvpEnter(id, fresh) {
   { const mine = side === 0 ? d.host : d.guest; if (mine?.deckId && d.status === 'mull') loanUse(mine.deckId, 'pvp:' + id); }   /* kölcsönpakli-számláló */
   ME = side; BOT = 1 - side;
   PVP.id = id; PVP.v = d.v; PVP.queue = []; PVP.running = false;
-  S = { ...JSON.parse(JSON.stringify(d.state)), events: [], pvp: { id, side, live: !!d.live, ranked: !!d.ranked } };
+  S = { ...JSON.parse(JSON.stringify(d.state)), events: [], pvp: { id, side, live: !!d.live, ranked: !!d.ranked, list: (side === 0 ? d.host : d.guest)?.list || {}, opp: (side === 0 ? d.guest : d.host)?.uid || null } };
   PVP.turnAt = d.turnAt || Date.now(); PVP.afk = d.afk || [0, 0];
   pvpJoinRoom(id, side); pvpPresence();
   ui.sel = null; ui.pend = null; busy = false; ui.handSeen = null; ui.botHandN = null; ui.flying = new Set();
@@ -8253,7 +8283,8 @@ function pvpEndMatch() {
   if (!p.pvpSeen.includes(id)) {   // a jutalom meccsenként egyszer jár
     p.pvpSeen = [...p.pvpSeen.slice(-40), id];
     const aw = awardMatch(draw ? 'draw' : win ? 'win' : 'loss');
-    const qd = questsOnMatch({ win, hero: S.players[ME].heroId, ...(S.qs || { actions: 0, items: 0, chars: 0, locs: 0, big: 0, heroDmg: 0, kills: 0 }) });
+    const fr = (typeof frOn === 'function' && frOn()) && FR.list.some(d => d.status === 'accepted' && frOther(d) === S.pvp.opp);
+    const qd = questsOnMatch({ win, hero: S.players[ME].heroId, ah: ahCount(S.pvp.list), ranked: !!S.pvp.ranked, friend: !!fr, ...(S.qs || { actions: 0, items: 0, chars: 0, locs: 0, big: 0, heroDmg: 0, kills: 0 }) });
     const px = passOnMatch(draw ? 'draw' : win ? 'win' : 'loss', qd);
     try { S.evRes = eventOnMatch({ win, pvp: true, ranked: !!S.pvp.ranked, lv: S.pvp.ranked ? 3 : 0, hero: S.players[ME].heroId, ...(S.qs || { actions: 0, items: 0, chars: 0, locs: 0, big: 0, heroDmg: 0, kills: 0 }) }); } catch (e) {}
     p.pvp = p.pvp || { w: 0, l: 0, d: 0 }; p.pvp[win ? 'w' : draw ? 'd' : 'l']++; save();
