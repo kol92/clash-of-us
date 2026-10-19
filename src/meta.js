@@ -2901,17 +2901,42 @@ async function frTradeModal(uid) {
   const sortC = a => a.sort((x, y) => (x.foil === y.foil ? 0 : x.foil ? -1 : 1) || RAR_ORDER[CARD[x.id].rarity] - RAR_ORDER[CARD[y.id].rarity] || CARD[x.id].cost - CARD[y.id].cost);
   sortC(theirs);
   const o = document.createElement('div'); o.className = 'overlay fr-trade';
-  const grid = (arr, pick) => arr.length ? `<div class="tr-grid">${arr.map((c, i) => `<button class="tr-c" data-${pick}="${i}">${cardHTML(c.id, { foil: c.foil })}<span class="tr-n">×${c.k}${pick === 'w' && owned(c.id) ? ` · neked ${owned(c.id)}` : ''}</span></button>`).join('')}</div>` : '';
+  /* szűrés + keresés a cserében (2026-10-19, Tomi): név/szöveg, szett, fajta, ritkaság, Full Art – lépésenként külön */
+  const TF = { q: '', set: '', type: '', rar: '', fa: '' };
+  const tfOk = c => { const C = CARD[c.id];
+    return (!TF.q || cfNorm(C.name + ' ' + (C.text || '')).includes(cfNorm(TF.q))) && (!TF.set || cardSet(C) === TF.set) && (!TF.type || C.type === TF.type)
+      && (!TF.rar || C.rarity === TF.rar) && (!TF.fa || (TF.fa === 'fa') === !!c.foil); };
+  const tfBar = rar => { const ch = (g, v, t) => `<button class="cf-chip${TF[g] === v ? ' on' : ''}" data-tf="${g}" data-v="${v}" aria-pressed="${TF[g] === v}">${t}</button>`;
+    return `<div class="tr-filt"><label class="cf-search"><span class="sr-only">Keresés</span><input class="tr-q" type="search" placeholder="Keresés…" value="${escH(TF.q)}" autocomplete="off"></label>
+      <div class="cf-row">${cfSets().map(([k, n]) => ch('set', k, `<span class="lbl-t">${k === 'hw' ? '🎃 ' : k === 'ah' ? '🌷 ' : ''}${k === 'ah' ? 'Amsterdam' : n}</span>`)).join('')}</div>
+      <div class="cf-row">${CF_TYPES.map(([k, n]) => ch('type', k, `<img src="art/ui/ic-type-${k}.webp" alt=""><span class="lbl-t">${n}</span>`)).join('')}</div>
+      ${rar ? `<div class="cf-row">${['k', 'r', 'e', 'l'].map(k => ch('rar', k, `<i class="rar r-${k}" aria-label="${RAR[k]}"></i>`)).join('')}${ch('fa', 'n', '<span class="lbl-t">Sima</span>')}${ch('fa', 'fa', '<span class="lbl-t">Full Art</span>')}</div>` : ''}</div>`; };
+  const tfReset = () => { TF.q = TF.set = TF.type = TF.rar = TF.fa = ''; };
+  const cell = (c, i, pick) => `<button class="tr-c" data-${pick}="${i}">${cardHTML(c.id, { foil: c.foil })}<span class="tr-n">×${c.k}${pick === 'w' && owned(c.id) ? ` · neked ${owned(c.id)}` : ''}</span></button>`;
+  const grid = (arr, pick, extra) => { const v = arr.map((c, i) => [c, i]).filter(([c]) => tfOk(c)), x = (extra || []).filter(tfOk);
+    if (!v.length && !x.length) return `<div class="tr-grid"><p class="q-note tr-none">${arr.length ? 'Nincs a szűrésnek megfelelő lap.' : pick === 'w' ? 'Neki még nincs cserélhető lapja.' : ''}</p></div>`;
+    return `<div class="tr-grid">${v.map(([c, i]) => cell(c, i, pick)).join('')}${x.map(c => `<div class="tr-c tr-off">${cardHTML(c.id, { foil: c.foil })}<span class="tr-n">${RAR[CARD[c.id].rarity]} – ezért nem adható</span></div>`).join('')}</div>`; };
+  const tfWire = (arr, pick, extra) => { const box = o.querySelector('.tr-box'), q = box.querySelector('.tr-q');
+    const re = () => { box.querySelector('.tr-grid').outerHTML = grid(arr, pick, extra && TF.q ? extra : null); };
+    q.oninput = () => { TF.q = q.value.trim(); re(); };
+    box.querySelector('.tr-filt').onclick = e => { const b = e.target.closest('[data-tf]'); if (!b) return; e.stopPropagation();
+      TF[b.dataset.tf] = TF[b.dataset.tf] === b.dataset.v ? '' : b.dataset.v;
+      box.querySelectorAll(`[data-tf="${b.dataset.tf}"]`).forEach(x => { const on = TF[x.dataset.tf] === x.dataset.v; x.classList.toggle('on', on); x.setAttribute('aria-pressed', on); }); re(); }; };
   const step1 = () => {
     o.innerHTML = `<div class="modal tr-box"><h3>${escH(name)} lapjai – melyiket kéred?</h3><p class="live">Csak azonos ritkaságú lapot adhatsz érte, Full Artot Full Artért. Naponta egy csere.</p>
-      ${grid(theirs, 'w') || '<p class="q-note">Neki még nincs cserélhető lapja.</p>'}<button class="btn" data-x>Mégse</button></div>`;
+      ${theirs.length ? tfBar(true) : ''}${grid(theirs, 'w')}<button class="btn" data-x>Mégse</button></div>`;
+    if (theirs.length) tfWire(theirs, 'w');
   };
   let want = null;
   const step2 = () => {
     const mine = []; for (const [id, e] of Object.entries(Store.p.coll)) { if (!tradable(id) || id === want.id || CARD[id].rarity !== CARD[want.id].rarity) continue; const k = want.foil ? e.f : e.n; if (k > 0) mine.push({ id, foil: want.foil, k }); }
     sortC(mine); o._mine = mine;
-    o.innerHTML = `<div class="modal tr-box"><h3>Mit adsz érte?</h3><div class="tr-want">${cardHTML(want.id, { foil: want.foil })}<span>${RAR[CARD[want.id].rarity]}${want.foil ? ' · Full Art' : ''}</span></div>
-      ${grid(mine, 'g') || `<p class="q-note">Nincs olyan ${want.foil ? 'Full Art ' : ''}${RAR[CARD[want.id].rarity].toLowerCase()} lapod, amit adhatnál érte.</p>`}<button class="btn" data-back1>Vissza</button></div>`;
+    /* kereséskor a többi (más ritkaságú / nem Full Art) lapod is látszik, szürkén, hogy kiderüljön, miért nem adható */
+    const off = []; for (const [id, e] of Object.entries(Store.p.coll)) { if (!tradable(id) || id === want.id || mine.some(m => m.id === id)) continue; const k = want.foil ? e.f : e.n; if (k > 0) off.push({ id, foil: want.foil, k }); }
+    tfReset();
+    o.innerHTML = `<div class="modal tr-box"><h3>Mit adsz érte?</h3><div class="tr-want">${cardHTML(want.id, { foil: want.foil })}<span>${RAR[CARD[want.id].rarity]}${want.foil ? ' · Full Art' : ''} – csak ${want.foil ? 'Full Art ' : ''}${RAR[CARD[want.id].rarity].toLowerCase()} lapot adhatsz érte</span></div>
+      ${mine.length ? tfBar(false) + grid(mine, 'g') : `<p class="q-note">Nincs olyan ${want.foil ? 'Full Art ' : ''}${RAR[CARD[want.id].rarity].toLowerCase()} lapod, amit adhatnál érte.</p>`}<button class="btn" data-back1>Vissza</button></div>`;
+    if (mine.length) tfWire(mine, 'g', off);
   };
   const step3 = give => {
     const inDeck = (Store.p.decks || []).some(d => d.list[give.id] && d.list[give.id] >= owned(give.id));
@@ -2926,7 +2951,7 @@ async function frTradeModal(uid) {
     const b = e.target.closest('button'); if (e.target === o || (b && b.hasAttribute('data-x'))) return o.remove(); if (!b) return;
     if (b.dataset.w != null) { want = theirs[+b.dataset.w]; return step2(); }
     if (b.dataset.g != null) return step3(o._mine[+b.dataset.g]);
-    if (b.hasAttribute('data-back1')) return step1();
+    if (b.hasAttribute('data-back1')) { tfReset(); return step1(); }
     if (b.hasAttribute('data-back2')) return step2();
     if (b.hasAttribute('data-send')) { b.disabled = true; o.remove(); await frOffer(uid, { id: want.id, foil: want.foil }, o._give); }
   };
