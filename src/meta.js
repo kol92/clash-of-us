@@ -1064,7 +1064,24 @@ function deckProblem(list, hero, loan) {   /* loan: szett-kezdőpakli – kölcs
   for (const id of Object.keys(list)) if (CARD[id].hero && list[id] > 0 && CARD[id].hero !== hero) return `${CARD[id].name}: csak ${HERO[CARD[id].hero].name} paklijába`;
   return null;
 }
-const deckIssue = d => deckProblem(d.list, d.hero || null, !!(d.starter && d.set));
+/* Kölcsönpakli (szett-kezdőpakli, 2026-10-19, Tomi): paklinként 3 meccs, utána lejár */
+const LOAN_MAX = 3;
+const isLoan = d => !!(d && d.starter && d.set);
+const loanLeft = d => LOAN_MAX - ((Store.p?.loan || {})[d.id] || 0);
+const deckIssue = d => isLoan(d) && loanLeft(d) <= 0 ? 'lejárt a kölcsönpakli' : deckProblem(d.list, d.hero || null, isLoan(d));
+function loanUse(deckId, matchKey) {   /* meccs indulásakor számol (kilépéssel sem lehet megúszni); matchKey: PvP-ben meccsenként egyszer */
+  const p = Store.p, d = allDecks().find(x => x.id === deckId); if (!p || !isLoan(d)) return;
+  if (matchKey) { p.loanM = p.loanM || []; if (p.loanM.includes(matchKey)) return; p.loanM = [...p.loanM.slice(-20), matchKey]; }
+  p.loan = { ...(p.loan || {}), [d.id]: ((p.loan || {})[d.id] || 0) + 1 }; save();
+  const left = loanLeft(d);
+  setTimeout(() => toast(left > 0 ? `🌷 Kölcsönpakli: még ${left} meccs ezzel a paklival` : '🌷 Ez az utolsó kölcsönmeccs ezzel a paklival!'), 1200);
+}
+function loanOutModal() {
+  const o = document.createElement('div'); o.className = 'overlay';
+  o.innerHTML = `<div class="modal"><h3>🌷 Ezek csak kölcsön paklik voltak!</h3><p class="live">Az Amsterdam Hősei kezdőpaklikat ${LOAN_MAX}-${LOAN_MAX} meccsig próbálhattad ki. Gyűjtsd össze a lapjaikat <b>Amsterdam packokból</b>, és rakd össze a saját változatodat a <b>Paklik</b> menüben (a kölcsönpaklit megnyitva a <b>Másolat</b> gombbal ki is indulhatsz belőle).</p><button class="btn primary" data-x>Értem</button></div>`;
+  o.onclick = e => { if (e.target.closest('[data-x]') || e.target === o) o.remove(); };
+  $('#layer').appendChild(o);
+}
 function heroPortrait(hid, cls = '') {
   const h = HERO[hid];
   if (!h) return `<span class="hp-img empty ${cls}">?</span>`;
@@ -1078,7 +1095,7 @@ function renderDecks() {
       const prob = deckIssue(d), h = HERO[d.hero];
       return `<button class="deck-card" data-deck="${d.id}">
         ${heroPortrait(d.hero, 'dc-hero')}
-        <span class="dc-txt"><b></b><em>${h ? h.name : 'Nincs hős'}</em><small>${d.starter ? 'Kezdőpakli · nem szerkeszthető' : prob ? prob : 'Játékra kész'}</small></span>
+        <span class="dc-txt"><b></b><em>${h ? h.name : 'Nincs hős'}</em><small>${isLoan(d) ? (loanLeft(d) > 0 ? `🌷 Kölcsönpakli · még ${loanLeft(d)} meccs` : '🌷 Kölcsönpakli · lejárt') : d.starter ? 'Kezdőpakli · nem szerkeszthető' : prob ? prob : 'Játékra kész'}</small></span>
         <span class="dc-go">${d.starter ? 'Megnéz' : 'Szerkeszt'}</span></button>`;
     }).join('')}</div>`;
   $('#decksBody').querySelectorAll('.deck-card').forEach((b, i) => b.querySelector('b').textContent = ds[i].name);
@@ -1872,9 +1889,9 @@ function ahNewsCheck() {
   p.news.push(key); save();
   const o = document.createElement('div'); o.className = 'overlay';
   o.innerHTML = `<div class="modal acct-box ah-news">
-    <p class="ah-news-t">${live ? 'Megérkezett a Best of Us TCG első tematikus miniszettje: az „Amsterdam Hősei”!' : 'A Best of Us TCG első tematikus miniszettje, az „Amsterdam Hősei” hétfőn érkezik 19:00 órakor!'}</p>
+    <p class="ah-news-t">${live ? 'Megérkezett a Best of Us TCG első tematikus miniszettje: az „Amsterdam Hősei”!' : `A Best of Us TCG első tematikus miniszettje, az „Amsterdam Hősei” ${new Date(SET_RELEASE.ah).toDateString() === new Date().toDateString() ? 'ma' : 'hétfőn'} érkezik 19:00 órakor!`}</p>
     <div class="ah-news-packs"><img src="art/ui/pack-ah.webp" alt="Amsterdam Hősei booster"><img src="art/ui/pack-ahshiny.webp" alt="Amsterdam Hősei Shiny booster"></div>
-    ${live ? `<p class="live">26 új lap, két új képesség (Igézhetetlen, Feltámadás), és saját booster a Boltban.</p><button class="btn primary" data-shop>Irány a Bolt</button><button class="btn ghost" data-x>Később</button>` : '<button class="btn primary" data-x>Alig várom!</button>'}</div>`;
+    ${live ? `<p class="live">26 új lap, két új képesség (Igézhetetlen, Feltámadás), saját booster a Boltban – és minden hősnek egy Amsterdam kölcsönpakli, amit ${LOAN_MAX} meccsig kipróbálhatsz.</p><button class="btn primary" data-shop>Irány a Bolt</button><button class="btn ghost" data-x>Később</button>` : '<button class="btn primary" data-x>Alig várom!</button>'}</div>`;
   o.onclick = ev => { if (ev.target.closest('[data-shop]')) { o.remove(); renderShop(); show('scr-shop'); return; }
     if (ev.target.closest('[data-x]') || ev.target === o) { o.remove(); setTimeout(() => { try { chestPopup(); } catch (er) {} }, 200); } };
   $('#layer').appendChild(o);
@@ -2267,7 +2284,7 @@ function renderPvp() {
 function pvpPickDeck(title, done, opt = {}) {   // ugyanaz a pakliválasztó képernyő, mint a bot elleni meccsnél
   openDeckPick({ title: title.replace(/<[^>]*>/g, ''), note: opt.note || 'Válaszd ki, melyik paklival játszol. A hőst a pakli határozza meg.', btn: opt.btn || 'Ezzel játszom', done, ...opt });
 }
-const pvpMe = dk => ({ ver: window.APP_VERSION || '', uid: Store.uid, name: Store.p.name || 'Játékos', hero: dk.hero, deckName: dk.name, list: { ...dk.list },
+const pvpMe = dk => ({ ver: window.APP_VERSION || '', uid: Store.uid, name: Store.p.name || 'Játékos', hero: dk.hero, deckName: dk.name, deckId: dk.id || null, list: { ...dk.list },
   cos: { back: myBack(), heroGold: heroSkin(dk.hero) === 'gold', heroFa: heroSkin(dk.hero) === 'fa', port: isPort(heroSkin(dk.hero)) ? heroSkin(dk.hero) : null, foils: Object.keys(dk.list).filter(id => ownsFoil(id)), foilN: myFoils(dk.list) } });   // amit az ellenfél is lát: Full Art hős és lapok
 async function pvpCreate(dk) {
   try { await Store.db.collection('pvp').add({ parts: [Store.uid], status: 'open', created: Date.now(), updated: Date.now(), host: pvpMe(dk), guest: null, v: 0 }); toast('Kihívás létrehozva – szólj a haveroknak!'); }
@@ -2299,6 +2316,7 @@ async function pvpJoin(id, dk) {
 function pvpEnter(id, fresh) {
   const d = fresh || PVP.list.find(x => x.id === id); if (!d || !d.state) { toast('Betöltés…'); return; }
   const side = pvpSideOf(d);
+  { const mine = side === 0 ? d.host : d.guest; if (mine?.deckId && d.status === 'mull') loanUse(mine.deckId, 'pvp:' + id); }   /* kölcsönpakli-számláló */
   ME = side; BOT = 1 - side;
   PVP.id = id; PVP.v = d.v; PVP.queue = []; PVP.running = false;
   S = { ...JSON.parse(JSON.stringify(d.state)), events: [], pvp: { id, side, live: !!d.live, ranked: !!d.ranked } };
