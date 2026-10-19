@@ -64,7 +64,7 @@ const CARDS = [
   { id:'i_vodkakancso', drink:true, type:'item', name:'Vodka Kancsó', cost:3, atk:4, hp:0, rarity:'r', muscle:true, hangover:true, text:'Utána a következő körödben a karakter bénult: nem támad, és nem üt vissza.' },
   { id:'i_bunda', type:'item', name:'Fehér szarvas bunda', cost:2, atk:0, hp:3, rarity:'r', taunt:true, text:'Gál Zoli benne nem pusztul el a támadása után, és Pajzsot is kap.' },
   // ===== Amsterdam hősei (első mini-szett, set:'ah', 2026-10-16 – csak a teszt ágon) =====
-  { id:'i_gomba', set:'ah', type:'item', name:'Varázsgomba', cost:1, atk:0, hp:0, rarity:'k', gomba:true, text:'+1/+1. Minden további Varázsgomba ugyanazon a karakteren eggyel többet ad: a második +2/+2, a harmadik +3/+3…' },
+  { id:'i_gomba', set:'ah', type:'item', name:'Varázsgomba', cost:1, atk:0, hp:0, rarity:'k', gomba:true, text:'+1/+1. Minden Varázsgomba, amit ebben a meccsben kijátszol, eggyel többet ad az előzőnél: a második +2/+2, a harmadik +3/+3… – bármelyik karakteredre teszed.' },
   { id:'i_cigi', set:'ah', type:'item', name:'Cigi', cost:1, tgt:'enemy', rarity:'k', cigi:true, text:'Egy ellenséges karakterre teszed: −1/−1. Az élete ettől nem mehet 1 alá.' },
   { id:'a_irkave', set:'ah', type:'action', name:'Ír kávé', cost:1, tgt:'own', rarity:'k', text:'Egy saját karaktered Pajzsot kap.' },
   { id:'a_suti', set:'ah', type:'action', name:'Süti', cost:1, tgt:'enemy', rarity:'k', text:'Egy ellenséges karakter elveszíti minden kulcsszavát (Lendület, Provokáció, Pajzs, Izom, Sunyulás, Láthatatlan, Igézhetetlen, Feltámadás).' },
@@ -549,12 +549,13 @@ function playCard(s, pi, hi, t) {
     const hp = (c.hp || 0) + (has(p, 'itemHp') ? 1 : 0);
     u.atk += c.atk || 0; u.hp += hp; u.maxHp += hp;
     if (c.shield) u.shield = true; if (c.haste) u.haste = true; if (c.doom) u.doom = true; if (c.muscle) u.muscle = true; if (c.hangover) u.hangover = true; if (c.taunt) u.taunt = true;
-    if (c.gomba) {   /* Varázsgomba: annyit ad, ahányadik gomba ezen a karakteren */
-      const n = u.items.filter(x => CARD[x] && CARD[x].gomba).length + 1;
-      u.atk += n; u.hp += n; u.maxHp += n;
+    let gn = 0;
+    if (c.gomba) {   /* Varázsgomba (2026-10-19, Tomi pontosítása): annyit ad, ahányadik gombát játszod ki ebben a meccsben – bármelyik karakterre */
+      gn = p.gombaN = (p.gombaN || 0) + 1;
+      u.atk += gn; u.hp += gn; u.maxHp += gn; u.gombaB = (u.gombaB || 0) + gn;
     }
     u.items.push(c.id);
-    ev(s, { t:'buff', side:pi, i:t.i, n: c.gomba ? u.items.filter(x => CARD[x] && CARD[x].gomba).length : undefined });
+    ev(s, { t:'buff', side:pi, i:t.i, n: c.gomba ? gn : undefined });
     // Fehér szarvas bunda Gál Zolin: Pajzsot is kap (2026-10-12)
     if (c.elusive) u.elusive = true;   /* Vodkása: Igézhetetlen */
     if (c.id === 'i_vodkasa' && bid(u.id) === 'c_tzs' && !u.shield) { u.shield = true; ev(s, { t:'boon', side:pi, i:t.i, b:'shield' }); }
@@ -694,7 +695,7 @@ function playCard(s, pi, hi, t) {
           if (!own.length) return;
           reveal(s, ei, i);
           const base = CARD[u.id];
-          const gm = own.filter(id => CARD[id].gomba).length, gb = gm * (gm + 1) / 2;   /* Varázsgombák: 1+2+…+n */
+          const gb = own.some(id => CARD[id].gomba) ? (u.gombaB || 0) : 0; if (gb) u.gombaB = 0;   /* a rajta lévő gombák összesen ennyit adtak */
           if (gb) { u.atk = Math.max(0, u.atk - gb); u.maxHp = Math.max(1, u.maxHp - gb); u.hp = Math.max(1, Math.min(u.hp, u.maxHp)); }
           for (const id of own) {
             const c = CARD[id], hp = (c.hp || 0) + (has(e, 'itemHp') ? 1 : 0);

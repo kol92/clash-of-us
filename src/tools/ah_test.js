@@ -23,6 +23,13 @@ ok(rc('k') === 13 && rc('r') === 6 && rc('e') === 4 && rc('l') === 3, `ritkaság
   play(s, 0, 'i_gomba', { k: 'unit', side: 0, i: 1 }); ok(u.atk === 9 && u.hp === 10, 'Varázsgomba #3: +3/+3 (9/10)');
   s.active = 1; play(s, 1, 'a_stop', { k: 'none' });
   ok(u.atk === 3 && u.maxHp === 4, `STOP leszedi a gombákat a halmozott bónusszal együtt (${u.atk}/${u.maxHp})`); }
+// --- Varázsgomba (2026-10-19): a számláló a meccsre szól, nem a karakterre ---
+{ const s = G(); const a = U(s, 0, 0, 'c_vajda'), b = U(s, 0, 1, 'c_gyuri');
+  play(s, 0, 'i_gomba', { k: 'unit', side: 0, i: 0 }); ok(a.atk === 4, '1. gomba Vajdára: +1/+1');
+  play(s, 0, 'i_gomba', { k: 'unit', side: 0, i: 1 }); ok(b.atk === 4 && b.hp === 4, `2. gomba egy MÁSIK karakterre is +2/+2 (Gyuri ${b.atk}/${b.hp})`);
+  play(s, 0, 'i_gomba', { k: 'unit', side: 0, i: 0 }); ok(a.atk === 7 && a.hp === 8, `3. gomba +3/+3 (Vajda ${a.atk}/${a.hp})`);
+  s.active = 1; play(s, 1, 'a_stop', { k: 'none' });
+  ok(a.atk === 3 && a.maxHp === 4 && b.atk === 2 && b.maxHp === 2, `STOP pontosan a kapott gomba-bónuszt veszi le (${a.atk}/${a.maxHp}, ${b.atk}/${b.maxHp})`); }
 // --- Cigi ---
 { const s = G(); const u = U(s, 1, 0, 'c_pifti'); play(s, 0, 'i_cigi', { k: 'unit', side: 1, i: 0 });
   ok(u.atk === 1 && u.hp === 1, `Cigi: −1/−1, de 1 alá nem (Pifti ${u.atk}/${u.hp})`);

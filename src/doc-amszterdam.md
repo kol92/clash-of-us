@@ -37,7 +37,7 @@
 
 **Eszközök**
 - **Börtönlánc** (i_lanc) · 2 · ritka · ellenséges karakterre teszed; a karakter a gazdája minden körének elején 1 sebzést kap (láncanként). Igézhetetlenre is rátehető (eszköz). A STOP nem szedi le (az az ellenfél eszközeit veszi le a saját karaktereiről, ez pedig a te eszközöd).
-- **Varázsgomba** (i_gomba) · 1 · gyakori · +1/+1; minden további gomba ugyanazon a karakteren eggyel többet ad (2. +2/+2, 3. +3/+3…). A STOP a halmozott bónuszt is leveszi.
+- **Varázsgomba** (i_gomba) · 1 · gyakori · +1/+1; minden további gomba ugyanazon a karakteren eggyel többet ad (2. +2/+2, 3. +3/+3…). A STOP a halmozott bónuszt is leveszi. **(2026-10-19 pontosítva: a számláló a meccsre szól – minden kijátszott gomba után a következő eggyel többet ad, bármelyik karakterre.)**
 - **Cigi** (i_cigi) · 1 · gyakori · ellenséges karakterre: −1/−1, az élete ettől nem mehet 1 alá
 
 **Akciók**

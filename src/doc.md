@@ -463,6 +463,10 @@ Hősképesség-ötletek a táblázatban (még nem zöldek, nincsenek beépítve)
 ## Javítás: „Újabb ranked” → Mégse beragadás (2026-10-16)
 - Meccs után az „Újabb ranked” gomb a lezárt meccs képernyőjén indította a keresést; ha valaki „Mégse”-t nyomott, a lezárt táblán ragadt, és a zászló sem csinált semmit. Mostantól az „Újabb ranked” előbb a Ranked képernyőre visz, a keresés megszakítása lezárt meccsből a menübe visz, és lezárt meccsen a zászló is a menübe visz.
 
+## Varázsgomba pontosítva (2026-10-19, Tomi)
+- A számláló a **meccsre** szól, nem a karakterre: minden Varázsgomba, amit kijátszol, eggyel többet ad az előzőnél (1. +1/+1, 2. +2/+2, 3. +3/+3…), bármelyik karakteredre teszed (`p.gombaN`; a karakteren kapott összeg `u.gombaB`, a STOP pontosan ezt veszi le). Új lapszöveg: „+1/+1. Minden Varázsgomba, amit ebben a meccsben kijátszol, eggyel többet ad az előzőnél: a második +2/+2, a harmadik +3/+3… – bármelyik karakteredre teszed.”
+- Mérés: kezdőpaklikban 48,5% → 48,9%; a Varázsgombák (Tomi) Amsterdam-pakli 54,1% a régi, 50,0% az Amsterdam-paklik ellen. Teszt: `tools/ah_test.js`.
+
 ## Javítás: Full Art lap neve a táblán (2026-10-19 20:54, Tomi)
 - A táblán a Full Art egységeknél egy későbbi CSS-szabály (26%-os oldalmargó) és a Full Art saját 22%-os belső margója együtt összeszorította a nevet – a „Drog kereső kutya” három sorba tört és rácsúszott a statokra. Full Art egységnél most csak a belső margó marad (`.unit.fa:not(.facedown) .uname`).
 
