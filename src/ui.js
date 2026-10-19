@@ -1719,7 +1719,7 @@ function startMatch(heroId, deckId, opt = {}) {
   const lv = opt.ranked ? rkBotLv() : (opt.lv || botLvPref());   // bot-szint: rankedben a rangtól függ
   let botList = null; try { botList = botDeckFor(bh, lv); } catch (e) {}   // a bot paklija szintenként más, és meccsenként változik (2026-10-16)
   S = newGame(heroId, { ...mine }, bh, botList || bd, first, { mulligan: true, foils: [0, 1].map(k => k === ME ? myFoils(mine) : {}) }); S.events = [];
-  S.botLv = lv;
+  S.botLv = lv; S.myList = { ...mine };   /* Amsterdam-küldetésekhez: a pakli lapjai */
   if (lv === 4) { S.players[BOT].hp += 6; S.players[BOT].maxHp += 6; }   // Mester bot: nyílt előny, +6 élettel kezd (a VS képernyő kiírja)
   if (opt.ranked) { S.ranked = true; const r = ensureRank(Store.p); if (r) { r.pend = Date.now(); save(); } }   // ha bezárja az appot, vereségnek számít
   ui.sel = null; busy = true; ui.handSeen = null; ui.botHandN = null; ui.flying = new Set(); show('scr-game');
@@ -1803,7 +1803,7 @@ function endMatch() {
   const kill = S.killShot && S.reason !== 'time' ? `<span class="ko-why">🏁 Döntő csapás: ${S.killShot}</span>` : '';
   const aw = awardMatch(draw ? 'draw' : win ? 'win' : 'loss');
   if (S.ranked && !S.rkDone) { S.rkDone = true; S.rkRes = rankOnMatch(draw ? 'draw' : win ? 'win' : 'loss'); }
-  const qd = S.qDone ? [] : questsOnMatch({ win, hero: S.players[ME].heroId, ...(S.qs || { actions: 0, items: 0, chars: 0, locs: 0, big: 0, heroDmg: 0, kills: 0 }) });
+  const qd = S.qDone ? [] : questsOnMatch({ win, hero: S.players[ME].heroId, ah: ahCount(S.myList), ranked: !!S.ranked, ...(S.qs || { actions: 0, items: 0, chars: 0, locs: 0, big: 0, heroDmg: 0, kills: 0 }) });
   const px = S.qDone ? null : passOnMatch(draw ? 'draw' : win ? 'win' : 'loss', qd);
   if (!S.qDone) try { S.evRes = eventOnMatch({ win, ranked: !!S.ranked, lv: S.botLv || 2, hero: S.players[ME].heroId, ...(S.qs || { actions: 0, items: 0, chars: 0, locs: 0, big: 0, heroDmg: 0, kills: 0 }) }); } catch (e) {}
   S.qDone = true;
