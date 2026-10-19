@@ -463,6 +463,12 @@ Hősképesség-ötletek a táblázatban (még nem zöldek, nincsenek beépítve)
 ## Javítás: „Újabb ranked” → Mégse beragadás (2026-10-16)
 - Meccs után az „Újabb ranked” gomb a lezárt meccs képernyőjén indította a keresést; ha valaki „Mégse”-t nyomott, a lezárt táblán ragadt, és a zászló sem csinált semmit. Mostantól az „Újabb ranked” előbb a Ranked képernyőre visz, a keresés megszakítása lezárt meccsből a menübe visz, és lezárt meccsen a zászló is a menübe visz.
 
+## GOD PACK – titkos (2026-10-20, Tomi)
+- **Minden** pack (sima, Shiny, ingyenes, ajándék, Base set és kiegészítő) 0,5% eséllyel God pack (`ECON.godPack`, `godPackRoll`). **Titok:** sehol nincs kiírva – az esélyek között sem, az Újdonságokban sem (csendes kitétel); csak aki kinyitja, látja.
+- Tartalom: **5 lap** 3 helyett, mind **Full Art**: 2 véletlen ritkaságú + 1 biztos epikus + 1 biztos legendás a pack szettjéből, és egy **arany**: kiegészítőben a szett arany lapja (`goldVar`), Base setben Arany hős (`rollHeroGold`); ha a szettnek nincs aranya, még egy legendás Full Art. A szánalomszámláló nullázódik; `p.godPacks` számolja, hányat nyitott valaki.
+- Animáció (`godIntro`): a feltépett pack szivárványszínben izzik és egyre jobban remeg, 14 színes fénysugár tör ki belőle, szivárványpor áramlik bele → fehér villanás, 4 színes lökéshullám, 120 szikra/csillag, remegő képernyő, óriás szivárványos **„GOD PACK”** felirat („5 lap · mind Full Art · és valami arany…”), a háttérben forgó szivárvány-dereng. Utána 5 lap (3+2 elrendezés, `.op-cards.five`), a hátlapok szivárványszínben izzanak; a Full Art lapok a szokásos különleges felfedéssel, az arany az arany-jelenettel fordul.
+- Teszt oldalon (`TEST_MODE`) eszközönként az **első** bontás biztosan God pack (`godForce`, localStorage `bou_god_t1`; újra: a kulcs törlése). Élesben ez sosem él.
+
 ## Tomi, a parti lelke: Akuma az ellenségen (2026-10-19, Tomi)
 - Hiba volt: az Akuma (+5 támadás, „a köre végén meghal”) pusztító italként az ellenséghez került, de a gazdája saját körének végéig élt, így előbb még ütött vele +5-tel – valójában erősítés lett. Most: ha a parti lelke Akumát ad ellenséges karakternek, az **még ugyanannak a körnek a végén meghal** (`u.doomFoe = pi`, a `runEndTurn` a túloldalt is nézi), a gazdája nem támadhat vele. Felirat: „+5 támadás, de ennek a körnek a végén meghal”. Teszt: `tools/party_test.js` (AKUMA OK).
 

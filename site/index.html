@@ -1778,6 +1778,26 @@ body.pf-loading #scr-menu .pb-name::after{content:'';display:inline-block;width:
   background:repeating-conic-gradient(from 0deg,rgba(255,220,120,.42) 0deg 9deg,transparent 9deg 22deg);-webkit-mask:radial-gradient(circle,#000 18%,transparent 66%);mask:radial-gradient(circle,#000 18%,transparent 66%);}
 .op-cards.ten{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px 6px;justify-items:center;max-width:620px;}
 .op-cards.ten .flip{--flw:min(108px,17.4vw);}
+/* GOD PACK (2026-10-20) */
+.op-cards.five{flex-wrap:wrap;max-width:430px;gap:24px 8px;}
+.op-cards.five .flip{--flw:min(118px,27vw);}
+.overlay.opening.god-pack{background:radial-gradient(circle at 50% 45%,rgba(90,30,140,.65),#05010a 72%);overflow:hidden;}
+.overlay.opening.god-pack::before{content:'';position:fixed;inset:-50%;background:conic-gradient(from 0deg,#ff4d6d,#ffb84d,#fff36b,#5dff9b,#4dd2ff,#8a6bff,#ff4dd8,#ff4d6d);opacity:.2;filter:blur(50px);animation:godSpin 14s linear infinite;pointer-events:none;}
+@keyframes godSpin{to{transform:rotate(360deg);}}
+.god-fx{position:fixed;inset:0;z-index:7;pointer-events:none;}
+.god-beam{position:fixed;width:7px;height:75vh;transform-origin:50% 100%;background:linear-gradient(to top,#fff,var(--c) 18%,transparent);border-radius:4px;mix-blend-mode:screen;filter:blur(1px);}
+.god-flash{position:fixed;inset:0;background:radial-gradient(circle at 50% 42%,#fff 0,#fff 30%,rgba(255,240,255,.85) 50%,rgba(180,140,255,.4) 70%,transparent 90%);opacity:0;}
+.god-ring{position:fixed;width:80px;height:80px;border-radius:50%;border:4px solid var(--c);box-shadow:0 0 24px var(--c),inset 0 0 24px var(--c);}
+.god-star{position:fixed;z-index:5;clip-path:polygon(50% 0,61% 39%,100% 50%,61% 61%,50% 100%,39% 61%,0 50%,39% 39%);pointer-events:none;}
+.god-title{position:fixed;left:0;right:0;top:34%;display:grid;justify-items:center;gap:10px;text-align:center;z-index:3;}
+.god-word{font-family:var(--display);font-size:clamp(52px,17vw,104px);line-height:1;letter-spacing:.04em;white-space:nowrap;
+  background:linear-gradient(90deg,#ff4d6d,#ffb84d,#fff36b,#5dff9b,#4dd2ff,#8a6bff,#ff4dd8,#ff4d6d);background-size:200% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;
+  filter:drop-shadow(0 0 14px rgba(255,255,255,.55)) drop-shadow(0 4px 0 rgba(0,0,0,.5));animation:godShift 2.2s linear infinite;}
+@keyframes godShift{to{background-position:200% 0;}}
+.god-sub{color:#fff;font:800 15px var(--body);letter-spacing:.06em;text-shadow:0 0 12px rgba(200,150,255,.9);}
+.op-cards.god .flip .face.back{animation:godBack 2.4s linear infinite;}
+@keyframes godBack{0%{box-shadow:0 0 0 2px #fff,0 0 24px 6px #ff4d6d;}17%{box-shadow:0 0 0 2px #fff,0 0 24px 6px #ffb84d;}33%{box-shadow:0 0 0 2px #fff,0 0 24px 6px #fff36b;}50%{box-shadow:0 0 0 2px #fff,0 0 24px 6px #5dff9b;}67%{box-shadow:0 0 0 2px #fff,0 0 24px 6px #4dd2ff;}83%{box-shadow:0 0 0 2px #fff,0 0 24px 6px #8a6bff;}100%{box-shadow:0 0 0 2px #fff,0 0 24px 6px #ff4d6d;}}
+@media (prefers-reduced-motion:reduce){.overlay.opening.god-pack::before,.god-word,.op-cards.god .flip .face.back{animation:none;}}
 .op-all{margin-top:4px;}
 .rk-botrow{display:flex;align-items:center;gap:12px;margin:0 0 10px;padding:10px 14px;border-radius:12px;background:rgba(10,20,30,.85);border:1px solid rgba(255,255,255,.14);cursor:pointer;}
 .rk-botrow input{width:22px;height:22px;accent-color:#f2c14e;flex:none;}
@@ -2384,7 +2404,7 @@ body.pf-loading #scr-menu .pb-name::after{content:'';display:inline-block;width:
 <script src="vendor/firebase-auth-compat.js"></script>
 <script src="vendor/firebase-firestore-compat.js"></script>
 <script src="vendor/firebase-database-compat.js"></script>
-<script>window.APP_VERSION = "2026.10.19-2238"; window.APP_BUILD = "2026.10.19-2241";</script>
+<script>window.APP_VERSION = "2026.10.19-2238"; window.APP_BUILD = "2026.10.20-0030";</script>
 <script>// ===== Best of Us – saját szerver (Firebase) =====
 // A játék eredetileg a Claude-os tárolót használta (window.claude.use('db' | 'user' | 'room')).
 // Ez a fájl ugyanazt a felületet adja Firebase-ből, így a játék kódja szinte változatlan maradhat:
@@ -5808,7 +5828,7 @@ function beginDrag(e, hi, el, opt = {}) {
   window.addEventListener('pointerup', up); window.addEventListener('pointercancel', up);
 }
 // ===== Profil, gazdaság, boosterek, paklik =====
-const ECON = { goldPlain: 0.005, goldShiny: 0.05, goldDupe: 100, heroFaChance: 0.02, shinyHero: 0.15, shinyPrice: 250, shinyVariant: 0.25, packPrice: 50, dailyCap: 200, win: 25, draw: 15, loss: 10, foilChance: 0.04, pityAfter: 10,
+const ECON = { goldPlain: 0.005, goldShiny: 0.05, goldDupe: 100, heroFaChance: 0.02, shinyHero: 0.15, shinyPrice: 250, shinyVariant: 0.25, packPrice: 50, dailyCap: 200, win: 25, draw: 15, loss: 10, foilChance: 0.04, pityAfter: 10, godPack: 0.005,
                odds: [['l', 1.5], ['e', 6.5], ['r', 22], ['k', 70]] };
 // a „token” lapok (pl. Query) csak más lap hatására kerülnek játékba: nincsenek packban, gyűjteményben, pakliban
 const PLAYABLE = CARDS.filter(c => !c.token && !c.off);   // off: kánon esemény lap, amíg nincs hozzá grafika – sehol nem látszik
@@ -6195,8 +6215,32 @@ function rollRarity() {
   for (const [k, w] of ECON.odds) { if (r < w) return k; r -= w; }
   return 'k';
 }
+/* ---- GOD PACK (2026-10-20, Tomi): minden pack 0,5% eséllyel – 5 lap 3 helyett, mind Full Art, egyikük legalább arany.
+   Titok: sehol nincs kiírva (esélyek közt sem), csak aki kinyitja, látja. Teszt oldalon (TEST_MODE) az első bontás eszközönként biztosan God pack. */
+function godForce() { if (!TEST_MODE) return false; try { if (localStorage.getItem('bou_god_t1') === '1') return false; localStorage.setItem('bou_god_t1', '1'); return true; } catch { return false; } }
+function godPackRoll(setId) {
+  const p = Store.p, pool = SETS[setId].cards, order = { k: 0, r: 1, e: 2, l: 3 };
+  const rars = [rollRarity(), rollRarity(), 'e', 'l'].sort((a, b) => order[a] - order[b]);   // legalább egy epikus és egy legendás
+  p.sinceEpic = 0;
+  const out = rars.map(rar => {
+    let ids = pool.filter(id => CARD[id].rarity === rar);
+    for (const lo of ['l', 'e', 'r', 'k']) { if (ids.length) break; if (order[lo] < order[rar]) ids = pool.filter(id => CARD[id].rarity === lo); }
+    const id = ids[Math.floor(Math.random() * ids.length)], isNew = !ownsFoil(id);
+    const e = p.coll[id] || (p.coll[id] = { n: 0, f: 0 }); e.f++;
+    return { id, foil: true, isNew };
+  });
+  const setGold = setId !== 'base' ? CARDS.filter(v => v.goldVar && v.set === setId).map(v => v.id) : [];
+  if (setGold.length) { const id = setGold[Math.floor(Math.random() * setGold.length)], isNew = owned(id) === 0;
+    const e = p.coll[id] || (p.coll[id] = { n: 0, f: 0 }); e.n++; out.push({ id, foil: false, gold: true, isNew }); }
+  else if (setId === 'base' && GOLD_HEROES.length) out.push(rollHeroGold(p));
+  else { const ids = pool.filter(id => CARD[id].rarity === 'l'), id = ids[Math.floor(Math.random() * ids.length)], isNew = !ownsFoil(id);   /* nincs arany a szettben: még egy legendás Full Art */
+    const e = p.coll[id] || (p.coll[id] = { n: 0, f: 0 }); e.f++; out.push({ id, foil: true, isNew }); }
+  out.god = true; p.godPacks = (p.godPacks || 0) + 1;
+  return out;
+}
 function openPackRoll(setId, forceFoil = false, shiny = false) {
   const p = Store.p, pool = SETS[setId].cards;
+  if (Math.random() < ECON.godPack || godForce()) return godPackRoll(setId);
   const slots = [rollRarity(), rollRarity(), rollRarity()];
   if (slots.every(x => x === 'k')) slots[2] = 'r';                       // legalább egy ritka
   const hasEpic = slots.some(x => x === 'e' || x === 'l');
@@ -6615,8 +6659,9 @@ async function packOpening(setId, cards, po = {}) {
                 { duration: 620, easing: 'cubic-bezier(.3,.6,.4,1)', fill: 'forwards' }).finished,
     pk.querySelector('.pk-body').animate([{ transform: 'none' }, { transform: 'translateY(6px) rotate(-1.5deg)' }, { transform: 'translateY(2px) rotate(1.5deg)' }, { transform: 'translateY(4px)' }],
                 { duration: 520, easing: 'ease-in-out', fill: 'forwards' }).finished]);
+  if (cards.god) await godIntro(o, pk, packEl);
   const hasGold = cards.some(c => c.gold);
-  if (hasGold) {   // arany van a packban: a feltépett pack aranyba borul, remeg a képernyő
+  if (hasGold && !cards.god) {   // arany van a packban: a feltépett pack aranyba borul, remeg a képernyő
     o.classList.add('gold-pack');
     await pk.animate([{ transform: 'none', filter: 'brightness(1)' }, { transform: 'scale(1.06) rotate(-1.5deg)', filter: 'brightness(1.5) sepia(.6)' }, { transform: 'scale(1.1) rotate(1.5deg)', filter: 'brightness(1.8) sepia(.8)' }, { transform: 'none', filter: 'brightness(1)' }], { duration: 900, easing: 'ease-in-out' }).finished;
   }
@@ -6624,12 +6669,54 @@ async function packOpening(setId, cards, po = {}) {
   flash.animate([{ opacity: 0 }, { opacity: 1 }, { opacity: 0 }], { duration: 600 });
   await packEl.animate([{ transform: 'none', opacity: 1 }, { transform: 'translateY(90px) scale(.9)', opacity: 0 }], { duration: 300, easing: 'ease-in', fill: 'forwards' }).finished;
   packEl.remove();
-  await cardReveal(o, cards);
+  await cardReveal(o, cards, { five: cards.length === 5, god: !!cards.god });
   o.remove(); o.classList.remove('gold-pack'); renderShop();
+}
+/* GOD PACK jelenet: a feltépett pack szivárványszínben izzik, fénysugarak törnek ki belőle, egyre jobban remeg,
+   majd fehér villanás, lökéshullámok, szivárványszikrák és óriás „GOD PACK” felirat */
+const GOD_COLS = ['#ff4d6d', '#ffb84d', '#fff36b', '#5dff9b', '#4dd2ff', '#8a6bff', '#ff4dd8'];
+async function godIntro(o, pk, packEl) {
+  o.classList.add('god-pack');
+  const r = pk.getBoundingClientRect(), cx = r.left + r.width / 2, cy = r.top + r.height * .32;
+  const layer = document.createElement('div'); layer.className = 'god-fx'; o.appendChild(layer);
+  const beams = [];
+  for (let k = 0; k < 14; k++) { const b = document.createElement('i'); b.className = 'god-beam'; b.style.left = cx + 'px'; b.style.top = cy + 'px';
+    const ang = (k * 360 / 14 + Math.random() * 12).toFixed(1); b.style.setProperty('--c', GOD_COLS[k % GOD_COLS.length]); layer.appendChild(b); beams.push(b);
+    b.animate([{ opacity: 0, transform: `translate(-50%,-100%) rotate(${ang}deg) scaleY(0)` }, { opacity: 1, transform: `translate(-50%,-100%) rotate(${ang}deg) scaleY(1)` }],
+              { duration: 300, delay: 120 + k * 120, easing: 'cubic-bezier(.2,1.3,.4,1)', fill: 'both' }); }
+  let rising = true;
+  (async () => { while (rising) { const c = GOD_COLS[Math.floor(Math.random() * GOD_COLS.length)], s = document.createElement('i'), sz = 3 + Math.random() * 5, a = Math.random() * Math.PI * 2, d = 260 + Math.random() * 200;
+    s.className = 'rare-spark'; s.style.cssText = `left:${cx + Math.cos(a) * d}px;top:${cy + Math.sin(a) * d}px;width:${sz}px;height:${sz}px;background:${c};box-shadow:0 0 ${sz * 3}px ${c}`; layer.appendChild(s);
+    s.animate([{ transform: 'translate(-50%,-50%)', opacity: 0 }, { opacity: 1, offset: .3 }, { transform: `translate(calc(-50% + ${-Math.cos(a) * d}px), calc(-50% + ${-Math.sin(a) * d}px)) scale(.3)`, opacity: 0 }],
+      { duration: 700 + Math.random() * 400, easing: 'ease-in', fill: 'forwards' }).finished.then(() => s.remove()); await sleep(25); } })();
+  const kf = Array.from({ length: 22 }, (_, k) => { const p = k / 21, j = 14 * p * p; return { transform: `translate(${(Math.random() - .5) * j}px,${(Math.random() - .5) * j}px) rotate(${(Math.random() - .5) * j * .35}deg) scale(${1 + p * .12})`, filter: `brightness(${1 + p * 1.6}) saturate(${1 + p}) hue-rotate(${p * 360}deg)` }; });
+  await pk.animate(kf, { duration: 2300, easing: 'ease-in', fill: 'forwards' }).finished;
+  rising = false;
+  // robbanás
+  const flash = document.createElement('div'); flash.className = 'god-flash'; layer.appendChild(flash);
+  flash.animate([{ opacity: 0 }, { opacity: 1, offset: .1 }, { opacity: 1, offset: .3 }, { opacity: 0 }], { duration: 1400, fill: 'forwards' });
+  packEl.style.visibility = 'hidden'; beams.forEach(b => b.remove());
+  const mx = innerWidth / 2, my = innerHeight * .42;
+  for (let k = 0; k < 4; k++) { const ring = document.createElement('i'); ring.className = 'god-ring'; ring.style.left = mx + 'px'; ring.style.top = my + 'px'; ring.style.setProperty('--c', GOD_COLS[(k * 2) % GOD_COLS.length]); layer.appendChild(ring);
+    ring.animate([{ transform: 'translate(-50%,-50%) scale(.1)', opacity: 1 }, { transform: 'translate(-50%,-50%) scale(11)', opacity: 0 }], { duration: 1300, delay: 150 + k * 170, easing: 'cubic-bezier(.1,.7,.3,1)', fill: 'both' }); }
+  for (let k = 0; k < 120; k++) { const s = document.createElement('i'), c = GOD_COLS[k % GOD_COLS.length], sz = 4 + Math.random() * 9, a = Math.random() * Math.PI * 2, d = 140 + Math.random() * 340;
+    s.className = k % 5 ? 'rare-spark' : 'god-star'; s.style.cssText = `left:${mx}px;top:${my}px;width:${sz}px;height:${sz}px;background:${c};box-shadow:0 0 ${sz * 2}px ${c}`; layer.appendChild(s);
+    s.animate([{ transform: 'translate(-50%,-50%) scale(1) rotate(0deg)', opacity: 1 }, { transform: `translate(calc(-50% + ${Math.cos(a) * d}px), calc(-50% + ${Math.sin(a) * d}px)) scale(.3) rotate(${360 + Math.random() * 360}deg)`, opacity: 0 }],
+      { duration: 1000 + Math.random() * 1000, delay: 120, easing: 'cubic-bezier(.1,.7,.3,1)', fill: 'both' }); }
+  const t = document.createElement('div'); t.className = 'god-title'; t.innerHTML = `<div class="god-word">GOD PACK</div><div class="god-sub">5 lap · mind Full Art · és valami arany…</div><div class="op-hint" style="visibility:hidden">Koppints a folytatáshoz</div>`; layer.appendChild(t);
+  t.querySelector('.god-word').animate([{ transform: 'scale(4)', opacity: 0, letterSpacing: '.6em', filter: 'blur(12px)' }, { transform: 'scale(.92)', opacity: 1, letterSpacing: '.04em', filter: 'blur(0)', offset: .7 }, { transform: 'scale(1)', opacity: 1, letterSpacing: '.04em', filter: 'blur(0)' }],
+    { duration: 900, delay: 350, easing: 'cubic-bezier(.2,1.2,.4,1)', fill: 'backwards' });
+  t.querySelector('.god-sub').animate([{ opacity: 0, transform: 'translateY(12px)' }, { opacity: 1, transform: 'none' }], { duration: 500, delay: 1200, fill: 'backwards' });
+  o.querySelector('.op-stage').animate([{ transform: 'translate(0,0)' }, { transform: 'translate(-9px,5px)' }, { transform: 'translate(8px,-6px)' }, { transform: 'translate(-5px,-3px)' }, { transform: 'translate(4px,4px)' }, { transform: 'none' }], { duration: 500, delay: 120 });
+  await sleep(2600);
+  t.querySelector('.op-hint').style.visibility = 'visible'; layer.style.pointerEvents = 'auto';
+  await Promise.race([sleep(9000), new Promise(res => layer.addEventListener('click', ev => { ev.stopPropagation(); res(); }, { once: true }))]);
+  await t.animate([{ opacity: 1, transform: 'none' }, { opacity: 0, transform: 'translateY(-40px) scale(.8)' }], { duration: 400, fill: 'forwards' }).finished;
+  layer.remove();
 }
 // a lapok felfordítása (pack és heti láda közös része); opt.ten: 10 lapos rács + „Mindet felfordítom”
 async function cardReveal(o, cards, opt = {}) {
-  const row = document.createElement('div'); row.className = 'op-cards' + (opt.ten ? ' ten' : '');
+  const row = document.createElement('div'); row.className = 'op-cards' + (opt.ten ? ' ten' : '') + (opt.five ? ' five' : '') + (opt.god ? ' god' : '');
   row.innerHTML = cards.map((c, i) => `<button class="flip${c.gold ? ' goldback' : ''}" data-i="${i}" style="--rc:${RAR_COLOR[pcRar(c)]}" aria-label="Lap felfordítása">
       <span class="flip-in"><span class="face back"></span><span class="face front">${pcHTML(c, { big: true, foil: c.foil })}${c.dupe ? `<em class="newtag dupetag">+${c.dupe} coin</em>` : c.have > 2 ? `<em class="newtag dupetag">×${c.have}</em>` : c.isNew ? '<em class="newtag">Új!</em>' : ''}</span></span></button>`).join('');
   o.querySelector('.op-stage').appendChild(row);
