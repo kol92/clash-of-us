@@ -463,6 +463,9 @@ Hősképesség-ötletek a táblázatban (még nem zöldek, nincsenek beépítve)
 ## Javítás: „Újabb ranked” → Mégse beragadás (2026-10-16)
 - Meccs után az „Újabb ranked” gomb a lezárt meccs képernyőjén indította a keresést; ha valaki „Mégse”-t nyomott, a lezárt táblán ragadt, és a zászló sem csinált semmit. Mostantól az „Újabb ranked” előbb a Ranked képernyőre visz, a keresés megszakítása lezárt meccsből a menübe visz, és lezárt meccsen a zászló is a menübe visz.
 
+## Megjelenési ajándék: 3 Amsterdam booster (2026-10-19, Tomi)
+- 2026-10-19 19:00-tól mindenki (aki megnyitja a játékot) egyszer 3 ingyen Amsterdam Hősei boostert kap (`ahLaunchGift`, `AH_LAUNCH_PACKS`, `p.gifts: 'ah-launch-packs'`, a Boltban „🌷 Amsterdam pack bontása”). A 19:00-s bejelentő ablak is szól róla. Tesztelve 18:55 / 19:01 órával.
+
 ## Smaragd és Gyémánt liga a 2. ranked szezontól (2026-10-19, Tomi)
 - A 2. ranked szezontól (10-23) Arany és Legenda között: **Smaragd 5–1** (t 15–19) és **Gyémánt 5–1** (t 20–24), Legenda t=25. Az 1. ranked szezon (`s2`) a régi skálán fut végig (Legenda = 15) – `rkLegOf(szezon)`, `rkLeg()`, `rkNameL`, `rkTierClsL`.
 - Smaragdban és Gyémántban 5 csillag kell fokozatonként; Aranytól felfelé nincs sorozatbónusz (`rkHard`); liga-esésvédelem: Smaragd 5 és Gyémánt 5 alá sem lehet visszaesni; Aranytól Mester bot.
