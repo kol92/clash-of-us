@@ -820,7 +820,7 @@ function partyDrink(s, pi, si) {
   ev(s, { t:'party', side:pi, i:si, ts, ti:j, id:d, o, tid:u.id });
   reveal(s, ts, j);
   if (c.type === 'item') {   // az ital rákerül, a hatásaival együtt (ellenségen idegen eszközként)
-    u.atk += c.atk || 0; if (c.haste) u.haste = true; if (c.doom) u.doom = true; if (c.muscle) u.muscle = true; if (c.hangover) u.hangover = true; if (c.elusive) u.elusive = true;
+    u.atk += c.atk || 0; if (c.haste) u.haste = true; if (c.doom) { if (ts === pi) u.doom = true; else u.doomFoe = pi; }   /* Akuma ellenségen (2026-10-19, Tomi): még a parti lelke körének végén meghal, a gazdája nem üthet vele */ if (c.muscle) u.muscle = true; if (c.hangover) u.hangover = true; if (c.elusive) u.elusive = true;
     u.items.push(d); if (ts !== pi) (u.foe = u.foe || []).push(d);
     ev(s, { t:'buff', side:ts, i:j, n:c.atk });
     if (d === 'i_vodkasa' && bid(u.id) === 'c_tzs' && !u.shield) { u.shield = true; ev(s, { t:'boon', side:ts, i:j, b:'shield' }); }
@@ -836,7 +836,7 @@ function partyDrink(s, pi, si) {
   }
   cleanup(s); checkWin(s);
 }
-const PARTY_FX = { i_energiaital:'+2 támadás', i_akuma:'+5 támadás, de a köre végén meghal', i_vodkakancso:'+4 támadás, utána bénult',
+const PARTY_FX = { i_energiaital:'+2 támadás', i_akuma:'+5 támadás, de ennek a körnek a végén meghal', i_vodkakancso:'+4 támadás, utána bénult',
   a_dinnyes:'3 sebzés', a_abszint:'7 sebzés', a_tubi:'6 sebzés (és 3 a te hősödnek)', a_kancso:'3 sebzés neki és 3 a hősének', a_talca:'2 sebzés',
   a_koktel:'+5 támadás vagy 5 sebzés', a_mangos:'4 életet gyógyul', a_rehab:'3 életet gyógyul, és magához tér', i_vodkasa:'Igézhetetlen lesz', a_adios:'a következő körében bénult', a_amongus:'6 sebzés – a paprikás jutott neki' };
 
@@ -1097,6 +1097,7 @@ function finishTurn(s) {
   p.board.forEach((u, i) => { if (u && u.hangover && u.hp > 0) { u.hangover = false; u.stun = Math.max(u.stun || 0, 1); ev(s, { t:'stun', side:pi, i }); } });
   p.board.forEach((u, i) => { if (u && u.expire != null && p.turns >= u.expire) { u.hp = 0; ev(s, { t:'expire', side:pi, i }); } });
   p.board.forEach((u, i) => { if (u && u.doom) { u.hp = 0; ev(s, { t:'doom', side:pi, i }); } });
+  s.players[other(pi)].board.forEach((u, i) => { if (u && u.doomFoe === pi) { u.hp = 0; ev(s, { t:'doom', side:other(pi), i }); } });   /* a parti lelke Akumája az ellenségen */
   cleanup(s);
   p.board.forEach(u => { if (u) u.temp = 0; });
   checkWin(s);
