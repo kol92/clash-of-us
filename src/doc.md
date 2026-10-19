@@ -463,6 +463,12 @@ Hősképesség-ötletek a táblázatban (még nem zöldek, nincsenek beépítve)
 ## Javítás: „Újabb ranked” → Mégse beragadás (2026-10-16)
 - Meccs után az „Újabb ranked” gomb a lezárt meccs képernyőjén indította a keresést; ha valaki „Mégse”-t nyomott, a lezárt táblán ragadt, és a zászló sem csinált semmit. Mostantól az „Újabb ranked” előbb a Ranked képernyőre visz, a keresés megszakítása lezárt meccsből a menübe visz, és lezárt meccsen a zászló is a menübe visz.
 
+## Amsterdam kölcsönpaklik élesben + indulás előtti teszt (2026-10-19, Tomi)
+- A 9 Amsterdam kezdőpakli (hősönként egy) 2026-10-19 19:00-tól választható, **kölcsönpakliként: paklinként 3 meccs** (`LOAN_MAX`, `p.loan`, `loanUse()` a meccs indulásakor – bot, ranked, PvP; PvP-ben meccsenként egyszer). A pakliválasztóban „🌷 Kölcsön · még N meccs”; lejárva halvány, rákoppintva: „Ezek csak kölcsön paklik voltak!” (`loanOutModal`). A Másolat gombbal saját pakli készíthető belőle (az már csak a meglévő lapokkal játszható).
+- A 19:00-s bejelentő említi a kölcsönpaklikat; az előzetes az indulás napján „ma 19:00”-t ír.
+- **Indulás előtti teszt (12:00–13:00):** mind a 16 teszt-fájl rendben; új `tools/stress.js` – 1500 + 800 bot-meccs véletlen paklikkal az ÖSSZES lapból, minden lépés után állapot-ellenőrzés, 460 meccs PvP-szerű (lépésenkénti véletlenmag) visszajátszása: 0 hiba, 100% determinisztikus. Felületi teszt 19:05-ös órával (élő cím): bejelentő, bolti sorrend, AH / AH Shiny pack, küldetés-ajándékok, gyűjtemény-szűrő, hátlap-haladás, teljes meccs kölcsönpaklival, ranked bot, Season Pass felfedés, Paklik képernyő – rendben.
+- Talált és javított hibák: a bot sosem játszotta ki a High Hawaiianst (nem értékelte a pakliba kevert gombákat); ha a meccs a VS-bevezető alatt bezárult (pl. Android vissza gomb), a kezdő kéz ablaka egy nem létező meccsre próbált megnyílni (hibaüzenet).
+
 ## Reptéri ellenőrzés a Cápán (2026-10-19, Tomi)
 - A Reptéri ellenőrzés mostantól a Cápát is célozhatja (eddig kizárta, mert „rögzített” lap). Ha a nálad úszó Cápát átteszed a túloldalra, átáll: azé lesz, aki áttette – az ő köre elején úszik, és az ellenfél karaktereit eszi; a hátralévő úszásai megmaradnak. Védekezésre és visszatámadásra is jó.
 

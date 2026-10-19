@@ -1716,7 +1716,8 @@ function startMatch(heroId, deckId, opt = {}) {
   if (opt.ranked) { S.ranked = true; const r = ensureRank(Store.p); if (r) { r.pend = Date.now(); save(); } }   // ha bezárja az appot, vereségnek számít
   ui.sel = null; busy = true; ui.handSeen = null; ui.botHandN = null; ui.flying = new Set(); show('scr-game');
   $('#layer').innerHTML = '';
-  vsIntro().then(() => { render(); setTimeout(() => showMulligan(first), 250 + S.players[ME].hand.length * 150 + 450); });
+  const S0 = S;   /* ha közben kiléptek a meccsből (pl. Android vissza gomb), ne nyíljon meg a kezdő kéz egy már nem létező meccsre */
+  vsIntro().then(() => { if (S !== S0) return; render(); setTimeout(() => { if (S === S0) showMulligan(first); }, 250 + S.players[ME].hand.length * 150 + 450); });
 }
 
 // ---------- kezdő kéz cseréje (mint a Hearthstone-ban) ----------
