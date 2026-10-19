@@ -369,16 +369,16 @@ h1,h2,h3{font-family:var(--display);font-weight:400;letter-spacing:.01em;text-wr
 .op-hint{font-size:12px;font-weight:900;letter-spacing:.14em;text-transform:uppercase;color:#cfe3df;}
 .op-flash{position:fixed;inset:0;background:radial-gradient(circle,#fff,rgba(255,240,200,.6) 40%,transparent 70%);pointer-events:none;opacity:0;}
 .op-cards{display:flex;justify-content:center;gap:8px;width:100%;}
-.flip{--fw:min(128px,29vw);width:var(--fw);aspect-ratio:5/7;perspective:900px;border-radius:12px;}
+.flip{--flw:min(128px,29vw);width:var(--flw);aspect-ratio:5/7;perspective:900px;border-radius:12px;}
 .flip-in{position:relative;display:block;width:100%;height:100%;transform-style:preserve-3d;transform:rotateY(180deg);transition:transform .6s cubic-bezier(.3,.1,.3,1.25);}
 .flip.open .flip-in{transform:rotateY(0deg);}
-.flip.rev{--fw:min(210px,56vw);}
+.flip.rev{--flw:min(210px,56vw);}
 .flip.rev .flip-in{transition:none;}
-.face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:calc(var(--fw)*.11);}
+.face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:calc(var(--flw)*.11);}
 .face.back{width:auto;height:auto;transform:rotateY(180deg);background:var(--bk,url('art/back.webp')) 50% 50%/cover;box-shadow:0 8px 20px rgba(0,0,0,.6),0 0 0 2px #c9a24a;}
 .flip:not(.open):not(.rev) .face.back{animation:backGlow 1.6s ease-in-out infinite;}
 @keyframes backGlow{50%{box-shadow:0 8px 20px rgba(0,0,0,.6),0 0 0 2px var(--rc),0 0 22px 4px var(--rc)}}
-.face.front .card{--cw:var(--fw);}
+.face.front .card{--cw:var(--flw);}   /* 2026-10-19: --flw (nem --fw), mert az arany és Kánon keret --fw-je ütközött vele */
 .flip.glow .face.front{animation:rareBurst 1.4s ease-out;}
 @keyframes rareBurst{0%{box-shadow:0 0 0 0 var(--rc)}30%{box-shadow:0 0 40px 16px var(--rc)}100%{box-shadow:0 0 0 0 transparent}}
 .newtag{position:absolute;top:-8px;right:-6px;z-index:5;font-style:normal;font-family:var(--display);font-size:14px;background:var(--green);color:#003321;padding:2px 8px;border-radius:8px;transform:rotate(8deg);box-shadow:0 2px 6px rgba(0,0,0,.4);}
@@ -477,7 +477,7 @@ h1,h2,h3{font-family:var(--display);font-weight:400;letter-spacing:.01em;text-wr
 .played{pointer-events:auto;background:radial-gradient(circle at 50% 50%,rgba(3,10,13,.35),rgba(3,10,13,.78));}
 .played .wrap{animation:none;}
 .played .card{--cw:min(210px,56vw);}
-.played .flip.rev .face.front .card{--cw:var(--fw);}
+.played .flip.rev .face.front .card{--cw:var(--flw);}
 .played .skip{font-size:10px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--mute);}
 .fx-hit{animation:fxHit .45s ease both;}
 @keyframes fxHit{0%{filter:none}12%{filter:brightness(1.9) sepia(1) hue-rotate(-45deg) saturate(5);transform:translateX(-7px) rotate(-2deg)}30%{transform:translateX(7px) rotate(2deg)}50%{transform:translateX(-4px)}100%{filter:none;transform:none}}
@@ -1752,7 +1752,7 @@ body.pf-loading #scr-menu .pb-name::after{content:'';display:inline-block;width:
 .ch-rays{position:absolute;left:50%;top:50%;width:170%;aspect-ratio:1;opacity:0;pointer-events:none;z-index:0;
   background:repeating-conic-gradient(from 0deg,rgba(255,220,120,.42) 0deg 9deg,transparent 9deg 22deg);-webkit-mask:radial-gradient(circle,#000 18%,transparent 66%);mask:radial-gradient(circle,#000 18%,transparent 66%);}
 .op-cards.ten{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px 6px;justify-items:center;max-width:620px;}
-.op-cards.ten .flip{--fw:min(108px,17.4vw);}
+.op-cards.ten .flip{--flw:min(108px,17.4vw);}
 .op-all{margin-top:4px;}
 .rk-botrow{display:flex;align-items:center;gap:12px;margin:0 0 10px;padding:10px 14px;border-radius:12px;background:rgba(10,20,30,.85);border:1px solid rgba(255,255,255,.14);cursor:pointer;}
 .rk-botrow input{width:22px;height:22px;accent-color:#f2c14e;flex:none;}
