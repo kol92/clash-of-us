@@ -590,8 +590,9 @@ function giveDiamond(p) { const e = p.coll[DIAMOND_CARD] || (p.coll[DIAMOND_CARD
 function wheelApply(p, seg) {   // a nyeremény jóváírása; visszaadja a szöveget
   const k = WHEEL[seg].k;
   if (k[0] === 'c') { const n = +k.slice(1); p.coins += n; return { txt: `+${n} coin`, ic: 'coin' }; }
-  if (k === 'pack') { p.giftPacks = (p.giftPacks || 0) + 1; return { txt: '1 booster pack – a Boltban bonthatod ki', ic: 'pack' }; }
-  if (k === 'shiny') { p.shinyPacks = (p.shinyPacks || 0) + 1; return { txt: '1 Shiny pack – a Boltban bonthatod ki', ic: 'shiny' }; }
+  /* 2026-10-19 (Tomi): az Amsterdam Hősei megjelenésétől a kerék Amsterdam boostert ad */
+  if (k === 'pack') { if (setLive('ah')) { p.ahPacks = (p.ahPacks || 0) + 1; return { txt: '1 Amsterdam booster – a Boltban bonthatod ki', ic: 'pack' }; } p.giftPacks = (p.giftPacks || 0) + 1; return { txt: '1 booster pack – a Boltban bonthatod ki', ic: 'pack' }; }
+  if (k === 'shiny') { if (setLive('ah')) { p.ahShinyPacks = (p.ahShinyPacks || 0) + 1; return { txt: '1 Amsterdam Shiny pack – a Boltban bonthatod ki', ic: 'shiny' }; } p.shinyPacks = (p.shinyPacks || 0) + 1; return { txt: '1 Shiny pack – a Boltban bonthatod ki', ic: 'shiny' }; }
   if (k === 'again') { p.wheel.extra = (p.wheel.extra || 0) + 1; return { txt: 'Még egy pörgetés!', ic: 'again' }; }
   if (k === 'shard') {
     p.wheel.shards = (p.wheel.shards || 0) + 1;
