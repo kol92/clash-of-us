@@ -2379,7 +2379,7 @@ body.pf-loading #scr-menu .pb-name::after{content:'';display:inline-block;width:
 <script src="vendor/firebase-auth-compat.js"></script>
 <script src="vendor/firebase-firestore-compat.js"></script>
 <script src="vendor/firebase-database-compat.js"></script>
-<script>window.APP_VERSION = "2026.10.19-2134"; window.APP_BUILD = "2026.10.19-2134";</script>
+<script>window.APP_VERSION = "2026.10.19-2138"; window.APP_BUILD = "2026.10.19-2138";</script>
 <script>// ===== Best of Us – saját szerver (Firebase) =====
 // A játék eredetileg a Claude-os tárolót használta (window.claude.use('db' | 'user' | 'room')).
 // Ez a fájl ugyanazt a felületet adja Firebase-ből, így a játék kódja szinte változatlan maradhat:
@@ -2797,7 +2797,7 @@ const CARDS = [
   { id:'l_korhaz', type:'loc', name:'Siófoki Kórház', cost:1, rarity:'k', text:'Minden karakter 1 életet gyógyul a gazdája körének végén.' },
 ];
 /* Arany lapok (Amszterdam hősei, 2026-10-17): az alaplap arany változata – ugyanaz a hatás, csak boosterből (0,5% / Shiny 5%) */
-CARDS.push({ ...CARDS.find(c => c.id === 'c_pifti'), id:'c_pifti3', name:'Pifti, a király', variantOf:'c_pifti', shopOnly:true, price:100 });   /* bolti ritka variáns, 2026-10-19 (Tomi) */
+CARDS.push({ ...CARDS.find(c => c.id === 'c_piftikiraly'), id:'c_piftikiraly2', variantOf:'c_piftikiraly', shopOnly:true, price:100 });   /* bolti ritka variáns, 2026-10-19 (Tomi) – a Pifti, a király (epikus) változata */
 for (const b of ['c_tomiparti', 'c_laszy', 'c_sasi']) CARDS.push({ ...CARDS.find(c => c.id === b), id:b + '2', variantOf:b });   /* 2026-10-18: új packból jövő változatok (Tomi) */
 for (const b of ['a_welcome', 'a_hawaiians', 'f_gameover']) CARDS.push({ ...CARDS.find(c => c.id === b), id:b + '_g', variantOf:b, goldVar:true });
 /* Bong (Amszterdam hősei): minden továbbadáskor 1-gyel drágább token-példány (legfeljebb 10) */
@@ -4098,7 +4098,7 @@ const ART = {
   a_rantott: { src:'art/rantott.webp?v=ce888fe848453ef6', av:'45% 40%', pos:'50% 38%' },
   c_tomiparti: { src:'art/tomiparti.webp?v=b7bb907f03a864ac', av:'47% 26%', pos:'47% 24%' },
   i_vodkasa: { src:'art/vodkasa.webp?v=4928c309a56330ff', av:'45% 45%', pos:'45% 40%' },
-  c_pifti3:     { src:'art/pifti_kiraly.webp?v=1096565817010317', av:'60% 22%', pos:'60% 20%' },
+  c_piftikiraly2: { src:'art/pifti_kiraly.webp?v=1096565817010317', av:'60% 22%', pos:'60% 20%' },
   c_tomiparti2: { src:'art/tomiparti2.webp?v=6a4dd12df51c382f', av:'58% 20%', pos:'58% 18%' },
   c_laszy2: { src:'art/laszy2.webp?v=bb4f3cb40062ddeb', av:'63% 22%', pos:'62% 20%' },
   c_sasi2: { src:'art/toma2.webp?v=ca416605c05b5d6a', av:'52% 22%', pos:'52% 20%' },
@@ -6001,6 +6001,9 @@ async function bootProfile() {
   if (TEST_MODE) testBanner(); else { pvpStart(); renderPvpBadge(); pvpRoomInit(); frStart(); frRefresh(); }
 }
 function migrate(p) {
+  /* 2026-10-19: a „Pifti, a király” bolti változat először tévesen a sima Pifti változata lett (c_pifti3) – átírjuk a helyesre */
+  if (p.coll && p.coll.c_pifti3) { const o = p.coll.c_pifti3, n = p.coll.c_piftikiraly2 || (p.coll.c_piftikiraly2 = { n: 0, f: 0 }); n.n += o.n || 0; n.f += o.f || 0; delete p.coll.c_pifti3; p._dirty = true; }
+  for (const d of p.decks || []) if (d.list && d.list.c_pifti3) { d.list.c_piftikiraly2 = (d.list.c_piftikiraly2 || 0) + d.list.c_pifti3; delete d.list.c_pifti3; p._dirty = true; }
   if (!p) return null;
   p = JSON.parse(JSON.stringify(p));
   p.coll = p.coll || starterCollection(); p.decks = p.decks || [];

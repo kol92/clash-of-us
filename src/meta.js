@@ -198,6 +198,9 @@ async function bootProfile() {
   if (TEST_MODE) testBanner(); else { pvpStart(); renderPvpBadge(); pvpRoomInit(); frStart(); frRefresh(); }
 }
 function migrate(p) {
+  /* 2026-10-19: a „Pifti, a király” bolti változat először tévesen a sima Pifti változata lett (c_pifti3) – átírjuk a helyesre */
+  if (p.coll && p.coll.c_pifti3) { const o = p.coll.c_pifti3, n = p.coll.c_piftikiraly2 || (p.coll.c_piftikiraly2 = { n: 0, f: 0 }); n.n += o.n || 0; n.f += o.f || 0; delete p.coll.c_pifti3; p._dirty = true; }
+  for (const d of p.decks || []) if (d.list && d.list.c_pifti3) { d.list.c_piftikiraly2 = (d.list.c_piftikiraly2 || 0) + d.list.c_pifti3; delete d.list.c_pifti3; p._dirty = true; }
   if (!p) return null;
   p = JSON.parse(JSON.stringify(p));
   p.coll = p.coll || starterCollection(); p.decks = p.decks || [];
