@@ -463,6 +463,12 @@ Hősképesség-ötletek a táblázatban (még nem zöldek, nincsenek beépítve)
 ## Javítás: „Újabb ranked” → Mégse beragadás (2026-10-16)
 - Meccs után az „Újabb ranked” gomb a lezárt meccs képernyőjén indította a keresést; ha valaki „Mégse”-t nyomott, a lezárt táblán ragadt, és a zászló sem csinált semmit. Mostantól az „Újabb ranked” előbb a Ranked képernyőre visz, a keresés megszakítása lezárt meccsből a menübe visz, és lezárt meccsen a zászló is a menübe visz.
 
+## Ranked szezonok a Season Passtól függetlenül + top 3 szezonjutalom (2026-10-19, Tomi)
+- `RK_SEASONS` (meta.js): **1. ranked szezon** (id `s2`, hogy a meglévő rangok megmaradjanak) 2026-10-12 – **2026-10-23 (péntek) 0:00**; **2. ranked szezon** (`r2`) 10-23 0:00 – 11-11 0:00. A következő ranked szezont ide kell felvenni.
+- A „nehezebb ranked” (`rkHard`: Aranyban nincs dupla csillag, Aranytól Mester bot) a 2. ranked szezontól, azaz péntektől él.
+- Szezonváltáskor a régi szezon végeredménye a profilba (`p.rkHist`) és a nyilvános kártyára (`pub.rkh`) kerül – ebből számolható a végső ranglista (`rkFinalBoard`, sorrend: rang, csillag / Legenda-pont, győzelmek).
+- **Top 3 jutalom:** `RK_TOP_REW[szezon] = [1., 2., 3. hely]` (pl. `{ coins: 2000, shiny: 5 }`) – **Tomi küldi**. A szezon zárása után 1 órával a menübe lépő játékos megnézi a végeredményt; ha az első háromban van, egyszer megkapja (`p.rkTop`), felugró ablakkal. Tesztelve (19:05 → péntek 2:00-s órával).
+
 ## Reptéri ellenőrzés: magyarázat, ha nem tehető át (2026-10-19, Peti: „csak saját karakterre működik”)
 - Ellenőrizve: motorban és felületen is működik ellenséges karakterre (két lépés: ellenséges karakter → a saját üres helyed). Valószínű ok: tele volt a saját tábla (a lap csak üres helyre hozhat át), vagy Igézhetetlen volt a célpont. Eddig erről semmi nem szólt – most üzenet jelzi (`repterWhy`): „Nincs üres helyed – …” / „… Igézhetetlen – nem tehető át” / „Az ellenfélnél nincs üres hely…”, koppintásnál és húzásnál is.
 

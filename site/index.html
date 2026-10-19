@@ -2365,7 +2365,7 @@ body.pf-loading #scr-menu .pb-name::after{content:'';display:inline-block;width:
 <script src="vendor/firebase-auth-compat.js"></script>
 <script src="vendor/firebase-firestore-compat.js"></script>
 <script src="vendor/firebase-database-compat.js"></script>
-<script>window.APP_VERSION = "2026.10.19-1215"; window.APP_BUILD = "2026.10.19-1346";</script>
+<script>window.APP_VERSION = "2026.10.19-1507"; window.APP_BUILD = "2026.10.19-1507";</script>
 <script>// ===== Best of Us – saját szerver (Firebase) =====
 // A játék eredetileg a Claude-os tárolót használta (window.claude.use('db' | 'user' | 'room')).
 // Ez a fájl ugyanazt a felületet adja Firebase-ből, így a játék kódja szinte változatlan maradhat:
@@ -8450,7 +8450,7 @@ function frPubSync(now) { if (TEST_MODE) return;
   FR.pubT = setTimeout(() => {
     const p = Store.p, coll = {};
     for (const [id, e] of Object.entries(p.coll || {})) if (tradable(id) && (e.n || e.f)) coll[id] = [e.n || 0, e.f || 0];
-    const rk = ensureRank(p); Store.db.doc('pub/' + Store.uid).set({ name: p.name, code: frCode(Store.uid), w: p.stats?.w || 0, rank: { season: rk.season, t: rk.t, st: rk.st, lp: rk.lp, g: rk.games || 0 }, coll, ver: window.APP_VERSION || '', dev: devKind(), updated: Date.now() }).catch(() => {});
+    const rk = ensureRank(p); Store.db.doc('pub/' + Store.uid).set({ name: p.name, code: frCode(Store.uid), w: p.stats?.w || 0, rank: { season: rk.season, t: rk.t, st: rk.st, lp: rk.lp, g: rk.games || 0, w: rk.w || 0 }, rkh: Object.fromEntries(Object.entries(p.rkHist || {}).slice(-4)), coll, ver: window.APP_VERSION || '', dev: devKind(), updated: Date.now() }).catch(() => {});
   }, now ? 50 : 2500);
 }
 // ---- meghívó link: …/?inv=<barátkód> – aki ezzel regisztrál (vagy belép), automatikusan barátja lesz a meghívónak ----
@@ -8759,7 +8759,15 @@ const RK_REWARDS = [   // 2026-10-12, Tomi: minden elért lépcső jutalma jár 
 const rkRewardFor = t => [...RK_REWARDS].reverse().find(r => t >= r.min) || null;
 const rkRewardsUpTo = t => RK_REWARDS.filter(r => t >= r.min);
 const rkRewText = r => [r.shiny ? `${r.shiny} Shiny pack` : '', r.packs ? `${r.packs} booster pack` : '', r.coins ? `${r.coins} coin` : '', r.back ? `${BACKS[r.back].name} hátlap` : ''].filter(Boolean).join(' + ');
-function rkSeason() { const s = curSeason(); if (s) return { id: s.id, end: s.end, name: s.name }; const d = new Date(); return { id: `m${d.getFullYear()}-${d.getMonth() + 1}`, end: new Date(d.getFullYear(), d.getMonth() + 1, 1), name: `${d.getFullYear()}. ${d.getMonth() + 1}. havi szezon` }; }
+/* Ranked szezonok – 2026-10-19 óta a Season Passtól függetlenül (Tomi). Az első id-ja 's2' marad, hogy a meglévő rangok ne nullázódjanak. */
+const RK_SEASONS = [
+  { id: 's2', name: '1. ranked szezon', start: new Date(2026, 9, 12, 0, 0), end: new Date(2026, 9, 23, 0, 0) },
+  { id: 'r2', name: '2. ranked szezon', start: new Date(2026, 9, 23, 0, 0), end: new Date(2026, 10, 11, 0, 0) },
+];
+/* Szezonvégi jutalom az első háromnak: RK_TOP_REW[szezon] = [1., 2., 3. hely jutalma], pl. { coins: 2000, shiny: 5 } (rkGrant formátum). Tomi küldi. */
+const RK_TOP_REW = {};
+function rkSeason() { const now = new Date(), r = RK_SEASONS.find(x => now >= x.start && now < x.end); if (r) return { id: r.id, end: r.end, name: r.name };
+  const s = curSeason(); if (s) return { id: s.id, end: s.end, name: s.name }; const d = new Date(); return { id: `m${d.getFullYear()}-${d.getMonth() + 1}`, end: new Date(d.getFullYear(), d.getMonth() + 1, 1), name: `${d.getFullYear()}. ${d.getMonth() + 1}. havi szezon` }; }
 function rkFresh(season) { return { season, t: 0, st: 0, streak: 0, shield: false, lp: 0, best: 0, w: 0, l: 0, games: 0 }; }
 // a profil rangja; szezonváltáskor jutalom + újrakezdés
 function ensureRank(p) {
@@ -8775,6 +8783,7 @@ function ensureRank(p) {
       rkGrant(p, rw);
       p.rankReward = { season: old.season, best: old.best, lp: old.lp, w: old.w, l: old.l, rew: rw, seen: false };
     }
+    if (old.games > 0) { p.rkHist = { ...(p.rkHist || {}), [old.season]: { t: old.t, st: old.st, lp: old.lp || 0, best: old.best, w: old.w, l: old.l, g: old.games } }; }   /* a szezon végeredménye (top 3 számításhoz) */
     p.rank = rkFresh(se.id); p._dirty = true; save();
   }
   return p.rank;
@@ -8939,6 +8948,28 @@ function renderRankTile() {
   if (em) em.innerHTML = rkEmblem(r.t, 'sm');
   if (!$('#scr-menu').hidden) { rkClaimDue(Store.p); rkTierPopup(); }   // akik már elérték a lépcsőt, most megkapják
   const rw = Store.p.rankReward; if (rw && !rw.seen) rkRewardPopup();
+  if (!$('#scr-menu').hidden && !rkTopCheck.done) { rkTopCheck.done = true; setTimeout(() => rkTopCheck().catch(() => {}), 1500); }   /* top 3 szezonjutalom (indításonként egyszer néz rá) */
+}
+// szezon végeredménye: mindenki, aki abban a szezonban játszott (pub: rkh[szezon] vagy még a régi rank mező)
+const rkCmp = (a, b) => b.t - a.t || (b.t >= RK_LEG ? (b.lp || 0) - (a.lp || 0) : b.st - a.st) || (b.w || 0) - (a.w || 0);
+async function rkFinalBoard(seasonId) {
+  const q = await Store.db.collection('pub').limit(500).get();
+  return q.docs.map(d => { const x = d.data(), h = (x.rkh || {})[seasonId] || (x.rank && x.rank.season === seasonId ? x.rank : null);
+    return h && ((h.g || 0) > 0 || h.t > 0 || h.st > 0) ? { uid: d.id, name: x.name, ...h } : null; }).filter(Boolean).sort(rkCmp);
+}
+async function rkTopCheck() {   /* lezárt szezon, amihez már van top 3 jutalom: ha benne vagy, egyszer megkapod */
+  const p = Store.p; if (!p || !Store.db || !Store.uid || TEST_MODE) return;
+  for (const se of RK_SEASONS) {
+    const rew = RK_TOP_REW[se.id]; if (!rew || Date.now() < se.end.getTime() + 36e5) continue;   /* a zárás után 1 órával (mindenki adata felkerül) */
+    p.rkTop = p.rkTop || {}; if (p.rkTop[se.id] != null) continue;
+    let board; try { board = await rkFinalBoard(se.id); } catch (e) { return; }
+    const pos = board.slice(0, 3).findIndex(x => x.uid === Store.uid);
+    p.rkTop[se.id] = pos; save();
+    if (pos >= 0 && rew[pos]) { rkGrant(p, rew[pos]); save(); renderProfileBar();
+      const o = document.createElement('div'); o.className = 'overlay';
+      o.innerHTML = `<div class="modal acct-box"><h3>🏆 ${['1.', '2.', '3.'][pos]} helyezés – ${escH(se.name)}</h3><p class="live">A szezon végén a ranglista ${['élén', 'második helyén', 'harmadik helyén'][pos]} végeztél!</p><p class="tut-gift">🎁 Jutalom: <b>${rkRewText(rew[pos])}</b></p><button class="btn primary" data-x>Szuper!</button></div>`;
+      o.onclick = e => { if (e.target.closest('[data-x]')) o.remove(); }; $('#layer').appendChild(o); }
+  }
 }
 function rkRewardPopup() {
   const p = Store.p, rw = p.rankReward; if (!rw || rw.seen || $('#layer .rk-season')) return;
@@ -9000,7 +9031,7 @@ function rankedSearch(dk) {
 function botLvPref() { const p = Store.p; if (!p) return 2; if (p.botLv) return p.botLv; const g = (p.stats?.w || 0) + (p.stats?.l || 0) + (p.stats?.d || 0); return g < 5 ? 1 : 2; }
 function rkBotLv() { const r = ensureRank(Store.p); const t = r ? r.t : 0; return t <= 2 ? 1 : t < 10 ? 2 : rkHard() ? 4 : 3; }
 // 2. szezontól (2026-11-11, Tomi döntése 2026-10-13): Aranyban nincs dupla csillag, és Aranytól Mester bot jön
-const rkHard = () => Date.now() >= (SEASONS.find(x => x.id === 's2')?.end?.getTime() || Infinity);
+const rkHard = () => Date.now() >= RK_SEASONS[0].end.getTime();   /* a 2. ranked szezontól (2026-10-23) */
 function rankedBot(dk) {
   ui.deck = dk.id;
   startMatch(dk.hero, dk.id, { ranked: true });
