@@ -463,6 +463,9 @@ Hősképesség-ötletek a táblázatban (még nem zöldek, nincsenek beépítve)
 ## Javítás: „Újabb ranked” → Mégse beragadás (2026-10-16)
 - Meccs után az „Újabb ranked” gomb a lezárt meccs képernyőjén indította a keresést; ha valaki „Mégse”-t nyomott, a lezárt táblán ragadt, és a zászló sem csinált semmit. Mostantól az „Újabb ranked” előbb a Ranked képernyőre visz, a keresés megszakítása lezárt meccsből a menübe visz, és lezárt meccsen a zászló is a menübe visz.
 
+## Bolti ritka variáns: Pifti, a király (2026-10-19, Tomi)
+- `c_pifti3` – a Pifti változata (ugyanaz a lap: 1 energia, 2/1), új képpel (Parlament), **100 coin**, 2 példány jár; csak a Boltban, a limitált kínálatban (a következő rotációig, 10-29). Packból nem jön, nem cserélhető (mint a többi bolti változat).
+
 ## Heti láda: minden szett lapjai (2026-10-19, Tomi)
 - A heti láda lapjai mostantól minden megjelent szett közös készletéből jönnek (`rollCardSlot`: Base set + Amsterdam Hősei, később az új szettek is maguktól) – a ritkaság-esélyek nem változtak; mérve ~28% Amsterdam lap. Az event-lapok (Halloween) nem kerülnek a ládába, az arany változatok sem.
 

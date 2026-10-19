@@ -225,6 +225,7 @@ const ART = {
   a_rantott: { src:'art/rantott.webp', av:'45% 40%', pos:'50% 38%' },
   c_tomiparti: { src:'art/tomiparti.webp', av:'47% 26%', pos:'47% 24%' },
   i_vodkasa: { src:'art/vodkasa.webp', av:'45% 45%', pos:'45% 40%' },
+  c_pifti3:     { src:'art/pifti_kiraly.webp', av:'60% 22%', pos:'60% 20%' },
   c_tomiparti2: { src:'art/tomiparti2.webp', av:'58% 20%', pos:'58% 18%' },
   c_laszy2: { src:'art/laszy2.webp', av:'63% 22%', pos:'62% 20%' },
   c_sasi2: { src:'art/toma2.webp', av:'52% 22%', pos:'52% 20%' },
