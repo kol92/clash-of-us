@@ -1007,6 +1007,8 @@ body.ev-hw #scr-menu .fan{filter:drop-shadow(0 0 22px rgba(255,140,40,.35));}
 .hp-list .hero-row .hp-img{width:46px;height:54px;}
 .ed-left .ed-filter{display:flex;flex-wrap:wrap;overflow:visible;gap:3px;}
 .ed-left .ed-filter button{flex:1 1 auto;}
+.ed-filter.ed-sets{margin-top:-4px;}
+.ed-left .ed-filter.ed-sets{position:static;}
 .newtag.dupetag{background:linear-gradient(135deg,#ffe27a,#f0a400);color:#3a2400;}
 
 .cell.picked,.hbar.picked{outline:3px solid #ff5d6c;outline-offset:-2px;box-shadow:0 0 18px rgba(255,93,108,.7);}
@@ -2265,6 +2267,7 @@ body.pf-loading #scr-menu .pb-name::after{content:'';display:inline-block;width:
       <div class="ed-left">
         <div class="seg ed-filter" id="edFilter" role="group" aria-label="Szűrés">
           <button data-f="all">Mind</button><button data-f="char">Karakter</button><button data-f="action">Akció</button><button data-f="item">Eszköz</button><button data-f="loc">Helyszín</button></div>
+        <div class="seg ed-filter ed-sets" id="edSetFilter" role="group" aria-label="Szűrés szettre"></div>
         <div class="ed-helprow"><button class="btn small ed-help" id="edHelp">🪄 Segíts!</button></div>
         <p class="ed-tip">Koppints egy lapra, hogy a paklihoz add. Nyomd hosszan a részletekért.</p>
         <div class="ed-pool" id="edPool"></div>
