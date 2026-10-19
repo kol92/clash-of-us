@@ -463,6 +463,10 @@ Hősképesség-ötletek a táblázatban (még nem zöldek, nincsenek beépítve)
 ## Javítás: „Újabb ranked” → Mégse beragadás (2026-10-16)
 - Meccs után az „Újabb ranked” gomb a lezárt meccs képernyőjén indította a keresést; ha valaki „Mégse”-t nyomott, a lezárt táblán ragadt, és a zászló sem csinált semmit. Mostantól az „Újabb ranked” előbb a Ranked képernyőre visz, a keresés megszakítása lezárt meccsből a menübe visz, és lezárt meccsen a zászló is a menübe visz.
 
+## Új bolti skin: Krisz, Doflamingo style (2026-10-19, Tomi)
+- Hős-portré Krisznek (`p_krisz_doffy`, `art/p_krisz_doffy.webp`), **150 coin**, 2026-10-19-től a Boltban (limitált kínálat, a következő rotációig – 10-29). Mindig Full Art; a Gyűjteményben a hősre koppintva váltható.
+- A bolti panelen a hosszú nevek (18 karakter fölött) kisebb betűvel íródnak, hogy kiférjenek.
+
 ## Szerencsekerék: Amsterdam boosterek (2026-10-19, Tomi)
 - Az Amsterdam Hősei megjelenése óta a kerék „pack” mezője 1 Amsterdam boostert, a „Shiny” mezője 1 Amsterdam Shiny packot ad (`wheelApply`; a Boltban bontható ki). Az esélyek nem változtak.
 

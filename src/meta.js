@@ -651,7 +651,7 @@ function shopPanelHTML({ attr, img, pos, contain, name, sub, price, have, holo, 
   return `<button class="sp-card ${st}${contain ? ' contain' : ''}" ${attr} aria-label="${escH(name)} – ${have ? 'megszerezted' : price + ' coin'}${poor ? ', nincs elég coin' : ''}">
     <span class="sp-img" style="${contain ? `--packimg:url('${img}')` : `background-image:url('${img}');${pos ? `background-position:${pos};` : ''}`}"></span>${holo ? '<span class="sc-holo sp-holo" aria-hidden="true"></span>' : ''}
     <span class="sp-frame" aria-hidden="true"></span>${extra}
-    <span class="sp-name">${name}</span>${sub ? `<span class="sp-sub">${sub}</span>` : ''}
+    <span class="sp-name${name.length > 18 ? ' long' : ''}">${name}</span>${sub ? `<span class="sp-sub">${sub}</span>` : ''}
     ${have ? '' : `<span class="sp-price">${price}</span>`}
   </button>`;
 }
