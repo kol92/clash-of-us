@@ -464,7 +464,8 @@ Hősképesség-ötletek a táblázatban (még nem zöldek, nincsenek beépítve)
 - Meccs után az „Újabb ranked” gomb a lezárt meccs képernyőjén indította a keresést; ha valaki „Mégse”-t nyomott, a lezárt táblán ragadt, és a zászló sem csinált semmit. Mostantól az „Újabb ranked” előbb a Ranked képernyőre visz, a keresés megszakítása lezárt meccsből a menübe visz, és lezárt meccsen a zászló is a menübe visz.
 
 ## Bolti ritka variáns: Pifti, a király (2026-10-19, Tomi)
-- `c_pifti3` – a Pifti változata (ugyanaz a lap: 1 energia, 2/1), új képpel (Parlament), **100 coin**, 2 példány jár; csak a Boltban, a limitált kínálatban (a következő rotációig, 10-29). Packból nem jön, nem cserélhető (mint a többi bolti változat).
+- `c_piftikiraly2` – a **Pifti, a király** (epikus, 4 energia, 4/2, „Kijátszáskor 5 Pifti haverja lapot kever a paklidba.”) változata, új képpel (Parlament), **100 coin**, 2 példány jár; csak a Boltban, a limitált kínálatban (a következő rotációig, 10-29). Packból nem jön, nem cserélhető (mint a többi bolti változat).
+- Javítva aznap este: először tévesen a sima Pifti (`c_pifti3`) változataként került ki – aki addig megvette, annak a `migrate()` a gyűjteményben és a paklikban is `c_piftikiraly2`-re cseréli (darabszám és Full Art megmarad).
 
 ## Heti láda: minden szett lapjai (2026-10-19, Tomi)
 - A heti láda lapjai mostantól minden megjelent szett közös készletéből jönnek (`rollCardSlot`: Base set + Amsterdam Hősei, később az új szettek is maguktól) – a ritkaság-esélyek nem változtak; mérve ~28% Amsterdam lap. Az event-lapok (Halloween) nem kerülnek a ládába, az arany változatok sem.
