@@ -463,6 +463,9 @@ Hősképesség-ötletek a táblázatban (még nem zöldek, nincsenek beépítve)
 ## Javítás: „Újabb ranked” → Mégse beragadás (2026-10-16)
 - Meccs után az „Újabb ranked” gomb a lezárt meccs képernyőjén indította a keresést; ha valaki „Mégse”-t nyomott, a lezárt táblán ragadt, és a zászló sem csinált semmit. Mostantól az „Újabb ranked” előbb a Ranked képernyőre visz, a keresés megszakítása lezárt meccsből a menübe visz, és lezárt meccsen a zászló is a menübe visz.
 
+## Javítás: halál-animáció támadás közben (2026-10-19, Peti jelezte)
+- Ha egy karakter a saját támadásában halt meg (pl. Lendülettel lerakott karakter, akit a visszaütés megöl), a támadás „forwards” animációja és a leszállás effektje felülírta a halál-animációt: a lap félúton megállt, majd egyszerre eltűnt. Most a halálnál minden korábbi effektet leveszünk (a támadás animációját lezárjuk, nem töröljük, így a rá váró kód nem kap hibát) – a lap rendesen elhalványul, elfordul, lecsúszik.
+
 ## Amsterdam kölcsönpaklik élesben + indulás előtti teszt (2026-10-19, Tomi)
 - A 9 Amsterdam kezdőpakli (hősönként egy) 2026-10-19 19:00-tól választható, **kölcsönpakliként: paklinként 3 meccs** (`LOAN_MAX`, `p.loan`, `loanUse()` a meccs indulásakor – bot, ranked, PvP; PvP-ben meccsenként egyszer). A pakliválasztóban „🌷 Kölcsön · még N meccs”; lejárva halvány, rákoppintva: „Ezek csak kölcsön paklik voltak!” (`loanOutModal`). A Másolat gombbal saját pakli készíthető belőle (az már csak a meglévő lapokkal játszható).
 - A 19:00-s bejelentő említi a kölcsönpaklikat; az előzetes az indulás napján „ma 19:00”-t ír.

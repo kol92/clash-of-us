@@ -2365,7 +2365,7 @@ body.pf-loading #scr-menu .pb-name::after{content:'';display:inline-block;width:
 <script src="vendor/firebase-auth-compat.js"></script>
 <script src="vendor/firebase-firestore-compat.js"></script>
 <script src="vendor/firebase-database-compat.js"></script>
-<script>window.APP_VERSION = "2026.10.19-1215"; window.APP_BUILD = "2026.10.19-1323";</script>
+<script>window.APP_VERSION = "2026.10.19-1215"; window.APP_BUILD = "2026.10.19-1333";</script>
 <script>// ===== Best of Us – saját szerver (Firebase) =====
 // A játék eredetileg a Claude-os tárolót használta (window.claude.use('db' | 'user' | 'room')).
 // Ez a fájl ugyanazt a felületet adja Firebase-ből, így a játék kódja szinte változatlan maradhat:
@@ -4775,7 +4775,12 @@ async function animateEvents(evs) {
       case 'doom': fx(el, 'fx-hit'); floatAt(anchor, 'Akuma elvitte', 'dmg'); hold = Math.max(hold, 520); break;
       case 'debuff': fx(el, 'fx-hit'); floatAt(anchor, `-${e.n} ⚔`, 'dmg'); hold = Math.max(hold, 480); break;
       case 'death':
-        if (el) { const d = el; setTimeout(() => { d.classList.remove('fx-hit'); fx(d, 'fx-die'); }, 220); }
+        if (el) { const d = el; setTimeout(() => {
+          /* 2026-10-19 (Peti): a frissen lerakott (pl. Lendületes) karakteren rajta maradt az fx-land osztály, ami felülírta a halál-animációt,
+             a támadás „forwards” animációja pedig a mozgását – ezért csak eltűnt. Minden korábbi effektet leveszünk. */
+          [...d.classList].filter(c => c.startsWith('fx-')).forEach(c => d.classList.remove(c));
+          d.getAnimations().forEach(a => { if (typeof CSSAnimation !== 'undefined' && a instanceof CSSAnimation) return; try { a.finish(); a.effect = null; } catch (er) {} });   /* finish: a rá váró kód nem kap hibát */
+          fx(d, 'fx-die'); }, 220); }
         hold = Math.max(hold, 900); break;
       case 'summon':
         if (e.id === 'l_munkahely') floatAt($('#loc'), '🏢 Munkahely!', 'info');

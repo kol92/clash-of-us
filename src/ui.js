@@ -918,7 +918,12 @@ async function animateEvents(evs) {
       case 'doom': fx(el, 'fx-hit'); floatAt(anchor, 'Akuma elvitte', 'dmg'); hold = Math.max(hold, 520); break;
       case 'debuff': fx(el, 'fx-hit'); floatAt(anchor, `-${e.n} ⚔`, 'dmg'); hold = Math.max(hold, 480); break;
       case 'death':
-        if (el) { const d = el; setTimeout(() => { d.classList.remove('fx-hit'); fx(d, 'fx-die'); }, 220); }
+        if (el) { const d = el; setTimeout(() => {
+          /* 2026-10-19 (Peti): a frissen lerakott (pl. Lendületes) karakteren rajta maradt az fx-land osztály, ami felülírta a halál-animációt,
+             a támadás „forwards” animációja pedig a mozgását – ezért csak eltűnt. Minden korábbi effektet leveszünk. */
+          [...d.classList].filter(c => c.startsWith('fx-')).forEach(c => d.classList.remove(c));
+          d.getAnimations().forEach(a => { if (typeof CSSAnimation !== 'undefined' && a instanceof CSSAnimation) return; try { a.finish(); a.effect = null; } catch (er) {} });   /* finish: a rá váró kód nem kap hibát */
+          fx(d, 'fx-die'); }, 220); }
         hold = Math.max(hold, 900); break;
       case 'summon':
         if (e.id === 'l_munkahely') floatAt($('#loc'), '🏢 Munkahely!', 'info');
