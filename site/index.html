@@ -2404,7 +2404,7 @@ body.pf-loading #scr-menu .pb-name::after{content:'';display:inline-block;width:
 <script src="vendor/firebase-auth-compat.js"></script>
 <script src="vendor/firebase-firestore-compat.js"></script>
 <script src="vendor/firebase-database-compat.js"></script>
-<script>window.APP_VERSION = "2026.10.19-2238"; window.APP_BUILD = "2026.10.20-0038";</script>
+<script>window.APP_VERSION = "2026.10.19-2238"; window.APP_BUILD = "2026.10.20-0044";</script>
 <script>// ===== Best of Us – saját szerver (Firebase) =====
 // A játék eredetileg a Claude-os tárolót használta (window.claude.use('db' | 'user' | 'room')).
 // Ez a fájl ugyanazt a felületet adja Firebase-ből, így a játék kódja szinte változatlan maradhat:
@@ -6217,7 +6217,7 @@ function rollRarity() {
 }
 /* ---- GOD PACK (2026-10-20, Tomi): minden pack 0,5% eséllyel – 5 lap 3 helyett, mind Full Art, egyikük legalább arany.
    Titok: sehol nincs kiírva (esélyek közt sem), csak aki kinyitja, látja. Teszt oldalon (TEST_MODE) az első bontás eszközönként biztosan God pack. */
-function godForce() { if (!TEST_MODE) return false; try { if (localStorage.getItem('bou_god_t2') === '1') return false; localStorage.setItem('bou_god_t2', '1'); return true; } catch { return false; } }
+function godForce() { if (!TEST_MODE) return false; try { if (localStorage.getItem('bou_god_t3') === '1') return false; localStorage.setItem('bou_god_t3', '1'); return true; } catch { return false; } }
 function godPackRoll(setId) {
   const p = Store.p, pool = SETS[setId].cards, order = { k: 0, r: 1, e: 2, l: 3 };
   const rars = [rollRarity(), 'e', 'l'].sort((a, b) => order[a] - order[b]);   // legalább egy epikus és egy legendás
@@ -6667,7 +6667,7 @@ async function packOpening(setId, cards, po = {}) {
                 { duration: 620, easing: 'cubic-bezier(.3,.6,.4,1)', fill: 'forwards' }).finished,
     pk.querySelector('.pk-body').animate([{ transform: 'none' }, { transform: 'translateY(6px) rotate(-1.5deg)' }, { transform: 'translateY(2px) rotate(1.5deg)' }, { transform: 'translateY(4px)' }],
                 { duration: 520, easing: 'ease-in-out', fill: 'forwards' }).finished]);
-  if (cards.god) await godIntro(o, pk, packEl);
+  if (cards.god) await godIntro(o, pk, packEl).catch(() => { o.querySelector('.god-fx')?.remove(); packEl.style.visibility = 'hidden'; });   /* hiba esetén se ragadjon be a jelenet */
   const hasGold = cards.some(c => c.gold);
   if (hasGold && !cards.god) {   // arany van a packban: a feltépett pack aranyba borul, remeg a képernyő
     o.classList.add('gold-pack');
@@ -6714,7 +6714,6 @@ async function godIntro(o, pk, packEl) {
   const t = document.createElement('div'); t.className = 'god-title'; t.innerHTML = `<div class="god-word">GOD PACK</div><div class="op-hint" style="visibility:hidden">Koppints a folytatáshoz</div>`; layer.appendChild(t);
   t.querySelector('.god-word').animate([{ transform: 'scale(4)', opacity: 0, letterSpacing: '.6em', filter: 'blur(12px)' }, { transform: 'scale(.92)', opacity: 1, letterSpacing: '.04em', filter: 'blur(0)', offset: .7 }, { transform: 'scale(1)', opacity: 1, letterSpacing: '.04em', filter: 'blur(0)' }],
     { duration: 900, delay: 350, easing: 'cubic-bezier(.2,1.2,.4,1)', fill: 'backwards' });
-  t.querySelector('.god-sub').animate([{ opacity: 0, transform: 'translateY(12px)' }, { opacity: 1, transform: 'none' }], { duration: 500, delay: 1200, fill: 'backwards' });
   o.querySelector('.op-stage').animate([{ transform: 'translate(0,0)' }, { transform: 'translate(-9px,5px)' }, { transform: 'translate(8px,-6px)' }, { transform: 'translate(-5px,-3px)' }, { transform: 'translate(4px,4px)' }, { transform: 'none' }], { duration: 500, delay: 120 });
   await sleep(2600);
   t.querySelector('.op-hint').style.visibility = 'visible'; layer.style.pointerEvents = 'auto';
