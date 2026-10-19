@@ -2384,7 +2384,7 @@ body.pf-loading #scr-menu .pb-name::after{content:'';display:inline-block;width:
 <script src="vendor/firebase-auth-compat.js"></script>
 <script src="vendor/firebase-firestore-compat.js"></script>
 <script src="vendor/firebase-database-compat.js"></script>
-<script>window.APP_VERSION = "2026.10.19-2238"; window.APP_BUILD = "2026.10.19-2238";</script>
+<script>window.APP_VERSION = "2026.10.19-2238"; window.APP_BUILD = "2026.10.19-2241";</script>
 <script>// ===== Best of Us – saját szerver (Firebase) =====
 // A játék eredetileg a Claude-os tárolót használta (window.claude.use('db' | 'user' | 'room')).
 // Ez a fájl ugyanazt a felületet adja Firebase-ből, így a játék kódja szinte változatlan maradhat:
@@ -8724,7 +8724,7 @@ async function frTradeModal(uid) {
   const cell = (c, i, pick) => `<button class="tr-c" data-${pick}="${i}">${cardHTML(c.id, { foil: c.foil })}<span class="tr-n">×${c.k}${pick === 'w' && owned(c.id) ? ` · neked ${owned(c.id)}` : ''}</span></button>`;
   const grid = (arr, pick, extra) => { const v = arr.map((c, i) => [c, i]).filter(([c]) => tfOk(c)), x = (extra || []).filter(tfOk);
     if (!v.length && !x.length) return `<div class="tr-grid"><p class="q-note tr-none">${arr.length ? 'Nincs a szűrésnek megfelelő lap.' : pick === 'w' ? 'Neki még nincs cserélhető lapja.' : ''}</p></div>`;
-    return `<div class="tr-grid">${v.map(([c, i]) => cell(c, i, pick)).join('')}${x.map(c => `<div class="tr-c tr-off">${cardHTML(c.id, { foil: c.foil })}<span class="tr-n">${RAR[CARD[c.id].rarity]} – ezért nem adható</span></div>`).join('')}</div>`; };
+    return `<div class="tr-grid">${v.map(([c, i]) => cell(c, i, pick)).join('')}${x.map(c => `<div class="tr-c tr-off">${cardHTML(c.id, { foil: c.foil })}<span class="tr-n">${c.why}</span></div>`).join('')}</div>`; };
   const tfWire = (arr, pick, extra) => { const box = o.querySelector('.tr-box'), q = box.querySelector('.tr-q');
     const re = () => { box.querySelector('.tr-grid').outerHTML = grid(arr, pick, extra && TF.q ? extra : null); };
     q.oninput = () => { TF.q = q.value.trim(); re(); };
@@ -8741,11 +8741,14 @@ async function frTradeModal(uid) {
     const mine = []; for (const [id, e] of Object.entries(Store.p.coll)) { if (!tradable(id) || id === want.id || CARD[id].rarity !== CARD[want.id].rarity) continue; const k = want.foil ? e.f : e.n; if (k > 0) mine.push({ id, foil: want.foil, k }); }
     sortC(mine); o._mine = mine;
     /* kereséskor a többi (más ritkaságú / nem Full Art) lapod is látszik, szürkén, hogy kiderüljön, miért nem adható */
-    const off = []; for (const [id, e] of Object.entries(Store.p.coll)) { if (!tradable(id) || id === want.id || mine.some(m => m.id === id)) continue; const k = want.foil ? e.f : e.n; if (k > 0) off.push({ id, foil: want.foil, k }); }
+    const off = [], wr = CARD[want.id].rarity; for (const [id, e] of Object.entries(Store.p.coll)) { if (!tradable(id) || mine.some(m => m.id === id) || !(e.n || e.f)) continue;
+      const k = want.foil ? e.f : e.n, foil = k > 0 ? want.foil : !want.foil;   /* miért nem adható: ugyanaz a lap / más ritkaság / csak a másik változat (Full Art ↔ sima) van meg */
+      off.push({ id, foil, k: k || (want.foil ? e.n : e.f), why: id === want.id ? 'Ugyanezt a lapot kéred' : CARD[id].rarity !== wr ? `${RAR[CARD[id].rarity]} – ezért nem adható` : want.foil ? 'Csak sima példányod van – Full Artért nem adható' : 'Csak Full Art példányod van – csak Full Artért adható' }); }
+    const faOnly = off.filter(c => c.id !== want.id && CARD[c.id].rarity === wr).length;
     tfReset();
     o.innerHTML = `<div class="modal tr-box"><h3>Mit adsz érte?</h3><div class="tr-want">${cardHTML(want.id, { foil: want.foil })}<span>${RAR[CARD[want.id].rarity]}${want.foil ? ' · Full Art' : ''} – csak ${want.foil ? 'Full Art ' : ''}${RAR[CARD[want.id].rarity].toLowerCase()} lapot adhatsz érte</span></div>
-      ${mine.length ? tfBar(false) + grid(mine, 'g') : `<p class="q-note">Nincs olyan ${want.foil ? 'Full Art ' : ''}${RAR[CARD[want.id].rarity].toLowerCase()} lapod, amit adhatnál érte.</p>`}<button class="btn" data-back1>Vissza</button></div>`;
-    if (mine.length) tfWire(mine, 'g', off);
+      ${faOnly ? `<p class="q-note tr-fa">ℹ️ ${faOnly} ${RAR[wr].toLowerCase()} lapod csak ${want.foil ? 'sima' : 'Full Art'} változatban van meg – ${want.foil ? 'sima lapért' : 'Full Art lapért'} adhatod őket (keresésnél szürkén látszanak).</p>` : ''}${mine.length || off.length ? tfBar(false) + grid(mine, 'g') : ''}${mine.length ? '' : `<p class="q-note">Nincs olyan ${want.foil ? 'Full Art ' : ''}${RAR[wr].toLowerCase()} lapod, amit adhatnál érte.</p>`}<button class="btn" data-back1>Vissza</button></div>`;
+    if (mine.length || off.length) tfWire(mine, 'g', off);
   };
   const step3 = give => {
     const inDeck = (Store.p.decks || []).some(d => d.list[give.id] && d.list[give.id] >= owned(give.id));
