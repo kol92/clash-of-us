@@ -518,13 +518,13 @@ Hősképesség-ötletek a táblázatban (még nem zöldek, nincsenek beépítve)
 
 ## Smaragd és Gyémánt liga a 2. ranked szezontól (2026-10-19, Tomi)
 - A 2. ranked szezontól (10-23) Arany és Legenda között: **Smaragd 5–1** (t 15–19) és **Gyémánt 5–1** (t 20–24), Legenda t=25. Az 1. ranked szezon (`s2`) a régi skálán fut végig (Legenda = 15) – `rkLegOf(szezon)`, `rkLeg()`, `rkNameL`, `rkTierClsL`.
-- Smaragdban és Gyémántban 5 csillag kell fokozatonként; Aranytól felfelé nincs sorozatbónusz (`rkHard`); liga-esésvédelem: Smaragd 5 és Gyémánt 5 alá sem lehet visszaesni; Aranytól Mester bot.
+- Smaragdban és Gyémántban 5 csillag kell fokozatonként; Aranytól felfelé nincs sorozatbónusz (`rkHard`); liga-esésvédelem: Smaragd 5 és Gyémánt 5 alá sem lehet visszaesni; Mester bot csak Gyémánttól (Gyémánt + Legenda; 2026-10-20, Tomi), Aranyban és Smaragdban Nehéz bot.
 - Lépcsőjutalmak (`RK_REWARDS_S2`): Bronz 4: 2 pack · Ezüst 5: 2 Shiny · Arany 5: 1000 coin · **Smaragd 5: 3 Shiny · Gyémánt 5: 2000 coin** (javaslat, Tomi átírhatja) · Legenda: Legenda hátlap. Az 1. szezon jutalmai (`RK_REWARDS_S1`) változatlanok.
 - Címer: `art/ui/rank-emerald.webp` (arany keret, smaragd), `rank-diamond.webp` (ezüst keret, kék gyémánt) – Tomi küldte 2026-10-19 este (előtte átszínezett ideiglenes képek). A ranked oldal szabályleírása szezontól függően írja ki a ligákat és a szezon végét.
 
 ## Ranked szezonok a Season Passtól függetlenül + top 3 szezonjutalom (2026-10-19, Tomi)
 - `RK_SEASONS` (meta.js): **1. ranked szezon** (id `s2`, hogy a meglévő rangok megmaradjanak) 2026-10-12 – **2026-10-23 (péntek) 0:00**; **2. ranked szezon** (`r2`) 10-23 0:00 – 11-11 0:00. A következő ranked szezont ide kell felvenni.
-- A „nehezebb ranked” (`rkHard`: Aranyban nincs dupla csillag, Aranytól Mester bot) a 2. ranked szezontól, azaz péntektől él.
+- A „nehezebb ranked” (`rkHard`: Aranyban nincs dupla csillag, Gyémánttól Mester bot) a 2. ranked szezontól, azaz péntektől él.
 - Szezonváltáskor a régi szezon végeredménye a profilba (`p.rkHist`) és a nyilvános kártyára (`pub.rkh`) kerül – ebből számolható a végső ranglista (`rkFinalBoard`, sorrend: rang, csillag / Legenda-pont, győzelmek).
 - **Top 3 jutalom:** `RK_TOP_REW[szezon] = [1., 2., 3. hely]` (pl. `{ coins: 2000, shiny: 5 }`) – **Tomi küldi**. A szezon zárása után 1 órával a menübe lépő játékos megnézi a végeredményt; ha az első háromban van, egyszer megkapja (`p.rkTop`), felugró ablakkal. Tesztelve (19:05 → péntek 2:00-s órával).
 
@@ -683,7 +683,7 @@ Hősképesség-ötletek a táblázatban (még nem zöldek, nincsenek beépítve)
 - Ok: Krisztián ~2 óra alatt jutott Arany 5-ről Legendába (Aranyban kb. 75%-os győzelem, a dupla csillaggal ~22 meccs).
 - Az 1. szezon végétől (`rkHard()`: a `s2` szezon vége után) automatikusan:
   - **Aranyban nincs dupla csillag** (a győzelmi sorozat bónusza csak Bronzban és Ezüstben jár).
-  - **Mester bot Aranytól** (`BOT_LV[4]`, `rkBotLv`): a Nehéz bot gondolkodása, a 🪄 paklisegéd által a teljes kártyakészletből összerakott paklival, és **+6 élettel kezd** (nyílt előny, a VS képernyő kiírja: „Bot · Mester (+6 élet)”).
+  - **Mester bot Gyémánttól** (2026-10-20 óta; előtte: Aranytól) (`BOT_LV[4]`, `rkBotLv`): a Nehéz bot gondolkodása, a 🪄 paklisegéd által a teljes kártyakészletből összerakott paklival, és **+6 élettel kezd** (nyílt előny, a VS képernyő kiírja: „Bot · Mester (+6 élet)”).
 - Mérés: Mester a Nehéz ellen 66,5%, a Normál ellen ~75% (+6 élettel; pusztán erősebb paklival / mélyebb kereséssel csak ~50–52% volt a Nehéz ellen). Szimuláció Arany 5 → Legenda dupla csillag nélkül: 60%-os játékos ~81 meccs, 70%-os ~46, 55%-os ~133.
 - A ranked „Hogyan működik?” már most előre jelzi a változást.
 
