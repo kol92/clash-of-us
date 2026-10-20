@@ -3395,7 +3395,7 @@ function renderRanked() {
       ${RKB.tab !== 'fr' ? '<p class="q-note rk-tip">Koppints egy játékosra – innen is bejelölheted barátnak.</p>' : ''}</div>
     <details class="rk-rules"><summary>Hogyan működik?</summary><ul>
       ${rkLeg() > 15 ? `<li><b>Új ligák:</b> Arany után jön a 💚 <b>Smaragd</b> és a 💎 <b>Gyémánt</b> (5–5 fokozat), csak utána a Legenda.</li>` : ''}
-      <li>Győzelem: +1 csillag. Sorozatban a 3. győzelemtől minden győzelem dupla, azaz 2 csillagot ér – ${rkHard() ? 'csak Bronzban és Ezüstben (Aranytól felfelé nem)' : 'Bronzban, Ezüstben és Aranyban is'}.</li>${rkHard() ? '\n      <li>Aranytól felfelé a Mester bot jön (erős pakli, +6 élet), ha nincs élő ellenfél.</li>' : '\n      <li>A 2. ranked szezontól (okt. 23.) nehezebb lesz: Arany után Smaragd és Gyémánt liga jön, Aranytól nem jár dupla csillag, és a Mester bot jön (erős pakli, +6 élet).</li>'}
+      <li>Győzelem: +1 csillag. Sorozatban a 3. győzelemtől minden győzelem dupla, azaz 2 csillagot ér – ${rkHard() ? 'csak Bronzban és Ezüstben (Aranytól felfelé nem)' : 'Bronzban, Ezüstben és Aranyban is'}.</li>${rkHard() ? '\n      <li>Aranyban és Smaragdban a Nehéz, Gyémánttól a Mester bot jön (erős pakli, +6 élet), ha nincs élő ellenfél.</li>' : '\n      <li>A 2. ranked szezontól (okt. 23.) nehezebb lesz: Arany után Smaragd és Gyémánt liga jön, Aranytól nem jár dupla csillag, és Gyémánttól a Mester bot jön (erős pakli, +6 élet).</li>'}
       <li>Az elért ligából nem esel vissza: ${rkLeg() > 15 ? 'Ezüst 5, Arany 5, Smaragd 5 és Gyémánt 5' : 'Ezüst 5 és Arany 5'} alá sem, csak a ligán belül.</li>
       <li>Bronzban 2, Ezüstben 3, Aranyban 4${rkLeg() > 15 ? ', Smaragdban és Gyémántban 5' : ''} csillag kell egy fokozathoz. ${rkLeg() > 15 ? 'Gyémánt 1' : 'Arany 1'} után jön a Legenda.</li>
       <li>Bronzban és Ezüst 5-ön a vereség nem visz el csillagot, és Ezüst 5 alá már nem eshetsz vissza.</li>
@@ -3415,8 +3415,8 @@ function rankedSearch(dk) {
 // bot-szint (2026-10-12): a bot elleni meccsben választható; az új játékosnak (első 5 meccs) Könnyű az alap.
 // Rankedben a rang dönt: Bronz 5–3 Könnyű, Bronz 2 – Ezüst 1 Normál, Arany és Legenda Nehéz.
 function botLvPref() { const p = Store.p; if (!p) return 2; if (p.botLv) return p.botLv; const g = (p.stats?.w || 0) + (p.stats?.l || 0) + (p.stats?.d || 0); return g < 5 ? 1 : 2; }
-function rkBotLv() { const r = ensureRank(Store.p); const t = r ? r.t : 0; return t <= 2 ? 1 : t < 10 ? 2 : rkHard() ? 4 : 3; }
-// 2. szezontól (2026-11-11, Tomi döntése 2026-10-13): Aranyban nincs dupla csillag, és Aranytól Mester bot jön
+function rkBotLv() { const r = ensureRank(Store.p); const t = r ? r.t : 0; return t <= 2 ? 1 : t < 10 ? 2 : rkHard() && t >= 20 ? 4 : 3; }   /* 2026-10-20 (Tomi): Mester bot csak Gyémánttól (Gyémánt + Legenda), Arany/Smaragd: Nehéz */
+// 2. szezontól (2026-11-11, Tomi döntése 2026-10-13): Aranyban nincs dupla csillag; Mester bot Gyémánttól (2026-10-20)
 const rkHard = () => Date.now() >= RK_SEASONS[0].end.getTime();   /* a 2. ranked szezontól (2026-10-23) */
 function rankedBot(dk) {
   ui.deck = dk.id;
