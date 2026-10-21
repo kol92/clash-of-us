@@ -463,6 +463,9 @@ Hősképesség-ötletek a táblázatban (még nem zöldek, nincsenek beépítve)
 ## Javítás: „Újabb ranked” → Mégse beragadás (2026-10-16)
 - Meccs után az „Újabb ranked” gomb a lezárt meccs képernyőjén indította a keresést; ha valaki „Mégse”-t nyomott, a lezárt táblán ragadt, és a zászló sem csinált semmit. Mostantól az „Újabb ranked” előbb a Ranked képernyőre visz, a keresés megszakítása lezárt meccsből a menübe visz, és lezárt meccsen a zászló is a menübe visz.
 
+## Safari „vissza” húzás tiltása meccs közben (2026-10-21, Laci javaslata)
+- Meccs közben (`body.in-game`) a képernyő bal/jobb szélén (14 px) induló egyujjas érintést elnyeljük (`touchstart` + `preventDefault`, ui.js), így a böngészős (Safari) szélről húzós vissza-gesztus nem indul el; `overscroll-behavior:none` is. A visszalépés eddig sem vitt ki a meccsből (`popstate` → `keep()`), de a Safari húzás-animációja zavart. Menükben marad a gesztus.
+
 ## Pakliszerkesztő: szebb változatok + hosszú nyomás a listában (2026-10-21, Laci javaslata)
 - **✨ Szebb változatok (N)** gomb (a 🪄 alatt, `#edUpg`): ha a pakliban lévő laphoz megvan egy változat (arany változat előre, aztán a ritka változatok), egy koppintással lecseréli (`upgradeList`, amely mostantól az aranyat részesíti előnyben). Csak akkor látszik, ha van mit cserélni; a 🪄 gomb ilyenkor „↶ Visszavonás”. A Full Art példányok eddig is maguktól csillognak a meccsen (`myFoils`), ahhoz nem kell csere.
 - A jobb oldali pakli-listában is **hosszan nyomva** megnyílik a lap nagyban (db a pakliban / gyűjteményben + súgó); a sima koppintás továbbra is kivesz egyet.
