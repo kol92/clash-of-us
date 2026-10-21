@@ -463,6 +463,9 @@ Hősképesség-ötletek a táblázatban (még nem zöldek, nincsenek beépítve)
 ## Javítás: „Újabb ranked” → Mégse beragadás (2026-10-16)
 - Meccs után az „Újabb ranked” gomb a lezárt meccs képernyőjén indította a keresést; ha valaki „Mégse”-t nyomott, a lezárt táblán ragadt, és a zászló sem csinált semmit. Mostantól az „Újabb ranked” előbb a Ranked képernyőre visz, a keresés megszakítása lezárt meccsből a menübe visz, és lezárt meccsen a zászló is a menübe visz.
 
+## Kulcsszó-szalag: Igézhetetlen (2026-10-21, Astra UI)
+- `art/ui/kw-elusive.webp` (640×104, átlátszó háttér): a lap súgójában (`cardHelpHTML`) a kulcsszó címe helyén ez a szalag látszik. Új szalag felvétele: kép az `art/ui/kw-*.webp`-be + egy sor a `KW_IMG`-be (ui.js, a `KW_HELP` fölött; kulcs = a kulcsszó neve).
+
 ## High Hawaiians: + 1 húzás (2026-10-21, Tomi)
 - Új szöveg: „Keverj öt Varázsgomba lapot a paklidba, majd húzz egy lapot.” A húzás a keverés után jön (lehet, hogy épp gomba). Az arany változat ugyanígy. Mérve korábban ~40%-os volt (a bot alulhasználja), ez erősítés. Teszt: `tools/ah_test.js`.
 
