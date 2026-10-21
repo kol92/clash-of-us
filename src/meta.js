@@ -1051,7 +1051,7 @@ function upgradeList(list) {
   if (!Store.p) return list;
   const out = { ...list };
   for (const [id, k] of Object.entries(list)) {
-    const vars = CARDS.filter(v => v.variantOf === id && owned(v.id) > 0).sort((a, b) => owned(b.id) - owned(a.id));
+    const vars = CARDS.filter(v => v.variantOf === id && owned(v.id) > 0).sort((a, b) => (b.goldVar ? 1 : 0) - (a.goldVar ? 1 : 0) || owned(b.id) - owned(a.id));   /* az arany változat előre (2026-10-21) */
     let left = k;
     for (const v of vars) { const use = Math.min(left, owned(v.id) - (out[v.id] || 0)); if (use > 0) { out[v.id] = (out[v.id] || 0) + use; left -= use; } }
     if (left < k) { if (left) out[id] = left; else delete out[id]; }
@@ -1240,6 +1240,11 @@ function renderEditor() {
   $('#edHelp').parentNode.hidden = ED.readonly;
   $('#edHelp').textContent = ED.undo ? '↶ Visszavonás' : n >= DECK_SIZE ? '🪄 Kész a pakli' : `🪄 Segíts! (+${DECK_SIZE - n} lap)`;
   $('#edHelp').classList.toggle('undo', !!ED.undo);
+  /* Laci javaslata (2026-10-21): ha van meg egy lap szebb változata (arany / ritka változat), egy gombbal lecseréli. A Full Art magától csillog, ahhoz nem kell semmi. */
+  { const up = ED.readonly ? null : upgradeList(d.list), nUp = up ? Object.keys(d.list).reduce((a, id) => a + Math.max(0, (d.list[id] || 0) - (up[id] || 0)), 0) : 0;
+    let ub = $('#edUpg'); if (!ub) { ub = document.createElement('button'); ub.id = 'edUpg'; ub.className = 'btn small ed-help ed-upg'; $('#edHelp').parentNode.appendChild(ub);
+      ub.onclick = () => { const dd = ED.deck, prev = { ...dd.list }, nl = upgradeList(dd.list); dd.list = nl; ED.undo = prev; renderEditor(); toast('✨ Lecseréltem a szebb változatokra – a hatásuk ugyanaz'); }; }
+    ub.hidden = !nUp; ub.textContent = `✨ Szebb változatok (${nUp})`; }
   $('#edShare').disabled = !n;
   $('#edStatus').textContent = ED.readonly ? 'Kezdőpakli – másold le, ha módosítanád.' : prob ? `Még nem játszható: ${prob}` : '✓ Játékra kész';
   $('#edStatus').className = 'ed-status' + (!ED.readonly && !prob ? ' ok' : '');
@@ -1268,9 +1273,19 @@ $('#edPool').addEventListener('click', e => {
   if (row) { row.scrollIntoView({ block: 'nearest' }); row.animate([{ background: 'rgba(255,211,77,.45)' }, { background: '' }], { duration: 500 }); }
 });
 $('#edPool').addEventListener('contextmenu', e => { const b = e.target.closest('[data-add]'); if (b) { e.preventDefault(); } });
+/* hosszú nyomás a pakli listájában is: a lap részletei (Laci javaslata, 2026-10-21) */
+let edLPress = null;
+$('#edList').addEventListener('pointerdown', e => {
+  const b = e.target.closest('[data-rm]'); if (!b) return;
+  edLPress = { t: setTimeout(() => { edLPress.long = true; const id = b.dataset.rm; openModal(cardHTML(id, { big: true, foil: ownsFoil(id) }), `${ED.deck.list[id] || 0} db a pakliban · ${owned(id)} db a gyűjteményedben`, cardHelpHTML(id)); }, 450) };
+});
+['pointerup', 'pointercancel', 'pointerleave'].forEach(t => $('#edList').addEventListener(t, () => { if (edLPress) clearTimeout(edLPress.t); }));
+$('#edList').addEventListener('contextmenu', e => { if (e.target.closest('[data-rm]')) e.preventDefault(); });
 $('#edList').addEventListener('click', e => {
   const b = e.target.closest('[data-rm]');
   if (!b) return;
+  if (edLPress && edLPress.long) { edLPress = null; return; }
+  edLPress = null;
   if (ED.readonly) { openModal(cardHTML(b.dataset.rm, { big: true, foil: ownsFoil(b.dataset.rm) }), '', cardHelpHTML(b.dataset.rm)); return; }
   const d = ED.deck.list, id = b.dataset.rm; d[id]--; if (!d[id]) delete d[id]; ED.undo = null; renderEditor();
 });
