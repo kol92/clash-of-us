@@ -36,7 +36,7 @@ s.active = 0; s.players[0].struck = false; s.players[1].board = [null, null, nul
 // Összetartás átka
 s = G('tomi', 'bence'); s.players[0].grave = [{ id: 'c_vajda' }, { id: 'a_dinnyes' }, { id: 'c_query' }, { id: 'c_gyuri' }];
 give(s, 0, 'f_atok'); E.playCard(s, 0, 0, { k: 'none' });
-ok(ids(s.players[0].board).split(' ').filter(x => x !== '-').sort().join() === ['c_gyuri:3/3', 'c_vajda:4/5'].sort().join(), 'Átok: két karakter vissza +2/+2 (' + ids(s.players[0].board) + ')');
+ok(ids(s.players[0].board).split(' ').filter(x => x !== '-').sort().join() === ['c_gyuri:2/2', 'c_vajda:3/4'].sort().join(), 'Átok: két karakter vissza, eszköz nélkül alapértéken – 2026-10-21 óta nincs +1/+1 (' + ids(s.players[0].board) + ')');
 ok(!s.players[0].grave.some(g => g.id === 'c_vajda' || g.id === 'c_gyuri'), 'Átok: kikerültek a temetőből');
 s = G('tomi', 'bence'); give(s, 0, 'f_atok'); ok(!E.canPlay(s, 0, 0), 'Átok: üres temetőnél nem játszható');
 // Bocsi, de vezetek (Dávid új Kánonja, 2026-10-18 – a Munkahely helyett)
