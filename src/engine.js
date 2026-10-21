@@ -72,7 +72,7 @@ const CARDS = [
   { id:'l_coffeeshop', set:'ah', type:'loc', name:'Coffee Shop', cost:3, rarity:'r', text:'Minden kör végén a soron lévő játékos paklijába bekeveredik egy véletlen eszköz lap.' },
   { id:'l_voros', set:'ah', type:'loc', name:'Vöröslámpás negyed', cost:1, rarity:'k', text:'Minden kör végén, a támadások előtt a soron lévő játékos egy véletlen karaktere végleg +1 támadást kap.' },
   { id:'c_kutya', set:'ah', type:'char', name:'Drog kereső kutya', cost:2, atk:2, hp:1, rarity:'r', sneak:true, deathDiscard:1, text:'Amikor meghal, az ellenfél eldob egy véletlen lapot a kezéből.' },
-  { id:'a_hawaiians', set:'ah', type:'action', name:'High Hawaiians', cost:4, tgt:'none', rarity:'e', text:'Keverj öt Varázsgomba lapot a paklidba.' },
+  { id:'a_hawaiians', set:'ah', type:'action', name:'High Hawaiians', cost:4, tgt:'none', rarity:'e', text:'Keverj öt Varázsgomba lapot a paklidba, majd húzz egy lapot.' },   /* +húzás: 2026-10-21 (Tomi) */
   { id:'a_repter', set:'ah', type:'action', name:'Reptéri ellenőrzés', cost:6, tgt:'airport', rarity:'r', text:'Válassz egy karaktert (sajátot vagy ellenségeset), és tedd át a tábla másik oldalára, egy ottani üres helyre.' },
   { id:'a_bong', set:'ah', type:'action', name:'Bong', cost:1, tgt:'none', rarity:'r', bong:1, text:'Az ellenfeled kezébe kerül, 1-gyel drágábban. Akinek a köre végén a kezében marad, eldobja, és a hőse annyit sebződik, amennyibe a lap kerül.' },
   { id:'a_irreggeli', set:'ah', type:'action', name:'Ír reggeli', cost:6, tgt:'none', rarity:'k', text:'Mindkét hős élete teljesen visszagyógyul.' },
@@ -599,7 +599,7 @@ function playCard(s, pi, hi, t) {
         reveal(s, ei, t.i);
         Object.assign(u, { noKw:true, haste:false, shield:false, taunt:false, muscle:false, invis:false, elusive:false, hidden:false }); delete u.boon;
         ev(s, { t:'silence', side:ei, i:t.i }); break; }
-      case 'a_hawaiians': for (let k = 0; k < 5; k++) p.deck.push('i_gomba'); shuffle(p.deck); p.welc = (p.welc || 0) + 5;   /* a bot is értékelje (2026-10-19) */ ev(s, { t:'shuffled', side:pi, i:-1, n:5, id:'i_gomba' }); break;
+      case 'a_hawaiians': for (let k = 0; k < 5; k++) p.deck.push('i_gomba'); shuffle(p.deck); p.welc = (p.welc || 0) + 5;   /* a bot is értékelje (2026-10-19) */ ev(s, { t:'shuffled', side:pi, i:-1, n:5, id:'i_gomba' }); draw(s, pi); break;
       case 'a_repter': if (t.t2) {
         const sd = t.side, os = t.t2.side, j = t.t2.i, src = s.players[sd], dst = s.players[os], u = src.board[t.i];
         if (!u || dst.board[j]) break;
