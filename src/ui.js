@@ -53,6 +53,8 @@ const TYPE_HELP = {
   action:['Akció', 'Egyszer használatos: kijátszod, azonnal hat, aztán a temetőbe kerül.'],
   loc:   ['Helyszín', 'A pálya közepére kerül, és mindkét játékosra hat, amíg egy másik helyszín le nem cseréli.'],
 };
+/* kulcsszó-szalagok (Astra UI, 2026-10-21): ha van kép, a súgóban a cím helyén az jelenik meg */
+const KW_IMG = { 'Igézhetetlen': 'art/ui/kw-elusive.webp' };
 const KW_HELP = {
   drink: ['Ital', 'Az akciók és eszközök között vannak italok. Kristóf kijátszáskor ezek közül ad egyet véletlenszerűen a kezedbe.'],
   muscle:['Izom', 'Ha a támadása megöli a vele szemben álló karaktert, a maradék sebzés az ellenfél hősét éri (Pajzs esetén nincs átütés).'],
@@ -88,7 +90,7 @@ function cardHelpHTML(id, u) {
   if (c.rarity === 'l') add('legend');
   if (c.finisher && !c.hero) rows.unshift(['Kánon esemény · közös', 'Ultra erős lap, bármelyik hős paklijába beteheted (egy pakliban legfeljebb 1). Kijátszáskor elsötétül a pálya, és különleges bevonulása van.']);
   else if (c.finisher) rows.unshift(['Kánon esemény', `Ultra erős lap, csak ${HERO[c.hero].name} paklijába tehető (a jobb felső sarokban az ő portréja). Kijátszáskor elsötétül a pálya, és különleges bevonulással érkezik.`]);
-  return `<dl class="help">${rows.map(([a, b]) => `<div><dt>${a}</dt><dd>${b}</dd></div>`).join('')}</dl>`;
+  return `<dl class="help">${rows.map(([a, b]) => { const im = KW_IMG[a]; return `<div${im ? ' class="kw-has"' : ''}><dt>${im ? `<img class="kw-ban" src="${im}" alt="${a}">` : a}</dt><dd>${b}</dd></div>`; }).join('')}</dl>`;
 }
 
 function hueOf(str) { let h = 0; for (const ch of str) h = (h * 31 + ch.charCodeAt(0)) % 360; return h; }
