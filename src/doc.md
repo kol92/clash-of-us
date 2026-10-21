@@ -463,6 +463,10 @@ Hősképesség-ötletek a táblázatban (még nem zöldek, nincsenek beépítve)
 ## Javítás: „Újabb ranked” → Mégse beragadás (2026-10-16)
 - Meccs után az „Újabb ranked” gomb a lezárt meccs képernyőjén indította a keresést; ha valaki „Mégse”-t nyomott, a lezárt táblán ragadt, és a zászló sem csinált semmit. Mostantól az „Újabb ranked” előbb a Ranked képernyőre visz, a keresés megszakítása lezárt meccsből a menübe visz, és lezárt meccsen a zászló is a menübe visz.
 
+## Bender és Az összetartás átka módosítás (2026-10-21, Tomi)
+- **Bender** (Bence Kánonja): az Árnyékemberek mind **Provokációval** kerülnek be. Új szöveg: „Minden szabad helyedre egy Provokációs Árnyékember (1/1) kerül…”. Bence saját paklival 47,8% → 48,7%.
+- **Az összetartás átka** (Tomi Kánonja): a két karakter **úgy tér vissza, ahogy meghalt**: a saját eszközeivel együtt (statok, Pajzs/Lendület/Izom/Provokáció/Igézhetetlen, Bunda Zolin, Vodkása TZS-en), és a Varázsgombák ereje is visszajön. Az ellenséges eszközök (pl. Buffalo) és az Akuma-szerű „meghal” eszközök nem jönnek vissza; a visszatérő eszközök kikerülnek a temetőből. A véletlen erő marad, **a +1/+1 viszont elmaradt** (Tomi döntése a mérés után: +1/+1-gyel Tomi 57,2% lett volna, így 53,7%; előtte 53,0%). Halálkor a temetőbe kerülő karakter-bejegyzés eltárolja a saját eszközeit (`items`) és a gomba-erőt (`gb`). Teszt: `tools/atok_items_test.js`.
+
 ## Kulcsszó-szalag: Igézhetetlen (2026-10-21, Astra UI)
 - `art/ui/kw-elusive.webp` (640×104, átlátszó háttér): a lap súgójában (`cardHelpHTML`) a kulcsszó címe helyén ez a szalag látszik. Új szalag felvétele: kép az `art/ui/kw-*.webp`-be + egy sor a `KW_IMG`-be (ui.js, a `KW_HELP` fölött; kulcs = a kulcsszó neve).
 

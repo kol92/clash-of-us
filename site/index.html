@@ -2406,7 +2406,7 @@ body.pf-loading #scr-menu .pb-name::after{content:'';display:inline-block;width:
 <script src="vendor/firebase-auth-compat.js"></script>
 <script src="vendor/firebase-firestore-compat.js"></script>
 <script src="vendor/firebase-database-compat.js"></script>
-<script>window.APP_VERSION = "2026.10.21-0918"; window.APP_BUILD = "2026.10.21-1055";</script>
+<script>window.APP_VERSION = "2026.10.21-1113"; window.APP_BUILD = "2026.10.21-1113";</script>
 <script>// ===== Best of Us – saját szerver (Firebase) =====
 // A játék eredetileg a Claude-os tárolót használta (window.claude.use('db' | 'user' | 'room')).
 // Ez a fájl ugyanazt a felületet adja Firebase-ből, így a játék kódja szinte változatlan maradhat:
@@ -2794,11 +2794,11 @@ const CARDS = [
   { id:'l_barhole', type:'loc', name:'Barhole', cost:1, rarity:'k', text:'Minden lap kijátszása 1-gyel kevesebbe kerül.' },
   { id:'l_laciverse', type:'loc', name:'Laciverse', cost:3, rarity:'e', text:'Csak annak segít, aki kijátszotta: minden karaktere +1 támadást kap.' },
   // --- Kánon esemény lapok: hősönként egy, csak annak a hősnek a paklijába. off = még nincs grafika, sehol nem látszik ---
-  { id:'f_bender', type:'action', name:'Bender', cost:6, rarity:'l', finisher:true, hero:'bence', tgt:'summon', text:'Minden szabad helyedre egy Árnyékember (1/1) kerül. Minden hiányzó hely után mindegyik +1/+1-et kap (pl. 2 szabad hely: két 3/3-as).' },
+  { id:'f_bender', type:'action', name:'Bender', cost:6, rarity:'l', finisher:true, hero:'bence', tgt:'summon', text:'Minden szabad helyedre egy Provokációs Árnyékember (1/1) kerül. Minden hiányzó hely után mindegyik +1/+1-et kap (pl. 2 szabad hely: két 3/3-as).' },
   { id:'f_egyutt', type:'action', name:'Együtt sírtok, együtt nevettek', cost:6, rarity:'l', finisher:true, hero:'gabi', tgt:'summon', text:'Megidéz egy Gyerek Zanát (3/3, Lendület) és egy Gyerek Gabit (3/3, Izom).' },
   { id:'f_jbl', type:'action', name:'JBL', cost:6, rarity:'l', finisher:true, hero:'laci', tgt:'ownSlot', text:'Lerakod a JBL hangfalat (0/4). A köröd végén 1 sebzést okoz minden ellenséges karakternek és az ellenfél hősének. Amíg él, az ellenfél két szélső helye zárva van, és legfeljebb 2 karaktere lehet. Ha kijátszáskor 2-nél több karaktere van, a szélső helyeken állók elpusztulnak.' },
   { id:'f_metamorf', type:'action', name:'Metamorfózis', cost:6, rarity:'l', finisher:true, hero:'krisz', text:'Krisz Baszóvá változik, és 12 élete lesz. Baszó minden köröd végén a karaktereid után 3-at üt: mindig a legbalra álló ellenséges karaktert, ha nincs ilyen, az ellenfél hősét. Neki nem lehet visszaütni.' },
-  { id:'f_atok', type:'action', name:'Az összetartás átka', cost:6, rarity:'l', finisher:true, hero:'tomi', tgt:'grave', text:'Két véletlen karakter visszatér a temetődből a pályára, +1/+1-gyel, és mindkettő kap egy-egy véletlen erőt: Izom, Láthatatlan, Provokáció, Pajzs, Sunyulás vagy Lendület.' },
+  { id:'f_atok', type:'action', name:'Az összetartás átka', cost:6, rarity:'l', finisher:true, hero:'tomi', tgt:'grave', text:'Két véletlen karakter visszatér a temetődből a pályára úgy, ahogy meghalt (az eszközeivel együtt), és mindkettő kap egy-egy véletlen erőt: Izom, Láthatatlan, Provokáció, Pajzs, Sunyulás vagy Lendület.' },
   { id:'f_vezetek', type:'action', name:'Bocsi, de vezetek', cost:6, rarity:'l', finisher:true, hero:'david', tgt:'none', text:'A játék végéig minden karakter, amit kijátszol, +1/+1-et és egy véletlen képességet kap: Lendület, Provokáció vagy Pajzs.' },
   { id:'f_munkahely', off:true, type:'action', name:'A munkahely', cost:6, rarity:'l', finisher:true, hero:'david', text:'Húzol 2 lapot, és kijátssza a Munkahely helyszínt: a te lapjaid 1-gyel olcsóbbak, az ellenfélé 1-gyel drágábbak. Ha a Munkahely eltűnik, Dávid 5 életet gyógyul.' },
   { id:'f_gepuzem', type:'action', name:'Gépüzemmód', cost:6, rarity:'l', finisher:true, hero:'milo', text:'Ha Milo meghalna, egyszer visszatér 10 élettel.' },
@@ -2815,7 +2815,7 @@ const CARDS = [
   { id:'a_rantott', type:'action', name:'Rántott hús', cost:0, tgt:'ownOrHero', rarity:'k', token:true, text:'Egy saját karaktered vagy a hősöd 3 életet gyógyul.' },
   { id:'a_szulinap', type:'action', name:'Boldog szülinapot Pifti!', cost:6, tgt:'summon', rarity:'r', text:'Három Piftit idéz a szabad helyeidre (ha kevesebb a hely, annyit).' },
   { id:'a_kor', type:'action', name:'Egy pohár víz', cost:0, rarity:'k', token:true, text:'Ebben a körben +1 energiád van. A 3. körödtől játszható ki. Aki másodikként jön, megkapja, mert a kezdés előny.' },
-  { id:'c_arnyek', type:'char', name:'Árnyékember', cost:0, atk:1, hp:1, rarity:'k', token:true, text:'Csak a Bender idézheti meg.' },
+  { id:'c_arnyek', type:'char', name:'Árnyékember', cost:0, atk:1, hp:1, rarity:'k', token:true, text:'Csak a Bender idézheti meg. Provokáció.' },
   { id:'c_gyzana', type:'char', name:'Gyerek Zana', cost:0, atk:3, hp:3, rarity:'l', token:true, haste:true, text:'Csak az Együtt sírtok, együtt nevettek idézheti meg.' },
   { id:'c_gygabi', type:'char', name:'Gyerek Gabi', cost:0, atk:3, hp:3, rarity:'l', token:true, muscle:true, text:'Csak az Együtt sírtok, együtt nevettek idézheti meg.' },
   { id:'c_jbl', type:'char', name:'JBL hangfal', cost:0, atk:0, hp:4, rarity:'l', token:true, noAttack:true, text:'Nem támad. A gazdája körének végén 1 sebzés minden ellenséges karakternek és az ellenfél hősének. Amíg él, az ellenfél két szélső helye zárva, és legfeljebb 2 karaktere lehet.' },
@@ -3402,7 +3402,7 @@ function playCard(s, pi, hi, t) {
         break;
       case 'f_bender': {   // minden szabad helyre Árnyékember; minél kevesebb a hely, annál erősebbek
         const sl = openSlots(s, pi), b = LANES - sl.length;
-        sl.forEach(j => { const u = makeUnit(s, 'c_arnyek', pi); u.atk += b; u.hp += b; u.maxHp += b; p.board[j] = u; ev(s, { t:'summon', side:pi, i:j, id:'c_arnyek' }); });
+        sl.forEach(j => { const u = makeUnit(s, 'c_arnyek', pi); u.atk += b; u.hp += b; u.maxHp += b; u.taunt = true;   /* 2026-10-21 (Tomi): Provokáció */ p.board[j] = u; ev(s, { t:'summon', side:pi, i:j, id:'c_arnyek' }); });
         break; }
       case 'f_egyutt': {
         const sl = openSlots(s, pi); let ids = ['c_gyzana', 'c_gygabi'];
@@ -3423,10 +3423,20 @@ function playCard(s, pi, hi, t) {
         const pool = p.grave.map((g, k) => k).filter(k => { const x = CARD[p.grave[k].id]; return x && x.type === 'char' && !x.token; });
         const pick = [];
         while (pick.length < Math.min(2, sl.length) && pool.length) pick.push(pool.splice(Math.floor(rnd() * pool.length), 1)[0]);
-        const ids = pick.map(k => p.grave[k].id);
+        const gs = pick.map(k => p.grave[k]), ids = gs.map(g => g.id);
         pick.sort((a, b) => b - a).forEach(k => p.grave.splice(k, 1));
         const bo = BOONS.slice();   // 2026-10-09: mindkettő kap egy (különböző) véletlen erőt is
-        ids.forEach((id, k) => { const u = makeUnit(s, id, pi); u.atk += 1; u.hp += 1; u.maxHp += 1; u.owner = pi; p.board[sl[k]] = u; ev(s, { t:'rise', side:pi, i:sl[k], id });
+        ids.forEach((id, k) => { const u = makeUnit(s, id, pi); u.owner = pi; p.board[sl[k]] = u; ev(s, { t:'rise', side:pi, i:sl[k], id });
+          /* 2026-10-21 (Tomi): úgy tér vissza, ahogy meghalt (a korábbi +1/+1 helyett, egyensúly: Tomi 53,2%) – a saját eszközeivel (és a gombák erejével) együtt; az Akuma-szerű „meghal” eszköz nem jön vissza */
+          const g = gs[k];
+          for (const it of g.items || []) { const c = CARD[it]; if (!c || c.doom) continue;
+            const gi = p.grave.findIndex(x => x.id === it && x.how === 'item'); if (gi >= 0) p.grave.splice(gi, 1);
+            const hp = (c.hp || 0) + (has(p, 'itemHp') ? 1 : 0); u.atk += c.atk || 0; u.hp += hp; u.maxHp += hp;
+            if (c.shield) u.shield = true; if (c.haste) u.haste = true; if (c.muscle) u.muscle = true; if (c.hangover) u.hangover = true; if (c.taunt) u.taunt = true; if (c.elusive) u.elusive = true;
+            if (it === 'i_bunda' && bid(u.id) === 'c_zoli') u.shield = true; if (it === 'i_vodkasa' && bid(u.id) === 'c_tzs') u.shield = true;
+            u.items.push(it); }
+          if (g.gb) { u.atk += g.gb; u.hp += g.gb; u.maxHp += g.gb; u.gombaB = g.gb; }
+          if ((g.items || []).length || g.gb) ev(s, { t:'buff', side:pi, i:sl[k] });
           const b = bo.splice(Math.floor(rnd() * bo.length), 1)[0]; giveBoon(u, b); ev(s, { t:'boon', side:pi, i:sl[k], b }); });
         break; }
       case 'f_vezetek': p.driver = true; ev(s, { t:'driver', side:pi, i:-1 }); break;   /* Bocsi, de vezetek: innentől minden kijátszott karakter erősödik */
@@ -3552,7 +3562,10 @@ function cleanup(s) {
         if (u && u.hp <= 0) {
           any = true;
           p.board[i] = null; ev(s, { t:'death', side, i, id:u.id });
-          bury(s, side, u.id, 'death', !!u.foil); buryItems(s, side, u);
+          bury(s, side, u.id, 'death', !!u.foil);
+          { const foe = [...(u.foe || [])], own = u.items.filter(x => { const k = foe.indexOf(x); if (k >= 0) { foe.splice(k, 1); return false; } return true; });   /* Az összetartás átka: így tér vissza (2026-10-21) */
+            const g = p.grave[p.grave.length - 1]; if (own.length) g.items = own; if (u.gombaB) g.gb = u.gombaB; }
+          buryItems(s, side, u);
           if (u.items.includes('i_kabala')) draw(s, side);
           if (CARD[u.id].deathDraw) draw(s, side);   // Barna, az életunt
           if (CARD[u.id].deathDiscard) {   /* Drog kereső kutya: az ellenfél eldob egy véletlen lapot a kezéből */
