@@ -2231,6 +2231,9 @@ body.pf-loading #scr-menu .pb-name::after{content:'';display:inline-block;width:
 .modal .live .rar{width:18px;height:18px;vertical-align:-4px;}
 
 .help .kw-ban{display:block;width:min(100%,230px);height:auto;margin:2px 0 4px -4px;}
+
+body.in-game{overscroll-behavior:none;}
+html:has(body.in-game){overscroll-behavior:none;}
 </style>
 </head>
 <body>
@@ -2408,7 +2411,7 @@ body.pf-loading #scr-menu .pb-name::after{content:'';display:inline-block;width:
 <script src="vendor/firebase-auth-compat.js"></script>
 <script src="vendor/firebase-firestore-compat.js"></script>
 <script src="vendor/firebase-database-compat.js"></script>
-<script>window.APP_VERSION = "2026.10.21-1226"; window.APP_BUILD = "2026.10.21-1226";</script>
+<script>window.APP_VERSION = "2026.10.21-1226"; window.APP_BUILD = "2026.10.21-1423";</script>
 <script>// ===== Best of Us – saját szerver (Firebase) =====
 // A játék eredetileg a Claude-os tárolót használta (window.claude.use('db' | 'user' | 'room')).
 // Ez a fájl ugyanazt a felületet adja Firebase-ből, így a játék kódja szinte változatlan maradhat:
@@ -4316,6 +4319,12 @@ try {
   });
 } catch (e) {}
 document.querySelectorAll('[data-back]').forEach(b => b.onclick = () => { renderMenuFan(); renderProfileBar(); show('scr-menu'); });
+// iOS Safari: a széléről induló „vissza” húzás tiltása meccs közben (Laci, 2026-10-21) – a képernyő szélén (14 px) induló érintést elnyeljük.
+// (A visszalépés amúgy sem viszi ki a meccsből – lásd popstate fent –, de a Safari húzás-animációja megzavarta a játékot.)
+document.addEventListener('touchstart', e => {
+  if (!document.body.classList.contains('in-game') || e.touches.length !== 1) return;
+  const x = e.touches[0].clientX; if (x < 14 || x > innerWidth - 14) e.preventDefault();
+}, { passive: false });
 // iOS: csippentéses zoom tiltása (a dupla koppintást a touch-action kezeli)
 ['gesturestart', 'gesturechange'].forEach(t => document.addEventListener(t, e => e.preventDefault(), { passive: false }));
 function renderMenuFan() {

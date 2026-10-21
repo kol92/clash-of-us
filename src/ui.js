@@ -400,6 +400,12 @@ try {
   });
 } catch (e) {}
 document.querySelectorAll('[data-back]').forEach(b => b.onclick = () => { renderMenuFan(); renderProfileBar(); show('scr-menu'); });
+// iOS Safari: a széléről induló „vissza” húzás tiltása meccs közben (Laci, 2026-10-21) – a képernyő szélén (14 px) induló érintést elnyeljük.
+// (A visszalépés amúgy sem viszi ki a meccsből – lásd popstate fent –, de a Safari húzás-animációja megzavarta a játékot.)
+document.addEventListener('touchstart', e => {
+  if (!document.body.classList.contains('in-game') || e.touches.length !== 1) return;
+  const x = e.touches[0].clientX; if (x < 14 || x > innerWidth - 14) e.preventDefault();
+}, { passive: false });
 // iOS: csippentéses zoom tiltása (a dupla koppintást a touch-action kezeli)
 ['gesturestart', 'gesturechange'].forEach(t => document.addEventListener(t, e => e.preventDefault(), { passive: false }));
 function renderMenuFan() {
