@@ -76,8 +76,9 @@ ok(rc('k') === 13 && rc('r') === 6 && rc('e') === 4 && rc('l') === 3, `ritkaság
   ok(s.players[0].hand.length === 1 && s.players[0].grave.some(g => g.how === 'discard'), 'Drog kereső kutya: halálakor az ellenfél eldob 1 lapot'); }
 // --- High Hawaiians, Barna, Laci, Ati ---
 { const s = G(); const d0 = s.players[0].deck.length; play(s, 0, 'a_hawaiians', { k: 'none' });
-  ok(s.players[0].deck.filter(x => x === 'i_gomba').length === 5 && s.players[0].deck.length === d0 + 5, 'High Hawaiians: 5 Varázsgomba a pakliba');
-  play(s, 0, 'c_ah_barna', { k: 'slot', side: 0, i: 0 }); ok(s.players[0].deck.filter(x => x === 'i_gomba').length === 6, 'Barna: +1 Varázsgomba a pakliba');
+  const gN = () => s.players[0].deck.filter(x => x === 'i_gomba').length + s.players[0].hand.filter(h => (h.id || h) === 'i_gomba').length;   /* 2026-10-21: utána húz is egyet (lehet, hogy épp gombát) */
+  ok(gN() === 5 && s.players[0].deck.length === d0 + 4, 'High Hawaiians: 5 Varázsgomba a pakliba, majd 1 húzás');
+  play(s, 0, 'c_ah_barna', { k: 'slot', side: 0, i: 0 }); ok(gN() === 6, 'Barna: +1 Varázsgomba a pakliba');
   play(s, 0, 'c_ah_laci', { k: 'slot', side: 0, i: 1 }); ok(s.players[0].hand.filter(h => h.id === 'a_irkave').length === 1, 'Laci: 1 Ír kávé a kézbe');
   play(s, 0, 'c_ah_ati', { k: 'slot', side: 0, i: 2 }); ok(s.players[0].board[3] && s.players[0].board[3].id === 'c_betti', 'Ati: Betti mellé (jobbra)'); }
 // --- Reptéri ellenőrzés ---
@@ -164,7 +165,7 @@ ok(rc('k') === 13 && rc('r') === 6 && rc('e') === 4 && rc('l') === 3, `ritkaság
 // --- Arany lapok ---
 { const g = E.CARDS.filter(c => c.goldVar); ok(g.map(c => c.id).sort().join() === 'a_hawaiians_g,a_welcome_g,f_gameover_g' && g.every(c => c.set === 'ah'), 'Arany lapok: Isten hozott, High Hawaiians, Game Over');
   const s = G(); const d0 = s.players[0].deck.length; play(s, 0, 'a_hawaiians_g', { k: 'none' });
-  ok(s.players[0].deck.length === d0 + 5, 'Arany High Hawaiians: ugyanaz a hatás (5 gomba)');
+  ok(s.players[0].deck.length === d0 + 4, 'Arany High Hawaiians: ugyanaz a hatás (5 gomba + 1 húzás)');
   const s2 = G(); s2.players[0].heroId = 'laci'; U(s2, 1, 0, 'c_vajda'); play(s2, 0, 'f_gameover_g', { k: 'none' });
   ok(s2.players[0].maxHp === 10 && !s2.players[1].board[0], 'Arany Game Over: ugyanaz a hatás');
   let inHand = 0; for (let k = 0; k < 20; k++) { const s3 = E.newGame('tomi', { a_welcome_g: 1, ...E.DECK_OF('tomi') }, 'gabi', E.DECK_OF('gabi'), 0, { mulligan: true }); if (s3.players[0].hand.some(h => h.id === 'a_welcome_g')) inHand++; }

@@ -463,6 +463,9 @@ Hősképesség-ötletek a táblázatban (még nem zöldek, nincsenek beépítve)
 ## Javítás: „Újabb ranked” → Mégse beragadás (2026-10-16)
 - Meccs után az „Újabb ranked” gomb a lezárt meccs képernyőjén indította a keresést; ha valaki „Mégse”-t nyomott, a lezárt táblán ragadt, és a zászló sem csinált semmit. Mostantól az „Újabb ranked” előbb a Ranked képernyőre visz, a keresés megszakítása lezárt meccsből a menübe visz, és lezárt meccsen a zászló is a menübe visz.
 
+## High Hawaiians: + 1 húzás (2026-10-21, Tomi)
+- Új szöveg: „Keverj öt Varázsgomba lapot a paklidba, majd húzz egy lapot.” A húzás a keverés után jön (lehet, hogy épp gomba). Az arany változat ugyanígy. Mérve korábban ~40%-os volt (a bot alulhasználja), ez erősítés. Teszt: `tools/ah_test.js`.
+
 ## GOD PACK – titkos (2026-10-20, Tomi)
 - **Minden** pack (sima, Shiny, ingyenes, ajándék, Base set és kiegészítő) 0,5% eséllyel God pack (`ECON.godPack`, `godPackRoll`). **Titok:** sehol nincs kiírva – az esélyek között sem, az Újdonságokban sem (csendes kitétel); csak aki kinyitja, látja.
 - Tartalom: **5 lap** 3 helyett, mind **Full Art**: 1 véletlen ritkaságú + 1 biztos epikus + 1 biztos legendás a pack szettjéből, + **1 ritka változat (skin), ami még nincs meg a játékosnak** (előbb a packból jövő változatok közül, ha mind megvan: bolti/passos változat, ha az is: bármelyik packos; 2026-10-20 este), és egy **arany**: kiegészítőben a szett arany lapja (`goldVar`), Base setben Arany hős (`rollHeroGold`); ha a szettnek nincs aranya, még egy legendás Full Art. A szánalomszámláló nullázódik; `p.godPacks` számolja, hányat nyitott valaki.
