@@ -463,6 +463,10 @@ Hősképesség-ötletek a táblázatban (még nem zöldek, nincsenek beépítve)
 ## Javítás: „Újabb ranked” → Mégse beragadás (2026-10-16)
 - Meccs után az „Újabb ranked” gomb a lezárt meccs képernyőjén indította a keresést; ha valaki „Mégse”-t nyomott, a lezárt táblán ragadt, és a zászló sem csinált semmit. Mostantól az „Újabb ranked” előbb a Ranked képernyőre visz, a keresés megszakítása lezárt meccsből a menübe visz, és lezárt meccsen a zászló is a menübe visz.
 
+## 2. ranked szezon extra jutalmai (2026-10-23, Tomi)
+- A meglévő lépcső-jutalmak (`RK_REWARDS_S2`) mellé: **Arany 5:** S2 Ranked hátlap · **Smaragd 5:** Legendás ??? változat · **Gyémánt 5:** új Gyémánt lap · **Legenda:** mozgó Gyémánt hős-portré. A designok később jönnek (Tomi).
+- `RK_LATER.r2` (meta.js): amíg egy tételnek nincs `grant` függvénye, a Ranked képernyő jutalomlistájában „+ … HAMAROSAN” címkével látszik. Ha elkészül: a tételhez `grant: p => {…}` (pl. hátlap: `p.backs` + `BACKS`-ba az új hátlap; lap: `p.coll`; portré: `PORTRAITS` + `p.ports`), és `rkLaterCheck` (a menüben, `renderRankTile`) **mindenkinek kiosztja, aki abban a szezonban elérte a lépcsőt** – akkor is, ha a szezon már véget ért (`p.rkHist[szezon].best`), egyszer (`p.rkLater[key]`).
+
 ## Ranked top 3: korona (2026-10-22, Tomi)
 - A lezárt ranked szezon első három helyezettje (`rkFinalBoard`, a zárás után 1 órával, `rkTopCheck`) **koronát** kap: 1. arany, 2. ezüst, 3. bronz (`RK_TOP_REW.s2`, már az 1. ranked szezontól). `p.crown = { k, pos, season, until }`, érvényes a **következő ranked szezon végéig** (`crownUntil`; ha nincs felvéve következő: 30 nap).
 - Látszik: a meccsen a hős portréjának bal felső sarkában (`.crown.cr-hero`, saját és PvP-ellenfél – a `cos.crown`-ból), a VS képernyőn a név előtt, és a ranglistán a név előtt (a `pub.crown`-ból; a barátok is látják). Botnak nincs.
