@@ -975,7 +975,7 @@ async function animateEvents(evs) {
       case 'espresso': floatAt(anchor, '☕ Jövő körben +2 lap', 'info'); hold = Math.max(hold, 700); break;
       case 'espressodraw': floatAt(anchor, `☕ Felpörögve: +${e.n} lap`, 'buff'); hold = Math.max(hold, 700); break;
       case 'flee': floatAt(anchor, '🏃 Menekül!', 'info'); hold = Math.max(hold, 600); break;
-      case 'gift': floatAt(anchor, `${e.id === 'i_ing' ? '👔' : '🍗'} ${CARD[e.id].name} a ${e.side === ME ? 'kezedbe' : 'kezébe'}!`, 'info'); hold = Math.max(hold, 700); break;
+      case 'gift': floatAt(anchor, `${e.id === 'i_ing' ? '👔' : e.id === 'i_gomba' ? '🍄' : e.id === 'a_irkave' ? '☕' : '🍗'} ${CARD[e.id].name} a ${e.side === ME ? 'kezedbe' : 'kezébe'}!`, 'info'); hold = Math.max(hold, 700); break;
       case 'drinkgift': floatAt(anchor, e.side === ME ? `🍸 ${CARD[e.id].name} a kezedbe!` : '🍸 Ital a kezébe!', 'info'); hold = Math.max(hold, 700); break;
       case 'deathblast': floatAt(anchor, '💥 Utolsó ütés!', 'dmg'); hold = Math.max(hold, 450); break;
       case 'zap': await zapFx(e); break;

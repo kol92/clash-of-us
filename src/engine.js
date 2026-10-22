@@ -86,7 +86,7 @@ const CARDS = [
   { id:'a_welcome', set:'ah', type:'action', name:'Isten hozott Amsterdamban', cost:1, tgt:'none', rarity:'k', openingHand:true, text:'Keverj öt véletlen Amsterdam Hősei lapot a paklidba. Mindig a kezdő kezedben van (hacsak le nem cseréled).' },
   { id:'c_ah_sasi', set:'ah', type:'char', name:'Sasi, Amsterdam hőse', cost:4, atk:2, hp:6, rarity:'k', haste:true, text:'' },
   { id:'c_ah_tomi', set:'ah', type:'char', name:'Tomi, Amsterdam hőse', cost:3, atk:1, hp:4, rarity:'k', elusive:true, text:'' },
-  { id:'c_ah_barna', set:'ah', type:'char', name:'Barna, Amsterdam hőse', cost:3, atk:3, hp:2, rarity:'k', text:'Kijátszáskor keverj egy Varázsgomba lapot a paklidba.' },
+  { id:'c_ah_barna', set:'ah', type:'char', name:'Barna, Amsterdam hőse', cost:3, atk:2, hp:2, rarity:'k', text:'Kijátszáskor a kezedbe kerül egy Varázsgomba.' },
   { id:'c_ah_laci', set:'ah', type:'char', name:'Laci, Amsterdam hőse', cost:2, atk:2, hp:2, rarity:'k', text:'Kijátszáskor egy Ír kávé kerül a kezedbe.' },
   { id:'c_ah_ati', set:'ah', type:'char', name:'Ati, Amsterdam hőse', cost:5, atk:3, hp:4, rarity:'k', text:'Kijátszáskor maga mellé idéz egy 2/2-es Bettit.' },
   { id:'c_betti', set:'ah', type:'char', name:'Betti', cost:0, atk:2, hp:2, rarity:'k', token:true, text:'Ati, Amsterdam hőse idézi meg.' },
@@ -493,7 +493,7 @@ function playCard(s, pi, hi, t) {
       addToHand(s, pi, d);
     }
     if (bid(c.id) === 'c_sasimeselo') draw(s, pi);
-    if (c.id === 'c_ah_barna') { p.deck.push('i_gomba'); shuffle(p.deck); ev(s, { t:'shuffled', side:pi, i:t.i, n:1, id:'i_gomba' }); }
+    if (c.id === 'c_ah_barna') { ev(s, { t:'gift', side:pi, i:t.i, id:'i_gomba' }); addToHand(s, pi, 'i_gomba'); }   /* 2026-10-22 (Tomi): kézbe, nem a pakliba */
     if (c.id === 'c_ah_laci') { ev(s, { t:'gift', side:pi, i:t.i, id:'a_irkave' }); addToHand(s, pi, 'a_irkave'); }   /* 2026-10-18: kettő helyett egy */
     if (c.id === 'c_ah_ati') {   /* Betti maga mellé (előbb jobbra, aztán balra, különben bárhova) */
       const os = openSlots(s, pi), spots = [t.i + 1, t.i - 1].filter(j => os.includes(j)), j = spots.length ? spots[0] : os.length ? os[0] : -1;

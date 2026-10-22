@@ -2411,7 +2411,7 @@ html:has(body.in-game){overscroll-behavior:none;}
 <script src="vendor/firebase-auth-compat.js"></script>
 <script src="vendor/firebase-firestore-compat.js"></script>
 <script src="vendor/firebase-database-compat.js"></script>
-<script>window.APP_VERSION = "2026.10.21-1226"; window.APP_BUILD = "2026.10.21-1423";</script>
+<script>window.APP_VERSION = "2026.10.22-1504"; window.APP_BUILD = "2026.10.22-1504";</script>
 <script>// ===== Best of Us – saját szerver (Firebase) =====
 // A játék eredetileg a Claude-os tárolót használta (window.claude.use('db' | 'user' | 'room')).
 // Ez a fájl ugyanazt a felületet adja Firebase-ből, így a játék kódja szinte változatlan maradhat:
@@ -2757,7 +2757,7 @@ const CARDS = [
   { id:'a_welcome', set:'ah', type:'action', name:'Isten hozott Amsterdamban', cost:1, tgt:'none', rarity:'k', openingHand:true, text:'Keverj öt véletlen Amsterdam Hősei lapot a paklidba. Mindig a kezdő kezedben van (hacsak le nem cseréled).' },
   { id:'c_ah_sasi', set:'ah', type:'char', name:'Sasi, Amsterdam hőse', cost:4, atk:2, hp:6, rarity:'k', haste:true, text:'' },
   { id:'c_ah_tomi', set:'ah', type:'char', name:'Tomi, Amsterdam hőse', cost:3, atk:1, hp:4, rarity:'k', elusive:true, text:'' },
-  { id:'c_ah_barna', set:'ah', type:'char', name:'Barna, Amsterdam hőse', cost:3, atk:3, hp:2, rarity:'k', text:'Kijátszáskor keverj egy Varázsgomba lapot a paklidba.' },
+  { id:'c_ah_barna', set:'ah', type:'char', name:'Barna, Amsterdam hőse', cost:3, atk:2, hp:2, rarity:'k', text:'Kijátszáskor a kezedbe kerül egy Varázsgomba.' },
   { id:'c_ah_laci', set:'ah', type:'char', name:'Laci, Amsterdam hőse', cost:2, atk:2, hp:2, rarity:'k', text:'Kijátszáskor egy Ír kávé kerül a kezedbe.' },
   { id:'c_ah_ati', set:'ah', type:'char', name:'Ati, Amsterdam hőse', cost:5, atk:3, hp:4, rarity:'k', text:'Kijátszáskor maga mellé idéz egy 2/2-es Bettit.' },
   { id:'c_betti', set:'ah', type:'char', name:'Betti', cost:0, atk:2, hp:2, rarity:'k', token:true, text:'Ati, Amsterdam hőse idézi meg.' },
@@ -3164,7 +3164,7 @@ function playCard(s, pi, hi, t) {
       addToHand(s, pi, d);
     }
     if (bid(c.id) === 'c_sasimeselo') draw(s, pi);
-    if (c.id === 'c_ah_barna') { p.deck.push('i_gomba'); shuffle(p.deck); ev(s, { t:'shuffled', side:pi, i:t.i, n:1, id:'i_gomba' }); }
+    if (c.id === 'c_ah_barna') { ev(s, { t:'gift', side:pi, i:t.i, id:'i_gomba' }); addToHand(s, pi, 'i_gomba'); }   /* 2026-10-22 (Tomi): kézbe, nem a pakliba */
     if (c.id === 'c_ah_laci') { ev(s, { t:'gift', side:pi, i:t.i, id:'a_irkave' }); addToHand(s, pi, 'a_irkave'); }   /* 2026-10-18: kettő helyett egy */
     if (c.id === 'c_ah_ati') {   /* Betti maga mellé (előbb jobbra, aztán balra, különben bárhova) */
       const os = openSlots(s, pi), spots = [t.i + 1, t.i - 1].filter(j => os.includes(j)), j = spots.length ? spots[0] : os.length ? os[0] : -1;
@@ -4894,7 +4894,7 @@ async function animateEvents(evs) {
       case 'espresso': floatAt(anchor, '☕ Jövő körben +2 lap', 'info'); hold = Math.max(hold, 700); break;
       case 'espressodraw': floatAt(anchor, `☕ Felpörögve: +${e.n} lap`, 'buff'); hold = Math.max(hold, 700); break;
       case 'flee': floatAt(anchor, '🏃 Menekül!', 'info'); hold = Math.max(hold, 600); break;
-      case 'gift': floatAt(anchor, `${e.id === 'i_ing' ? '👔' : '🍗'} ${CARD[e.id].name} a ${e.side === ME ? 'kezedbe' : 'kezébe'}!`, 'info'); hold = Math.max(hold, 700); break;
+      case 'gift': floatAt(anchor, `${e.id === 'i_ing' ? '👔' : e.id === 'i_gomba' ? '🍄' : e.id === 'a_irkave' ? '☕' : '🍗'} ${CARD[e.id].name} a ${e.side === ME ? 'kezedbe' : 'kezébe'}!`, 'info'); hold = Math.max(hold, 700); break;
       case 'drinkgift': floatAt(anchor, e.side === ME ? `🍸 ${CARD[e.id].name} a kezedbe!` : '🍸 Ital a kezébe!', 'info'); hold = Math.max(hold, 700); break;
       case 'deathblast': floatAt(anchor, '💥 Utolsó ütés!', 'dmg'); hold = Math.max(hold, 450); break;
       case 'zap': await zapFx(e); break;

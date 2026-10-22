@@ -27,7 +27,7 @@
 **Karakterek**
 - **Sasi, Amszterdam hőse** (c_ah_sasi) · 4 · 2/6 · gyakori · Lendület
 - **Tomi, Amszterdam hőse** (c_ah_tomi) · 3 · 1/4 · gyakori · Igézhetetlen
-- **Barna, Amszterdam hőse** (c_ah_barna) · 3 · 3/2 · gyakori · kijátszáskor egy Varázsgomba a paklidba
+- **Barna, Amszterdam hőse** (c_ah_barna) · 3 · 2/2 · gyakori · kijátszáskor egy Varázsgomba a kezedbe (2026-10-22, Tomi: eddig a pakliba keverte és 3/2 volt)
 - **Laci, Amszterdam hőse** (c_ah_laci) · 2 · 2/2 · gyakori · kijátszáskor **egy** Ír kávé a kezedbe (2026-10-18: kettő helyett egy, Tomi)
 - **Ati, Amszterdam hőse** (c_ah_ati) · 5 · 3/4 · gyakori · kijátszáskor maga mellé idéz egy 2/2-es **Bettit** (c_betti, token, nem gyűjthető; előbb jobbra, aztán balra, különben bárhova)
 - **Bence, Amszterdam terrorja** (c_ah_bence) · 6 · **3/5** · legendás · Lendület, Feltámadás (2026-10-18: 4/5 → 3/5, Tomi)
