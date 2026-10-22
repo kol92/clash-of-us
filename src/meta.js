@@ -2426,7 +2426,7 @@ function pvpPickDeck(title, done, opt = {}) {   // ugyanaz a pakliválasztó ké
   openDeckPick({ title: title.replace(/<[^>]*>/g, ''), note: opt.note || 'Válaszd ki, melyik paklival játszol. A hőst a pakli határozza meg.', btn: opt.btn || 'Ezzel játszom', done, ...opt });
 }
 const pvpMe = dk => ({ ver: window.APP_VERSION || '', uid: Store.uid, name: Store.p.name || 'Játékos', hero: dk.hero, deckName: dk.name, deckId: dk.id || null, list: { ...dk.list },
-  cos: { back: myBack(), heroGold: heroSkin(dk.hero) === 'gold', heroFa: heroSkin(dk.hero) === 'fa', port: isPort(heroSkin(dk.hero)) ? heroSkin(dk.hero) : null, foils: Object.keys(dk.list).filter(id => ownsFoil(id)), foilN: myFoils(dk.list) } });   // amit az ellenfél is lát: Full Art hős és lapok
+  cos: { back: myBack(), crown: myCrown(), heroGold: heroSkin(dk.hero) === 'gold', heroFa: heroSkin(dk.hero) === 'fa', port: isPort(heroSkin(dk.hero)) ? heroSkin(dk.hero) : null, foils: Object.keys(dk.list).filter(id => ownsFoil(id)), foilN: myFoils(dk.list) } });   // amit az ellenfél is lát: Full Art hős és lapok
 async function pvpCreate(dk) {
   try { await Store.db.collection('pvp').add({ parts: [Store.uid], status: 'open', created: Date.now(), updated: Date.now(), host: pvpMe(dk), guest: null, v: 0 }); toast('Kihívás létrehozva – szólj a haveroknak!'); }
   catch (e) { toast(e?.code === 'quota_exceeded' ? 'Megtelt a tárhely, próbáld később' : 'Nem sikerült létrehozni (lehet, hogy nincs írási jogod)'); }
@@ -2808,7 +2808,7 @@ function frPubSync(now) { if (TEST_MODE) return;
   FR.pubT = setTimeout(() => {
     const p = Store.p, coll = {};
     for (const [id, e] of Object.entries(p.coll || {})) if (tradable(id) && (e.n || e.f)) coll[id] = [e.n || 0, e.f || 0];
-    const rk = ensureRank(p); Store.db.doc('pub/' + Store.uid).set({ name: p.name, code: frCode(Store.uid), w: p.stats?.w || 0, rank: { season: rk.season, t: rk.t, st: rk.st, lp: rk.lp, g: rk.games || 0, w: rk.w || 0 }, rkh: Object.fromEntries(Object.entries(p.rkHist || {}).slice(-4)), coll, ver: window.APP_VERSION || '', dev: devKind(), updated: Date.now() }).catch(() => {});
+    const rk = ensureRank(p); Store.db.doc('pub/' + Store.uid).set({ name: p.name, code: frCode(Store.uid), w: p.stats?.w || 0, rank: { season: rk.season, t: rk.t, st: rk.st, lp: rk.lp, g: rk.games || 0, w: rk.w || 0 }, rkh: Object.fromEntries(Object.entries(p.rkHist || {}).slice(-4)), crown: crownOk(p.crown) ? { k: p.crown.k, until: p.crown.until } : null, coll, ver: window.APP_VERSION || '', dev: devKind(), updated: Date.now() }).catch(() => {});
   }, now ? 50 : 2500);
 }
 // ---- meghívó link: …/?inv=<barátkód> – aki ezzel regisztrál (vagy belép), automatikusan barátja lesz a meghívónak ----
@@ -3158,14 +3158,20 @@ const RK_REWARDS_S2 = [   // 2. ranked szezontól (2026-10-23): Smaragd és Gyé
 const rkRewTable = sid => sid === 's2' ? RK_REWARDS_S1 : RK_REWARDS_S2;
 const rkRewardFor = t => [...rkRewTable(rkSeason().id)].reverse().find(r => t >= r.min) || null;
 const rkRewardsUpTo = (t, sid) => rkRewTable(sid || rkSeason().id).filter(r => t >= r.min);
-const rkRewText = r => [r.shiny ? `${r.shiny} Shiny pack` : '', r.packs ? `${r.packs} booster pack` : '', r.coins ? `${r.coins} coin` : '', r.back ? `${BACKS[r.back].name} hátlap` : ''].filter(Boolean).join(' + ');
+const rkRewText = r => [r.crown ? `👑 ${CROWN_NAME[r.crown]} korona a hősöd portréján (a következő szezon végéig, mindenki látja)` : '', r.shiny ? `${r.shiny} Shiny pack` : '', r.packs ? `${r.packs} booster pack` : '', r.coins ? `${r.coins} coin` : '', r.back ? `${BACKS[r.back].name} hátlap` : ''].filter(Boolean).join(' + ');
 /* Ranked szezonok – 2026-10-19 óta a Season Passtól függetlenül (Tomi). Az első id-ja 's2' marad, hogy a meglévő rangok ne nullázódjanak. */
 const RK_SEASONS = [
   { id: 's2', name: '1. ranked szezon', start: new Date(2026, 9, 12, 0, 0), end: new Date(2026, 9, 23, 0, 0) },
   { id: 'r2', name: '2. ranked szezon', start: new Date(2026, 9, 23, 0, 0), end: new Date(2026, 10, 11, 0, 0) },
 ];
 /* Szezonvégi jutalom az első háromnak: RK_TOP_REW[szezon] = [1., 2., 3. hely jutalma], pl. { coins: 2000, shiny: 5 } (rkGrant formátum). Tomi küldi. */
-const RK_TOP_REW = {};
+const RK_TOP_REW = { s2: [{ crown: 'gold' }, { crown: 'silver' }, { crown: 'bronze' }] };   /* 2026-10-22 (Tomi): az első három egy kis koronát kap a hős portréja bal felső sarkába – mindenki látja */
+/* Korona: a következő ranked szezon végéig látszik (ha nincs következő felvéve: 30 napig). p.crown = { k, pos, season, until } – a pub-ban is (barátok, ranglista), PvP-ben a cos-ban. */
+const CROWN_K = ['gold', 'silver', 'bronze'], CROWN_NAME = { gold: 'arany', silver: 'ezüst', bronze: 'bronz' };
+const crownUntil = sid => { const i = RK_SEASONS.findIndex(x => x.id === sid), nx = RK_SEASONS[i + 1]; return nx ? nx.end.getTime() : RK_SEASONS[i].end.getTime() + 30 * 864e5; };
+const crownOk = c => !!c && CROWN_K.includes(c.k) && Date.now() < (c.until || 0);
+const myCrown = () => { const c = Store.p && Store.p.crown; return crownOk(c) ? c.k : null; };
+const crownHTML = (k, cls = '') => k && CROWN_K.includes(k) ? `<i class="crown cr-${k}${cls ? ' ' + cls : ''}" role="img" aria-label="${CROWN_NAME[k]} korona – ranked top 3" title="Ranked szezon ${CROWN_K.indexOf(k) + 1}. helyezett"></i>` : '';
 function rkSeason() { const now = new Date(), r = RK_SEASONS.find(x => now >= x.start && now < x.end); if (r) return { id: r.id, end: r.end, name: r.name };
   const s = curSeason(); if (s) return { id: s.id, end: s.end, name: s.name }; const d = new Date(); return { id: `m${d.getFullYear()}-${d.getMonth() + 1}`, end: new Date(d.getFullYear(), d.getMonth() + 1, 1), name: `${d.getFullYear()}. ${d.getMonth() + 1}. havi szezon` }; }
 function rkFresh(season) { return { season, t: 0, st: 0, streak: 0, shield: false, lp: 0, best: 0, w: 0, l: 0, games: 0 }; }
@@ -3238,6 +3244,7 @@ function rkGrant(p, rew) {
   if (rew.packs) p.giftPacks = (p.giftPacks || 0) + rew.packs;
   if (rew.shiny) p.shinyPacks = (p.shinyPacks || 0) + rew.shiny;
   if (rew.coins) p.coins += rew.coins;
+  if (rew.crown) p.crown = { k: rew.crown, pos: rew.pos, season: rew.season, until: rew.until };
   if (rew.back && !(p.backs || []).includes(rew.back)) { p.backs = [...(p.backs || []), rew.back]; p.cardBack = rew.back; try { applyBack(); } catch (e) {} }
 }
 function rkClaimDue(p, fromMatch) {
@@ -3365,7 +3372,7 @@ async function rkTopCheck() {   /* lezárt szezon, amihez már van top 3 jutalom
     let board; try { board = await rkFinalBoard(se.id); } catch (e) { return; }
     const pos = board.slice(0, 3).findIndex(x => x.uid === Store.uid);
     p.rkTop[se.id] = pos; save();
-    if (pos >= 0 && rew[pos]) { rkGrant(p, rew[pos]); save(); renderProfileBar();
+    if (pos >= 0 && rew[pos]) { rkGrant(p, { ...rew[pos], pos, season: se.id, until: crownUntil(se.id) }); save(); renderProfileBar(); frPubSync(true);
       const o = document.createElement('div'); o.className = 'overlay';
       o.innerHTML = `<div class="modal acct-box"><h3>🏆 ${['1.', '2.', '3.'][pos]} helyezés – ${escH(se.name)}</h3><p class="live">A szezon végén a ranglista ${['élén', 'második helyén', 'harmadik helyén'][pos]} végeztél!</p><p class="tut-gift">🎁 Jutalom: <b>${rkRewText(rew[pos])}</b></p><button class="btn primary" data-x>Szuper!</button></div>`;
       o.onclick = e => { if (e.target.closest('[data-x]')) o.remove(); }; $('#layer').appendChild(o); }
@@ -3386,9 +3393,9 @@ function renderRanked() {
   setTimeout(() => rkLoadBoard(), 0);   // a ranglista percenként legfeljebb egyszer frissül
   const r = ensureRank(Store.p), se = rkSeason();
   const days = Math.max(0, Math.ceil((se.end - new Date()) / 864e5));
-  const me = { name: Store.p.name, t: r.t, st: r.st, lp: r.lp, me: true };
+  const me = { name: Store.p.name, t: r.t, st: r.st, lp: r.lp, me: true, crown: myCrown() };
   const frIds = (typeof frOn === 'function' && frOn()) ? FR.list.filter(d => d.status === 'accepted').map(frOther) : [];
-  const fr = frIds.map(u => { const pb = FR.pub[u]; return pb && pb.rank && pb.rank.season === se.id ? { uid: u, name: pb.name, code: pb.code, w: pb.w, ...pb.rank } : null; }).filter(Boolean);
+  const fr = frIds.map(u => { const pb = FR.pub[u]; return pb && pb.rank && pb.rank.season === se.id ? { uid: u, name: pb.name, code: pb.code, w: pb.w, crown: crownOk(pb.crown) ? pb.crown.k : null, ...pb.rank } : null; }).filter(Boolean);
   // 2026-10-12: a ranglistán mindenki rajta van, aki ebben a szezonban játszott rankedet (a „pub” profilokból)
   const all = RKB.season === se.id ? RKB.list.filter(x => x.uid !== Store.uid) : [];
   const others = RKB.tab === 'fr' ? fr : [...all, ...fr.filter(f => !all.some(x => x.uid === f.uid))];
@@ -3405,7 +3412,7 @@ function renderRanked() {
     <div class="lbl">Jutalmak – a lépcső elérésekor azonnal járnak</div>
     <div class="rk-rews">${rkRewTable(se.id).map(x => `<div class="rk-rew${r.best >= x.min ? ' got' : ''}">${rkEmblem(x.min, 'xs')}<span><b>${x.name}</b><small>${rkRewText(x.rew)}</small></span>${r.best >= x.min ? '<em>elérve</em>' : ''}</div>`).join('')}</div>
     <div class="lbl rk-lbhead"><span>Ranglista</span><span class="seg rk-tabs" role="group"><button data-rkt="all" aria-pressed="${RKB.tab !== 'fr'}">Mindenki</button><button data-rkt="fr" aria-pressed="${RKB.tab === 'fr'}">Barátok</button></span></div>
-    <div class="rk-board">${shown.map(x => `<${x.me ? 'div' : 'button'} class="rk-row${x.me ? ' me' : ''}"${x.me ? '' : ` data-rkp="${x.uid}"`}><span class="rk-pos">${board.indexOf(x) + 1}.</span>${rkEmblem(x.t, 'xs')}<b>${escH(x.name || 'Játékos')}${!x.me && frSet.has(x.uid) ? ' <i class="rk-fr" title="Barátod">🤝</i>' : !x.me && pend.has(x.uid) ? ' <i class="rk-fr" title="Jelölés folyamatban">⏳</i>' : ''}</b><small>${x.t >= rkLeg() ? `Legenda · ${x.lp || 0} pont` : `${rkName(x.t)} · ${x.st}★`}</small></${x.me ? 'div' : 'button'}>`).join('')}
+    <div class="rk-board">${shown.map(x => `<${x.me ? 'div' : 'button'} class="rk-row${x.me ? ' me' : ''}"${x.me ? '' : ` data-rkp="${x.uid}"`}><span class="rk-pos">${board.indexOf(x) + 1}.</span>${rkEmblem(x.t, 'xs')}<b>${crownHTML(x.crown, 'cr-inl')}${escH(x.name || 'Játékos')}${!x.me && frSet.has(x.uid) ? ' <i class="rk-fr" title="Barátod">🤝</i>' : !x.me && pend.has(x.uid) ? ' <i class="rk-fr" title="Jelölés folyamatban">⏳</i>' : ''}</b><small>${x.t >= rkLeg() ? `Legenda · ${x.lp || 0} pont` : `${rkName(x.t)} · ${x.st}★`}</small></${x.me ? 'div' : 'button'}>`).join('')}
       ${others.length ? '' : `<p class="q-note">${RKB.tab === 'fr' ? 'Még egy barátod sem játszott ranked meccset ebben a szezonban.' : RKB.busy ? 'Ranglista betöltése…' : 'Még senki más nem játszott ranked meccset ebben a szezonban.'}</p>`}
       ${RKB.tab !== 'fr' ? '<p class="q-note rk-tip">Koppints egy játékosra – innen is bejelölheted barátnak.</p>' : ''}</div>
     <details class="rk-rules"><summary>Hogyan működik?</summary><ul>
@@ -3418,6 +3425,7 @@ function renderRanked() {
       <li>Aranytól minden vereség −1 csillag, és 0 csillagnál visszaesel egy fokozatot – de a liga 5-ös fokozata alá nem.</li>
       <li>Legendában Legenda-pontokat gyűjtesz, onnan már nem esel vissza.</li>
       <li>A lépcsők jutalma (${rkRewTable(se.id).map(x => x.name).join(', ')}) azonnal jár, amikor eléred – szezononként egyszer.</li>
+      <li>👑 A szezon végén a ranglista első három helyezettje koronát kap (arany, ezüst, bronz) a hőse portréjára – a következő szezon végéig mindenki látja: meccsen, a VS képernyőn és a ranglistán.</li>
       <li>A szezon vége: ${se.end.toLocaleDateString('hu-HU', { month: 'long', day: 'numeric' })} – utána mindenki Bronz 5-ről kezd, és az első három helyezett külön jutalmat kap.</li></ul></details>`;
   $('#rkPlay').onclick = () => pvpPickDeck('Ranked pakli', dk => rankedSearch(dk), { ranked: true, btn: '🏆 Ranked meccs indítása', note: 'Válaszd ki, melyik paklival mész rankedbe.' });
 }
@@ -3448,7 +3456,7 @@ async function rkLoadBoard(force) {
   try {
     const q = await Store.db.collection('pub').where('rank.season', '==', se.id).limit(300).get();
     RKB.list = q.docs.map(d => ({ uid: d.id, ...d.data() })).filter(x => x.rank && (x.rank.g > 0 || x.rank.t > 0 || x.rank.st > 0))
-      .map(x => ({ uid: x.uid, name: x.name, code: x.code, w: x.w || 0, ...x.rank }));
+      .map(x => ({ uid: x.uid, name: x.name, code: x.code, w: x.w || 0, crown: crownOk(x.crown) ? x.crown.k : null, ...x.rank }));
     RKB.season = se.id; RKB.at = Date.now();
   } catch (e) { RKB.at = Date.now(); /* offline: marad a régi lista, egy percig nem próbálja újra */ }
   RKB.busy = false;
