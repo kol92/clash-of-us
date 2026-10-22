@@ -465,7 +465,7 @@ Hősképesség-ötletek a táblázatban (még nem zöldek, nincsenek beépítve)
 
 ## Bolti ritka variáns: Boros virágcsokorral (2026-10-23, Tomi)
 - `c_boros2` – a Boros (5 energia, 3/5, ritka, Provokáció) változata, új képpel (virágcsokor, naplemente), **50 coin**, 2 példány jár; csak a Boltban, a limitált kínálatban (a következő rotációig, 10-29). Packból nem jön, nem cserélhető.
-- **Gabi, a Beton hős-portré:** a 2. ranked szezonban **Ezüst 5**-ön jár (`RK_LATER.r2`, `r2_gabi`) – a kép még nem jött meg, addig „hamarosan”; utólag mindenki megkapja, aki elérte.
+- **Gabi, a Beton hős-portré** (`p_gabi_beton`, `passOnly` – boltban és ládában nincs): a 2. ranked szezonban **Ezüst 5**-ön jár (`RK_LATER.r2`, `r2_gabi`, kész a grant). Megkapáskor rögtön ezt viseli Gabi, és felugrik a portré nagyban („🎁 Ranked jutalom (Ezüst 5): …”). Aki már elérte, a következő menübe lépéskor kapja meg. A kép: Gabi a betonba ütött ököllel, éjszakai vasútállomás.
 
 ## 2. ranked szezon extra jutalmai (2026-10-23, Tomi)
 - A meglévő lépcső-jutalmak (`RK_REWARDS_S2`) mellé: **Ezüst 5:** Gabi, a Beton hős-portré · **Arany 5:** S2 Ranked hátlap · **Smaragd 5:** Legendás ??? változat · **Gyémánt 5:** új Gyémánt lap · **Legenda:** mozgó Gyémánt hős-portré. A designok később jönnek (Tomi).

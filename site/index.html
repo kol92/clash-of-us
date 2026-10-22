@@ -2422,7 +2422,7 @@ html:has(body.in-game){overscroll-behavior:none;}
 <script src="vendor/firebase-auth-compat.js"></script>
 <script src="vendor/firebase-firestore-compat.js"></script>
 <script src="vendor/firebase-database-compat.js"></script>
-<script>window.APP_VERSION = "2026.10.23-0051"; window.APP_BUILD = "2026.10.23-0051";</script>
+<script>window.APP_VERSION = "2026.10.23-0051"; window.APP_BUILD = "2026.10.23-0053";</script>
 <script>// ===== Best of Us – saját szerver (Firebase) =====
 // A játék eredetileg a Claude-os tárolót használta (window.claude.use('db' | 'user' | 'room')).
 // Ez a fájl ugyanazt a felületet adja Firebase-ből, így a játék kódja szinte változatlan maradhat:
@@ -4099,6 +4099,7 @@ const ART = {
   p_laci_hw:      { src:'art/p_laci_hw.webp?v=527c7a858048bb7b', av:'72% 25%', pos:'66% 24%', port:'72% 22%' },
   p_sasi_mage:    { src:'art/p_sasi_mage.webp?v=93208683e1286d47', av:'68% 16%', pos:'64% 18%', port:'68% 14%' },
   p_krisz_doffy:  { src:'art/p_krisz_doffy.webp?v=afd6437cba284431', av:'52% 30%', pos:'52% 28%', port:'52% 26%' },
+  p_gabi_beton:   { src:'art/p_gabi_beton.webp?v=c59e0018cd6d061c', av:'58% 26%', pos:'56% 26%', port:'58% 22%' },
   c_nyitinap:     { src:'art/nyitinap.webp?v=cdbcc561b41ba1d1', av:'72% 34%', pos:'66% 36%' },
   g_barna: { src:'art/g_barna.webp?v=2687c5a371343d73', av:'64% 20%', pos:'62% 20%', port:'64% 16%' },
   g_laci:  { src:'art/g_laci.webp?v=a6809a5542dbbb5b',  av:'46% 20%', pos:'46% 20%', port:'46% 16%' },
@@ -4297,7 +4298,8 @@ const PORTRAITS = {
   p_david_hw:     { hero: 'david', name: 'Dávid, a rémbolt előtt', passOnly: true, ev: 'hw26' },
   p_tomi_hw:      { hero: 'tomi',  name: 'Tomi, a holdfény fotósa', passOnly: true, ev: 'hw26' },
   p_laci_hw:      { hero: 'laci',  name: 'Laci, az éjféli úriember', passOnly: true, ev: 'hw26' },
-  p_krisz_doffy:  { hero: 'krisz', name: 'Krisz, Doflamingo style', price: 150, from: '2026-10-19' },   /* bolt, 2026-10-19 (Tomi) */
+  p_krisz_doffy:  { hero: 'krisz', name: 'Krisz, Doflamingo style', price: 150, from: '2026-10-19' },
+  p_gabi_beton:   { hero: 'gabi',  name: 'Gabi, a Beton', passOnly: true },   /* 2. ranked szezon, Ezüst 5 jutalma (2026-10-23, Tomi) – boltban, ládában nincs */   /* bolt, 2026-10-19 (Tomi) */
   p_sasi_mage:    { hero: 'sasi',  name: 'Sasi, a mágus', price: 250, from: '2026-10-16' },   // bolt: a következő rotációtól (from = ettől a naptól kapható)   // event: a heti ládából is jöhet   // ajándék: Best of Us TCG nap (2026-10-12)
 };
 const isPort = v => !!(v && PORTRAITS[v] && ART[v]);
@@ -9029,7 +9031,7 @@ const RK_REWARDS_S2 = [   // 2. ranked szezontól (2026-10-23): Smaragd és Gyé
 /* 2. ranked szezon extra jutalmai (2026-10-23, Tomi) – a designok később jönnek. Amíg nincs kész (grant nincs megadva), „hamarosan” felirattal látszik;
    amikor elkészül (grant függvény + ready), mindenki megkapja, aki abban a szezonban elérte a lépcsőt – akkor is, ha a szezon már véget ért (rkHist[szezon].best). */
 const RK_LATER = { r2: [
-  { min: 5,  key: 'r2_gabi',  name: 'Gabi, a Beton hős-portré' },   /* 2026-10-23 (Tomi): Ezüst 5 – a kép még nem jött meg */
+  { min: 5,  key: 'r2_gabi',  name: 'Gabi, a Beton hős-portré', grant: p => { if (!(p.portraits || []).includes('p_gabi_beton')) p.portraits = [...(p.portraits || []), 'p_gabi_beton']; p.heroSkin = { ...(p.heroSkin || {}), gabi: 'p_gabi_beton' }; }, show: () => heroCardHTML(HERO.gabi, { big: true, port: 'p_gabi_beton' }), note: 'Gabi mostantól ezt a portrét viseli – a Gyűjteményben a hősre koppintva visszaválthatsz.' },   /* 2026-10-23 (Tomi): Ezüst 5 */
   { min: 10, key: 'r2_back',  name: 'S2 Ranked hátlap' },
   { min: 15, key: 'r2_var',   name: 'Legendás ??? változat' },
   { min: 20, key: 'r2_dia',   name: 'új Gyémánt lap' },
@@ -9042,7 +9044,10 @@ function rkLaterCheck(p) {   /* elkészült extra jutalmak kiosztása (egyszer, 
     const best = p.rank && p.rank.season === sid ? p.rank.best || 0 : (p.rkHist && p.rkHist[sid] ? p.rkHist[sid].best || 0 : -1);
     for (const x of xs) { if (!x.grant || best < x.min || (p.rkLater || {})[x.key]) continue; x.grant(p); (p.rkLater = p.rkLater || {})[x.key] = Date.now(); got.push(x); }
   }
-  if (got.length) { save(); toast(`🎁 Ranked jutalom megérkezett: ${got.map(x => x.name).join(', ')}`); }
+  if (got.length) { save(); renderMenuFan?.();
+    const sh = got.find(x => x.show);
+    if (sh) openModal(sh.show(), `🎁 Ranked jutalom (${rkNameL(sh.min, rkLegOf('r2'))}): ${got.map(x => x.name).join(', ')}! ${sh.note || ''}`, '');
+    else toast(`🎁 Ranked jutalom megérkezett: ${got.map(x => x.name).join(', ')}`); }
   return got;
 }
 const rkRewTable = sid => sid === 's2' ? RK_REWARDS_S1 : RK_REWARDS_S2;
