@@ -463,8 +463,12 @@ Hősképesség-ötletek a táblázatban (még nem zöldek, nincsenek beépítve)
 ## Javítás: „Újabb ranked” → Mégse beragadás (2026-10-16)
 - Meccs után az „Újabb ranked” gomb a lezárt meccs képernyőjén indította a keresést; ha valaki „Mégse”-t nyomott, a lezárt táblán ragadt, és a zászló sem csinált semmit. Mostantól az „Újabb ranked” előbb a Ranked képernyőre visz, a keresés megszakítása lezárt meccsből a menübe visz, és lezárt meccsen a zászló is a menübe visz.
 
+## Bolti ritka variáns: Boros virágcsokorral (2026-10-23, Tomi)
+- `c_boros2` – a Boros (5 energia, 3/5, ritka, Provokáció) változata, új képpel (virágcsokor, naplemente), **50 coin**, 2 példány jár; csak a Boltban, a limitált kínálatban (a következő rotációig, 10-29). Packból nem jön, nem cserélhető.
+- **Gabi, a Beton hős-portré:** a 2. ranked szezonban **Ezüst 5**-ön jár (`RK_LATER.r2`, `r2_gabi`) – a kép még nem jött meg, addig „hamarosan”; utólag mindenki megkapja, aki elérte.
+
 ## 2. ranked szezon extra jutalmai (2026-10-23, Tomi)
-- A meglévő lépcső-jutalmak (`RK_REWARDS_S2`) mellé: **Arany 5:** S2 Ranked hátlap · **Smaragd 5:** Legendás ??? változat · **Gyémánt 5:** új Gyémánt lap · **Legenda:** mozgó Gyémánt hős-portré. A designok később jönnek (Tomi).
+- A meglévő lépcső-jutalmak (`RK_REWARDS_S2`) mellé: **Ezüst 5:** Gabi, a Beton hős-portré · **Arany 5:** S2 Ranked hátlap · **Smaragd 5:** Legendás ??? változat · **Gyémánt 5:** új Gyémánt lap · **Legenda:** mozgó Gyémánt hős-portré. A designok később jönnek (Tomi).
 - `RK_LATER.r2` (meta.js): amíg egy tételnek nincs `grant` függvénye, a Ranked képernyő jutalomlistájában „+ … HAMAROSAN” címkével látszik. Ha elkészül: a tételhez `grant: p => {…}` (pl. hátlap: `p.backs` + `BACKS`-ba az új hátlap; lap: `p.coll`; portré: `PORTRAITS` + `p.ports`), és `rkLaterCheck` (a menüben, `renderRankTile`) **mindenkinek kiosztja, aki abban a szezonban elérte a lépcsőt** – akkor is, ha a szezon már véget ért (`p.rkHist[szezon].best`), egyszer (`p.rkLater[key]`).
 
 ## Ranked top 3: korona (2026-10-22, Tomi)

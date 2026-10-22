@@ -198,6 +198,7 @@ const ART = {
   a_mangos: { src:'art/mangos.webp', pos:'52% 42%' },
   i_buffalo: { src:'art/buffalo.webp', pos:'50% 52%' },
   c_boros:  { src:'art/boros.webp', pos:'50% 14%' },
+  c_boros2: { src:'art/boros2.webp', av:'52% 20%', pos:'52% 22%' },
   a_delfin: { src:'art/delfin.webp', pos:'40% 38%' },
   i_borkabat:{ src:'art/borkabat.webp', pos:'50% 22%' },
   i_varazsho:{ src:'art/varazsho.webp', pos:'50% 50%' },
