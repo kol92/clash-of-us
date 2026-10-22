@@ -3158,6 +3158,7 @@ const RK_REWARDS_S2 = [   // 2. ranked szezontól (2026-10-23): Smaragd és Gyé
 /* 2. ranked szezon extra jutalmai (2026-10-23, Tomi) – a designok később jönnek. Amíg nincs kész (grant nincs megadva), „hamarosan” felirattal látszik;
    amikor elkészül (grant függvény + ready), mindenki megkapja, aki abban a szezonban elérte a lépcsőt – akkor is, ha a szezon már véget ért (rkHist[szezon].best). */
 const RK_LATER = { r2: [
+  { min: 5,  key: 'r2_gabi',  name: 'Gabi, a Beton hős-portré' },   /* 2026-10-23 (Tomi): Ezüst 5 – a kép még nem jött meg */
   { min: 10, key: 'r2_back',  name: 'S2 Ranked hátlap' },
   { min: 15, key: 'r2_var',   name: 'Legendás ??? változat' },
   { min: 20, key: 'r2_dia',   name: 'új Gyémánt lap' },
