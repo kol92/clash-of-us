@@ -463,6 +463,10 @@ Hősképesség-ötletek a táblázatban (még nem zöldek, nincsenek beépítve)
 ## Javítás: „Újabb ranked” → Mégse beragadás (2026-10-16)
 - Meccs után az „Újabb ranked” gomb a lezárt meccs képernyőjén indította a keresést; ha valaki „Mégse”-t nyomott, a lezárt táblán ragadt, és a zászló sem csinált semmit. Mostantól az „Újabb ranked” előbb a Ranked képernyőre visz, a keresés megszakítása lezárt meccsből a menübe visz, és lezárt meccsen a zászló is a menübe visz.
 
+## Barna, Amsterdam hőse: gomba a kézbe (2026-10-22, Tomi)
+- Új: „Kijátszáskor a kezedbe kerül egy Varázsgomba.” (eddig a paklidba keverte), és **2/2** lett (3/2 helyett). A sima „kézbe” változat mérve nagy erősítés volt (Amsterdam kezdőpaklik a Base kezdőpaklik ellen, 480 meccs/pakli: Barna 44→59%, Bence 48→65%, Tomi 58→73%, Krisz 46→63%); Tomi döntése a mérés után: kézbe + 2/2 (Barna 54%, Bence 59%, Tomi 68%, Krisz 64%). Megjegyzés: az Amsterdam paklik a Base kezdőpaklik ellen eleve 45–60% körül voltak.
+- **Mérés (nem élesített): Varázsgomba + 1 lap húzás.** Ugyanezzel a módszerrel a gombás paklik +4–16 ponttal erősödnének (pl. Tomi gombás paklija 68→85%, Bence AH 65→77%, Milo AH 61→74%) – túl erős.
+
 ## Safari „vissza” húzás tiltása meccs közben (2026-10-21, Laci javaslata)
 - Meccs közben (`body.in-game`) a képernyő bal/jobb szélén (14 px) induló egyujjas érintést elnyeljük (`touchstart` + `preventDefault`, ui.js), így a böngészős (Safari) szélről húzós vissza-gesztus nem indul el; `overscroll-behavior:none` is. A visszalépés eddig sem vitt ki a meccsből (`popstate` → `keep()`), de a Safari húzás-animációja zavart. Menükben marad a gesztus.
 
