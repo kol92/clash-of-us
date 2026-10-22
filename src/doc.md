@@ -466,7 +466,7 @@ Hősképesség-ötletek a táblázatban (még nem zöldek, nincsenek beépítve)
 ## Ranked top 3: korona (2026-10-22, Tomi)
 - A lezárt ranked szezon első három helyezettje (`rkFinalBoard`, a zárás után 1 órával, `rkTopCheck`) **koronát** kap: 1. arany, 2. ezüst, 3. bronz (`RK_TOP_REW.s2`, már az 1. ranked szezontól). `p.crown = { k, pos, season, until }`, érvényes a **következő ranked szezon végéig** (`crownUntil`; ha nincs felvéve következő: 30 nap).
 - Látszik: a meccsen a hős portréjának bal felső sarkában (`.crown.cr-hero`, saját és PvP-ellenfél – a `cos.crown`-ból), a VS képernyőn a név előtt, és a ranglistán a név előtt (a `pub.crown`-ból; a barátok is látják). Botnak nincs.
-- **Ideiglenesen 👑 emoji** (ezüst/bronz színszűrővel), amíg Tomi UI-ja meg nem jön – akkor `art/ui/crown-gold|silver|bronze.webp` háttérképként a `.crown` osztályra.
+- Képek (Tomi UI, 2026-10-22 este): `art/ui/crown-gold|silver|bronze.webp` (240 px széles, ~1,6:1, számmal: 1, 2, 3), háttérképként a `.crown.cr-*` osztályon.
 - A ranked szabályok közt is kiírva. Felugró ablak a jutalomnál: „🏆 2. helyezés – … 👑 ezüst korona …”.
 
 ## Barna, Amsterdam hőse: gomba a kézbe (2026-10-22, Tomi)
