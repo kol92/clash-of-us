@@ -3374,7 +3374,8 @@ async function rkTopCheck() {   /* lezárt szezon, amihez már van top 3 jutalom
     p.rkTop[se.id] = pos; save();
     if (pos >= 0 && rew[pos]) { rkGrant(p, { ...rew[pos], pos, season: se.id, until: crownUntil(se.id) }); save(); renderProfileBar(); frPubSync(true);
       const o = document.createElement('div'); o.className = 'overlay';
-      o.innerHTML = `<div class="modal acct-box"><h3>🏆 ${['1.', '2.', '3.'][pos]} helyezés – ${escH(se.name)}</h3><p class="live">A szezon végén a ranglista ${['élén', 'második helyén', 'harmadik helyén'][pos]} végeztél!</p><p class="tut-gift">🎁 Jutalom: <b>${rkRewText(rew[pos])}</b></p><button class="btn primary" data-x>Szuper!</button></div>`;
+      o.className = 'overlay rk-top-pop';   /* 2026-10-22 (Tomi): gratuláció */
+      o.innerHTML = `<div class="modal acct-box"><div class="rk-top-crown">${crownHTML(rew[pos].crown)}</div><h3>Gratulálunk! ${pos + 1}. helyezett lettél!</h3><p class="live">${/^(1|5|[AEIOUÁÉÍÓÖŐÚÜŰ])/i.test(se.name) ? 'Az' : 'A'} ${escH(se.name)} végén a ranglista ${['élén', 'második helyén', 'harmadik helyén'][pos]} végeztél. 🏆</p><p class="tut-gift">🎁 Jutalom: <b>${rkRewText(rew[pos])}</b></p><button class="btn primary" data-x>Köszönöm!</button></div>`;
       o.onclick = e => { if (e.target.closest('[data-x]')) o.remove(); }; $('#layer').appendChild(o); }
   }
 }

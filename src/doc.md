@@ -467,7 +467,7 @@ Hősképesség-ötletek a táblázatban (még nem zöldek, nincsenek beépítve)
 - A lezárt ranked szezon első három helyezettje (`rkFinalBoard`, a zárás után 1 órával, `rkTopCheck`) **koronát** kap: 1. arany, 2. ezüst, 3. bronz (`RK_TOP_REW.s2`, már az 1. ranked szezontól). `p.crown = { k, pos, season, until }`, érvényes a **következő ranked szezon végéig** (`crownUntil`; ha nincs felvéve következő: 30 nap).
 - Látszik: a meccsen a hős portréjának bal felső sarkában (`.crown.cr-hero`, saját és PvP-ellenfél – a `cos.crown`-ból), a VS képernyőn a név előtt, és a ranglistán a név előtt (a `pub.crown`-ból; a barátok is látják). Botnak nincs.
 - Képek (Tomi UI, 2026-10-22 este): `art/ui/crown-gold|silver|bronze.webp` (240 px széles, ~1,6:1, számmal: 1, 2, 3), háttérképként a `.crown.cr-*` osztályon.
-- A ranked szabályok közt is kiírva. Felugró ablak a jutalomnál: „🏆 2. helyezés – … 👑 ezüst korona …”.
+- A ranked szabályok közt is kiírva. Felugró ablak a jutalomnál (Tomi kérése): nagy, beugró korona-kép + „Gratulálunk! X. helyezett lettél!” + „Az 1. ranked szezon végén a ranglista élén/második/harmadik helyén végeztél. 🏆” + a jutalom.
 
 ## Barna, Amsterdam hőse: gomba a kézbe (2026-10-22, Tomi)
 - Új: „Kijátszáskor a kezedbe kerül egy Varázsgomba.” (eddig a paklidba keverte), és **2/2** lett (3/2 helyett). A sima „kézbe” változat mérve nagy erősítés volt (Amsterdam kezdőpaklik a Base kezdőpaklik ellen, 480 meccs/pakli: Barna 44→59%, Bence 48→65%, Tomi 58→73%, Krisz 46→63%); Tomi döntése a mérés után: kézbe + 2/2 (Barna 54%, Bence 59%, Tomi 68%, Krisz 64%). Megjegyzés: az Amsterdam paklik a Base kezdőpaklik ellen eleve 45–60% körül voltak.
