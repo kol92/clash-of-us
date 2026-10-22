@@ -463,6 +463,12 @@ Hősképesség-ötletek a táblázatban (még nem zöldek, nincsenek beépítve)
 ## Javítás: „Újabb ranked” → Mégse beragadás (2026-10-16)
 - Meccs után az „Újabb ranked” gomb a lezárt meccs képernyőjén indította a keresést; ha valaki „Mégse”-t nyomott, a lezárt táblán ragadt, és a zászló sem csinált semmit. Mostantól az „Újabb ranked” előbb a Ranked képernyőre visz, a keresés megszakítása lezárt meccsből a menübe visz, és lezárt meccsen a zászló is a menübe visz.
 
+## Ranked top 3: korona (2026-10-22, Tomi)
+- A lezárt ranked szezon első három helyezettje (`rkFinalBoard`, a zárás után 1 órával, `rkTopCheck`) **koronát** kap: 1. arany, 2. ezüst, 3. bronz (`RK_TOP_REW.s2`, már az 1. ranked szezontól). `p.crown = { k, pos, season, until }`, érvényes a **következő ranked szezon végéig** (`crownUntil`; ha nincs felvéve következő: 30 nap).
+- Látszik: a meccsen a hős portréjának bal felső sarkában (`.crown.cr-hero`, saját és PvP-ellenfél – a `cos.crown`-ból), a VS képernyőn a név előtt, és a ranglistán a név előtt (a `pub.crown`-ból; a barátok is látják). Botnak nincs.
+- **Ideiglenesen 👑 emoji** (ezüst/bronz színszűrővel), amíg Tomi UI-ja meg nem jön – akkor `art/ui/crown-gold|silver|bronze.webp` háttérképként a `.crown` osztályra.
+- A ranked szabályok közt is kiírva. Felugró ablak a jutalomnál: „🏆 2. helyezés – … 👑 ezüst korona …”.
+
 ## Barna, Amsterdam hőse: gomba a kézbe (2026-10-22, Tomi)
 - Új: „Kijátszáskor a kezedbe kerül egy Varázsgomba.” (eddig a paklidba keverte), és **2/2** lett (3/2 helyett). A sima „kézbe” változat mérve nagy erősítés volt (Amsterdam kezdőpaklik a Base kezdőpaklik ellen, 480 meccs/pakli: Barna 44→59%, Bence 48→65%, Tomi 58→73%, Krisz 46→63%); Tomi döntése a mérés után: kézbe + 2/2 (Barna 54%, Bence 59%, Tomi 68%, Krisz 64%). Megjegyzés: az Amsterdam paklik a Base kezdőpaklik ellen eleve 45–60% körül voltak.
 - **Mérés (nem élesített): Varázsgomba + 1 lap húzás.** Ugyanezzel a módszerrel a gombás paklik +4–16 ponttal erősödnének (pl. Tomi gombás paklija 68→85%, Bence AH 65→77%, Milo AH 61→74%) – túl erős.
