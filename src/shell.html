@@ -2226,6 +2226,8 @@ html:has(body.in-game){overscroll-behavior:none;}
 .crown.cr-hero{position:absolute;left:2px;top:2px;z-index:2;font-size:30px;transform:rotate(-14deg);}
 .crown.cr-vs{margin-right:8px;font-size:.8em;transform:rotate(-12deg);}
 .crown.cr-inl{margin-right:5px;font-size:1em;}
+.rk-top-crown{display:grid;place-items:center;margin:-4px 0 4px;} .rk-top-crown .crown{font-size:72px;animation:crownPop .9s cubic-bezier(.2,1.4,.4,1) both;}
+@keyframes crownPop{0%{transform:scale(.2) rotate(-25deg);opacity:0;}100%{transform:none;opacity:1;}}
 </style>
 
 <div id="app">

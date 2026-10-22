@@ -2241,6 +2241,8 @@ html:has(body.in-game){overscroll-behavior:none;}
 .crown.cr-hero{position:absolute;left:2px;top:2px;z-index:2;font-size:30px;transform:rotate(-14deg);}
 .crown.cr-vs{margin-right:8px;font-size:.8em;transform:rotate(-12deg);}
 .crown.cr-inl{margin-right:5px;font-size:1em;}
+.rk-top-crown{display:grid;place-items:center;margin:-4px 0 4px;} .rk-top-crown .crown{font-size:72px;animation:crownPop .9s cubic-bezier(.2,1.4,.4,1) both;}
+@keyframes crownPop{0%{transform:scale(.2) rotate(-25deg);opacity:0;}100%{transform:none;opacity:1;}}
 </style>
 </head>
 <body>
@@ -2418,7 +2420,7 @@ html:has(body.in-game){overscroll-behavior:none;}
 <script src="vendor/firebase-auth-compat.js"></script>
 <script src="vendor/firebase-firestore-compat.js"></script>
 <script src="vendor/firebase-database-compat.js"></script>
-<script>window.APP_VERSION = "2026.10.22-2040"; window.APP_BUILD = "2026.10.22-2044";</script>
+<script>window.APP_VERSION = "2026.10.22-2040"; window.APP_BUILD = "2026.10.22-2045";</script>
 <script>// ===== Best of Us – saját szerver (Firebase) =====
 // A játék eredetileg a Claude-os tárolót használta (window.claude.use('db' | 'user' | 'room')).
 // Ez a fájl ugyanazt a felületet adja Firebase-ből, így a játék kódja szinte változatlan maradhat:
@@ -9239,7 +9241,8 @@ async function rkTopCheck() {   /* lezárt szezon, amihez már van top 3 jutalom
     p.rkTop[se.id] = pos; save();
     if (pos >= 0 && rew[pos]) { rkGrant(p, { ...rew[pos], pos, season: se.id, until: crownUntil(se.id) }); save(); renderProfileBar(); frPubSync(true);
       const o = document.createElement('div'); o.className = 'overlay';
-      o.innerHTML = `<div class="modal acct-box"><h3>🏆 ${['1.', '2.', '3.'][pos]} helyezés – ${escH(se.name)}</h3><p class="live">A szezon végén a ranglista ${['élén', 'második helyén', 'harmadik helyén'][pos]} végeztél!</p><p class="tut-gift">🎁 Jutalom: <b>${rkRewText(rew[pos])}</b></p><button class="btn primary" data-x>Szuper!</button></div>`;
+      o.className = 'overlay rk-top-pop';   /* 2026-10-22 (Tomi): gratuláció */
+      o.innerHTML = `<div class="modal acct-box"><div class="rk-top-crown">${crownHTML(rew[pos].crown)}</div><h3>Gratulálunk! ${pos + 1}. helyezett lettél!</h3><p class="live">${/^(1|5|[AEIOUÁÉÍÓÖŐÚÜŰ])/i.test(se.name) ? 'Az' : 'A'} ${escH(se.name)} végén a ranglista ${['élén', 'második helyén', 'harmadik helyén'][pos]} végeztél. 🏆</p><p class="tut-gift">🎁 Jutalom: <b>${rkRewText(rew[pos])}</b></p><button class="btn primary" data-x>Köszönöm!</button></div>`;
       o.onclick = e => { if (e.target.closest('[data-x]')) o.remove(); }; $('#layer').appendChild(o); }
   }
 }
