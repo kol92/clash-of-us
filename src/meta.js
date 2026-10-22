@@ -3158,7 +3158,7 @@ const RK_REWARDS_S2 = [   // 2. ranked szezontól (2026-10-23): Smaragd és Gyé
 /* 2. ranked szezon extra jutalmai (2026-10-23, Tomi) – a designok később jönnek. Amíg nincs kész (grant nincs megadva), „hamarosan” felirattal látszik;
    amikor elkészül (grant függvény + ready), mindenki megkapja, aki abban a szezonban elérte a lépcsőt – akkor is, ha a szezon már véget ért (rkHist[szezon].best). */
 const RK_LATER = { r2: [
-  { min: 5,  key: 'r2_gabi',  name: 'Gabi, a Beton hős-portré' },   /* 2026-10-23 (Tomi): Ezüst 5 – a kép még nem jött meg */
+  { min: 5,  key: 'r2_gabi',  name: 'Gabi, a Beton hős-portré', grant: p => { if (!(p.portraits || []).includes('p_gabi_beton')) p.portraits = [...(p.portraits || []), 'p_gabi_beton']; p.heroSkin = { ...(p.heroSkin || {}), gabi: 'p_gabi_beton' }; }, show: () => heroCardHTML(HERO.gabi, { big: true, port: 'p_gabi_beton' }), note: 'Gabi mostantól ezt a portrét viseli – a Gyűjteményben a hősre koppintva visszaválthatsz.' },   /* 2026-10-23 (Tomi): Ezüst 5 */
   { min: 10, key: 'r2_back',  name: 'S2 Ranked hátlap' },
   { min: 15, key: 'r2_var',   name: 'Legendás ??? változat' },
   { min: 20, key: 'r2_dia',   name: 'új Gyémánt lap' },
@@ -3171,7 +3171,10 @@ function rkLaterCheck(p) {   /* elkészült extra jutalmak kiosztása (egyszer, 
     const best = p.rank && p.rank.season === sid ? p.rank.best || 0 : (p.rkHist && p.rkHist[sid] ? p.rkHist[sid].best || 0 : -1);
     for (const x of xs) { if (!x.grant || best < x.min || (p.rkLater || {})[x.key]) continue; x.grant(p); (p.rkLater = p.rkLater || {})[x.key] = Date.now(); got.push(x); }
   }
-  if (got.length) { save(); toast(`🎁 Ranked jutalom megérkezett: ${got.map(x => x.name).join(', ')}`); }
+  if (got.length) { save(); renderMenuFan?.();
+    const sh = got.find(x => x.show);
+    if (sh) openModal(sh.show(), `🎁 Ranked jutalom (${rkNameL(sh.min, rkLegOf('r2'))}): ${got.map(x => x.name).join(', ')}! ${sh.note || ''}`, '');
+    else toast(`🎁 Ranked jutalom megérkezett: ${got.map(x => x.name).join(', ')}`); }
   return got;
 }
 const rkRewTable = sid => sid === 's2' ? RK_REWARDS_S1 : RK_REWARDS_S2;
