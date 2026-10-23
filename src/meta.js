@@ -595,18 +595,45 @@ async function buyPack(setId, free) {
   else if (free === 'shiny') { if (p.coins < ECON.shinyPrice) { toast('Nincs elég coinod'); return; } p.coins -= ECON.shinyPrice; }
   else if (free) { if (!freePackReady()) return; p.freeDate = today(); }
   else { if (p.coins < ECON.packPrice) { toast('Nincs elég coinod'); return; } p.coins -= ECON.packPrice; }
-  p.packs++;
+  const { cards, conv, shinyMode } = packRollFull(setId, free);
+  await save(); renderProfileBar(); renderShop();
+  await packOpening(setId, cards, { shiny: shinyMode });
+  if (conv.coins) toast(`Fölösleges hős-példány beváltva: +${conv.coins} coin`);
+}
+
+function packRollFull(setId, free) {   /* egy pack lapjai + a fölösleges hős-példányok beváltása (buyPack és a tömeges bontás közös része) */
+  const p = Store.p; p.packs++;
   const shinyMode = free === 'shiny' || free === 'shinyGift' || free === 'ahShinyGift';
   const cards = openPackRoll(setId, free === 'fa', shinyMode);
   const conv = { coins: 0 };   // a lapok duplikátumai megmaradnak (cserélhetők, vagy a Gyűjteményben kézzel beválthatók)
   for (const c of cards) if (!c.hero && !c.isNew) c.have = owned(c.id);
   for (const c of cards) if (c.gold && c.hero && (p.heroGold || {})[c.hero] > 1) {   /* csak arany HŐS (az arany lap sima gyűjteményi lap) – 2026-10-18 javítás */ p.heroGold[c.hero]--; p.coins += ECON.goldDupe; conv.coins += ECON.goldDupe; c.dupe = ECON.goldDupe; }
   for (const c of cards) if (c.hero && !c.gold && p.heroFa[c.hero] > 1) { p.heroFa[c.hero]--; p.coins += DUPE_COIN_RARE; conv.coins += DUPE_COIN_RARE; c.dupe = DUPE_COIN_RARE; }
+  return { cards, conv, shinyMode };
+}
+/* ---- Tömeges bontás (2026-10-24, Tomi): az azonos fajta ajándék packok egyszerre; a lapok sorokban, gyorsan, egymás után fordulnak fel –
+   legendás, Full Art, arany (és változat) lapnál megáll a sor, amíg meg nem nézed ---- */
+const BULK = { faPack: ['base', 'fa', 'faPacks', 'Full Art ajándék pack'], giftPack: ['base', 'gift', 'giftPacks', 'Ajándék pack'], giftAh: ['ah', 'ahGift', 'ahPacks', 'Amsterdam pack'],
+               giftAhShiny: ['ah', 'ahShinyGift', 'ahShinyPacks', 'Amsterdam Shiny pack'], giftShiny: ['base', 'shinyGift', 'shinyPacks', 'Ajándék Shiny pack'] };
+async function openAllPacks(kind) {
+  const p = Store.p, B = BULK[kind]; if (!p || !B) return; const [setId, free, key, name] = B, n = p[key] || 0; if (n < 2) return;
+  p[key] = 0; const all = [], conv = { coins: 0 }; let shiny = false, god = 0;
+  for (let k = 0; k < n; k++) { const r = packRollFull(setId, free); all.push(...r.cards); conv.coins += r.conv.coins; shiny = r.shinyMode; if (r.cards.god) god++; }
   await save(); renderProfileBar(); renderShop();
-  await packOpening(setId, cards, { shiny: shinyMode });
+  const o = document.createElement('div'); o.className = 'overlay opening bulk-op';
+  o.innerHTML = `<div class="op-stage"><div class="bulk-head"><b>${n} × ${escH(name)}</b><small>${all.length} lap${god ? ` · 🌈 ${god} GOD PACK!` : ''}</small></div></div>`;
+  $('#layer').appendChild(o);
+  const packs = document.createElement('div'); packs.className = 'bulk-packs'; packs.innerHTML = Array.from({ length: Math.min(n, 8) }, (_, k) => `<span style="--k:${k}">${packHTML(setId, { shiny })}</span>`).join('');
+  o.querySelector('.op-stage').appendChild(packs);
+  await packs.animate([{ opacity: 0, transform: 'translateY(30px) scale(.8)' }, { opacity: 1, transform: 'none' }], { duration: 380, easing: 'cubic-bezier(.2,1.3,.4,1)' }).finished;
+  await sleep(350);
+  const flash = document.createElement('div'); flash.className = 'op-flash' + (all.some(c => c.gold) ? ' gold' : ''); o.appendChild(flash);
+  flash.animate([{ opacity: 0 }, { opacity: 1 }, { opacity: 0 }], { duration: 500 });
+  await packs.animate([{ opacity: 1 }, { opacity: 0, transform: 'scale(1.15)' }], { duration: 260, fill: 'forwards' }).finished; packs.remove(); flash.remove();
+  await cardReveal(o, all, { ten: true, auto: true });
+  o.remove(); renderShop();
   if (conv.coins) toast(`Fölösleges hős-példány beváltva: +${conv.coins} coin`);
 }
-
 // ---- Szerencsekerék: naponta egy ingyen pörgetés; főnyeremény a 💎 Gyémánt Best of Us ----
 const DIAMOND_CARD = 'c_bou_d', SHARDS_NEED = 10, DIAMOND_DUPE = 300;
 const WHEEL = [   // [kulcs, felirat, súly %, szín]
@@ -746,11 +773,11 @@ function renderShop() {
       <div class="shop-grid">${items.map(shopOfferHTML).join('')}${ports.map(portOfferHTML).join('')}</div>
     </section>` : '';
   const gifts = [
-    p.faPacks > 0 ? `<button class="btn primary gift fa" id="faPack">✨ Full Art ajándék pack${p.faPacks > 1 ? ` (${p.faPacks})` : ''}</button>` : '',
-    p.giftPacks > 0 ? `<button class="btn primary gift" id="giftPack">🎁 Ajándék pack bontása${p.giftPacks > 1 ? ` (${p.giftPacks})` : ''}</button>` : '',
-    p.ahPacks > 0 ? `<button class="btn primary gift" id="giftAh">🌷 Amsterdam pack bontása${p.ahPacks > 1 ? ` (${p.ahPacks})` : ''}</button>` : '',
-    p.ahShinyPacks > 0 ? `<button class="btn primary shiny-btn" id="giftAhShiny">🌷 Amsterdam Shiny pack${p.ahShinyPacks > 1 ? ` (${p.ahShinyPacks})` : ''}</button>` : '',
-    p.shinyPacks > 0 ? `<button class="btn primary shiny-btn" id="giftShiny">🎁 Ajándék Shiny pack${p.shinyPacks > 1 ? ` (${p.shinyPacks})` : ''}</button>` : '',
+    p.faPacks > 0 ? `<div class="gift-row">${`<button class="btn primary gift fa" id="faPack">✨ Full Art ajándék pack${p.faPacks > 1 ? ` (${p.faPacks})` : ''}</button>`}${p.faPacks > 1 ? `<button class="bulk-btn" data-bulk="faPack" title="Mindet egyszerre">⚡ Mind (${p.faPacks})</button>` : ''}</div>` : '',
+    p.giftPacks > 0 ? `<div class="gift-row">${`<button class="btn primary gift" id="giftPack">🎁 Ajándék pack bontása${p.giftPacks > 1 ? ` (${p.giftPacks})` : ''}</button>`}${p.giftPacks > 1 ? `<button class="bulk-btn" data-bulk="giftPack" title="Mindet egyszerre">⚡ Mind (${p.giftPacks})</button>` : ''}</div>` : '',
+    p.ahPacks > 0 ? `<div class="gift-row">${`<button class="btn primary gift" id="giftAh">🌷 Amsterdam pack bontása${p.ahPacks > 1 ? ` (${p.ahPacks})` : ''}</button>`}${p.ahPacks > 1 ? `<button class="bulk-btn" data-bulk="giftAh" title="Mindet egyszerre">⚡ Mind (${p.ahPacks})</button>` : ''}</div>` : '',
+    p.ahShinyPacks > 0 ? `<div class="gift-row">${`<button class="btn primary shiny-btn" id="giftAhShiny">🌷 Amsterdam Shiny pack${p.ahShinyPacks > 1 ? ` (${p.ahShinyPacks})` : ''}</button>`}${p.ahShinyPacks > 1 ? `<button class="bulk-btn" data-bulk="giftAhShiny" title="Mindet egyszerre">⚡ Mind (${p.ahShinyPacks})</button>` : ''}</div>` : '',
+    p.shinyPacks > 0 ? `<div class="gift-row">${`<button class="btn primary shiny-btn" id="giftShiny">🎁 Ajándék Shiny pack${p.shinyPacks > 1 ? ` (${p.shinyPacks})` : ''}</button>`}${p.shinyPacks > 1 ? `<button class="bulk-btn" data-bulk="giftShiny" title="Mindet egyszerre">⚡ Mind (${p.shinyPacks})</button>` : ''}</div>` : '',
     `<button class="btn primary" id="freePack" ${free ? '' : 'disabled'}>${free ? (freePackSet() === 'ah' ? '🌷 Napi ingyen Amsterdam pack' : '🎁 Napi ingyen pack') : 'Mai ingyen pack elhasználva'}</button>`].join('');
   $('#shopBody').innerHTML = `
     <div class="wallet"><span class="coin" aria-hidden="true"></span><b>${p.coins}</b><small>coin</small></div>
@@ -791,6 +818,7 @@ function renderShop() {
   if ($('#giftShiny')) $('#giftShiny').onclick = () => buyPack('base', 'shinyGift');
   if ($('#giftAh')) $('#giftAh').onclick = () => buyPack('ah', 'ahGift');
   if ($('#giftAhShiny')) $('#giftAhShiny').onclick = () => buyPack('ah', 'ahShinyGift');
+  $('#shopBody').querySelectorAll('[data-bulk]').forEach(b => b.onclick = () => openAllPacks(b.dataset.bulk));
 }
 function packHTML(setId, o = {}) {
   return `<div class="pack pk set-${setId}${o.shiny ? ' shiny' : ''}" role="img" aria-label="Best of Us – ${o.shiny ? 'Shiny ' : ''}${SETS[setId].name} booster pack">
@@ -903,7 +931,14 @@ async function cardReveal(o, cards, opt = {}) {
   row.querySelectorAll('.flip').forEach((f, i) => f.animate([{ transform: 'translateY(60px) scale(.6)', opacity: 0 }, { transform: 'none', opacity: 1 }],
     { duration: 380, delay: 80 * i, easing: 'cubic-bezier(.2,1.3,.4,1)', fill: 'backwards' }));
   let left = cards.length;
-  if (opt.ten) {
+  if (opt.auto) {   /* tömeges bontás: magától, gyorsan fordít; a különleges lapnál (legendás / Full Art / arany / változat) megvárja, amíg megnézed */
+    (async () => { await sleep(500);
+      for (const f of row.querySelectorAll('.flip')) {
+        f.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+        for (let k = 0; k < 600 && !f.classList.contains('open'); k++) { if (row.dataset.busy !== '1') f.click(); await sleep(40); }
+        while (row.dataset.busy === '1') await sleep(50);
+        await sleep(110); } })();
+  } else if (opt.ten) {
     const all = document.createElement('button'); all.className = 'btn small op-all'; all.textContent = 'Mindet felfordítom';
     o.querySelector('.op-stage').appendChild(all);
     all.onclick = async () => { all.disabled = true;
@@ -1171,7 +1206,7 @@ function heroPortrait(hid, cls = '') {
   return `<span class="hp-img ${cls}${aid !== hid ? ' gold' : ''}" style="--h:${h.hue};${ART[aid] ? `background-image:url('${artSrc(aid, false)}')` : ''}">${ART[aid] ? '' : initials(h.name)}</span>`;
 }
 function renderDecks() {
-  const ds = allDecks();
+  const ds = allDecks().sort((a, b) => (a.starter ? 1 : 0) - (b.starter ? 1 : 0));   /* a saját paklik legfelül (2026-10-24) */
   $('#decksBody').innerHTML = `<button class="btn primary" id="newDeck">+ Új pakli</button><button class="btn" id="impDeck">📥 Pakli beillesztése</button>
     <div class="deck-list">${ds.map(d => {
       const prob = deckIssue(d), h = HERO[d.hero];

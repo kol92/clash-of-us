@@ -2230,6 +2230,14 @@ html:has(body.in-game){overscroll-behavior:none;}
 @keyframes crownPop{0%{transform:scale(.2) rotate(-25deg);opacity:0;}100%{transform:none;opacity:1;}}
 
 .rk-soon{display:inline-block;margin-left:4px;padding:0 6px;border-radius:8px;background:rgba(255,211,77,.18);color:var(--gold);font-style:normal;font-weight:800;font-size:.9em;}
+
+/* tömeges bontás (2026-10-24) */
+.gift-row{display:flex;gap:6px;align-items:stretch;width:100%;} .gift-row>.btn{flex:1 1 auto;min-width:0;width:auto;}
+.bulk-btn{flex:none;padding:0 14px;border-radius:14px;font:800 14px var(--body);white-space:nowrap;cursor:pointer;background:linear-gradient(135deg,#ffd34d,#ff8a3d);color:#2a1300;border:1px solid rgba(255,255,255,.5);box-shadow:0 0 12px rgba(255,170,60,.45);}
+.overlay.opening.bulk-op{place-items:start center;padding-top:max(18px,env(safe-area-inset-top));padding-bottom:60px;}
+.bulk-head{display:grid;justify-items:center;gap:2px;color:#fff;text-align:center;} .bulk-head b{font-family:var(--display);font-size:22px;} .bulk-head small{color:var(--gold);font-weight:800;}
+.bulk-packs{display:flex;justify-content:center;margin:20px 0;} .bulk-packs>span{margin-left:-60px;transform:rotate(calc((var(--k) - 3) * 5deg));} .bulk-packs>span:first-child{margin-left:0;}
+.bulk-packs .pack{--pw:110px;}
 </style>
 
 <div id="app">
