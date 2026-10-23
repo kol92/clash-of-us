@@ -463,6 +463,10 @@ Hősképesség-ötletek a táblázatban (még nem zöldek, nincsenek beépítve)
 ## Javítás: „Újabb ranked” → Mégse beragadás (2026-10-16)
 - Meccs után az „Újabb ranked” gomb a lezárt meccs képernyőjén indította a keresést; ha valaki „Mégse”-t nyomott, a lezárt táblán ragadt, és a zászló sem csinált semmit. Mostantól az „Újabb ranked” előbb a Ranked képernyőre visz, a keresés megszakítása lezárt meccsből a menübe visz, és lezárt meccsen a zászló is a menübe visz.
 
+## Tömeges packbontás + saját paklik legfelül (2026-10-24, Tomi)
+- **⚡ Mind (N)** gomb a Boltban minden ajándék-pack fajta mellett, ha legalább 2 van belőle (Ajándék, Amsterdam, Amsterdam Shiny, Ajándék Shiny, Full Art ajándék): egyszerre kibontja mindet (`openAllPacks`, `BULK`; a pack-logika közös: `packRollFull`). Rövid pack-legyező animáció → az összes lap rácsban (5 oszlop, görgethető), és **magától, gyorsan egymás után fordulnak fel**; legendás, Full Art, arany és ritka változat lapnál **megáll a sor**, és lefut a megszokott különleges felfedés, amíg meg nem nézed (`cardReveal` `auto`). A God pack itt is bejöhet (a fejlécben „🌈 GOD PACK!” jelzi, külön jelenet nélkül). Vásárolt (coinos) packokra nincs tömeges bontás.
+- **Saját paklik legfelül:** a pakliválasztóban (és a Paklik menüben) a saját paklik mindig a kezdőpaklik előtt vannak.
+
 ## Tomi, a parti lelke: Adios a hőst éri (2026-10-24, Tomi)
 - Hiba volt: a parti lelke Adios Motherfuckere egy véletlen ellenséges **karaktert** bénított meg. A lap szerint csak a **hőst** lehet: most a parti lelkénél is az ellenfél hősét bénítja (a következő körében nem játszhat ki lapot, `T.locked`), karakter nem kap bénulást. Felirat: „a következő körében nem játszhat ki lapot”. Teszt: `tools/party_test.js`.
 
