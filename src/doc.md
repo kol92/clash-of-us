@@ -463,6 +463,9 @@ Hősképesség-ötletek a táblázatban (még nem zöldek, nincsenek beépítve)
 ## Javítás: „Újabb ranked” → Mégse beragadás (2026-10-16)
 - Meccs után az „Újabb ranked” gomb a lezárt meccs képernyőjén indította a keresést; ha valaki „Mégse”-t nyomott, a lezárt táblán ragadt, és a zászló sem csinált semmit. Mostantól az „Újabb ranked” előbb a Ranked képernyőre visz, a keresés megszakítása lezárt meccsből a menübe visz, és lezárt meccsen a zászló is a menübe visz.
 
+## Új meccs-háttér (2026-10-23, Tomi UI)
+- `art/ui/board.webp` lecserélve (900×1946): éjszakai amszterdami csatorna, híd, lámpák, a közepe sötétzöld márvány (ott van a tábla). Ugyanazt a fájlt használja a meccs-képernyő és a széles nézet elmosott háttere is. A régi: Tomi gépén / git történetben.
+
 ## Bolti ritka variáns: Boros virágcsokorral (2026-10-23, Tomi)
 - `c_boros2` – a Boros (5 energia, 3/5, ritka, Provokáció) változata, új képpel (virágcsokor, naplemente), **50 coin**, 2 példány jár; csak a Boltban, a limitált kínálatban (a következő rotációig, 10-29). Packból nem jön, nem cserélhető.
 - **Gabi, a Beton hős-portré** (`p_gabi_beton`, `passOnly` – boltban és ládában nincs): a 2. ranked szezonban **Ezüst 5**-ön jár (`RK_LATER.r2`, `r2_gabi`, kész a grant). Megkapáskor rögtön ezt viseli Gabi, és felugrik a portré nagyban („🎁 Ranked jutalom (Ezüst 5): …”). Aki már elérte, a következő menübe lépéskor kapja meg. A kép: Gabi a betonba ütött ököllel, éjszakai vasútállomás.
