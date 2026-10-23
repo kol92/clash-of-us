@@ -16,6 +16,7 @@ for (let k = 0; k < 3000; k++) {
   s.events = []; me.hand.unshift({ uid: 99999, id: 'c_tomiparti' }); E.playCard(s, 0, 0, { k: 'slot', side: 0, i: 0 });
   const e = s.events.find(x => x.t === 'party'); if (!e) { ok(false, 'nincs party esemény'); continue; }
   seen[e.id] = (seen[e.id] || 0) + 1;
+  if (e.id === 'a_adios') ok(e.ti === -1 && op.locked && !op.board.some(u => u && u.stun), 'Adios: az ellenfél hősét bénítja, nem karaktert');
   const good = GOOD.includes(e.id) || (e.id === 'a_koktel' && e.o === 'buff');
   ok(e.ts === (good ? 0 : 1), `${e.id}${e.o ? '/' + e.o : ''}: rossz oldal (${e.ts})`);
   if (HEAL.includes(e.id)) {
