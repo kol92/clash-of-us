@@ -150,10 +150,10 @@ const CARDS = [
   { id:'a_szulinap', type:'action', name:'Boldog szülinapot Pifti!', cost:6, tgt:'summon', rarity:'r', text:'Három Piftit idéz a szabad helyeidre (ha kevesebb a hely, annyit).' },
   { id:'a_kor', type:'action', name:'Egy pohár víz', cost:0, rarity:'k', token:true, text:'Ebben a körben +1 energiád van. A 3. körödtől játszható ki. Aki másodikként jön, megkapja, mert a kezdés előny.' },
   /* Laszy Kánonja (2026-10-23, Tomi; teszt): három Szolga – 2/2, Provokáció, aki megtámadja, annak a saját eszközeit ellopják és magukra teszik */
-  { id:'f_csoves', set:'pc', type:'action', name:'Csövesek és Cigányok', cost:6, rarity:'l', finisher:true, hero:'laszy', tgt:'summon', text:'Három Szolga (2/2, Provokáció) érkezik a szabad helyeidre. Aki megtámadja őket, attól ellopják az eszközeit, és magukra teszik.' },
-  { id:'c_szolga1', set:'pc', type:'char', name:'Szolga', cost:0, atk:2, hp:2, rarity:'k', token:true, taunt:true, thief:true, text:'Provokáció. Aki megtámadja, attól ellopja az eszközeit, és magára teszi.' },
-  { id:'c_szolga2', set:'pc', type:'char', name:'Szolga', cost:0, atk:2, hp:2, rarity:'k', token:true, taunt:true, thief:true, text:'Provokáció. Aki megtámadja, attól ellopja az eszközeit, és magára teszi.' },
-  { id:'c_szolga3', set:'pc', type:'char', name:'Szolga', cost:0, atk:2, hp:2, rarity:'k', token:true, taunt:true, thief:true, text:'Provokáció. Aki megtámadja, attól ellopja az eszközeit, és magára teszi.' },
+  { id:'f_csoves', set:'pc', type:'action', name:'Csövesek és Cigányok', cost:6, rarity:'l', finisher:true, hero:'laszy', tgt:'summon', text:'Három Szolga (2/1, Provokáció) érkezik a szabad helyeidre. Aki megtámadja őket, attól ellopják az eszközeit, és magukra teszik.' },
+  { id:'c_szolga1', set:'pc', type:'char', name:'Szolga', cost:0, atk:2, hp:1, rarity:'k', token:true, taunt:true, thief:true, text:'Provokáció. Aki megtámadja, attól ellopja az eszközeit, és magára teszi.' },
+  { id:'c_szolga2', set:'pc', type:'char', name:'Szolga', cost:0, atk:2, hp:1, rarity:'k', token:true, taunt:true, thief:true, text:'Provokáció. Aki megtámadja, attól ellopja az eszközeit, és magára teszi.' },
+  { id:'c_szolga3', set:'pc', type:'char', name:'Szolga', cost:0, atk:2, hp:1, rarity:'k', token:true, taunt:true, thief:true, text:'Provokáció. Aki megtámadja, attól ellopja az eszközeit, és magára teszi.' },
   { id:'c_arnyek', type:'char', name:'Árnyékember', cost:0, atk:1, hp:1, rarity:'k', token:true, text:'Csak a Bender idézheti meg. Provokáció.' },
   { id:'c_gyzana', type:'char', name:'Gyerek Zana', cost:0, atk:3, hp:3, rarity:'l', token:true, haste:true, text:'Csak az Együtt sírtok, együtt nevettek idézheti meg.' },
   { id:'c_gygabi', type:'char', name:'Gyerek Gabi', cost:0, atk:3, hp:3, rarity:'l', token:true, muscle:true, text:'Csak az Együtt sírtok, együtt nevettek idézheti meg.' },
@@ -253,7 +253,7 @@ const DECKS = {
     list:{ c_ah_ati:2, c_ah_laci:2, c_kutya:2, c_ppvar:1, c_ah_sasi:2, c_ah_barna:1, i_gomba:2, a_suti:1, a_bong:1, c_vizipipa:1, l_voros:1, f_gameover:1, f_gluten:1, c_pp:2 } },
   /* Laszy kezdőpaklija (2026-10-23, teszt) – Base set lapokból + a saját Kánonja (Csövesek és Cigányok) */
   vadbuli: { set:'pc', name:'Vad buli', hero:'laszy', desc:'Laszy sosem tudja, kit talál el – de a sok olcsó karakter és a vodka miatt az ellenfél többet szív, mint ti. A végén pedig berúg maga Laszy is.',
-    list:{ c_pifti:2, c_gyuri:2, c_kovacs:2, c_zoli:2, c_vajda:2, c_rebi:1, c_talos:1, a_dinnyes:2, a_cheddar:1, i_energiaital:1, a_tubi:1, c_sasi:1, c_laszy:1, f_csoves:1 } },
+    list:{ c_pifti:2, c_gyuri:2, c_kovacs:2, c_zoli:2, c_vajda:1, c_rebi:1, c_talos:1, a_dinnyes:2, a_cheddar:1, i_energiaital:1, a_tubi:1, c_sasi:1, c_laszy:1, f_csoves:1, i_lepke:1 } },   /* 2026-10-23: 1 Vajda helyett Csattogós lepke – a 2/1-es Szolgákkal 51,8% */
 };
 const DECK_OF = hid => Object.keys(DECKS).find(k => DECKS[k].hero === hid);
 

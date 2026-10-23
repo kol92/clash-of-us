@@ -4,7 +4,7 @@ let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('HIBA:', m)
 const G = () => { const s = E.newGame('laszy', E.DECK_OF('laszy'), 'tomi', E.DECK_OF('tomi'), 0); s.active = 0; for (const p of s.players) { p.board = [null, null, null, null]; p.hand = []; p.energy = p.maxEnergy = 30; } return s; };
 const play = (s, side, id, t) => { const p = s.players[side], a = s.active; s.active = side; p.energy = 30; p.hand.unshift({ uid: Math.floor(Math.random() * 1e9), id }); const r = E.playCard(s, side, 0, t); s.active = a; return r; };
 { const s = G(); play(s, 0, 'f_csoves', { k: 'none' }); const sz = s.players[0].board.filter(u => u && /c_szolga/.test(u.id));
-  ok(sz.length === 3 && sz.every(u => u.atk === 2 && u.hp === 2 && E.CARD[u.id].taunt), 'Kánon: 3 Szolga, 2/2, Provokáció'); }
+  ok(sz.length === 3 && sz.every(u => u.atk === 2 && u.hp === 1 && E.CARD[u.id].taunt), 'Kánon: 3 Szolga, 2/1, Provokáció'); }
 { const s = G(); s.players[0].board[3] = null; play(s, 0, 'c_vajda', { k: 'slot', side: 0, i: 0 }); play(s, 0, 'f_csoves', { k: 'none' });
   ok(s.players[0].board.filter(u => u && /c_szolga/.test(u.id)).length === 3, 'Kánon: 3 szabad hely → 3 Szolga'); }
 { const s = G(); const sz0 = E.CARDS.find(c => c.id === 'c_szolga1');
