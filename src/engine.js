@@ -176,10 +176,14 @@ const HEROES = [
   { id:'milo', name:'Milo', hue:95, text:'Ha egy karaktered meghal, 1 sebzést okoz az ellenfél hősének.' },
   { id:'laci', name:'Laci', hue:255, text:'Minden harmadik körödben húzol egy extra lapot.' },
   { id:'sasi', name:'Sasi', hue:280, text:'Ha a köröd végén legalább két karaktered áll a táblán, 1 sebzést okozol az ellenfél hősének.' },
+  /* Laszy (10. hős, a Peaches and Cream kiegészítővel – 2026-10-23, Tomi; egyelőre csak a teszt ágon) */
+  { id:'laszy', name:'Laszy', hue:22, set:'pc', text:'Vad buli: a köröd végén egy véletlen ellenség (karakter vagy hős) 1 sebzést kap – de 25% eséllyel helyette egy saját karaktered vagy a hősöd. Az „Éjfél után” lapjaid nála +1-gyel erősebbek.' },
 ];
 const HERO = Object.fromEntries(HEROES.map(h => [h.id, h]));
 // passzív képességek → hős
-const PASSIVE = { firstCharAtk:'barna', endHeal:'gabi', firstTwo:'krisz', itemHp:'tomi', regular:'david', bigHp:'bence', deathPing:'milo', extraDraw:'laci', teamPing:'sasi' };
+const PASSIVE = { firstCharAtk:'barna', endHeal:'gabi', firstTwo:'krisz', itemHp:'tomi', regular:'david', bigHp:'bence', deathPing:'milo', extraDraw:'laci', teamPing:'sasi', wildParty:'laszy', midnightPlus:'laszy' };
+/* Laszy: az „Éjfél után” hatások +1-gyel erősebbek (+1/+1, +1 sebzés vagy +1 gyógyítás) – a Peaches lapok ezt használják: midBonus(p) */
+const midBonus = p => has(p, 'midnightPlus') ? 1 : 0;
 const has = (p, key) => p.heroId === PASSIVE[key];
 const isReg = (s, side) => false;   /* Dávid régi, helyszínenként eltérő kedvezményei 2026-10-18-tól megszűntek (új Törzsvendég: lásd finishTurn) */
 // JBL hangfal: amíg az egyik oldalon él, a másik oldal két szélső helye zárva, és ott legfeljebb 2 karakter lehet
@@ -242,6 +246,9 @@ const DECKS = {
     list:{ a_welcome:1, a_trip:1, a_csend:1, a_repter:1, a_irkave:2, c_ah_tomi:1, c_ah_sasi:2, c_ah_ati:2, c_ah_laci:2, c_ppvar:2, c_kutya:2, c_vajda:1, f_jbl:1, i_lanc:1 } },
   ah_sasi: { set:'ah', name:'Amszterdami banda', hero:'sasi', desc:'Minél többen vagytok, annál jobb: Ati hozza Bettit, Laci és a kutya gyorsan lent van, Sasi minden körben odacsap – és ha kell, jön a Game Over.',
     list:{ c_ah_ati:2, c_ah_laci:2, c_kutya:2, c_ppvar:1, c_ah_sasi:2, c_ah_barna:1, i_gomba:2, a_suti:1, a_bong:1, c_vizipipa:1, l_voros:1, f_gameover:1, f_gluten:1, c_pp:2 } },
+  /* Laszy kezdőpaklija (2026-10-23, teszt) – Base set lapokból; a saját Kánonja a Peaches szettel jön */
+  vadbuli: { set:'pc', name:'Vad buli', hero:'laszy', desc:'Laszy sosem tudja, kit talál el – de a sok olcsó karakter és a vodka miatt az ellenfél többet szív, mint ti. A végén pedig berúg maga Laszy is.',
+    list:{ c_pifti:2, c_gyuri:2, c_kovacs:2, c_zoli:2, c_vajda:2, c_rebi:1, c_talos:1, a_dinnyes:2, a_cheddar:1, i_energiaital:1, a_tubi:1, c_sasi:1, c_laszy:1, f_capa:1 } },
 };
 const DECK_OF = hid => Object.keys(DECKS).find(k => DECKS[k].hero === hid);
 
@@ -1104,6 +1111,15 @@ function finishTurn(s) {
     if (best >= 0) healUnit(s, pi, best, 1); else healHero(s, pi, 1);
   }
   if (s.winner == null && has(p, 'teamPing') && p.board.filter(u => u && !isFixed(u)).length >= 2) { ev(s, { t:'passive', side:pi, k:'teamPing' }); damageHero(s, other(pi), 1); }
+  if (s.winner == null && has(p, 'wildParty')) {   /* Laszy – Vad buli: véletlen ellenség 1 sebzés, 25% eséllyel a saját oldalán (karakter vagy hős); a Cápa/JBL-féle rögzített és az Igézhetetlen kimarad */
+    const own = rnd() < 0.25, ts = own ? pi : other(pi), T = s.players[ts];
+    const opts = T.board.map((u, k) => u && !isFixed(u) && !isEl(u) ? k : -2).filter(k => k >= 0); opts.push(-1);
+    const ti = opts[Math.floor(rnd() * opts.length)];
+    ev(s, { t:'passive', side:pi, k:'wildParty', own, ts, ti, id: ti >= 0 ? T.board[ti].id : null });
+    ev(s, { t:'zap', side:pi, i:-1, ts, ti, kind:'wild' });
+    if (ti === -1) damageHero(s, ts, 1); else { reveal(s, ts, ti); damageUnit(s, ts, ti, 1); }
+    cleanup(s); checkWin(s);
+  }
   if (locIs(s, 'l_morisson') && !isReg(s, pi) && p.board.some(u => u)) { ev(s, { t:'locfx', side:pi, id:'l_morisson' }); p.board.forEach((u, i) => { if (u) damageUnit(s, pi, i, 1); }); }
   if (locIs(s, 'l_korhaz') && p.board.some(u => u)) { ev(s, { t:'locfx', side:pi, id:'l_korhaz' }); p.board.forEach((u, i) => { if (u) healUnit(s, pi, i, isReg(s, pi) ? 2 : 1); }); }
   p.board.forEach((u, i) => { if (u && u.stun) { u.stun--; if (!u.stun) { if (u.items.includes('i_buffalo')) { u.items = u.items.filter(x => x !== 'i_buffalo'); u.foe = (u.foe || []).filter(x => x !== 'i_buffalo'); bury(s, other(pi), 'i_buffalo', 'item'); } ev(s, { t:'unstun', side:pi, i }); } } });
@@ -1246,4 +1262,4 @@ function botChoose(real, lvl = 2) {
   return best && { hi: best.hi, t: best.t };
 }
 
-if (typeof module !== 'undefined') module.exports = { whyNot, preAttack, isEl, canMove, moveTargets, moveUnit, BOT_LV, baszoStrike, sharkSwim, atiFlee, openSlots, closedLane, CARDS_ALL: CARDS, DECK_OF, LANES, MAX_HALF, mulligan, botMulligan, beginGame, CARDS, CARD, HEROES, HERO, DECKS, newGame, playCard, canPlay, targetsFor, cardCost, attackLane, finishTurn, runEndTurn, botChoose, canAttack, effAtk };
+if (typeof module !== 'undefined') module.exports = { midBonus, whyNot, preAttack, isEl, canMove, moveTargets, moveUnit, BOT_LV, baszoStrike, sharkSwim, atiFlee, openSlots, closedLane, CARDS_ALL: CARDS, DECK_OF, LANES, MAX_HALF, mulligan, botMulligan, beginGame, CARDS, CARD, HEROES, HERO, DECKS, newGame, playCard, canPlay, targetsFor, cardCost, attackLane, finishTurn, runEndTurn, botChoose, canAttack, effAtk };

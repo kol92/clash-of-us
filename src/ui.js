@@ -150,6 +150,7 @@ const ART = {
   bence: { src:'art/bence.webp', av:'50% 14%' },
   barna: { src:'art/barna.webp', av:'52% 15%' },
   sasi:  { src:'art/sasi.webp',  av:'50% 15%' },
+  laszy: { src:'art/laszy.webp', av:'48% 22%', pos:'48% 20%', port:'48% 18%' },   /* 10. hős (teszt, 2026-10-23) */
   // Arany hősök (a legritkább lapok)
   g_krisz: { src:'art/g_krisz.webp', av:'60% 22%', pos:'60% 24%', port:'62% 20%' },
   g_tomi:  { src:'art/g_tomi.webp',  av:'56% 14%', pos:'56% 16%', port:'57% 12%' },
@@ -688,14 +689,14 @@ function slashAt(el) {
 const unitAt = (side, i) => cellEl(side, i)?.querySelector('.unit');
 // Célzott hatás: fénygolyó repül a forrásból a célpontig, hogy látszódjon, mi kit talált el (Molnár Zsolti, Kovács Bence, Alekosz Tibi…)
 async function zapFx(e) {
-  const from = cellEl(e.side, e.i), to = e.ti === -1 ? barEl(e.ts)?.querySelector('.hpbar') : cellEl(e.ts, e.ti);
+  const from = e.i === -1 ? barEl(e.side)?.querySelector('.hport-hit') || barEl(e.side) : cellEl(e.side, e.i), to = e.ti === -1 ? barEl(e.ts)?.querySelector('.hpbar') : cellEl(e.ts, e.ti);
   if (!from || !to) return;
   const a = from.getBoundingClientRect(), b = to.getBoundingClientRect();
   const x0 = a.left + a.width / 2, y0 = a.top + a.height / 2, x1 = b.left + b.width / 2, y1 = b.top + b.height / 2;
   const tgt = e.ti === -1 ? barEl(e.ts) : unitAt(e.ts, e.ti);
   if (tgt) tgt.classList.add('zap-mark');   // a célpont már repülés közben jelölve van
   const o = document.createElement('div'); o.className = 'zap-orb ' + e.kind;
-  o.textContent = e.kind === 'kill' ? '💀' : e.kind === 'steal' ? '🫳' : e.kind === 'sound' ? '🔊' : '💥';
+  o.textContent = e.kind === 'kill' ? '💀' : e.kind === 'steal' ? '🫳' : e.kind === 'sound' ? '🔊' : e.kind === 'wild' ? '🍾' : '💥';
   o.style.left = x0 + 'px'; o.style.top = y0 + 'px';
   $('#layer').appendChild(o);
   const dx = x1 - x0, dy = y1 - y0, lift = Math.min(90, Math.hypot(dx, dy) * 0.35);
@@ -748,7 +749,7 @@ function logEvents(evs, snap) {
       case 'passive': {   // hős-képesség (2026-10-13): látszódjon, miért sebződött / gyógyult / húzott
         const hn = HERO[S.players[e.side].heroId]?.name || 'Hős', w = e.side === ME ? `A hősöd (${hn})` : hn;
         const PT = { regular: `van helyszín a pályán → ${e.id ? `<b class="lc" data-lc="${e.id}">${escH(CARD[e.id].name)}</b>` : 'egy karaktere'} végleg +1/+1`, deathPing: 'meghalt egy karaktere → 1 sebzés az ellenfél hősének', teamPing: 'legalább 2 karaktere áll a táblán → 1 sebzés az ellenfél hősének',
-                     endHeal: 'a köre végén 1 életet gyógyít', extraDraw: 'minden 3. körében húz egy extra lapot', firstCharAtk: `+1 támadás: ${e.id ? `<b class="lc" data-lc="${e.id}">${escH(CARD[e.id].name)}</b>` : 'az első karaktere'}` };
+                     wildParty: e.own ? `vad buli – mellé! ${e.ti === -1 ? 'a saját hősét' : e.id ? `a saját <b class="lc" data-lc="${e.id}">${escH(CARD[e.id].name)}</b> lapját` : 'a sajátját'} találta el (1 sebzés)` : `vad buli → ${e.ti === -1 ? 'az ellenfél hőse' : e.id ? `<b class="lc" data-lc="${e.id}">${escH(CARD[e.id].name)}</b>` : 'egy ellenség'}: 1 sebzés`, endHeal: 'a köre végén 1 életet gyógyít', extraDraw: 'minden 3. körében húz egy extra lapot', firstCharAtk: `+1 támadás: ${e.id ? `<b class="lc" data-lc="${e.id}">${escH(CARD[e.id].name)}</b>` : 'az első karaktere'}` };
         L(`✨ ${w} képessége: ${PT[e.k] || ''}`); break; }
       case 'locfx': if (e.id === 'l_voros') { L(`📍 <b class="lc" data-lc="${e.id}">${escH(CARD[e.id].name)}</b>: ${e.side === ME ? 'egy karaktered' : 'az ellenfél egyik karaktere'} végleg +1 támadást kap`); break; }
         L(`📍 <b class="lc" data-lc="${e.id}">${escH(CARD[e.id].name)}</b>: ${e.id === 'l_korhaz' ? (e.side === ME ? 'a karaktereid gyógyulnak' : 'az ellenfél karakterei gyógyulnak') : (e.side === ME ? 'minden karaktered 1 sebzést kap' : 'az ellenfél minden karaktere 1 sebzést kap')}`); break;

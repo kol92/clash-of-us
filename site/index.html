@@ -550,6 +550,7 @@ h1,h2,h3{font-family:var(--display);font-weight:400;letter-spacing:.01em;text-wr
 .opt-box h3{margin:0;text-align:center;}
 .opt-btn{font-size:17px;padding:14px 12px;}
 .zap-orb{position:fixed;z-index:62;pointer-events:none;width:46px;height:46px;border-radius:50%;display:grid;place-items:center;font-size:24px;line-height:1;background:radial-gradient(circle,#fff 0 18%,#ffd36b 34%,#ff6a2a 58%,rgba(255,60,20,0) 72%);box-shadow:0 0 22px 8px rgba(255,120,40,.65);}
+.zap-orb.wild{background:radial-gradient(circle,#fff 0 16%,#ffb35c 32%,#c13cff 58%,rgba(90,0,140,0) 72%);box-shadow:0 0 24px 9px rgba(220,90,255,.6);}
 .zap-orb.kill{background:radial-gradient(circle,#fff 0 16%,#d9b3ff 32%,#7b2cff 56%,rgba(60,0,120,0) 72%);box-shadow:0 0 26px 10px rgba(140,60,255,.7);}
 .zap-orb.steal{background:radial-gradient(circle,#fff 0 16%,#bfffd0 32%,#22c55e 56%,rgba(0,90,40,0) 72%);box-shadow:0 0 22px 8px rgba(40,200,110,.6);}
 .zap-boom{position:fixed;z-index:61;pointer-events:none;width:30px;height:30px;border-radius:50%;transform:translate(-50%,-50%);border:4px solid #ffb347;box-shadow:0 0 30px 10px rgba(255,140,40,.6);animation:zapBoom .6s ease-out forwards;}
@@ -2422,7 +2423,7 @@ html:has(body.in-game){overscroll-behavior:none;}
 <script src="vendor/firebase-auth-compat.js"></script>
 <script src="vendor/firebase-firestore-compat.js"></script>
 <script src="vendor/firebase-database-compat.js"></script>
-<script>window.APP_VERSION = "2026.10.23-1543"; window.APP_BUILD = "2026.10.23-1543";</script>
+<script>window.APP_VERSION = "2026.10.23-1558"; window.APP_BUILD = "2026.10.23-1600";</script>
 <script>// ===== Best of Us – saját szerver (Firebase) =====
 // A játék eredetileg a Claude-os tárolót használta (window.claude.use('db' | 'user' | 'room')).
 // Ez a fájl ugyanazt a felületet adja Firebase-ből, így a játék kódja szinte változatlan maradhat:
@@ -2858,10 +2859,14 @@ const HEROES = [
   { id:'milo', name:'Milo', hue:95, text:'Ha egy karaktered meghal, 1 sebzést okoz az ellenfél hősének.' },
   { id:'laci', name:'Laci', hue:255, text:'Minden harmadik körödben húzol egy extra lapot.' },
   { id:'sasi', name:'Sasi', hue:280, text:'Ha a köröd végén legalább két karaktered áll a táblán, 1 sebzést okozol az ellenfél hősének.' },
+  /* Laszy (10. hős, a Peaches and Cream kiegészítővel – 2026-10-23, Tomi; egyelőre csak a teszt ágon) */
+  { id:'laszy', name:'Laszy', hue:22, set:'pc', text:'Vad buli: a köröd végén egy véletlen ellenség (karakter vagy hős) 1 sebzést kap – de 25% eséllyel helyette egy saját karaktered vagy a hősöd. Az „Éjfél után” lapjaid nála +1-gyel erősebbek.' },
 ];
 const HERO = Object.fromEntries(HEROES.map(h => [h.id, h]));
 // passzív képességek → hős
-const PASSIVE = { firstCharAtk:'barna', endHeal:'gabi', firstTwo:'krisz', itemHp:'tomi', regular:'david', bigHp:'bence', deathPing:'milo', extraDraw:'laci', teamPing:'sasi' };
+const PASSIVE = { firstCharAtk:'barna', endHeal:'gabi', firstTwo:'krisz', itemHp:'tomi', regular:'david', bigHp:'bence', deathPing:'milo', extraDraw:'laci', teamPing:'sasi', wildParty:'laszy', midnightPlus:'laszy' };
+/* Laszy: az „Éjfél után” hatások +1-gyel erősebbek (+1/+1, +1 sebzés vagy +1 gyógyítás) – a Peaches lapok ezt használják: midBonus(p) */
+const midBonus = p => has(p, 'midnightPlus') ? 1 : 0;
 const has = (p, key) => p.heroId === PASSIVE[key];
 const isReg = (s, side) => false;   /* Dávid régi, helyszínenként eltérő kedvezményei 2026-10-18-tól megszűntek (új Törzsvendég: lásd finishTurn) */
 // JBL hangfal: amíg az egyik oldalon él, a másik oldal két szélső helye zárva, és ott legfeljebb 2 karakter lehet
@@ -2924,6 +2929,9 @@ const DECKS = {
     list:{ a_welcome:1, a_trip:1, a_csend:1, a_repter:1, a_irkave:2, c_ah_tomi:1, c_ah_sasi:2, c_ah_ati:2, c_ah_laci:2, c_ppvar:2, c_kutya:2, c_vajda:1, f_jbl:1, i_lanc:1 } },
   ah_sasi: { set:'ah', name:'Amszterdami banda', hero:'sasi', desc:'Minél többen vagytok, annál jobb: Ati hozza Bettit, Laci és a kutya gyorsan lent van, Sasi minden körben odacsap – és ha kell, jön a Game Over.',
     list:{ c_ah_ati:2, c_ah_laci:2, c_kutya:2, c_ppvar:1, c_ah_sasi:2, c_ah_barna:1, i_gomba:2, a_suti:1, a_bong:1, c_vizipipa:1, l_voros:1, f_gameover:1, f_gluten:1, c_pp:2 } },
+  /* Laszy kezdőpaklija (2026-10-23, teszt) – Base set lapokból; a saját Kánonja a Peaches szettel jön */
+  vadbuli: { set:'pc', name:'Vad buli', hero:'laszy', desc:'Laszy sosem tudja, kit talál el – de a sok olcsó karakter és a vodka miatt az ellenfél többet szív, mint ti. A végén pedig berúg maga Laszy is.',
+    list:{ c_pifti:2, c_gyuri:2, c_kovacs:2, c_zoli:2, c_vajda:2, c_rebi:1, c_talos:1, a_dinnyes:2, a_cheddar:1, i_energiaital:1, a_tubi:1, c_sasi:1, c_laszy:1, f_capa:1 } },
 };
 const DECK_OF = hid => Object.keys(DECKS).find(k => DECKS[k].hero === hid);
 
@@ -3786,6 +3794,15 @@ function finishTurn(s) {
     if (best >= 0) healUnit(s, pi, best, 1); else healHero(s, pi, 1);
   }
   if (s.winner == null && has(p, 'teamPing') && p.board.filter(u => u && !isFixed(u)).length >= 2) { ev(s, { t:'passive', side:pi, k:'teamPing' }); damageHero(s, other(pi), 1); }
+  if (s.winner == null && has(p, 'wildParty')) {   /* Laszy – Vad buli: véletlen ellenség 1 sebzés, 25% eséllyel a saját oldalán (karakter vagy hős); a Cápa/JBL-féle rögzített és az Igézhetetlen kimarad */
+    const own = rnd() < 0.25, ts = own ? pi : other(pi), T = s.players[ts];
+    const opts = T.board.map((u, k) => u && !isFixed(u) && !isEl(u) ? k : -2).filter(k => k >= 0); opts.push(-1);
+    const ti = opts[Math.floor(rnd() * opts.length)];
+    ev(s, { t:'passive', side:pi, k:'wildParty', own, ts, ti, id: ti >= 0 ? T.board[ti].id : null });
+    ev(s, { t:'zap', side:pi, i:-1, ts, ti, kind:'wild' });
+    if (ti === -1) damageHero(s, ts, 1); else { reveal(s, ts, ti); damageUnit(s, ts, ti, 1); }
+    cleanup(s); checkWin(s);
+  }
   if (locIs(s, 'l_morisson') && !isReg(s, pi) && p.board.some(u => u)) { ev(s, { t:'locfx', side:pi, id:'l_morisson' }); p.board.forEach((u, i) => { if (u) damageUnit(s, pi, i, 1); }); }
   if (locIs(s, 'l_korhaz') && p.board.some(u => u)) { ev(s, { t:'locfx', side:pi, id:'l_korhaz' }); p.board.forEach((u, i) => { if (u) healUnit(s, pi, i, isReg(s, pi) ? 2 : 1); }); }
   p.board.forEach((u, i) => { if (u && u.stun) { u.stun--; if (!u.stun) { if (u.items.includes('i_buffalo')) { u.items = u.items.filter(x => x !== 'i_buffalo'); u.foe = (u.foe || []).filter(x => x !== 'i_buffalo'); bury(s, other(pi), 'i_buffalo', 'item'); } ev(s, { t:'unstun', side:pi, i }); } } });
@@ -3928,7 +3945,7 @@ function botChoose(real, lvl = 2) {
   return best && { hi: best.hi, t: best.t };
 }
 
-if (typeof module !== 'undefined') module.exports = { whyNot, preAttack, isEl, canMove, moveTargets, moveUnit, BOT_LV, baszoStrike, sharkSwim, atiFlee, openSlots, closedLane, CARDS_ALL: CARDS, DECK_OF, LANES, MAX_HALF, mulligan, botMulligan, beginGame, CARDS, CARD, HEROES, HERO, DECKS, newGame, playCard, canPlay, targetsFor, cardCost, attackLane, finishTurn, runEndTurn, botChoose, canAttack, effAtk };
+if (typeof module !== 'undefined') module.exports = { midBonus, whyNot, preAttack, isEl, canMove, moveTargets, moveUnit, BOT_LV, baszoStrike, sharkSwim, atiFlee, openSlots, closedLane, CARDS_ALL: CARDS, DECK_OF, LANES, MAX_HALF, mulligan, botMulligan, beginGame, CARDS, CARD, HEROES, HERO, DECKS, newGame, playCard, canPlay, targetsFor, cardCost, attackLane, finishTurn, runEndTurn, botChoose, canAttack, effAtk };
 /* TESZT OLDAL (teszt ág): minden, ami nem az éles cím, teszt mód – lásd meta.js testBanner / bootProfile */
 const TEST_MODE = typeof location !== 'undefined' && location.hostname !== 'bestofus.pages.dev';
 /* Szettek megjelenése (2026-10-18): az Amszterdam hősei 2026-10-19 (hétfő) 19:00-kor (budapesti idő) jelenik meg élesben – addig minden lapja rejtve.
@@ -4081,6 +4098,7 @@ const ART = {
   bence: { src:'art/bence.webp?v=1bdf4b33c38406c0', av:'50% 14%' },
   barna: { src:'art/barna.webp?v=bff0fe17006c5413', av:'52% 15%' },
   sasi:  { src:'art/sasi.webp?v=f64b4db670dc8b91',  av:'50% 15%' },
+  laszy: { src:'art/laszy.webp?v=4edad4360709bea8', av:'48% 22%', pos:'48% 20%', port:'48% 18%' },   /* 10. hős (teszt, 2026-10-23) */
   // Arany hősök (a legritkább lapok)
   g_krisz: { src:'art/g_krisz.webp?v=e818b75b5f2e40a4', av:'60% 22%', pos:'60% 24%', port:'62% 20%' },
   g_tomi:  { src:'art/g_tomi.webp?v=a8caa2a6e51e8443',  av:'56% 14%', pos:'56% 16%', port:'57% 12%' },
@@ -4123,7 +4141,7 @@ const ART = {
   c_vera: { src:'art/vera.webp?v=9259e2fb87fe4128', pos:'52% 16%', zoom:'170% auto' },
   c_nyiti: { src:'art/nyiti.webp?v=81e5320e5a70c97e', pos:'56% 28%' },
   c_talos: { src:'art/talos.webp?v=73abfe082d0ac857', pos:'53% 15%' },
-  c_laszy: { src:'art/laszy.webp?v=6fa4258661a36310', pos:'80% 21%', zoom:'150% auto' },
+  c_laszy: { src:'art/laszy.webp?v=4edad4360709bea8', pos:'80% 21%', zoom:'150% auto' },
   a_abszint:{ src:'art/abszint.webp?v=00f971e87f87b13c', pos:'45% 45%' },
   a_dinnyes:{ src:'art/dinnyes.webp?v=d084d4861d85e2de', pos:'50% 50%' },
   a_koktel: { src:'art/koktel.webp?v=30029a1d8403a115', pos:'50% 50%' },
@@ -4619,14 +4637,14 @@ function slashAt(el) {
 const unitAt = (side, i) => cellEl(side, i)?.querySelector('.unit');
 // Célzott hatás: fénygolyó repül a forrásból a célpontig, hogy látszódjon, mi kit talált el (Molnár Zsolti, Kovács Bence, Alekosz Tibi…)
 async function zapFx(e) {
-  const from = cellEl(e.side, e.i), to = e.ti === -1 ? barEl(e.ts)?.querySelector('.hpbar') : cellEl(e.ts, e.ti);
+  const from = e.i === -1 ? barEl(e.side)?.querySelector('.hport-hit') || barEl(e.side) : cellEl(e.side, e.i), to = e.ti === -1 ? barEl(e.ts)?.querySelector('.hpbar') : cellEl(e.ts, e.ti);
   if (!from || !to) return;
   const a = from.getBoundingClientRect(), b = to.getBoundingClientRect();
   const x0 = a.left + a.width / 2, y0 = a.top + a.height / 2, x1 = b.left + b.width / 2, y1 = b.top + b.height / 2;
   const tgt = e.ti === -1 ? barEl(e.ts) : unitAt(e.ts, e.ti);
   if (tgt) tgt.classList.add('zap-mark');   // a célpont már repülés közben jelölve van
   const o = document.createElement('div'); o.className = 'zap-orb ' + e.kind;
-  o.textContent = e.kind === 'kill' ? '💀' : e.kind === 'steal' ? '🫳' : e.kind === 'sound' ? '🔊' : '💥';
+  o.textContent = e.kind === 'kill' ? '💀' : e.kind === 'steal' ? '🫳' : e.kind === 'sound' ? '🔊' : e.kind === 'wild' ? '🍾' : '💥';
   o.style.left = x0 + 'px'; o.style.top = y0 + 'px';
   $('#layer').appendChild(o);
   const dx = x1 - x0, dy = y1 - y0, lift = Math.min(90, Math.hypot(dx, dy) * 0.35);
@@ -4679,7 +4697,7 @@ function logEvents(evs, snap) {
       case 'passive': {   // hős-képesség (2026-10-13): látszódjon, miért sebződött / gyógyult / húzott
         const hn = HERO[S.players[e.side].heroId]?.name || 'Hős', w = e.side === ME ? `A hősöd (${hn})` : hn;
         const PT = { regular: `van helyszín a pályán → ${e.id ? `<b class="lc" data-lc="${e.id}">${escH(CARD[e.id].name)}</b>` : 'egy karaktere'} végleg +1/+1`, deathPing: 'meghalt egy karaktere → 1 sebzés az ellenfél hősének', teamPing: 'legalább 2 karaktere áll a táblán → 1 sebzés az ellenfél hősének',
-                     endHeal: 'a köre végén 1 életet gyógyít', extraDraw: 'minden 3. körében húz egy extra lapot', firstCharAtk: `+1 támadás: ${e.id ? `<b class="lc" data-lc="${e.id}">${escH(CARD[e.id].name)}</b>` : 'az első karaktere'}` };
+                     wildParty: e.own ? `vad buli – mellé! ${e.ti === -1 ? 'a saját hősét' : e.id ? `a saját <b class="lc" data-lc="${e.id}">${escH(CARD[e.id].name)}</b> lapját` : 'a sajátját'} találta el (1 sebzés)` : `vad buli → ${e.ti === -1 ? 'az ellenfél hőse' : e.id ? `<b class="lc" data-lc="${e.id}">${escH(CARD[e.id].name)}</b>` : 'egy ellenség'}: 1 sebzés`, endHeal: 'a köre végén 1 életet gyógyít', extraDraw: 'minden 3. körében húz egy extra lapot', firstCharAtk: `+1 támadás: ${e.id ? `<b class="lc" data-lc="${e.id}">${escH(CARD[e.id].name)}</b>` : 'az első karaktere'}` };
         L(`✨ ${w} képessége: ${PT[e.k] || ''}`); break; }
       case 'locfx': if (e.id === 'l_voros') { L(`📍 <b class="lc" data-lc="${e.id}">${escH(CARD[e.id].name)}</b>: ${e.side === ME ? 'egy karaktered' : 'az ellenfél egyik karaktere'} végleg +1 támadást kap`); break; }
         L(`📍 <b class="lc" data-lc="${e.id}">${escH(CARD[e.id].name)}</b>: ${e.id === 'l_korhaz' ? (e.side === ME ? 'a karaktereid gyógyulnak' : 'az ellenfél karakterei gyógyulnak') : (e.side === ME ? 'minden karaktered 1 sebzést kap' : 'az ellenfél minden karaktere 1 sebzést kap')}`); break;
