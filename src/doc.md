@@ -463,6 +463,9 @@ Hősképesség-ötletek a táblázatban (még nem zöldek, nincsenek beépítve)
 ## Javítás: „Újabb ranked” → Mégse beragadás (2026-10-16)
 - Meccs után az „Újabb ranked” gomb a lezárt meccs képernyőjén indította a keresést; ha valaki „Mégse”-t nyomott, a lezárt táblán ragadt, és a zászló sem csinált semmit. Mostantól az „Újabb ranked” előbb a Ranked képernyőre visz, a keresés megszakítása lezárt meccsből a menübe visz, és lezárt meccsen a zászló is a menübe visz.
 
+## Hős-lap nagyban: hosszú nyomás (2026-10-23, Tomi)
+- A Gyűjteményben a hős-lapra **koppintva** (ha több portréja van) továbbra is a portréválasztó jön; **hosszan nyomva** (450 ms) a hős nagyban nyílik meg a viselt portréval (Full Art fülön a Full Art-tal, az arany sorban az arannyal) – `heroBigView`, `longPress` (ui.js). A portréválasztóban is: egy portrét hosszan nyomva nagyban mutatja (választás nélkül).
+
 ## Új meccs-háttér (2026-10-23, Tomi UI)
 - `art/ui/board.webp` lecserélve (900×1946): éjszakai amszterdami csatorna, híd, lámpák, a közepe sötétzöld márvány (ott van a tábla). Ugyanazt a fájlt használja a meccs-képernyő és a széles nézet elmosott háttere is. A régi: Tomi gépén / git történetben.
 
