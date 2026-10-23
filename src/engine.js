@@ -149,6 +149,11 @@ const CARDS = [
   { id:'a_rantott', type:'action', name:'Rántott hús', cost:0, tgt:'ownOrHero', rarity:'k', token:true, text:'Egy saját karaktered vagy a hősöd 3 életet gyógyul.' },
   { id:'a_szulinap', type:'action', name:'Boldog szülinapot Pifti!', cost:6, tgt:'summon', rarity:'r', text:'Három Piftit idéz a szabad helyeidre (ha kevesebb a hely, annyit).' },
   { id:'a_kor', type:'action', name:'Egy pohár víz', cost:0, rarity:'k', token:true, text:'Ebben a körben +1 energiád van. A 3. körödtől játszható ki. Aki másodikként jön, megkapja, mert a kezdés előny.' },
+  /* Laszy Kánonja (2026-10-23, Tomi; teszt): három Szolga – 2/2, Provokáció, aki megtámadja, annak a saját eszközeit ellopják és magukra teszik */
+  { id:'f_csoves', set:'pc', type:'action', name:'Csövesek és Cigányok', cost:6, rarity:'l', finisher:true, hero:'laszy', tgt:'summon', text:'Három Szolga (2/2, Provokáció) érkezik a szabad helyeidre. Aki megtámadja őket, attól ellopják az eszközeit, és magukra teszik.' },
+  { id:'c_szolga1', set:'pc', type:'char', name:'Szolga', cost:0, atk:2, hp:2, rarity:'k', token:true, taunt:true, thief:true, text:'Provokáció. Aki megtámadja, attól ellopja az eszközeit, és magára teszi.' },
+  { id:'c_szolga2', set:'pc', type:'char', name:'Szolga', cost:0, atk:2, hp:2, rarity:'k', token:true, taunt:true, thief:true, text:'Provokáció. Aki megtámadja, attól ellopja az eszközeit, és magára teszi.' },
+  { id:'c_szolga3', set:'pc', type:'char', name:'Szolga', cost:0, atk:2, hp:2, rarity:'k', token:true, taunt:true, thief:true, text:'Provokáció. Aki megtámadja, attól ellopja az eszközeit, és magára teszi.' },
   { id:'c_arnyek', type:'char', name:'Árnyékember', cost:0, atk:1, hp:1, rarity:'k', token:true, text:'Csak a Bender idézheti meg. Provokáció.' },
   { id:'c_gyzana', type:'char', name:'Gyerek Zana', cost:0, atk:3, hp:3, rarity:'l', token:true, haste:true, text:'Csak az Együtt sírtok, együtt nevettek idézheti meg.' },
   { id:'c_gygabi', type:'char', name:'Gyerek Gabi', cost:0, atk:3, hp:3, rarity:'l', token:true, muscle:true, text:'Csak az Együtt sírtok, együtt nevettek idézheti meg.' },
@@ -246,9 +251,9 @@ const DECKS = {
     list:{ a_welcome:1, a_trip:1, a_csend:1, a_repter:1, a_irkave:2, c_ah_tomi:1, c_ah_sasi:2, c_ah_ati:2, c_ah_laci:2, c_ppvar:2, c_kutya:2, c_vajda:1, f_jbl:1, i_lanc:1 } },
   ah_sasi: { set:'ah', name:'Amszterdami banda', hero:'sasi', desc:'Minél többen vagytok, annál jobb: Ati hozza Bettit, Laci és a kutya gyorsan lent van, Sasi minden körben odacsap – és ha kell, jön a Game Over.',
     list:{ c_ah_ati:2, c_ah_laci:2, c_kutya:2, c_ppvar:1, c_ah_sasi:2, c_ah_barna:1, i_gomba:2, a_suti:1, a_bong:1, c_vizipipa:1, l_voros:1, f_gameover:1, f_gluten:1, c_pp:2 } },
-  /* Laszy kezdőpaklija (2026-10-23, teszt) – Base set lapokból; a saját Kánonja a Peaches szettel jön */
+  /* Laszy kezdőpaklija (2026-10-23, teszt) – Base set lapokból + a saját Kánonja (Csövesek és Cigányok) */
   vadbuli: { set:'pc', name:'Vad buli', hero:'laszy', desc:'Laszy sosem tudja, kit talál el – de a sok olcsó karakter és a vodka miatt az ellenfél többet szív, mint ti. A végén pedig berúg maga Laszy is.',
-    list:{ c_pifti:2, c_gyuri:2, c_kovacs:2, c_zoli:2, c_vajda:2, c_rebi:1, c_talos:1, a_dinnyes:2, a_cheddar:1, i_energiaital:1, a_tubi:1, c_sasi:1, c_laszy:1, f_capa:1 } },
+    list:{ c_pifti:2, c_gyuri:2, c_kovacs:2, c_zoli:2, c_vajda:2, c_rebi:1, c_talos:1, a_dinnyes:2, a_cheddar:1, i_energiaital:1, a_tubi:1, c_sasi:1, c_laszy:1, f_csoves:1 } },
 };
 const DECK_OF = hid => Object.keys(DECKS).find(k => DECKS[k].hero === hid);
 
@@ -746,6 +751,9 @@ function playCard(s, pi, hi, t) {
         const sl = openSlots(s, pi), b = LANES - sl.length;
         sl.forEach(j => { const u = makeUnit(s, 'c_arnyek', pi); u.atk += b; u.hp += b; u.maxHp += b; u.taunt = true;   /* 2026-10-21 (Tomi): Provokáció */ p.board[j] = u; ev(s, { t:'summon', side:pi, i:j, id:'c_arnyek' }); });
         break; }
+      case 'f_csoves': {   /* Laszy Kánonja: legfeljebb 3 Szolga a szabad helyekre */
+        openSlots(s, pi).slice(0, 3).forEach((j, k) => { const id = 'c_szolga' + (k + 1); p.board[j] = makeUnit(s, id, pi); ev(s, { t:'summon', side:pi, i:j, id }); });
+        break; }
       case 'f_egyutt': {
         const sl = openSlots(s, pi); let ids = ['c_gyzana', 'c_gygabi'];
         if (sl.length < 2) ids = [ids[Math.floor(rnd() * 2)]];
@@ -981,7 +989,7 @@ function moveUnit(s, pi, a, b) {
 function strike(s, i) {
   const pi = s.active, ei = other(pi), me = s.players[pi], u = me.board[i];
   reveal(s, pi, i);
-  const a = effAtk(s, pi, i);
+  let a = effAtk(s, pi, i);
   ev(s, { t:'attack', side:pi, i });
   if (bid(u.id) === 'c_tzs' && !(u.items || []).includes('i_vodkasa')) damageHero(s, pi, 1);   /* Vodkása mellett nem sebzi a saját hősét */
   if (a <= 0 || s.winner != null) return;
@@ -997,6 +1005,7 @@ function strike(s, i) {
   const x = s.players[ei].board[j];
   if (tj < 0 && (u.id === 'c_nyiti' || !x || isInv(x))) { damageHero(s, ei, a); return; }
   reveal(s, ei, j);
+  if (CARD[x.id].thief && stealItems(s, pi, i, ei, j)) a = effAtk(s, pi, i);   /* Szolga: a támadó eszközei átkerülnek rá, mielőtt összecsapnak */
   const r = x.stun || isInv(u) ? 0 : effAtk(s, ei, j);   // Láthatatlan támadót nem lehet visszaütni
   const sh = x.shield;
   damageUnit(s, ei, j, x.id === 'c_ppvar' ? Math.max(0, a - 2) : a);   /* PP, a váratlan: aki megtámadja, 2-vel kisebbet üt rá */
@@ -1004,6 +1013,29 @@ function strike(s, i) {
   // Izom: ami sebzés a karakter halála után megmarad, az ellenfél hősét éri (a Pajzs elnyeli az egészet)
   if ((kwC(u, 'muscle') || u.muscle) && !sh && x.hp < 0) { ev(s, { t:'overflow', side:ei, i:-1, n:-x.hp }); damageHero(s, ei, -x.hp, true); }
   damageUnit(s, pi, i, r); cleanup(s);
+}
+/* Szolga (Laszy Kánonja): a támadó SAJÁT eszközei (az ellenfél által rárakottak nem) a hatásukkal együtt átkerülnek a Szolgára */
+function stealItems(s, ps, pi, ts, tj) {
+  const u = s.players[ps].board[pi], x = s.players[ts].board[tj]; if (!u || !x) return 0;
+  const foe = [...(u.foe || [])], keep = [], own = [];
+  for (const id of u.items) { const k = foe.indexOf(id); if (k >= 0) { foe.splice(k, 1); keep.push(id); } else own.push(id); }
+  if (!own.length) return 0;
+  const base = CARD[u.id], P = s.players[ps], T = s.players[ts];
+  const gb = own.some(id => CARD[id].gomba) ? (u.gombaB || 0) : 0;
+  if (gb) { u.gombaB = 0; u.atk = Math.max(0, u.atk - gb); u.maxHp = Math.max(1, u.maxHp - gb); u.hp = Math.max(1, Math.min(u.hp, u.maxHp)); x.gombaB = (x.gombaB || 0) + gb; x.atk += gb; x.hp += gb; x.maxHp += gb; }
+  for (const id of own) {
+    const c = CARD[id], hpU = (c.hp || 0) + (has(P, 'itemHp') ? 1 : 0), hpX = (c.hp || 0) + (has(T, 'itemHp') ? 1 : 0);
+    u.atk = Math.max(0, u.atk - (c.atk || 0)); u.maxHp = Math.max(1, u.maxHp - hpU); u.hp = Math.max(1, Math.min(u.hp, u.maxHp));
+    if (c.shield && !base.shield) u.shield = false; if (c.haste && !base.haste) u.haste = false; if (c.doom) u.doom = false;
+    if (c.muscle && !base.muscle) u.muscle = false; if (c.taunt && !base.taunt) u.taunt = false; if (c.hangover) u.hangover = false;
+    if (c.elusive && !base.elusive && !keep.some(y => CARD[y].elusive)) u.elusive = false;
+    x.atk += c.atk || 0; x.hp += hpX; x.maxHp += hpX;
+    if (c.shield) x.shield = true; if (c.haste) x.haste = true; if (c.doom) x.doom = true; if (c.muscle) x.muscle = true; if (c.taunt) x.taunt = true; if (c.elusive) x.elusive = true; if (c.hangover) x.hangover = true;
+    x.items.push(id);
+  }
+  u.items = keep;
+  ev(s, { t:'itemsteal', side:ts, i:tj, from:{ side:ps, i:pi }, ids:own });
+  return own.length;
 }
 const isInv = u => !!(u && (kwC(u, 'invis') || u.invis));   // Láthatatlan: a lapon vagy kapott erőként (Tomi Kánon eseménye)
 const invisAt = (s, side, i) => isInv(s.players[side].board[i]);   // Láthatatlan: a támadás átmegy rajta

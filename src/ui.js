@@ -247,6 +247,10 @@ const ART = {
   c_amszterdam: { src:'art/amszterdam.webp', av:'60% 22%', pos:'58% 24%' },
   c_barnaelet: { src:'art/barnaelet.webp', av:'54% 26%', pos:'54% 26%' },
   f_bender: { src:'art/f_bender.webp', av:'55% 40%', pos:'55% 34%' },   // Kánon esemény lapok
+  f_csoves:  { src:'art/f_csoves.webp', av:'40% 22%', pos:'40% 20%' },   /* Laszy Kánonja (teszt) */
+  c_szolga1: { src:'art/c_szolga1.webp', av:'50% 30%', pos:'50% 28%' },
+  c_szolga2: { src:'art/c_szolga2.webp', av:'60% 35%', pos:'60% 32%' },
+  c_szolga3: { src:'art/c_szolga3.webp', av:'45% 45%', pos:'45% 40%' },
   f_egyutt: { src:'art/f_egyutt.webp', av:'50% 28%', pos:'50% 26%' },
   f_jbl:    { src:'art/f_jbl.webp', av:'40% 30%', pos:'38% 34%' },
   c_arnyek: { src:'art/arnyek.webp', av:'50% 14%', pos:'50% 18%' },   // a Kánon események által hozott lapok
@@ -770,6 +774,7 @@ function logEvents(evs, snap) {
       case 'shield': L(`🛡 ${unitName(e.side, e.i)} pajzsa elnyelte az ütést`); break;
       case 'bounce': L(`↩ ${unitName(e.side, e.i)} visszakerült a kézbe`); break;
       case 'stolen': L(`🫳 ${unitName(e.side, e.i)} átállt a másik oldalra`); break;
+      case 'itemsteal': L(`🫳 ${unitName(e.side, e.i)} ellopta: ${e.ids.map(id => `<b class="lc" data-lc="${id}">${escH(CARD[id].name)}</b>`).join(', ')} (${unitName(e.from.side, e.from.i)} eszköz${e.ids.length > 1 ? 'ei' : 'e'})`); break;
       case 'push': L(`➡ Egy karakter arrébb tolva`); break;
       case 'misfire': L(`🍺 ${unitName(e.side, e.i)} mellé ütött`); break;
       case 'reveal': if (e.side !== ME) L(`🃏 Felfordult: ${CARD[e.id].name}`); break;
@@ -1005,6 +1010,7 @@ async function animateEvents(evs) {
       case 'move': floatAt(anchor, e.swap ? '👞 Helycsere!' : '👞 Áthelyezve', 'info'); hold = Math.max(hold, 350); break;
       case 'push': floatAt(anchor, 'Arrébb tolva!', 'info'); hold = Math.max(hold, 300); break;
       case 'stolen': fx(el, e.side === ME ? 'fx-bounce-up' : 'fx-bounce-down'); floatAt(anchor, '🫳 Ellopták!', 'dmg'); hold = Math.max(hold, 650); break;
+      case 'itemsteal': floatAt(anchor, `🫳 Ellopta: ${e.ids.length > 1 ? e.ids.length + ' eszköz' : CARD[e.ids[0]].name}!`, 'buff'); hold = Math.max(hold, 800); break;
       case 'steal': floatAt(anchor, `🫳 ${CARD[e.id].name} átállt!`, 'buff'); hold = Math.max(hold, 700); break;
       case 'handswap': fx($('#app'), 'fx-quake'); floatAt(anchor, '🎭 Álarcos bál! Kézcsere!', 'info'); hold = Math.max(hold, 1000); break;
       case 'polaroid': floatAt(anchor, `📸 ${e.n} lap vissza a pakliba`, 'buff'); hold = Math.max(hold, 800); break;
