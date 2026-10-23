@@ -97,11 +97,12 @@ const skinName = v => SKIN_NAME[v] || (PORTRAITS[v] ? PORTRAITS[v].name : v);
 function skinModal(hid) {
   const h = HERO[hid], have = heroSkins(hid), cur = heroSkin(hid);
   const o = document.createElement('div'); o.className = 'overlay';
-  o.innerHTML = `<div class="modal tr-box skin-box"><h3>${escH(h.name)} – melyik portrét használod?</h3><p class="live">Ez látszik a meccseken (a PvP-ellenfeled is ezt látja), a pakliválasztóban és a menüben.</p>
+  o.innerHTML = `<div class="modal tr-box skin-box"><h3>${escH(h.name)} – melyik portrét használod?</h3><p class="live">Ez látszik a meccseken (a PvP-ellenfeled is ezt látja), a pakliválasztóban és a menüben. Hosszan nyomva nagyban is megnézheted.</p>
     <div class="skin-row">${have.map(v => `<button class="skin-opt${v === cur ? ' on' : ''}" data-skin="${v}">${heroCardHTML(h, { foil: v === 'fa', gold: v === 'gold', port: isPort(v) ? v : null })}<span>${skinName(v)}${v === cur ? ' ✓' : ''}</span></button>`).join('')}</div>
     <button class="btn" data-x>Bezárás</button></div>`;
   o.onclick = async e => { const b = e.target.closest('button'); if (e.target === o || (b && b.hasAttribute('data-x'))) return o.remove(); if (!b || !b.dataset.skin) return;
     const p = Store.p; p.heroSkin = { ...(p.heroSkin || {}), [hid]: b.dataset.skin }; await save(); o.remove(); renderColl(); renderMenuFan(); toast(`${h.name}: ${skinName(b.dataset.skin)} portré beállítva`); };
+  if (typeof longPress === 'function') longPress(o, '[data-skin]', b => heroBigView(hid, b.dataset.skin));   /* hosszan nyomva: nagyban */
   $('#layer').appendChild(o);
 }
 function rollHeroGold(p) {

@@ -549,6 +549,21 @@ function collCardModal(id, cap) {
     if (x.n + x.f > DUPE_KEEP) collCardModal(id);   // ha még van fölösleg, nyitva marad
   }, true);
 }
+/* hosszú nyomás (2026-10-23, Tomi): a hős-lapot (a viselt portréval) nagyban is meg lehet nézni – a koppintás továbbra is a portréválasztó */
+function heroBigView(hid, sk) {
+  sk = sk || (Store.p ? heroSkin(hid) : 'base');
+  openModal(heroCardHTML(HERO[hid], { big: true, foil: sk === 'fa', gold: sk === 'gold', port: isPort(sk) ? sk : null }), `${HERO[hid].name} · ${skinName(sk)} portré`, '');
+}
+function longPress(root, sel, fn) {
+  let lp = null;
+  root.addEventListener('pointerdown', e => { const el = e.target.closest(sel); if (!el) return; lp = { t: setTimeout(() => { lp.long = true; fn(el); }, 450) }; });
+  ['pointerup', 'pointercancel', 'pointerleave', 'pointermove'].forEach(t => root.addEventListener(t, e => { if (lp && (t !== 'pointermove' || Math.abs(e.movementX) + Math.abs(e.movementY) > 6)) clearTimeout(lp.t); }));
+  root.addEventListener('click', e => { if (lp && lp.long && e.target.closest(sel)) { e.stopImmediatePropagation(); e.preventDefault(); } lp = null; }, true);
+  root.addEventListener('contextmenu', e => { if (e.target.closest(sel)) e.preventDefault(); });
+}
+longPress($('#collBody'), '[data-hcard],[data-hgold]', el => { const hid = el.dataset.hcard || el.dataset.hgold;
+  if (el.dataset.hgold) return heroBigView(hid, 'gold');
+  heroBigView(hid, ui.foil ? 'fa' : Store.p ? heroSkin(hid) : 'base'); });
 $('#collBody').onclick = e => {
   if (e.target.closest('#bkBtn')) return backPicker();
   if (e.target.closest('#dupeBtn')) return dupeModal();
