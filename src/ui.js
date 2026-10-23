@@ -150,7 +150,7 @@ const ART = {
   bence: { src:'art/bence.webp', av:'50% 14%' },
   barna: { src:'art/barna.webp', av:'52% 15%' },
   sasi:  { src:'art/sasi.webp',  av:'50% 15%' },
-  laszy: { src:'art/laszy.webp', av:'48% 22%', pos:'48% 20%', port:'48% 18%' },   /* 10. hős (teszt, 2026-10-23) */
+  laszy: { src:'art/h_laszy.webp', av:'48% 22%', pos:'48% 20%', port:'48% 18%' },   /* 10. hős (teszt, 2026-10-23) */
   // Arany hősök (a legritkább lapok)
   g_krisz: { src:'art/g_krisz.webp', av:'60% 22%', pos:'60% 24%', port:'62% 20%' },
   g_tomi:  { src:'art/g_tomi.webp',  av:'56% 14%', pos:'56% 16%', port:'57% 12%' },
