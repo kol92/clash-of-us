@@ -825,6 +825,11 @@ function partyDrink(s, pi, si) {
     }
     cleanup(s); checkWin(s); return;
   }
+  if (d === 'a_adios') {   /* 2026-10-24 (Tomi): az Adios a lapon is csak a HŐST bénítja – a parti lelkénél is az ellenfél hősét éri, nem egy karaktert */
+    ev(s, { t:'party', side:pi, i:si, ts, ti:-1, hero:true, id:d, o });
+    T.locked = true; ev(s, { t:'lock', side:ts, i:-1 });
+    cleanup(s); checkWin(s); return;
+  }
   const cand = T.board.map((x, k) => x && !isFixed(x) && !isEl(x) ? k : -1).filter(k => k >= 0);
   if (!cand.length) { ev(s, { t:'party', side:pi, i:si, ts, ti:-1, id:d, none:true }); return; }
   const j = cand[Math.floor(rnd() * cand.length)], u = T.board[j];
@@ -843,13 +848,12 @@ function partyDrink(s, pi, si) {
     case 'a_talca': damageUnit(s, ei, j, 2); break;
     case 'a_amongus': damageUnit(s, ei, j, 6); break;   // a parti lelke a paprikásat adja neki
     case 'a_koktel': if (o === 'buff') { u.atk += 5; ev(s, { t:'buff', side:ts, i:j, n:5 }); } else damageUnit(s, ei, j, 5); break;
-    case 'a_adios': u.stun = Math.max(u.stun || 0, 1); ev(s, { t:'stun', side:ei, i:j }); break;
   }
   cleanup(s); checkWin(s);
 }
 const PARTY_FX = { i_energiaital:'+2 támadás', i_akuma:'+5 támadás, de ennek a körnek a végén meghal', i_vodkakancso:'+4 támadás, utána bénult',
   a_dinnyes:'3 sebzés', a_abszint:'7 sebzés', a_tubi:'6 sebzés (és 3 a te hősödnek)', a_kancso:'3 sebzés neki és 3 a hősének', a_talca:'2 sebzés',
-  a_koktel:'+5 támadás vagy 5 sebzés', a_mangos:'4 életet gyógyul', a_rehab:'3 életet gyógyul, és magához tér', i_vodkasa:'Igézhetetlen lesz', a_adios:'a következő körében bénult', a_amongus:'6 sebzés – a paprikás jutott neki' };
+  a_koktel:'+5 támadás vagy 5 sebzés', a_mangos:'4 életet gyógyul', a_rehab:'3 életet gyógyul, és magához tér', i_vodkasa:'Igézhetetlen lesz', a_adios:'a következő körében nem játszhat ki lapot', a_amongus:'6 sebzés – a paprikás jutott neki' };
 
 function dropLocation(s, how) {   // a pályán lévő helyszín eltűnik (lecserélik vagy kitiltják)
   const L = s.location; if (!L) return;

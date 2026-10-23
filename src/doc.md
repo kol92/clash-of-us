@@ -463,6 +463,9 @@ Hősképesség-ötletek a táblázatban (még nem zöldek, nincsenek beépítve)
 ## Javítás: „Újabb ranked” → Mégse beragadás (2026-10-16)
 - Meccs után az „Újabb ranked” gomb a lezárt meccs képernyőjén indította a keresést; ha valaki „Mégse”-t nyomott, a lezárt táblán ragadt, és a zászló sem csinált semmit. Mostantól az „Újabb ranked” előbb a Ranked képernyőre visz, a keresés megszakítása lezárt meccsből a menübe visz, és lezárt meccsen a zászló is a menübe visz.
 
+## Tomi, a parti lelke: Adios a hőst éri (2026-10-24, Tomi)
+- Hiba volt: a parti lelke Adios Motherfuckere egy véletlen ellenséges **karaktert** bénított meg. A lap szerint csak a **hőst** lehet: most a parti lelkénél is az ellenfél hősét bénítja (a következő körében nem játszhat ki lapot, `T.locked`), karakter nem kap bénulást. Felirat: „a következő körében nem játszhat ki lapot”. Teszt: `tools/party_test.js`.
+
 ## Hős-lap nagyban: hosszú nyomás (2026-10-23, Tomi)
 - A Gyűjteményben a hős-lapra **koppintva** (ha több portréja van) továbbra is a portréválasztó jön; **hosszan nyomva** (450 ms) a hős nagyban nyílik meg a viselt portréval (Full Art fülön a Full Art-tal, az arany sorban az arannyal) – `heroBigView`, `longPress` (ui.js). A portréválasztóban is: egy portrét hosszan nyomva nagyban mutatja (választás nélkül).
 
