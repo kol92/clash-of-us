@@ -463,6 +463,9 @@ Hősképesség-ötletek a táblázatban (még nem zöldek, nincsenek beépítve)
 ## Javítás: „Újabb ranked” → Mégse beragadás (2026-10-16)
 - Meccs után az „Újabb ranked” gomb a lezárt meccs képernyőjén indította a keresést; ha valaki „Mégse”-t nyomott, a lezárt táblán ragadt, és a zászló sem csinált semmit. Mostantól az „Újabb ranked” előbb a Ranked képernyőre visz, a keresés megszakítása lezárt meccsből a menübe visz, és lezárt meccsen a zászló is a menübe visz.
 
+## Több pack vásárlása egyszerre (2026-10-24, Tomi)
+- A Boltban a packra koppintva felugrik egy választó (`packBuyModal`): **1, 3, 5 vagy 10 db** (a coinból nem kijövő opció szürke). 1 db: a megszokott feltépés; több: a tömeges bontás (`bulkOpen` – ugyanaz, mint a ⚡ Mind: gyors, automatikus felfordítás, a különleges lapoknál megáll). Minden pack-fajtára (Base, Shiny, Amsterdam, Amsterdam Shiny; a teszt ágon Peaches is).
+
 ## Tömeges packbontás + saját paklik legfelül (2026-10-24, Tomi)
 - **⚡ Mind (N)** gomb a Boltban minden ajándék-pack fajta mellett, ha legalább 2 van belőle (Ajándék, Amsterdam, Amsterdam Shiny, Ajándék Shiny, Full Art ajándék): egyszerre kibontja mindet (`openAllPacks`, `BULK`; a pack-logika közös: `packRollFull`). Rövid pack-legyező animáció → az összes lap rácsban (5 oszlop, görgethető), és **magától, gyorsan egymás után fordulnak fel**; legendás, Full Art, arany és ritka változat lapnál **megáll a sor**, és lefut a megszokott különleges felfedés, amíg meg nem nézed (`cardReveal` `auto`). A God pack itt is bejöhet (a fejlécben „🌈 GOD PACK!” jelzi, külön jelenet nélkül). Vásárolt (coinos) packokra nincs tömeges bontás.
 - **Saját paklik legfelül:** a pakliválasztóban (és a Paklik menüben) a saját paklik mindig a kezdőpaklik előtt vannak.

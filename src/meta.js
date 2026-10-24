@@ -601,6 +601,24 @@ async function buyPack(setId, free) {
   if (conv.coins) toast(`Fölösleges hős-példány beváltva: +${conv.coins} coin`);
 }
 
+/* Pack vásárlás: 1, 3, 5 vagy 10 egyszerre (2026-10-24, Tomi). Egy pack: a megszokott feltépés; több: tömeges bontás. */
+function packBuyModal(k) {
+  const p = Store.p; if (!p) return;
+  const sh = /shiny$/.test(k), setId = k.startsWith('ah') ? 'ah' : k.startsWith('pc') ? 'pc' : 'base', pr = sh ? ECON.shinyPrice : ECON.packPrice;
+  const name = `${setId === 'base' ? (sh ? 'Shiny' : 'Base set') : SETS[setId].short + (sh ? ' Shiny' : '')} pack`;
+  if (p.coins < pr) return toast(`Nincs elég coinod (${p.coins}/${pr})`);
+  const o = document.createElement('div'); o.className = 'overlay';
+  o.innerHTML = `<div class="modal acct-box pb-box"><div class="pb-pack">${packHTML(setId, { shiny: sh })}</div><h3>${escH(name)}</h3><p class="live">Hányat veszel? Most ${p.coins} coinod van.</p>
+    <div class="pb-opts">${[1, 3, 5, 10].map(n => { const c = n * pr, ok = p.coins >= c;
+      return `<button class="btn${n === 1 ? ' primary' : ''} pb-opt" data-n="${n}" ${ok ? '' : 'disabled'}><b>${n} db</b><small><span class="coin sm" aria-hidden="true"></span> ${c}</small></button>`; }).join('')}</div>
+    <button class="btn" data-x>Mégse</button></div>`;
+  o.onclick = async e => { const b = e.target.closest('button'); if (e.target === o || (b && b.hasAttribute('data-x'))) return o.remove(); if (!b || !b.dataset.n) return;
+    const n = +b.dataset.n, cost = n * pr; if (p.coins < cost) return toast('Nincs elég coinod');
+    o.remove();
+    if (n === 1) return buyPack(setId, sh ? 'shiny' : false);
+    p.coins -= cost; await bulkOpen(setId, sh ? 'shiny' : false, n, name); };
+  $('#layer').appendChild(o);
+}
 function packRollFull(setId, free) {   /* egy pack lapjai + a fölösleges hős-példányok beváltása (buyPack és a tömeges bontás közös része) */
   const p = Store.p; p.packs++;
   const shinyMode = free === 'shiny' || free === 'shinyGift' || free === 'ahShinyGift';
@@ -617,7 +635,10 @@ const BULK = { faPack: ['base', 'fa', 'faPacks', 'Full Art ajándék pack'], gif
                giftAhShiny: ['ah', 'ahShinyGift', 'ahShinyPacks', 'Amsterdam Shiny pack'], giftShiny: ['base', 'shinyGift', 'shinyPacks', 'Ajándék Shiny pack'] };
 async function openAllPacks(kind) {
   const p = Store.p, B = BULK[kind]; if (!p || !B) return; const [setId, free, key, name] = B, n = p[key] || 0; if (n < 2) return;
-  p[key] = 0; const all = [], conv = { coins: 0 }; let shiny = false, god = 0;
+  p[key] = 0; return bulkOpen(setId, free, n, name);
+}
+async function bulkOpen(setId, free, n, name) {   /* n pack egyszerre: ajándék packok (⚡ Mind) és több pack vásárlása (2026-10-24) */
+  const p = Store.p; const all = [], conv = { coins: 0 }; let shiny = false, god = 0;
   for (let k = 0; k < n; k++) { const r = packRollFull(setId, free); all.push(...r.cards); conv.coins += r.conv.coins; shiny = r.shinyMode; if (r.cards.god) god++; }
   await save(); renderProfileBar(); renderShop();
   const o = document.createElement('div'); o.className = 'overlay opening bulk-op';
@@ -806,10 +827,7 @@ function renderShop() {
     </div>`;
   $('#shopBody').querySelectorAll('[data-buy]').forEach(b => b.onclick = () => buyShopItem(b.dataset.buy));
   $('#shopBody').querySelectorAll('[data-port]').forEach(b => b.onclick = () => buyPortrait(b.dataset.port));
-  $('#shopBody').querySelectorAll('[data-pack]').forEach(b => b.onclick = () => {
-    const k = b.dataset.pack, sh = k === 'shiny' || k === 'ahshiny', pr = sh ? ECON.shinyPrice : ECON.packPrice;
-    if (Store.p.coins < pr) return toast(`Nincs elég coinod (${Store.p.coins}/${pr})`);
-    buyPack(k.startsWith('ah') ? 'ah' : 'base', sh ? 'shiny' : false); });
+  $('#shopBody').querySelectorAll('[data-pack]').forEach(b => b.onclick = () => packBuyModal(b.dataset.pack));
   const jb = $('#shopBody').querySelector('[data-jump]'); if (jb) jb.onclick = () => $('#shopBody .shop-limited')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   $('#freePack').onclick = () => buyPack(freePackSet(), true);
   if ($('#chestBtn')) $('#chestBtn').onclick = () => buyChest();

@@ -2238,6 +2238,12 @@ html:has(body.in-game){overscroll-behavior:none;}
 .bulk-head{display:grid;justify-items:center;gap:2px;color:#fff;text-align:center;} .bulk-head b{font-family:var(--display);font-size:22px;} .bulk-head small{color:var(--gold);font-weight:800;}
 .bulk-packs{display:flex;justify-content:center;margin:20px 0;} .bulk-packs>span{margin-left:-60px;transform:rotate(calc((var(--k) - 3) * 5deg));} .bulk-packs>span:first-child{margin-left:0;}
 .bulk-packs .pack{--pw:110px;}
+
+/* több pack vásárlása (2026-10-24) */
+.pb-box{display:grid;justify-items:center;gap:10px;} .pb-pack .pack{--pw:96px;}
+.pb-opts{display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%;}
+.pb-opt{display:grid;gap:2px;padding:10px 6px;} .pb-opt b{font-size:18px;} .pb-opt small{display:inline-flex;align-items:center;justify-content:center;gap:4px;font-weight:800;}
+.pb-opt[disabled]{opacity:.4;}
 </style>
 
 <div id="app">
