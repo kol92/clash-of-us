@@ -296,8 +296,8 @@ const DECKS = {
   ah_sasi: { set:'ah', name:'Amszterdami banda', hero:'sasi', desc:'Minél többen vagytok, annál jobb: Ati hozza Bettit, Laci és a kutya gyorsan lent van, Sasi minden körben odacsap – és ha kell, jön a Game Over.',
     list:{ c_ah_ati:2, c_ah_laci:2, c_kutya:2, c_ppvar:1, c_ah_sasi:2, c_ah_barna:1, i_gomba:2, a_suti:1, a_bong:1, c_vizipipa:1, l_voros:1, f_gameover:1, f_gluten:1, c_pp:2 } },
   /* Laszy kezdőpaklija (2026-10-23, teszt) – Base set lapokból + a saját Kánonja (Csövesek és Cigányok) */
-  vadbuli: { set:'pc', name:'Vad buli', hero:'laszy', desc:'Laszy sosem tudja, kit talál el – de a sok olcsó karakter és a vodka miatt az ellenfél többet szív, mint ti. A végén pedig berúg maga Laszy is.',
-    list:{ c_pifti:2, c_gyuri:2, c_kovacs:2, c_zoli:2, c_vajda:1, c_rebi:1, c_talos:1, a_dinnyes:2, a_cheddar:1, i_energiaital:1, a_tubi:1, c_sasi:1, c_laszy:1, f_csoves:1, i_lepke:1 } },   /* 2026-10-23: 1 Vajda helyett Csattogós lepke – a 2/1-es Szolgákkal 51,8% */
+  vadbuli: { set:'pc', free:true, name:'Vad buli a Peachesben', hero:'laszy', desc:'Laszy a Peaches-ben kezdte a pályafutását: egy húzásra a Kalinka, Flaming Lamborghini az elején, éjfél után pedig elszabadul a banda – a végén jönnek a Csövesek és Cigányok.',
+    list:{ c_pc_barna:2, c_pc_zoli:1, c_pc_sasi:1, c_pc_laszy:1, c_pc_david:1, a_kalinka:2, a_lambo:2, a_jager:1, a_pezsgo:1, c_pifti:2, c_gyuri:2, c_kovacs:2, c_rebi:1, f_csoves:1 } },   /* 2026-10-24 (Tomi): Laszy egyetlen kezdőpaklija Peaches-tematikájú; free: nem kölcsön, nem kell birtokolni a lapokat – 51,6% */
 };
 const DECK_OF = hid => Object.keys(DECKS).find(k => DECKS[k].hero === hid);
 

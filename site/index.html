@@ -2461,7 +2461,7 @@ html:has(body.in-game){overscroll-behavior:none;}
 <script src="vendor/firebase-auth-compat.js"></script>
 <script src="vendor/firebase-firestore-compat.js"></script>
 <script src="vendor/firebase-database-compat.js"></script>
-<script>window.APP_VERSION = "2026.10.24-1512"; window.APP_BUILD = "2026.10.24-1514";</script>
+<script>window.APP_VERSION = "2026.10.24-1526"; window.APP_BUILD = "2026.10.24-1527";</script>
 <script>// ===== Best of Us – saját szerver (Firebase) =====
 // A játék eredetileg a Claude-os tárolót használta (window.claude.use('db' | 'user' | 'room')).
 // Ez a fájl ugyanazt a felületet adja Firebase-ből, így a játék kódja szinte változatlan maradhat:
@@ -3017,8 +3017,8 @@ const DECKS = {
   ah_sasi: { set:'ah', name:'Amszterdami banda', hero:'sasi', desc:'Minél többen vagytok, annál jobb: Ati hozza Bettit, Laci és a kutya gyorsan lent van, Sasi minden körben odacsap – és ha kell, jön a Game Over.',
     list:{ c_ah_ati:2, c_ah_laci:2, c_kutya:2, c_ppvar:1, c_ah_sasi:2, c_ah_barna:1, i_gomba:2, a_suti:1, a_bong:1, c_vizipipa:1, l_voros:1, f_gameover:1, f_gluten:1, c_pp:2 } },
   /* Laszy kezdőpaklija (2026-10-23, teszt) – Base set lapokból + a saját Kánonja (Csövesek és Cigányok) */
-  vadbuli: { set:'pc', name:'Vad buli', hero:'laszy', desc:'Laszy sosem tudja, kit talál el – de a sok olcsó karakter és a vodka miatt az ellenfél többet szív, mint ti. A végén pedig berúg maga Laszy is.',
-    list:{ c_pifti:2, c_gyuri:2, c_kovacs:2, c_zoli:2, c_vajda:1, c_rebi:1, c_talos:1, a_dinnyes:2, a_cheddar:1, i_energiaital:1, a_tubi:1, c_sasi:1, c_laszy:1, f_csoves:1, i_lepke:1 } },   /* 2026-10-23: 1 Vajda helyett Csattogós lepke – a 2/1-es Szolgákkal 51,8% */
+  vadbuli: { set:'pc', free:true, name:'Vad buli a Peachesben', hero:'laszy', desc:'Laszy a Peaches-ben kezdte a pályafutását: egy húzásra a Kalinka, Flaming Lamborghini az elején, éjfél után pedig elszabadul a banda – a végén jönnek a Csövesek és Cigányok.',
+    list:{ c_pc_barna:2, c_pc_zoli:1, c_pc_sasi:1, c_pc_laszy:1, c_pc_david:1, a_kalinka:2, a_lambo:2, a_jager:1, a_pezsgo:1, c_pifti:2, c_gyuri:2, c_kovacs:2, c_rebi:1, f_csoves:1 } },   /* 2026-10-24 (Tomi): Laszy egyetlen kezdőpaklija Peaches-tematikájú; free: nem kölcsön, nem kell birtokolni a lapokat – 51,6% */
 };
 const DECK_OF = hid => Object.keys(DECKS).find(k => DECKS[k].hero === hid);
 
@@ -7320,7 +7320,7 @@ function botDeckFor(hero, lv, rnd = Math.random) {
 }
 // [DECKHELP-END]
 function allDecks() {
-  const starters = Object.entries(DECKS).filter(([, d]) => !d.set || setLive(d.set)).map(([id, d]) => ({ id, name: d.name, desc: d.desc, hero: d.hero, list: upgradeList(d.list), starter: true, set: d.set }));   /* szett-kezdőpakli csak a megjelenéstől */
+  const starters = Object.entries(DECKS).filter(([, d]) => !d.set || setLive(d.set)).map(([id, d]) => ({ id, name: d.name, desc: d.desc, hero: d.hero, list: upgradeList(d.list), starter: true, set: d.set, free: !!d.free }));   /* szett-kezdőpakli csak a megjelenéstől */
   return starters.concat(Store.p ? Store.p.decks : []);
 }
 const deckCount = list => Object.values(list).reduce((a, b) => a + b, 0);
@@ -7335,9 +7335,9 @@ function deckProblem(list, hero, loan) {   /* loan: szett-kezdőpakli – kölcs
 }
 /* Kölcsönpakli (szett-kezdőpakli, 2026-10-19, Tomi): paklinként 3 meccs, utána lejár */
 const LOAN_MAX = 3;
-const isLoan = d => !!(d && d.starter && d.set);
+const isLoan = d => !!(d && d.starter && d.set && !d.free);   /* free: a hős saját kezdőpaklija (pl. Laszy) – nem kölcsön */
 const loanLeft = d => LOAN_MAX - ((Store.p?.loan || {})[d.id] || 0);
-const deckIssue = d => isLoan(d) && loanLeft(d) <= 0 ? 'lejárt a kölcsönpakli' : deckProblem(d.list, d.hero || null, isLoan(d));
+const deckIssue = d => isLoan(d) && loanLeft(d) <= 0 ? 'lejárt a kölcsönpakli' : deckProblem(d.list, d.hero || null, isLoan(d) || !!(d.starter && d.free));
 function loanUse(deckId, matchKey) {   /* meccs indulásakor számol (kilépéssel sem lehet megúszni); matchKey: PvP-ben meccsenként egyszer */
   const p = Store.p, d = allDecks().find(x => x.id === deckId); if (!p || !isLoan(d)) return;
   if (matchKey) { p.loanM = p.loanM || []; if (p.loanM.includes(matchKey)) return; p.loanM = [...p.loanM.slice(-20), matchKey]; }

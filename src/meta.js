@@ -1190,7 +1190,7 @@ function botDeckFor(hero, lv, rnd = Math.random) {
 }
 // [DECKHELP-END]
 function allDecks() {
-  const starters = Object.entries(DECKS).filter(([, d]) => !d.set || setLive(d.set)).map(([id, d]) => ({ id, name: d.name, desc: d.desc, hero: d.hero, list: upgradeList(d.list), starter: true, set: d.set }));   /* szett-kezdőpakli csak a megjelenéstől */
+  const starters = Object.entries(DECKS).filter(([, d]) => !d.set || setLive(d.set)).map(([id, d]) => ({ id, name: d.name, desc: d.desc, hero: d.hero, list: upgradeList(d.list), starter: true, set: d.set, free: !!d.free }));   /* szett-kezdőpakli csak a megjelenéstől */
   return starters.concat(Store.p ? Store.p.decks : []);
 }
 const deckCount = list => Object.values(list).reduce((a, b) => a + b, 0);
@@ -1205,9 +1205,9 @@ function deckProblem(list, hero, loan) {   /* loan: szett-kezdőpakli – kölcs
 }
 /* Kölcsönpakli (szett-kezdőpakli, 2026-10-19, Tomi): paklinként 3 meccs, utána lejár */
 const LOAN_MAX = 3;
-const isLoan = d => !!(d && d.starter && d.set);
+const isLoan = d => !!(d && d.starter && d.set && !d.free);   /* free: a hős saját kezdőpaklija (pl. Laszy) – nem kölcsön */
 const loanLeft = d => LOAN_MAX - ((Store.p?.loan || {})[d.id] || 0);
-const deckIssue = d => isLoan(d) && loanLeft(d) <= 0 ? 'lejárt a kölcsönpakli' : deckProblem(d.list, d.hero || null, isLoan(d));
+const deckIssue = d => isLoan(d) && loanLeft(d) <= 0 ? 'lejárt a kölcsönpakli' : deckProblem(d.list, d.hero || null, isLoan(d) || !!(d.starter && d.free));
 function loanUse(deckId, matchKey) {   /* meccs indulásakor számol (kilépéssel sem lehet megúszni); matchKey: PvP-ben meccsenként egyszer */
   const p = Store.p, d = allDecks().find(x => x.id === deckId); if (!p || !isLoan(d)) return;
   if (matchKey) { p.loanM = p.loanM || []; if (p.loanM.includes(matchKey)) return; p.loanM = [...p.loanM.slice(-20), matchKey]; }
