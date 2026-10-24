@@ -1,11 +1,11 @@
 // Peaches and Cream – „Éjfél után” karakterek (2026-10-24, teszt ág)
 const E = require(require('path').join(__dirname, '..', 'engine.js'));
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('HIBA:', m); } else console.log('ok  ', m); };
-const G = (h = 'tomi', half = 15) => { const s = E.newGame(h, E.DECK_OF(h === 'laszy' ? 'laszy' : 'tomi'), 'gabi', E.DECK_OF('gabi'), 0); s.active = 0; s.half = half; for (const p of s.players) { p.board = [null, null, null, null]; p.hand = []; p.energy = p.maxEnergy = 30; } return s; };
+const G = (h = 'tomi', half = 11) => { const s = E.newGame(h, E.DECK_OF(h === 'laszy' ? 'laszy' : 'tomi'), 'gabi', E.DECK_OF('gabi'), 0); s.active = 0; s.half = half; for (const p of s.players) { p.board = [null, null, null, null]; p.hand = []; p.energy = p.maxEnergy = 30; } return s; };
 const play = (s, side, id, t) => { const p = s.players[side], a = s.active; s.active = side; p.energy = 30; p.hand.unshift({ uid: Math.floor(Math.random() * 1e9), id }); const r = E.playCard(s, side, 0, t); s.active = a; return r; };
 const B = s => s.players[0].board;
 { const s = G('tomi', 5); play(s, 0, 'c_pc_barna', { k: 'slot', side: 0, i: 0 }); ok(B(s)[0].atk === 1 && !B(s)[0].midOn, 'éjfél előtt: Barna 1/2');
-  s.half = 14; s.active = 0; E.runEndTurn(s); s.active = 1; E.runEndTurn(s);   /* → a 0. játékos 8. köre */
+  s.half = 9; s.active = 0; E.runEndTurn(s); s.active = 1; E.runEndTurn(s);   /* → a 0. játékos 6. köre */
   ok(E.isMidnight(s) && B(s)[0] && B(s)[0].atk === 3 && B(s)[0].maxHp === 4, `éjfélkor bekapcsol: Barna ${B(s)[0] && B(s)[0].atk}/${B(s)[0] && B(s)[0].maxHp}`); }
 { const s = G(); play(s, 0, 'c_pc_barna', { k: 'slot', side: 0, i: 0 }); ok(B(s)[0].atk === 3 && B(s)[0].hp === 4, 'éjfél után kijátszva: +2/+2'); }
 { const s = G('laszy'); play(s, 0, 'c_pc_barna', { k: 'slot', side: 0, i: 0 }); ok(B(s)[0].atk === 4 && B(s)[0].hp === 5, 'Laszy hősnél +1: Barna 4/5'); }
@@ -14,7 +14,9 @@ const B = s => s.players[0].board;
 { const s = G(); play(s, 0, 'c_gyuri', { k: 'slot', side: 0, i: 0 }); play(s, 0, 'c_gyuri', { k: 'slot', side: 0, i: 2 }); play(s, 0, 'c_pc_sasi', { k: 'slot', side: 0, i: 1 });
   ok(B(s)[0].atk === 4 && B(s)[2].atk === 4 && B(s)[1].atk === 2, 'Sasi: a szomszédok +2/+2'); }
 { const s = G(); play(s, 0, 'c_pc_tomi', { k: 'slot', side: 0, i: 0 }); ok(B(s)[1] && B(s)[1].id === 'c_belvedere', 'Tomi: Belvedere mellé');
-  play(s, 0, 'c_gyuri', { k: 'slot', side: 0, i: 2 }); ok(E.effAtk(s, 0, 2) === 4 && E.effAtk(s, 0, 0) === 4, 'Belvedere: a mellette állók +2 támadás'); }
+  play(s, 0, 'c_gyuri', { k: 'slot', side: 0, i: 2 }); s.active = 0; E.runEndTurn(s);
+  ok(B(s)[2] && B(s)[2].maxHp === 3 && B(s)[0].maxHp === 5 && B(s)[1].hp >= 9, `Belvedere: a köröd végén a szomszédai +1/+1 (Gyuri ${B(s)[2] && B(s)[2].atk}/${B(s)[2] && B(s)[2].maxHp}, Tomi ${B(s)[0].atk}/${B(s)[0].maxHp})`); }
+{ const s = G(); play(s, 0, 'c_belvedere', { k: 'slot', side: 0, i: 1 }); ok(B(s)[1].hp === 10 && E.CARD.c_belvedere.cost === 4, 'Belvedere: kijátszható lap, 0/10'); }
 { const s = G(); play(s, 1, 'c_vajda', { k: 'slot', side: 1, i: 2 }); play(s, 0, 'c_pc_boros', { k: 'slot', side: 0, i: 0 });
   ok(!s.players[1].board[2] && s.players[1].hand.some(h => h.id === 'c_vajda') && B(s)[0].atk === 4, 'Boros: +2/+2 és kidobja Vajdát a kezébe'); }
 { const s = G(); play(s, 0, 'c_pc_laszy', { k: 'slot', side: 0, i: 0 }); ok(s.players[0].hand.some(h => h.id === 'a_kalinka') && B(s)[0].atk === 7 && B(s)[0].hp === 6, 'Laszy: Kalinka a kézbe, +6/+3');

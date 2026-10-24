@@ -2431,7 +2431,7 @@ html:has(body.in-game){overscroll-behavior:none;}
 <script src="vendor/firebase-auth-compat.js"></script>
 <script src="vendor/firebase-firestore-compat.js"></script>
 <script src="vendor/firebase-database-compat.js"></script>
-<script>window.APP_VERSION = "2026.10.24-1251"; window.APP_BUILD = "2026.10.24-1252";</script>
+<script>window.APP_VERSION = "2026.10.24-1302"; window.APP_BUILD = "2026.10.24-1302";</script>
 <script>// ===== Best of Us – saját szerver (Firebase) =====
 // A játék eredetileg a Claude-os tárolót használta (window.claude.use('db' | 'user' | 'room')).
 // Ez a fájl ugyanazt a felületet adja Firebase-ből, így a játék kódja szinte változatlan maradhat:
@@ -2840,16 +2840,16 @@ const CARDS = [
   { id:'a_rantott', type:'action', name:'Rántott hús', cost:0, tgt:'ownOrHero', rarity:'k', token:true, text:'Egy saját karaktered vagy a hősöd 3 életet gyógyul.' },
   { id:'a_szulinap', type:'action', name:'Boldog szülinapot Pifti!', cost:6, tgt:'summon', rarity:'r', text:'Három Piftit idéz a szabad helyeidre (ha kevesebb a hely, annyit).' },
   { id:'a_kor', type:'action', name:'Egy pohár víz', cost:0, rarity:'k', token:true, text:'Ebben a körben +1 energiád van. A 3. körödtől játszható ki. Aki másodikként jön, megkapja, mert a kezdés előny.' },
-  /* ===== Egy Éjszaka a Peaches and Creamben (set 'pc', teszt ág, 2026-10-24, Tomi) – „Éjfél után”: a 8. körtől él (kijátszáskor, vagy ha már lent van: a gazdája 8. körének elején egyszer bekapcsol) ===== */
+  /* ===== Egy Éjszaka a Peaches and Creamben (set 'pc', teszt ág, 2026-10-24, Tomi) – „Éjfél után”: a 6. körtől él (kijátszáskor, vagy ha már lent van: a gazdája 6. körének elején egyszer bekapcsol) ===== */
   { id:'c_pc_barna', set:'pc', type:'char', name:'Barna, éjfél után', cost:1, atk:1, hp:2, rarity:'k', haste:true, mid:true, text:'Lendület. Éjfél után: +2/+2.' },
-  { id:'c_pc_tomi', set:'pc', type:'char', name:'Tomi, éjfél után', cost:5, atk:2, hp:4, rarity:'r', mid:true, text:'Éjfél után: maga mellé tesz egy 3 literes Belvederét.' },
+  { id:'c_pc_tomi', set:'pc', type:'char', name:'Tomi, éjfél után', cost:5, atk:2, hp:4, rarity:'r', mid:true, text:'Éjfél után: maga mellé tesz egy Három Literes Belvederét.' },
   { id:'c_pc_krisz', set:'pc', type:'char', name:'Krisz, éjfél után', cost:5, atk:5, hp:2, rarity:'e', mid:true, text:'Éjfél után: Lendület és Izom.' },
   { id:'c_pc_laszy', set:'pc', type:'char', name:'Laszy, éjfél után', cost:1, atk:1, hp:3, rarity:'e', mid:true, text:'Kijátszáskor a kezedbe kerül egy 0,2 Kalinka. Éjfél után: +6/+3, de támadáskor 50% eséllyel a saját hősödet üti.' },
   { id:'c_pc_zoli', set:'pc', type:'char', name:'Gál Zoli, éjfél után', cost:3, atk:2, hp:3, rarity:'r', mid:true, text:'Éjfél után: támadáskor saját magát üti meg. Ha így (vagy bárhogy) meghal, minden ellenséges karakter 3 sebzést kap.' },
   { id:'c_pc_boros', set:'pc', type:'char', name:'Boros, éjfél után', cost:1, atk:2, hp:1, rarity:'k', mid:true, text:'Éjfél után: +2/+2, és kidob egy véletlen ellenséges karaktert (visszakerül a gazdája kezébe).' },
   { id:'c_pc_david', set:'pc', type:'char', name:'Dávid, éjfél után', cost:4, atk:2, hp:3, rarity:'k', mid:true, text:'Éjfél után: +4/+3.' },
   { id:'c_pc_sasi', set:'pc', type:'char', name:'Sasi, éjfél után', cost:2, atk:2, hp:2, rarity:'r', mid:true, text:'Éjfél után: a mellette álló karaktereid +2/+2-t kapnak.' },
-  { id:'c_belvedere', set:'pc', type:'char', name:'3 literes Belvedere', cost:0, atk:0, hp:4, rarity:'r', token:true, noAttack:true, text:'Nem támad. A mellette álló karaktereid +2 támadást kapnak. (Tomi, éjfél után hozza.)' },
+  { id:'c_belvedere', set:'pc', drink:true, noParty:true, type:'char', name:'Három Literes Belvedere', cost:4, atk:0, hp:10, rarity:'l', noAttack:true, text:'Nem támad. Minden köröd végén, a támadás előtt a mellette álló karaktereid +1/+1-et kapnak.' },   /* 2026-10-24 (Tomi): gyűjthető legendás Ital-karakter; Tomi, éjfél után is ezt teszi le */
   { id:'a_kalinka', set:'pc', drink:true, type:'action', name:'0,2 Kalinka', cost:0, tgt:'own', rarity:'k', token:true, noParty:true, text:'Egy karaktered +1/+1.' },
   /* Laszy Kánonja (2026-10-23, Tomi; teszt): három Szolga – 2/2, Provokáció, aki megtámadja, annak a saját eszközeit ellopják és magukra teszik */
   { id:'f_csoves', set:'pc', type:'action', name:'Csövesek és Cigányok', cost:6, rarity:'l', finisher:true, hero:'laszy', tgt:'summon', text:'Három Szolga (2/1, Provokáció) érkezik a szabad helyeidre. Aki megtámadja őket, attól ellopják az eszközeit, és magukra teszik.' },
@@ -2891,7 +2891,7 @@ const HERO = Object.fromEntries(HEROES.map(h => [h.id, h]));
 const PASSIVE = { firstCharAtk:'barna', endHeal:'gabi', firstTwo:'krisz', itemHp:'tomi', regular:'david', bigHp:'bence', deathPing:'milo', extraDraw:'laci', teamPing:'sasi', wildParty:'laszy', midnightPlus:'laszy' };
 /* Laszy: az „Éjfél után” hatások +1-gyel erősebbek (+1/+1, +1 sebzés vagy +1 gyógyítás) – a Peaches lapok ezt használják: midBonus(p) */
 const midBonus = p => has(p, 'midnightPlus') ? 1 : 0;
-const MIDNIGHT = 8;   /* „Éjfél után”: a 8. körtől (mindkét játékosnál ugyanakkor) */
+const MIDNIGHT = 6;   /* „Éjfél után”: a 6. kör elejétől (mindkét játékosnál ugyanakkor) – 2026-10-24, Tomi (eredetileg 8) */
 const isMidnight = s => Math.ceil(s.half / 2) >= MIDNIGHT;
 function kickOut(s, side, j) {   /* Kidobás: a karakter visszakerül a gazdája kezébe, az eszközei elvesznek */
   const x = s.players[side].board[j]; if (!x) return;
@@ -3109,8 +3109,6 @@ function effAtk(s, side, i) {
   let a = u.atk + u.temp;
   if (b[i - 1] && b[i - 1].id === 'c_talos') a += 2;
   if (b[i + 1] && b[i + 1].id === 'c_talos') a += 2;
-  if (b[i - 1] && b[i - 1].id === 'c_belvedere') a += 2;
-  if (b[i + 1] && b[i + 1].id === 'c_belvedere') a += 2;
   if (u.id === 'c_norbi' && (b[i - 1] || b[i + 1])) a += 2;   // Lukács Norbi: ha van mellette valaki
   const opp = s.players[1 - side].board[i];
   if (opp && opp.id === 'c_rebi') a -= 1;
@@ -3913,7 +3911,11 @@ function finishTurn(s) {
 
 /* Kör végi hatások a támadások ELŐTT (Vöröslámpás negyed: a soron lévő játékos egy véletlen karaktere végleg +1 támadást kap) */
 function preAttack(s) {
-  if (s.winner != null || !locIs(s, 'l_voros')) return;
+  if (s.winner != null) return;
+  { const pi = s.active, b = s.players[pi].board;   /* Három Literes Belvedere: a köröd végén, támadás előtt a szomszédai +1/+1 */
+    b.forEach((v, j) => { if (!v || bid(v.id) !== 'c_belvedere') return; ev(s, { t:'belvedere', side:pi, i:j });
+      for (const k of [j - 1, j + 1]) { const x = b[k]; if (x && !isFixed(x)) { x.atk += 1; x.hp += 1; x.maxHp += 1; ev(s, { t:'buff', side:pi, i:k, n:1 }); } } }); }
+  if (!locIs(s, 'l_voros')) return;
   const pi = s.active, b = s.players[pi].board, c = b.map((u, i) => u && !isFixed(u) ? i : -1).filter(i => i >= 0);
   if (!c.length) return;
   const i = c[Math.floor(rnd() * c.length)]; b[i].atk += 1; ev(s, { t:'locfx', side:pi, id:'l_voros' }); ev(s, { t:'buff', side:pi, i, n:1 });
@@ -4291,7 +4293,7 @@ const ART = {
   c_pc_boros: { src:'art/pc_boros.webp?v=75954aad92b72667', av:'40% 20%', pos:'40% 18%' },
   c_pc_david: { src:'art/pc_david.webp?v=74c4a46c51bef4f0', av:'40% 25%', pos:'40% 22%' },
   c_pc_sasi:  { src:'art/pc_sasi.webp?v=b10b3291260daee2',  av:'55% 17%', pos:'55% 15%' },
-  c_belvedere:{ src:'art/belvedere.webp?v=389a6cc262f109f3', av:'60% 55%', pos:'60% 50%' },
+  c_belvedere:{ src:'art/belvedere.webp?v=a6b5c0a4aebd7d3a', av:'50% 40%', pos:'50% 35%' },
   f_csoves:  { src:'art/f_csoves.webp?v=e93ebd46638af594', av:'40% 22%', pos:'40% 20%' },   /* Laszy Kánonja (teszt) */
   c_szolga1: { src:'art/c_szolga1.webp?v=9e149b858a555840', av:'50% 30%', pos:'50% 28%' },
   c_szolga2: { src:'art/c_szolga2.webp?v=94c76158cdeba91c', av:'60% 35%', pos:'60% 32%' },
@@ -4819,6 +4821,7 @@ function logEvents(evs, snap) {
       case 'shield': L(`🛡 ${unitName(e.side, e.i)} pajzsa elnyelte az ütést`); break;
       case 'bounce': L(`↩ ${unitName(e.side, e.i)} visszakerült a kézbe`); break;
       case 'stolen': L(`🫳 ${unitName(e.side, e.i)} átállt a másik oldalra`); break;
+      case 'belvedere': L(`🍾 Három Literes Belvedere: a mellette állók +1/+1`); break;
       case 'midnight': L(`🌙 Éjfél után: <b class="lc" data-lc="${e.id}">${escH(CARD[e.id].name)}</b> bekapcsolt${e.b ? ' (Laszy: +1)' : ''}`); break;
       case 'kickout': L(`🚪 Kidobták: <b class="lc" data-lc="${e.id}">${escH(CARD[e.id].name)}</b> (vissza a kézbe)`); break;
       case 'zoliblast': L(`💥 Gál Zoli kidőlt: ${e.n} sebzés minden ellenséges karakternek`); break;
@@ -5058,6 +5061,7 @@ async function animateEvents(evs) {
       case 'move': floatAt(anchor, e.swap ? '👞 Helycsere!' : '👞 Áthelyezve', 'info'); hold = Math.max(hold, 350); break;
       case 'push': floatAt(anchor, 'Arrébb tolva!', 'info'); hold = Math.max(hold, 300); break;
       case 'stolen': fx(el, e.side === ME ? 'fx-bounce-up' : 'fx-bounce-down'); floatAt(anchor, '🫳 Ellopták!', 'dmg'); hold = Math.max(hold, 650); break;
+      case 'belvedere': floatAt(anchor, '🍾 Belvedere: +1/+1 a szomszédoknak', 'buff'); hold = Math.max(hold, 600); break;
       case 'midnight': floatAt(anchor, '🌙 Éjfél után!', 'buff'); hold = Math.max(hold, 700); break;
       case 'kickout': fx(el, e.side === ME ? 'fx-bounce-up' : 'fx-bounce-down'); floatAt(anchor, '🚪 Kidobták!', 'dmg'); hold = Math.max(hold, 650); break;
       case 'zoliblast': fx($('#app'), 'fx-quake'); floatAt(anchor, `💥 ${e.n} mindenkinek!`, 'dmg'); hold = Math.max(hold, 700); break;
@@ -5345,7 +5349,7 @@ function render() {
   setHTML(loc, L ? `<span class="pin${ART[L.id] ? ' has-art' : ''}" style="--h:${hueOf(L.id)};${ART[L.id] ? `background-image:url('${artSrc(L.id, false)}');background-position:${ART[L.id].pos}` : ''}">${ART[L.id] ? '' : initials(lc.name)}</span><span><b>${lc.name}</b><small>${lc.text}</small></span>`
                     : `<span class="pin">–</span><span><b>Nincs helyszín</b><small>Játssz ki egy helyszínkártyát, ami mindkét félre hat.</small></span>`);
   const R = MAX_HALF / 2, rnd = Math.min(R, Math.ceil(S.half / 2));
-  $('#round').textContent = `${rnd >= 8 ? '🌙 ' : ''}${rnd}. kör / ${R}`;   /* 🌙 = Éjfél után (a 8. körtől) */ $('#round').className = 'round' + (rnd >= R - 1 ? ' last' : '');
+  $('#round').textContent = `${rnd >= 6 ? '🌙 ' : ''}${rnd}. kör / ${R}`;   /* 🌙 = Éjfél után (a 6. körtől) */ $('#round').className = 'round' + (rnd >= R - 1 ? ' last' : '');
   const end = $('#endBtn');
   end.disabled = !myTurn; end.textContent = S.active === ME ? 'Kör vége' : 'Ellenfél köre';
   end.classList.toggle('wait', S.active !== ME); end.setAttribute('aria-label', end.textContent);
@@ -5620,7 +5624,7 @@ async function misfireAnim(pi, i, el, mf) {
 
 async function resolveEnd() {
   const pi = S.active;
-  if (S.location && S.location.id === 'l_voros') await runFx(() => preAttack(S));   /* Vöröslámpás negyed: a támadások előtt */
+  if ((S.location && S.location.id === 'l_voros') || S.players[S.active].board.some(v => v && bid(v.id) === 'c_belvedere')) await runFx(() => preAttack(S));   /* Vöröslámpás negyed / Három Literes Belvedere: a támadások előtt */
   for (let i = 0; i < LANES; i++) {
     if (S.winner != null) break;
     const u = S.players[pi].board[i];

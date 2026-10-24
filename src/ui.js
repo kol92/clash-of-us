@@ -255,7 +255,7 @@ const ART = {
   c_pc_boros: { src:'art/pc_boros.webp', av:'40% 20%', pos:'40% 18%' },
   c_pc_david: { src:'art/pc_david.webp', av:'40% 25%', pos:'40% 22%' },
   c_pc_sasi:  { src:'art/pc_sasi.webp',  av:'55% 17%', pos:'55% 15%' },
-  c_belvedere:{ src:'art/belvedere.webp', av:'60% 55%', pos:'60% 50%' },
+  c_belvedere:{ src:'art/belvedere.webp', av:'50% 40%', pos:'50% 35%' },
   f_csoves:  { src:'art/f_csoves.webp', av:'40% 22%', pos:'40% 20%' },   /* Laszy Kánonja (teszt) */
   c_szolga1: { src:'art/c_szolga1.webp', av:'50% 30%', pos:'50% 28%' },
   c_szolga2: { src:'art/c_szolga2.webp', av:'60% 35%', pos:'60% 32%' },
@@ -783,6 +783,7 @@ function logEvents(evs, snap) {
       case 'shield': L(`🛡 ${unitName(e.side, e.i)} pajzsa elnyelte az ütést`); break;
       case 'bounce': L(`↩ ${unitName(e.side, e.i)} visszakerült a kézbe`); break;
       case 'stolen': L(`🫳 ${unitName(e.side, e.i)} átállt a másik oldalra`); break;
+      case 'belvedere': L(`🍾 Három Literes Belvedere: a mellette állók +1/+1`); break;
       case 'midnight': L(`🌙 Éjfél után: <b class="lc" data-lc="${e.id}">${escH(CARD[e.id].name)}</b> bekapcsolt${e.b ? ' (Laszy: +1)' : ''}`); break;
       case 'kickout': L(`🚪 Kidobták: <b class="lc" data-lc="${e.id}">${escH(CARD[e.id].name)}</b> (vissza a kézbe)`); break;
       case 'zoliblast': L(`💥 Gál Zoli kidőlt: ${e.n} sebzés minden ellenséges karakternek`); break;
@@ -1022,6 +1023,7 @@ async function animateEvents(evs) {
       case 'move': floatAt(anchor, e.swap ? '👞 Helycsere!' : '👞 Áthelyezve', 'info'); hold = Math.max(hold, 350); break;
       case 'push': floatAt(anchor, 'Arrébb tolva!', 'info'); hold = Math.max(hold, 300); break;
       case 'stolen': fx(el, e.side === ME ? 'fx-bounce-up' : 'fx-bounce-down'); floatAt(anchor, '🫳 Ellopták!', 'dmg'); hold = Math.max(hold, 650); break;
+      case 'belvedere': floatAt(anchor, '🍾 Belvedere: +1/+1 a szomszédoknak', 'buff'); hold = Math.max(hold, 600); break;
       case 'midnight': floatAt(anchor, '🌙 Éjfél után!', 'buff'); hold = Math.max(hold, 700); break;
       case 'kickout': fx(el, e.side === ME ? 'fx-bounce-up' : 'fx-bounce-down'); floatAt(anchor, '🚪 Kidobták!', 'dmg'); hold = Math.max(hold, 650); break;
       case 'zoliblast': fx($('#app'), 'fx-quake'); floatAt(anchor, `💥 ${e.n} mindenkinek!`, 'dmg'); hold = Math.max(hold, 700); break;
@@ -1309,7 +1311,7 @@ function render() {
   setHTML(loc, L ? `<span class="pin${ART[L.id] ? ' has-art' : ''}" style="--h:${hueOf(L.id)};${ART[L.id] ? `background-image:url('${artSrc(L.id, false)}');background-position:${ART[L.id].pos}` : ''}">${ART[L.id] ? '' : initials(lc.name)}</span><span><b>${lc.name}</b><small>${lc.text}</small></span>`
                     : `<span class="pin">–</span><span><b>Nincs helyszín</b><small>Játssz ki egy helyszínkártyát, ami mindkét félre hat.</small></span>`);
   const R = MAX_HALF / 2, rnd = Math.min(R, Math.ceil(S.half / 2));
-  $('#round').textContent = `${rnd >= 8 ? '🌙 ' : ''}${rnd}. kör / ${R}`;   /* 🌙 = Éjfél után (a 8. körtől) */ $('#round').className = 'round' + (rnd >= R - 1 ? ' last' : '');
+  $('#round').textContent = `${rnd >= 6 ? '🌙 ' : ''}${rnd}. kör / ${R}`;   /* 🌙 = Éjfél után (a 6. körtől) */ $('#round').className = 'round' + (rnd >= R - 1 ? ' last' : '');
   const end = $('#endBtn');
   end.disabled = !myTurn; end.textContent = S.active === ME ? 'Kör vége' : 'Ellenfél köre';
   end.classList.toggle('wait', S.active !== ME); end.setAttribute('aria-label', end.textContent);
@@ -1584,7 +1586,7 @@ async function misfireAnim(pi, i, el, mf) {
 
 async function resolveEnd() {
   const pi = S.active;
-  if (S.location && S.location.id === 'l_voros') await runFx(() => preAttack(S));   /* Vöröslámpás negyed: a támadások előtt */
+  if ((S.location && S.location.id === 'l_voros') || S.players[S.active].board.some(v => v && bid(v.id) === 'c_belvedere')) await runFx(() => preAttack(S));   /* Vöröslámpás negyed / Három Literes Belvedere: a támadások előtt */
   for (let i = 0; i < LANES; i++) {
     if (S.winner != null) break;
     const u = S.players[pi].board[i];

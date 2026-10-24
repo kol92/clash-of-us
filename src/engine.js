@@ -149,16 +149,16 @@ const CARDS = [
   { id:'a_rantott', type:'action', name:'Rántott hús', cost:0, tgt:'ownOrHero', rarity:'k', token:true, text:'Egy saját karaktered vagy a hősöd 3 életet gyógyul.' },
   { id:'a_szulinap', type:'action', name:'Boldog szülinapot Pifti!', cost:6, tgt:'summon', rarity:'r', text:'Három Piftit idéz a szabad helyeidre (ha kevesebb a hely, annyit).' },
   { id:'a_kor', type:'action', name:'Egy pohár víz', cost:0, rarity:'k', token:true, text:'Ebben a körben +1 energiád van. A 3. körödtől játszható ki. Aki másodikként jön, megkapja, mert a kezdés előny.' },
-  /* ===== Egy Éjszaka a Peaches and Creamben (set 'pc', teszt ág, 2026-10-24, Tomi) – „Éjfél után”: a 8. körtől él (kijátszáskor, vagy ha már lent van: a gazdája 8. körének elején egyszer bekapcsol) ===== */
+  /* ===== Egy Éjszaka a Peaches and Creamben (set 'pc', teszt ág, 2026-10-24, Tomi) – „Éjfél után”: a 6. körtől él (kijátszáskor, vagy ha már lent van: a gazdája 6. körének elején egyszer bekapcsol) ===== */
   { id:'c_pc_barna', set:'pc', type:'char', name:'Barna, éjfél után', cost:1, atk:1, hp:2, rarity:'k', haste:true, mid:true, text:'Lendület. Éjfél után: +2/+2.' },
-  { id:'c_pc_tomi', set:'pc', type:'char', name:'Tomi, éjfél után', cost:5, atk:2, hp:4, rarity:'r', mid:true, text:'Éjfél után: maga mellé tesz egy 3 literes Belvederét.' },
+  { id:'c_pc_tomi', set:'pc', type:'char', name:'Tomi, éjfél után', cost:5, atk:2, hp:4, rarity:'r', mid:true, text:'Éjfél után: maga mellé tesz egy Három Literes Belvederét.' },
   { id:'c_pc_krisz', set:'pc', type:'char', name:'Krisz, éjfél után', cost:5, atk:5, hp:2, rarity:'e', mid:true, text:'Éjfél után: Lendület és Izom.' },
   { id:'c_pc_laszy', set:'pc', type:'char', name:'Laszy, éjfél után', cost:1, atk:1, hp:3, rarity:'e', mid:true, text:'Kijátszáskor a kezedbe kerül egy 0,2 Kalinka. Éjfél után: +6/+3, de támadáskor 50% eséllyel a saját hősödet üti.' },
   { id:'c_pc_zoli', set:'pc', type:'char', name:'Gál Zoli, éjfél után', cost:3, atk:2, hp:3, rarity:'r', mid:true, text:'Éjfél után: támadáskor saját magát üti meg. Ha így (vagy bárhogy) meghal, minden ellenséges karakter 3 sebzést kap.' },
   { id:'c_pc_boros', set:'pc', type:'char', name:'Boros, éjfél után', cost:1, atk:2, hp:1, rarity:'k', mid:true, text:'Éjfél után: +2/+2, és kidob egy véletlen ellenséges karaktert (visszakerül a gazdája kezébe).' },
   { id:'c_pc_david', set:'pc', type:'char', name:'Dávid, éjfél után', cost:4, atk:2, hp:3, rarity:'k', mid:true, text:'Éjfél után: +4/+3.' },
   { id:'c_pc_sasi', set:'pc', type:'char', name:'Sasi, éjfél után', cost:2, atk:2, hp:2, rarity:'r', mid:true, text:'Éjfél után: a mellette álló karaktereid +2/+2-t kapnak.' },
-  { id:'c_belvedere', set:'pc', type:'char', name:'3 literes Belvedere', cost:0, atk:0, hp:4, rarity:'r', token:true, noAttack:true, text:'Nem támad. A mellette álló karaktereid +2 támadást kapnak. (Tomi, éjfél után hozza.)' },
+  { id:'c_belvedere', set:'pc', drink:true, noParty:true, type:'char', name:'Három Literes Belvedere', cost:4, atk:0, hp:10, rarity:'l', noAttack:true, text:'Nem támad. Minden köröd végén, a támadás előtt a mellette álló karaktereid +1/+1-et kapnak.' },   /* 2026-10-24 (Tomi): gyűjthető legendás Ital-karakter; Tomi, éjfél után is ezt teszi le */
   { id:'a_kalinka', set:'pc', drink:true, type:'action', name:'0,2 Kalinka', cost:0, tgt:'own', rarity:'k', token:true, noParty:true, text:'Egy karaktered +1/+1.' },
   /* Laszy Kánonja (2026-10-23, Tomi; teszt): három Szolga – 2/2, Provokáció, aki megtámadja, annak a saját eszközeit ellopják és magukra teszik */
   { id:'f_csoves', set:'pc', type:'action', name:'Csövesek és Cigányok', cost:6, rarity:'l', finisher:true, hero:'laszy', tgt:'summon', text:'Három Szolga (2/1, Provokáció) érkezik a szabad helyeidre. Aki megtámadja őket, attól ellopják az eszközeit, és magukra teszik.' },
@@ -200,7 +200,7 @@ const HERO = Object.fromEntries(HEROES.map(h => [h.id, h]));
 const PASSIVE = { firstCharAtk:'barna', endHeal:'gabi', firstTwo:'krisz', itemHp:'tomi', regular:'david', bigHp:'bence', deathPing:'milo', extraDraw:'laci', teamPing:'sasi', wildParty:'laszy', midnightPlus:'laszy' };
 /* Laszy: az „Éjfél után” hatások +1-gyel erősebbek (+1/+1, +1 sebzés vagy +1 gyógyítás) – a Peaches lapok ezt használják: midBonus(p) */
 const midBonus = p => has(p, 'midnightPlus') ? 1 : 0;
-const MIDNIGHT = 8;   /* „Éjfél után”: a 8. körtől (mindkét játékosnál ugyanakkor) */
+const MIDNIGHT = 6;   /* „Éjfél után”: a 6. kör elejétől (mindkét játékosnál ugyanakkor) – 2026-10-24, Tomi (eredetileg 8) */
 const isMidnight = s => Math.ceil(s.half / 2) >= MIDNIGHT;
 function kickOut(s, side, j) {   /* Kidobás: a karakter visszakerül a gazdája kezébe, az eszközei elvesznek */
   const x = s.players[side].board[j]; if (!x) return;
@@ -418,8 +418,6 @@ function effAtk(s, side, i) {
   let a = u.atk + u.temp;
   if (b[i - 1] && b[i - 1].id === 'c_talos') a += 2;
   if (b[i + 1] && b[i + 1].id === 'c_talos') a += 2;
-  if (b[i - 1] && b[i - 1].id === 'c_belvedere') a += 2;
-  if (b[i + 1] && b[i + 1].id === 'c_belvedere') a += 2;
   if (u.id === 'c_norbi' && (b[i - 1] || b[i + 1])) a += 2;   // Lukács Norbi: ha van mellette valaki
   const opp = s.players[1 - side].board[i];
   if (opp && opp.id === 'c_rebi') a -= 1;
@@ -1222,7 +1220,11 @@ function finishTurn(s) {
 
 /* Kör végi hatások a támadások ELŐTT (Vöröslámpás negyed: a soron lévő játékos egy véletlen karaktere végleg +1 támadást kap) */
 function preAttack(s) {
-  if (s.winner != null || !locIs(s, 'l_voros')) return;
+  if (s.winner != null) return;
+  { const pi = s.active, b = s.players[pi].board;   /* Három Literes Belvedere: a köröd végén, támadás előtt a szomszédai +1/+1 */
+    b.forEach((v, j) => { if (!v || bid(v.id) !== 'c_belvedere') return; ev(s, { t:'belvedere', side:pi, i:j });
+      for (const k of [j - 1, j + 1]) { const x = b[k]; if (x && !isFixed(x)) { x.atk += 1; x.hp += 1; x.maxHp += 1; ev(s, { t:'buff', side:pi, i:k, n:1 }); } } }); }
+  if (!locIs(s, 'l_voros')) return;
   const pi = s.active, b = s.players[pi].board, c = b.map((u, i) => u && !isFixed(u) ? i : -1).filter(i => i >= 0);
   if (!c.length) return;
   const i = c[Math.floor(rnd() * c.length)]; b[i].atk += 1; ev(s, { t:'locfx', side:pi, id:'l_voros' }); ev(s, { t:'buff', side:pi, i, n:1 });
