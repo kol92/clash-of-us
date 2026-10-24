@@ -46,4 +46,8 @@ const B = s => s.players[0].board;
   ok(!B(s)[0] && v && v.disc === 1 && h.some(x => x.id === 'i_napszemuveg') && E.cardCost(s, 0, 'c_vajda', v) === 2, 'Ruhatár leadás: karakter + eszköz a kézbe, 1-gyel olcsóbb');
   const t = G(); t.players[0].grave = [{ id: 'c_gyuri', how: 'death' }, { id: 'a_dinnyes', how: 'action' }]; play(t, 0, 'c_pifti', { k: 'slot', side: 0, i: 0 }); t.players[0].hand = [];
   play(t, 0, 'a_ruhatar', { k: 'unit', side: 0, i: 0, o: 1 }); ok(t.players[0].hand.some(x => x.id === 'c_gyuri') && B(t)[0], 'Ruhatár kiváltás: a halott karakter a kézbe'); }
+{ const s = G(); play(s, 1, 'c_vajda', { k: 'slot', side: 1, i: 1 }); play(s, 0, 'c_portas', { k: 'slot', side: 0, i: 0 });
+  ok(!s.players[1].board[1] && s.players[1].hand.some(h => h.id === 'c_vajda'), 'Portás kézből: kidob egy ellenséget');
+  const t = G(); play(t, 1, 'c_vajda', { k: 'slot', side: 1, i: 1 }); play(t, 0, 'c_wcneni', { k: 'slot', side: 0, i: 2 }); play(t, 1, 'a_dinnyes', { k: 'unit', side: 0, i: 2 });
+  ok(t.players[0].board[2] && t.players[0].board[2].id === 'c_portas' && t.players[1].board[1], 'a WC-s néni Portása nem dob ki'); }
 console.log(fails ? 'HIBÁK: ' + fails : 'PEACHES 2 OK');
