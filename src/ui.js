@@ -256,6 +256,7 @@ const ART = {
   c_pc_david: { src:'art/pc_david.webp', av:'40% 25%', pos:'40% 22%' },
   c_pc_sasi:  { src:'art/pc_sasi.webp',  av:'55% 17%', pos:'55% 15%' },
   c_wcneni:   { src:'art/pc_wcneni.webp', av:'45% 22%', pos:'45% 20%' },
+  c_portas:   { src:'art/pc_portas.webp', av:'52% 16%', pos:'52% 14%' },
   c_belvedere:{ src:'art/belvedere.webp', av:'50% 40%', pos:'50% 35%' },
   f_csoves:  { src:'art/f_csoves.webp', av:'40% 22%', pos:'40% 20%' },   /* Laszy Kánonja (teszt) */
   c_szolga1: { src:'art/c_szolga1.webp', av:'50% 30%', pos:'50% 28%' },

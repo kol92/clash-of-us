@@ -2461,7 +2461,7 @@ html:has(body.in-game){overscroll-behavior:none;}
 <script src="vendor/firebase-auth-compat.js"></script>
 <script src="vendor/firebase-firestore-compat.js"></script>
 <script src="vendor/firebase-database-compat.js"></script>
-<script>window.APP_VERSION = "2026.10.24-1356"; window.APP_BUILD = "2026.10.24-1356";</script>
+<script>window.APP_VERSION = "2026.10.24-1403"; window.APP_BUILD = "2026.10.24-1403";</script>
 <script>// ===== Best of Us – saját szerver (Firebase) =====
 // A játék eredetileg a Claude-os tárolót használta (window.claude.use('db' | 'user' | 'room')).
 // Ez a fájl ugyanazt a felületet adja Firebase-ből, így a játék kódja szinte változatlan maradhat:
@@ -2880,7 +2880,7 @@ const CARDS = [
   { id:'c_pc_david', set:'pc', type:'char', name:'Dávid, éjfél után', cost:4, atk:2, hp:3, rarity:'k', mid:true, text:'Éjfél után: +4/+3.' },
   { id:'c_pc_sasi', set:'pc', type:'char', name:'Sasi, éjfél után', cost:2, atk:2, hp:2, rarity:'r', mid:true, text:'Éjfél után: a mellette álló karaktereid +2/+2-t kapnak.' },
   { id:'c_wcneni', set:'pc', type:'char', name:'WC-s néni', cost:5, atk:1, hp:3, rarity:'e', taunt:true, text:'Provokáció. Ha sebzést kap, de túléli, visszaugrik a kezedbe, és a helyére egy 5/5-ös Peaches Portás kerül.' },
-  { id:'c_portas', set:'pc', type:'char', name:'Peaches Portás', cost:0, atk:5, hp:5, rarity:'k', token:true, text:'A WC-s néni hívta.' },
+  { id:'c_portas', set:'pc', type:'char', name:'Peaches Portás', cost:5, atk:5, hp:5, rarity:'k', text:'A WC-s néni is hívja.' },   /* 2026-10-24 (Tomi): gyűjthető gyakori lap is */
   { id:'c_belvedere', set:'pc', drink:true, noParty:true, type:'char', name:'Három Literes Belvedere', cost:4, atk:0, hp:10, rarity:'l', noAttack:true, text:'Nem támad. Minden köröd végén, a támadás előtt a mellette álló karaktereid +1/+1-et kapnak.' },   /* 2026-10-24 (Tomi): gyűjthető legendás Ital-karakter; Tomi, éjfél után is ezt teszi le */
   { id:'a_kalinka', set:'pc', drink:true, type:'action', name:'0,2 Kalinka', cost:0, tgt:'own', rarity:'k', token:true, noParty:true, text:'Egy karaktered +1/+1.' },
   /* Laszy Kánonja (2026-10-23, Tomi; teszt): három Szolga – 2/2, Provokáció, aki megtámadja, annak a saját eszközeit ellopják és magukra teszik */
@@ -4333,6 +4333,7 @@ const ART = {
   c_pc_david: { src:'art/pc_david.webp?v=74c4a46c51bef4f0', av:'40% 25%', pos:'40% 22%' },
   c_pc_sasi:  { src:'art/pc_sasi.webp?v=b10b3291260daee2',  av:'55% 17%', pos:'55% 15%' },
   c_wcneni:   { src:'art/pc_wcneni.webp?v=b405356c48107df5', av:'45% 22%', pos:'45% 20%' },
+  c_portas:   { src:'art/pc_portas.webp?v=c883be4c309abd6a', av:'52% 16%', pos:'52% 14%' },
   c_belvedere:{ src:'art/belvedere.webp?v=a6b5c0a4aebd7d3a', av:'50% 40%', pos:'50% 35%' },
   f_csoves:  { src:'art/f_csoves.webp?v=e93ebd46638af594', av:'40% 22%', pos:'40% 20%' },   /* Laszy Kánonja (teszt) */
   c_szolga1: { src:'art/c_szolga1.webp?v=9e149b858a555840', av:'50% 30%', pos:'50% 28%' },
