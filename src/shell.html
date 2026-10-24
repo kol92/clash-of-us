@@ -2264,6 +2264,11 @@ html:has(body.in-game){overscroll-behavior:none;}
 .mid-title em{display:block;margin-top:8px;font-style:normal;font-weight:700;font-size:15px;color:#cbd5f5;}
 .mid-flash{position:absolute;inset:0;background:#dfe8ff;opacity:0;pointer-events:none;}
 .mid-intro .fin-skip{bottom:calc(5% + env(safe-area-inset-bottom));}
+/* több pack vásárlása (2026-10-24) */
+.pb-box{display:grid;justify-items:center;gap:10px;} .pb-pack .pack{--pw:96px;}
+.pb-opts{display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%;}
+.pb-opt{display:grid;gap:2px;padding:10px 6px;} .pb-opt b{font-size:18px;} .pb-opt small{display:inline-flex;align-items:center;justify-content:center;gap:4px;font-weight:800;}
+.pb-opt[disabled]{opacity:.4;}
 </style>
 
 <div id="app">
