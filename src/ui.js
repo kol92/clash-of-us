@@ -257,6 +257,13 @@ const ART = {
   c_pc_sasi:  { src:'art/pc_sasi.webp',  av:'55% 17%', pos:'55% 15%' },
   c_wcneni:   { src:'art/pc_wcneni.webp', av:'45% 22%', pos:'45% 20%' },
   c_portas:   { src:'art/pc_portas.webp', av:'52% 16%', pos:'52% 14%' },
+  a_lambo:    { src:'art/pc_lambo.webp', pos:'50% 40%' },
+  a_bloody:   { src:'art/pc_bloody.webp', pos:'50% 40%' },
+  a_jager:    { src:'art/pc_jager.webp', pos:'45% 45%' },
+  i_purple:   { src:'art/pc_purple.webp', pos:'50% 50%' },
+  a_ruhatar:  { src:'art/pc_ruhatar.webp', av:'50% 22%', pos:'50% 25%' },
+  a_pezsgo:   { src:'art/pc_pezsgo.webp', pos:'50% 50%' },
+  a_kalinka:  { src:'art/pc_kalinka.webp', pos:'40% 50%' },
   c_belvedere:{ src:'art/belvedere.webp', av:'50% 40%', pos:'50% 35%' },
   f_csoves:  { src:'art/f_csoves.webp', av:'40% 22%', pos:'40% 20%' },   /* Laszy Kánonja (teszt) */
   c_szolga1: { src:'art/c_szolga1.webp', av:'50% 30%', pos:'50% 28%' },
