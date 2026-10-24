@@ -20,7 +20,7 @@ const B = s => s.players[0].board;
 { const s = G(); play(s, 1, 'c_vajda', { k: 'slot', side: 1, i: 2 }); play(s, 0, 'c_pc_boros', { k: 'slot', side: 0, i: 0 });
   ok(!s.players[1].board[2] && s.players[1].hand.some(h => h.id === 'c_vajda') && B(s)[0].atk === 4, 'Boros: +2/+2 és kidobja Vajdát a kezébe'); }
 { const s = G(); play(s, 0, 'c_pc_laszy', { k: 'slot', side: 0, i: 0 }); ok(s.players[0].hand.some(h => h.id === 'a_kalinka') && B(s)[0].atk === 7 && B(s)[0].hp === 6, 'Laszy: Kalinka a kézbe, +6/+3');
-  play(s, 0, 'a_kalinka', { k: 'unit', side: 0, i: 0 }); ok(B(s)[0].atk === 8, 'Kalinka +1/+1');
+  play(s, 0, 'a_kalinka', { k: 'unit', side: 0, i: 0 }); ok(B(s)[0].atk === 9 && B(s)[0].haste, 'Kalinka Laszy, éjfél utánon: +2/+2 és Lendület');
   let own = 0; for (let k = 0; k < 400; k++) { const t = G(); play(t, 0, 'c_pc_laszy', { k: 'slot', side: 0, i: 0 }); B(t)[0].fresh = false; const h = t.players[0].hp; t.events = []; E.runEndTurn(t); if (t.players[0].hp < h) own++; }
   ok(own > 150 && own < 250, `Laszy: ~50% a saját hős (${own}/400)`); }
 { const s = G(); play(s, 1, 'c_vajda', { k: 'slot', side: 1, i: 1 }); play(s, 1, 'c_gyuri', { k: 'slot', side: 1, i: 3 }); play(s, 0, 'c_pc_zoli', { k: 'slot', side: 0, i: 0 }); B(s)[0].fresh = false; B(s)[0].hp = 2;
@@ -30,4 +30,20 @@ const B = s => s.players[0].board;
   ok(B(s)[2] && B(s)[2].id === 'c_portas' && B(s)[2].atk === 5 && p.hand.some(h => h.id === 'c_wcneni'), 'WC-s néni: Provokáció, megütik → kézbe, helyén 5/5 Portás');
   const t = G(); play(t, 0, 'c_wcneni', { k: 'slot', side: 0, i: 1 }); play(t, 1, 'a_abszint', { k: 'unit', side: 0, i: 1 });
   ok(!t.players[0].board[1] && !t.players[0].hand.some(h => h.id === 'c_wcneni'), 'WC-s néni: ha a sebzés megöli, nincs visszaugrás'); }
-console.log(fails ? 'HIBÁK: ' + fails : 'PEACHES OK');
+// 2026-10-24: italok, Purple Card, Ruhatár
+{ const s = G('tomi', 3); play(s, 0, 'c_gyuri', { k: 'slot', side: 0, i: 0 }); play(s, 0, 'a_jager', { k: 'unit', side: 0, i: 0 }); ok(B(s)[0].atk === 4 && !B(s)[0].haste, 'Jäger éjfél előtt +2/+2');
+  const t = G(); play(t, 0, 'c_gyuri', { k: 'slot', side: 0, i: 0 }); play(t, 0, 'a_jager', { k: 'unit', side: 0, i: 0 }); ok(B(t)[0].atk === 5 && B(t)[0].haste, 'Jäger éjfél után +3/+3 + Lendület'); }
+{ const s = G(); play(s, 0, 'c_laszy', { k: 'slot', side: 0, i: 0 }); play(s, 0, 'a_kalinka', { k: 'unit', side: 0, i: 0 }); ok(B(s)[0].atk === 8 && B(s)[0].haste, 'Kalinka Laszyn: +2/+2 és Lendület');
+  play(s, 0, 'c_gyuri', { k: 'slot', side: 0, i: 1 }); play(s, 0, 'a_kalinka', { k: 'unit', side: 0, i: 1 }); ok(B(s)[1].atk === 3, 'Kalinka másnak: +1/+1 (' + B(s).map(u => u && u.id + ':' + u.atk) + ')'); }
+{ const s = G(); s.players[0].turnCards = 0; const h = s.players[0].hand.length; play(s, 0, 'a_lambo', { k: 'none' }); ok(s.players[0].energy === 30, `Lamborghini első lapként: +1 energia (30-1+1=${s.players[0].energy}) és húzás`); }
+{ const s = G(); play(s, 1, 'c_gyuri', { k: 'slot', side: 1, i: 2 }); s.players[0].hp = 10; play(s, 0, 'a_bloody', { k: 'unit', side: 1, i: 2 }); ok(!s.players[1].board[2] && s.players[0].hp === 13, 'Bloody Mary: megöli → +3 élet'); }
+{ const s = G(); s.players[0].charThisTurn = false; play(s, 0, 'c_gyuri', { k: 'slot', side: 0, i: 0 }); s.players[0].charThisTurn = false; play(s, 0, 'a_pezsgo', { k: 'none' });
+  ok(B(s)[0].maxHp === 3 && s.players[0].nextCharDisc === 1 && E.cardCost(s, 0, 'c_vajda') === 2, 'Pezsgő: +1 élet, a következő karakter olcsóbb'); }
+{ const s = G(); play(s, 1, 'c_gyuri', { k: 'slot', side: 1, i: 0 }); play(s, 1, 'i_purple', { k: 'unit', side: 1, i: 0 }); play(s, 0, 'c_pc_boros', { k: 'slot', side: 0, i: 0 });
+  ok(s.players[1].board[0] && s.players[1].board[0].haste, 'Purple Card: nem dobható ki (Boros)'); }
+{ const s = G(); play(s, 0, 'c_vajda', { k: 'slot', side: 0, i: 0 }); play(s, 0, 'i_napszemuveg', { k: 'unit', side: 0, i: 0 }); s.players[0].hand = [];
+  play(s, 0, 'a_ruhatar', { k: 'unit', side: 0, i: 0, o: 0 }); const h = s.players[0].hand, v = h.find(x => x.id === 'c_vajda');
+  ok(!B(s)[0] && v && v.disc === 1 && h.some(x => x.id === 'i_napszemuveg') && E.cardCost(s, 0, 'c_vajda', v) === 2, 'Ruhatár leadás: karakter + eszköz a kézbe, 1-gyel olcsóbb');
+  const t = G(); t.players[0].grave = [{ id: 'c_gyuri', how: 'death' }, { id: 'a_dinnyes', how: 'action' }]; play(t, 0, 'c_pifti', { k: 'slot', side: 0, i: 0 }); t.players[0].hand = [];
+  play(t, 0, 'a_ruhatar', { k: 'unit', side: 0, i: 0, o: 1 }); ok(t.players[0].hand.some(x => x.id === 'c_gyuri') && B(t)[0], 'Ruhatár kiváltás: a halott karakter a kézbe'); }
+console.log(fails ? 'HIBÁK: ' + fails : 'PEACHES 2 OK');

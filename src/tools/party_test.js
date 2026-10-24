@@ -1,7 +1,7 @@
 // Tomi, a parti lelke (2026-10-18): jó italok a saját oldalra, pusztítók az ellenségre; gyógyítás a legsérültebbnek
 const E = require(require('path').join(__dirname, '..', 'engine.js'));
 let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('HIBA:', m); } };
-const GOOD = ['i_energiaital', 'i_vodkakancso', 'i_vodkasa', 'a_mangos', 'a_rehab'], HEAL = ['a_mangos', 'a_rehab'];
+const GOOD = ['i_energiaital', 'i_vodkakancso', 'i_vodkasa', 'a_mangos', 'a_rehab', 'a_jager'], HEAL = ['a_mangos', 'a_rehab'];
 const seen = {};
 for (let k = 0; k < 3000; k++) {
   const s = E.newGame('tomi', E.DECK_OF('tomi'), 'gabi', E.DECK_OF('gabi'), 0); s.events = []; s.active = 0;

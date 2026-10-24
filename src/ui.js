@@ -785,6 +785,8 @@ function logEvents(evs, snap) {
       case 'shield': L(`🛡 ${unitName(e.side, e.i)} pajzsa elnyelte az ütést`); break;
       case 'bounce': L(`↩ ${unitName(e.side, e.i)} visszakerült a kézbe`); break;
       case 'stolen': L(`🫳 ${unitName(e.side, e.i)} átállt a másik oldalra`); break;
+      case 'purple': L(`💜 Peaches Purple Card: ${unitName(e.side, e.i)} nem dobható ki`); break;
+      case 'ruhatar': L(e.o === 1 ? `🧥 Ruhatár: <b class="lc" data-lc="${e.id}">${escH(CARD[e.id].name)}</b> kiváltva – vissza a kézbe` : `🧥 Ruhatár: <b class="lc" data-lc="${e.id}">${escH(CARD[e.id].name)}</b> leadva – a kézbe, 1-gyel olcsóbban`); break;
       case 'wcneni': L(`🚽 A WC-s néni elviharzott (vissza a kézbe) – jön a Peaches Portás!`); break;
       case 'midnightstart': L('🌙 <b>Elmúlt ÉJFÉL</b> – az „Éjfél után” lapok mostantól élnek'); break;
       case 'belvedere': L(`🍾 Három Literes Belvedere: a mellette állók +1/+1`); break;
@@ -1020,6 +1022,8 @@ async function animateEvents(evs) {
       case 'gift': floatAt(anchor, `${e.id === 'i_ing' ? '👔' : e.id === 'i_gomba' ? '🍄' : e.id === 'a_irkave' ? '☕' : '🍗'} ${CARD[e.id].name} a ${e.side === ME ? 'kezedbe' : 'kezébe'}!`, 'info'); hold = Math.max(hold, 700); break;
       case 'drinkgift': floatAt(anchor, e.side === ME ? `🍸 ${CARD[e.id].name} a kezedbe!` : '🍸 Ital a kezébe!', 'info'); hold = Math.max(hold, 700); break;
       case 'deathblast': floatAt(anchor, '💥 Utolsó ütés!', 'dmg'); hold = Math.max(hold, 450); break;
+      case 'purple': floatAt(anchor, '💜 VIP – nem dobható ki!', 'buff'); hold = Math.max(hold, 600); break;
+      case 'ruhatar': if (e.i >= 0) { fx(el, e.side === ME ? 'fx-bounce-down' : 'fx-bounce-up'); floatAt(anchor, '🧥 Ruhatárba!', 'info'); } hold = Math.max(hold, 600); break;
       case 'wcneni': fx(el, e.side === ME ? 'fx-bounce-down' : 'fx-bounce-up'); floatAt(anchor, '🚽 „Na majd adok én neked!”', 'info'); hold = Math.max(hold, 900); break;
       case 'midnightstart': await midnightIntro(); break;
       case 'zap': await zapFx(e); break;
@@ -1356,7 +1360,7 @@ function render() {
   const h = $('#hand');
   if (!ui.drag) {
   setHTML(h, hand.length ? hand.map((c, i) => cardHTML(c.id, {
-    cost: cardCost(S, ME, c.id), foil: !!c.foil,
+    cost: cardCost(S, ME, c.id, c), foil: !!c.foil,
     cls: (ui.sel === i ? 'sel' : '') + (myTurn && canPlay(S, ME, i) ? ' ok' : myTurn || S.active !== ME ? ' dim' : ''),   // az ellenfél körében a kéz elsötétül
     attrs: `data-hi="${i}" data-uid="${c.uid}" role="button" tabindex="0" aria-label="${CARD[c.id].name}${ui.sel === i ? ', kijelölve' : myTurn && canPlay(S, ME, i) ? ', kijátszható' : ''}"` })).join('') : '<span class="hand-empty">Üres a kezed</span>');
   const cw = parseFloat(getComputedStyle(h.querySelector('.card') || h).getPropertyValue('--cw')) || 82;
@@ -1408,7 +1412,7 @@ function openPreview(i, el) {
   if (ui.pend != null) { ui.sel = null; ui.pend = null; render(); }
   const why = whyNot(S, ME, i);
   const canDrag = !why && !busy && S.active === ME;
-  openModal(cardHTML(h.id, { big: true, foil: !!h.foil, cost: cardCost(S, ME, h.id), attrs: canDrag ? 'data-drag="1"' : '' }),
+  openModal(cardHTML(h.id, { big: true, foil: !!h.foil, cost: cardCost(S, ME, h.id, h), attrs: canDrag ? 'data-drag="1"' : '' }),
     why ? `${why}.` : 'Kijátszáshoz húzd fel ezt a lapot a táblára (vagy a kezedből).', cardHelpHTML(h.id));
   if (canDrag) {
     const ov = $('#layer').lastElementChild, big = ov.querySelector('.card');
