@@ -214,7 +214,7 @@ function kickOut(s, side, j) {   /* Kidobás: a karakter visszakerül a gazdája
   const x = s.players[side].board[j]; if (!x) return;
   if ((x.items || []).includes('i_purple')) { ev(s, { t:'purple', side, i:j }); return; }   /* Peaches Purple Card: nem dobható ki */
   reveal(s, side, j); s.players[side].board[j] = null; ev(s, { t:'kickout', side, i:j, id:x.id }); buryItems(s, side, x);
-  if (!CARD[x.id].token) addToHand(s, side, x.id, x.foil);
+  if (!CARD[x.id].token && addToHand(s, side, x.id, x.foil)) { const h = s.players[side].hand[s.players[side].hand.length - 1]; h.kickN = (x.kickN || 0) + 1; ev(s, { t:'kickcost', side, i:-1, id:x.id, n:h.kickN }); }   /* minden kidobás után 1-gyel drágább (2026-10-24, Tomi) */
 }
 function midOn(s, pi, j) {   /* egy „Éjfél után” karakter bekapcsol (egyszer); Laszy hősnél +1-gyel erősebb */
   const p = s.players[pi], u = p.board[j]; if (!u || !CARD[u.id].mid || u.midOn) return; u.midOn = true;
@@ -412,7 +412,7 @@ function startTurn(s) {
 }
 
 function cardCost(s, pi, id, h) {
-  const c = CARD[id], p = s.players[pi]; let v = c.cost - ((h && h.disc) || 0);   /* Ruhatár: a kézbe visszakerült lap olcsóbb */
+  const c = CARD[id], p = s.players[pi]; let v = c.cost - ((h && h.disc) || 0) + ((h && h.kickN) || 0);   /* Ruhatár: a kézbe visszakerült lap olcsóbb */
   if (c.type === 'char' && p.nextCharDisc) v -= p.nextCharDisc;   /* Welcome Pezsgő */
   if (id === 'a_kor') return 0;   /* Egy pohár víz: mindig ingyenes – a Budapest Park drágítása miatt eddig 1-be került, és nem adott semmit (2026-10-18, Peti) */
   if (locIs(s, 'l_park') && !isReg(s, pi)) v++;
@@ -533,7 +533,7 @@ function playCard(s, pi, hi, t) {
     if (!p.drinkDraw && p.board.some(x => x && x.id === 'c_laczko')) { p.drinkDraw = true; const j = p.board.findIndex(x => x && x.id === 'c_laczko'); ev(s, { t:'drinkdraw', side:pi, i:j }); draw(s, pi); }
   }
   if (c.type === 'char') {
-    const u = makeUnit(s, c.id, pi); if (h.foil) u.foil = true;
+    const u = makeUnit(s, c.id, pi); if (h.foil) u.foil = true; if (h.kickN) u.kickN = h.kickN;
     if (c.enemySide) { u.owner = pi; e.board[t.i] = u; ev(s, { t:'pipa', side:ei, i:t.i }); }   /* Barna vízipipája: az ellenfélhez kerül */
     else { p.board[t.i] = u; p.lastPlaced = u.uid; }   // a Cápa erre vadászik
     if (has(p, 'firstCharAtk') && !p.charThisTurn && c.id !== 'c_korso' && !c.enemySide && c.cost <= 2) { u.atk += 1; ev(s, { t:'passive', side:pi, k:'firstCharAtk', id:c.id }); ev(s, { t:'buff', side:pi, i:t.i }); }

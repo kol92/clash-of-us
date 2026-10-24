@@ -48,6 +48,11 @@ const B = s => s.players[0].board;
   play(t, 0, 'a_ruhatar', { k: 'unit', side: 0, i: 0, o: 1 }); ok(t.players[0].hand.some(x => x.id === 'c_gyuri') && B(t)[0], 'Ruhatár kiváltás: a halott karakter a kézbe'); }
 { const s = G(); play(s, 1, 'c_vajda', { k: 'slot', side: 1, i: 1 }); play(s, 0, 'c_portas', { k: 'slot', side: 0, i: 0 });
   ok(!s.players[1].board[1] && s.players[1].hand.some(h => h.id === 'c_vajda'), 'Portás kézből: kidob egy ellenséget');
-  const t = G(); play(t, 1, 'c_vajda', { k: 'slot', side: 1, i: 1 }); play(t, 0, 'c_wcneni', { k: 'slot', side: 0, i: 2 }); play(t, 1, 'a_dinnyes', { k: 'unit', side: 0, i: 2 });
+  const v = s.players[1].hand.find(h => h.id === 'c_vajda'); ok(v.kickN === 1 && E.cardCost(s, 1, 'c_vajda', v) === 4, 'kidobott lap 1-gyel drágább');
+  play(s, 1, 'c_vajda', { k: 'slot', side: 1, i: 3 }); s.players[1].hand = s.players[1].hand.filter(h => h !== v); s.players[1].hand.unshift({ ...v, uid: 1234 }); s.players[1].hand.shift();
+  { const s2 = G(); play(s2, 1, 'c_vajda', { k: 'slot', side: 1, i: 1 }); play(s2, 0, 'c_portas', { k: 'slot', side: 0, i: 0 }); const h1 = s2.players[1].hand.find(h => h.id === 'c_vajda');
+    s2.active = 1; s2.players[1].energy = 30; const hi = s2.players[1].hand.indexOf(h1); E.playCard(s2, 1, hi, { k: 'slot', side: 1, i: 2 }); s2.active = 0; s2.players[0].board[0] = null;
+    play(s2, 0, 'c_portas', { k: 'slot', side: 0, i: 0 }); const h2 = s2.players[1].hand.find(h => h.id === 'c_vajda'); ok(h2 && h2.kickN === 2 && E.cardCost(s2, 1, 'c_vajda', h2) === 5, 'másodszor kidobva 2-vel drágább'); }
+  const t = G(); play(t, 1, 'c_vajda', { k: 'slot', side: 1, i: 1 }); play(t, 0, 'c_wcneni', { k: 'slot', side: 0, i: 2 }); play(t, 1, 'c_gyuri', { k: 'slot', side: 1, i: 0 }); t.players[1].board[0].fresh = false; t.active = 1; E.runEndTurn(t);
   ok(t.players[0].board[2] && t.players[0].board[2].id === 'c_portas' && t.players[1].board[1], 'a WC-s néni Portása nem dob ki'); }
 console.log(fails ? 'HIBÁK: ' + fails : 'PEACHES 2 OK');

@@ -798,6 +798,7 @@ function logEvents(evs, snap) {
       case 'midnightstart': L('🌙 <b>Elmúlt ÉJFÉL</b> – az „Éjfél után” lapok mostantól élnek'); break;
       case 'belvedere': L(`🍾 Három Literes Belvedere: a mellette állók +1/+1`); break;
       case 'midnight': L(`🌙 Éjfél után: <b class="lc" data-lc="${e.id}">${escH(CARD[e.id].name)}</b> bekapcsolt${e.b ? ' (Laszy: +1)' : ''}`); break;
+      case 'kickcost': L(`💸 ${e.side === ME ? 'A' : 'Az ellenfél'} <b class="lc" data-lc="${e.id}">${escH(CARD[e.id].name)}</b> lapja mostantól +${e.n} energiába kerül`); break;
       case 'kickout': L(`🚪 Kidobták: <b class="lc" data-lc="${e.id}">${escH(CARD[e.id].name)}</b> (vissza a kézbe)`); break;
       case 'zoliblast': L(`💥 Gál Zoli kidőlt: ${e.n} sebzés minden ellenséges karakternek`); break;
       case 'itemsteal': L(`🫳 ${unitName(e.side, e.i)} ellopta: ${e.ids.map(id => `<b class="lc" data-lc="${id}">${escH(CARD[id].name)}</b>`).join(', ')} (${unitName(e.from.side, e.from.i)} eszköz${e.ids.length > 1 ? 'ei' : 'e'})`); break;
