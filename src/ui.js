@@ -255,6 +255,7 @@ const ART = {
   c_pc_boros: { src:'art/pc_boros.webp', av:'40% 20%', pos:'40% 18%' },
   c_pc_david: { src:'art/pc_david.webp', av:'40% 25%', pos:'40% 22%' },
   c_pc_sasi:  { src:'art/pc_sasi.webp',  av:'55% 17%', pos:'55% 15%' },
+  c_wcneni:   { src:'art/pc_wcneni.webp', av:'45% 22%', pos:'45% 20%' },
   c_belvedere:{ src:'art/belvedere.webp', av:'50% 40%', pos:'50% 35%' },
   f_csoves:  { src:'art/f_csoves.webp', av:'40% 22%', pos:'40% 20%' },   /* Laszy Kánonja (teszt) */
   c_szolga1: { src:'art/c_szolga1.webp', av:'50% 30%', pos:'50% 28%' },
@@ -783,6 +784,7 @@ function logEvents(evs, snap) {
       case 'shield': L(`🛡 ${unitName(e.side, e.i)} pajzsa elnyelte az ütést`); break;
       case 'bounce': L(`↩ ${unitName(e.side, e.i)} visszakerült a kézbe`); break;
       case 'stolen': L(`🫳 ${unitName(e.side, e.i)} átállt a másik oldalra`); break;
+      case 'wcneni': L(`🚽 A WC-s néni elviharzott (vissza a kézbe) – jön a Peaches Portás!`); break;
       case 'midnightstart': L('🌙 <b>Elmúlt ÉJFÉL</b> – az „Éjfél után” lapok mostantól élnek'); break;
       case 'belvedere': L(`🍾 Három Literes Belvedere: a mellette állók +1/+1`); break;
       case 'midnight': L(`🌙 Éjfél után: <b class="lc" data-lc="${e.id}">${escH(CARD[e.id].name)}</b> bekapcsolt${e.b ? ' (Laszy: +1)' : ''}`); break;
@@ -1017,6 +1019,7 @@ async function animateEvents(evs) {
       case 'gift': floatAt(anchor, `${e.id === 'i_ing' ? '👔' : e.id === 'i_gomba' ? '🍄' : e.id === 'a_irkave' ? '☕' : '🍗'} ${CARD[e.id].name} a ${e.side === ME ? 'kezedbe' : 'kezébe'}!`, 'info'); hold = Math.max(hold, 700); break;
       case 'drinkgift': floatAt(anchor, e.side === ME ? `🍸 ${CARD[e.id].name} a kezedbe!` : '🍸 Ital a kezébe!', 'info'); hold = Math.max(hold, 700); break;
       case 'deathblast': floatAt(anchor, '💥 Utolsó ütés!', 'dmg'); hold = Math.max(hold, 450); break;
+      case 'wcneni': fx(el, e.side === ME ? 'fx-bounce-down' : 'fx-bounce-up'); floatAt(anchor, '🚽 „Na majd adok én neked!”', 'info'); hold = Math.max(hold, 900); break;
       case 'midnightstart': await midnightIntro(); break;
       case 'zap': await zapFx(e); break;
       case 'party': await partyFx(e); break;

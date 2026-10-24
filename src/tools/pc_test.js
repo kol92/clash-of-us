@@ -25,4 +25,9 @@ const B = s => s.players[0].board;
   ok(own > 150 && own < 250, `Laszy: ~50% a saját hős (${own}/400)`); }
 { const s = G(); play(s, 1, 'c_vajda', { k: 'slot', side: 1, i: 1 }); play(s, 1, 'c_gyuri', { k: 'slot', side: 1, i: 3 }); play(s, 0, 'c_pc_zoli', { k: 'slot', side: 0, i: 0 }); B(s)[0].fresh = false; B(s)[0].hp = 2;
   E.runEndTurn(s); ok(!B(s)[0] && s.players[1].board[1].hp === 1 && !s.players[1].board[3], `Zoli: magát üti, meghal, 3 sebzés minden ellenségnek (Vajda ${s.players[1].board[1] && s.players[1].board[1].hp})`); }
+{ const s = G(); play(s, 0, 'c_wcneni', { k: 'slot', side: 0, i: 2 }); play(s, 1, 'c_gyuri', { k: 'slot', side: 1, i: 0 }); s.players[1].board[0].fresh = false;
+  s.active = 1; E.runEndTurn(s); const p = s.players[0];
+  ok(B(s)[2] && B(s)[2].id === 'c_portas' && B(s)[2].atk === 5 && p.hand.some(h => h.id === 'c_wcneni'), 'WC-s néni: Provokáció, megütik → kézbe, helyén 5/5 Portás');
+  const t = G(); play(t, 0, 'c_wcneni', { k: 'slot', side: 0, i: 1 }); play(t, 1, 'a_abszint', { k: 'unit', side: 0, i: 1 });
+  ok(!t.players[0].board[1] && !t.players[0].hand.some(h => h.id === 'c_wcneni'), 'WC-s néni: ha a sebzés megöli, nincs visszaugrás'); }
 console.log(fails ? 'HIBÁK: ' + fails : 'PEACHES OK');

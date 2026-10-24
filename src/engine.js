@@ -158,6 +158,8 @@ const CARDS = [
   { id:'c_pc_boros', set:'pc', type:'char', name:'Boros, éjfél után', cost:1, atk:2, hp:1, rarity:'k', mid:true, text:'Éjfél után: +2/+2, és kidob egy véletlen ellenséges karaktert (visszakerül a gazdája kezébe).' },
   { id:'c_pc_david', set:'pc', type:'char', name:'Dávid, éjfél után', cost:4, atk:2, hp:3, rarity:'k', mid:true, text:'Éjfél után: +4/+3.' },
   { id:'c_pc_sasi', set:'pc', type:'char', name:'Sasi, éjfél után', cost:2, atk:2, hp:2, rarity:'r', mid:true, text:'Éjfél után: a mellette álló karaktereid +2/+2-t kapnak.' },
+  { id:'c_wcneni', set:'pc', type:'char', name:'WC-s néni', cost:5, atk:1, hp:3, rarity:'e', taunt:true, text:'Provokáció. Ha sebzést kap, de túléli, visszaugrik a kezedbe, és a helyére egy 5/5-ös Peaches Portás kerül.' },
+  { id:'c_portas', set:'pc', type:'char', name:'Peaches Portás', cost:0, atk:5, hp:5, rarity:'k', token:true, text:'A WC-s néni hívta.' },
   { id:'c_belvedere', set:'pc', drink:true, noParty:true, type:'char', name:'Három Literes Belvedere', cost:4, atk:0, hp:10, rarity:'l', noAttack:true, text:'Nem támad. Minden köröd végén, a támadás előtt a mellette álló karaktereid +1/+1-et kapnak.' },   /* 2026-10-24 (Tomi): gyűjthető legendás Ital-karakter; Tomi, éjfél után is ezt teszi le */
   { id:'a_kalinka', set:'pc', drink:true, type:'action', name:'0,2 Kalinka', cost:0, tgt:'own', rarity:'k', token:true, noParty:true, text:'Egy karaktered +1/+1.' },
   /* Laszy Kánonja (2026-10-23, Tomi; teszt): három Szolga – 2/2, Provokáció, aki megtámadja, annak a saját eszközeit ellopják és magukra teszik */
@@ -927,6 +929,7 @@ function damageUnit(s, side, i, n) {
   reveal(s, side, i);
   if (u.shield) { u.shield = false; ev(s, { t:'shield', side, i }); return; }
   n = boost(s, n, side); u.hp -= n; ev(s, { t:'dmg', side, i, n });
+  if (bid(u.id) === 'c_wcneni') u.wcHit = true;   /* WC-s néni: ha túléli, a cleanup visszaküldi a kézbe, helyére Portás jön */
 }
 function healUnit(s, side, i, n) {
   const u = s.players[side].board[i]; if (!u) return;
@@ -945,6 +948,11 @@ function cleanup(s) {
     let any = false;
     for (const side of [0, 1]) {
       const p = s.players[side];
+      p.board.forEach((u, i) => {   /* WC-s néni (Peaches, 2026-10-24): sebzést kapott, de él → vissza a gazdája kezébe, a helyére egy 5/5-ös Peaches Portás */
+        if (!u || !u.wcHit) return; u.wcHit = false; if (u.hp <= 0) return;
+        p.board[i] = null; buryItems(s, side, u); ev(s, { t:'wcneni', side, i }); addToHand(s, side, u.id, u.foil);
+        const g = makeUnit(s, 'c_portas', side); p.board[i] = g; ev(s, { t:'summon', side, i, id:'c_portas' });
+      });
       p.board.forEach((u, i) => {
         if (u && u.hp <= 0 && kwC(u, 'revive') && !u.revived) {   // Feltámadás (Gabi, a legyőzhetetlen; Bence, Amszterdam terrorja): egyszer feléled a helyén 1 élettel
           any = true; buryItems(s, side, u);
