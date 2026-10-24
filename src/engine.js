@@ -160,6 +160,11 @@ const CARDS = [
   { id:'c_pc_sasi', set:'pc', type:'char', name:'Sasi, éjfél után', cost:2, atk:2, hp:2, rarity:'r', mid:true, text:'Éjfél után: a mellette álló karaktereid +2/+2-t kapnak.' },
   { id:'c_wcneni', set:'pc', type:'char', name:'WC-s néni', cost:5, atk:1, hp:3, rarity:'e', taunt:true, text:'Provokáció. Ha sebzést kap, de túléli, visszaugrik a kezedbe, és a helyére egy 5/5-ös Peaches Portás kerül.' },
   { id:'c_portas', set:'pc', type:'char', name:'Peaches Portás', cost:5, atk:5, hp:5, rarity:'k', text:'Kijátszáskor kidob egy véletlen ellenséges karaktert (vissza a gazdája kezébe). A WC-s néni is hívja – akkor nem dob ki senkit.' },   /* 2026-10-24 (Tomi): gyűjthető gyakori lap is */
+  { id:'c_pg', set:'pc', type:'char', name:'P.G.', cost:5, atk:5, hp:4, rarity:'e', mid:true, text:'Kijátszáskor kidob egy véletlen ellenséges karaktert. Éjfél után: +2/+1, és még egyet kidob.' },
+  { id:'l_peaches', set:'pc', type:'loc', name:'Peaches and Cream', cost:3, rarity:'k', text:'Minden kör elején a soron lévő játékos kezébe egy véletlen Ital kerül.' },
+  { id:'l_vip', set:'pc', type:'loc', name:'VIP szoba', cost:3, rarity:'r', text:'Csak annak hat, aki kijátszotta: a karaktereit nem lehet kidobni.' },
+  { id:'l_csirkes', set:'pc', type:'loc', name:'A Csirkés', cost:5, rarity:'e', text:'Csak annak hat, aki kijátszotta: a köre végén a hőse 2 életet gyógyul.' },
+  { id:'f_korlatlan', set:'pc', type:'action', name:'Korlátlan italfogyasztás', cost:6, rarity:'l', finisher:true, tgt:'none', text:'Három véletlen Ital kerül a kezedbe – mind csak 1 energiába kerül, bármilyen ital is az.' },
   { id:'c_belvedere', set:'pc', drink:true, noParty:true, type:'char', name:'Három Literes Belvedere', cost:4, atk:0, hp:10, rarity:'l', noAttack:true, text:'Nem támad. Minden köröd végén, a támadás előtt a mellette álló karaktereid +1/+1-et kapnak.' },   /* 2026-10-24 (Tomi): gyűjthető legendás Ital-karakter; Tomi, éjfél után is ezt teszi le */
   { id:'a_kalinka', set:'pc', drink:true, type:'action', name:'0,2 Kalinka', cost:0, tgt:'own', rarity:'k', noParty:true, text:'Egy karaktered +1/+1. Ha Laszy issza meg: +2/+2 és Lendület.' },
   { id:'a_jager', set:'pc', drink:true, type:'action', name:'Jägermeister', cost:2, tgt:'own', rarity:'r', text:'Egy karaktered +2/+2. Éjfél után: helyette +3/+3 és Lendület.' },
@@ -210,8 +215,11 @@ const PASSIVE = { firstCharAtk:'barna', endHeal:'gabi', firstTwo:'krisz', itemHp
 const midBonus = p => has(p, 'midnightPlus') ? 1 : 0;
 const MIDNIGHT = 6;   /* „Éjfél után”: a 6. kör elejétől (mindkét játékosnál ugyanakkor) – 2026-10-24, Tomi (eredetileg 8) */
 const isMidnight = s => Math.ceil(s.half / 2) >= MIDNIGHT;
+const DRINK_POOL = () => CARDS.filter(x => x.drink && x.type !== 'char' && !x.variantOf && !x.token && !x.off).map(x => x.id);   /* Peaches helyszín, Korlátlan italfogyasztás */
+const locOwn = (s, id, pi) => locIs(s, id) && (s.location.owner === pi || isReg(s, pi));
 function kickOut(s, side, j) {   /* Kidobás: a karakter visszakerül a gazdája kezébe, az eszközei elvesznek */
   const x = s.players[side].board[j]; if (!x) return;
+  if (locOwn(s, 'l_vip', side)) { ev(s, { t:'locfx', side, id:'l_vip' }); return; }   /* VIP szoba: a tulajdonosát nem lehet kidobni */
   if ((x.items || []).includes('i_purple')) { ev(s, { t:'purple', side, i:j }); return; }   /* Peaches Purple Card: nem dobható ki */
   reveal(s, side, j); s.players[side].board[j] = null; ev(s, { t:'kickout', side, i:j, id:x.id }); buryItems(s, side, x);
   if (!CARD[x.id].token && addToHand(s, side, x.id, x.foil)) { const h = s.players[side].hand[s.players[side].hand.length - 1]; h.kickN = (x.kickN || 0) + 1; ev(s, { t:'kickcost', side, i:-1, id:x.id, n:h.kickN }); }   /* minden kidobás után 1-gyel drágább (2026-10-24, Tomi) */
@@ -228,6 +236,7 @@ function midOn(s, pi, j) {   /* egy „Éjfél után” karakter bekapcsol (egys
   else if (id === 'c_pc_boros') { up(2 + b, 2 + b);
     const e = other(pi), c = s.players[e].board.map((x, k) => x && !isFixed(x) && !isEl(x) ? k : -1).filter(k => k >= 0);
     if (c.length) kickOut(s, e, c[Math.floor(rnd() * c.length)]); }
+  else if (id === 'c_pg') { up(2 + b, 1 + b); const e2 = other(pi), c2 = s.players[e2].board.map((x, k) => x && !isFixed(x) && !isEl(x) ? k : -1).filter(k => k >= 0); if (c2.length) kickOut(s, e2, c2[Math.floor(rnd() * c2.length)]); }
   else if (id === 'c_pc_sasi') { for (const k of [j - 1, j + 1]) { const x = p.board[k]; if (x && !isFixed(x)) { x.atk += 2 + b; x.hp += 2 + b; x.maxHp += 2 + b; ev(s, { t:'buff', side:pi, i:k }); } } }
   else if (id === 'c_pc_tomi') { const k = [j - 1, j + 1].find(k => k >= 0 && k < LANES && !p.board[k] && !closedLane(s, pi, k));
     if (k != null) { const v = makeUnit(s, 'c_belvedere', pi); if (b) { v.hp += b; v.maxHp += b; } p.board[k] = v; ev(s, { t:'summon', side:pi, i:k, id:'c_belvedere' }); } }
@@ -407,6 +416,7 @@ function startTurn(s) {
   sharkSwim(s, pi);
   if (has(p, 'extraDraw') && p.turns % 3 === 0) { ev(s, { t:'passive', side:pi, k:'extraDraw' }); draw(s, pi); }
   if (s.half === 2 * MIDNIGHT - 1) ev(s, { t:'midnightstart', side:pi, i:-1 });   /* „Elmúlt ÉJFÉL” – a 6. kör legelején, egyszer (2026-10-24, Tomi) */
+  if (locIs(s, 'l_peaches')) { const D = DRINK_POOL(), d = D[Math.floor(rnd() * D.length)]; ev(s, { t:'locfx', side:pi, id:'l_peaches' }); ev(s, { t:'drinkgift', side:pi, i:-1, id:d }); addToHand(s, pi, d); }   /* Peaches and Cream helyszín */
   if (isMidnight(s)) { p.board.forEach((u, j) => { if (u && CARD[u.id].mid && !u.midOn) midOn(s, pi, j); }); cleanup(s); }   /* éjfélkor a lent lévő Éjfél után lapok bekapcsolnak */
   checkWin(s);
 }
@@ -414,7 +424,8 @@ function startTurn(s) {
 function cardCost(s, pi, id, h) {
   const c = CARD[id], p = s.players[pi]; let v = c.cost - ((h && h.disc) || 0) + ((h && h.kickN) || 0);   /* Ruhatár: a kézbe visszakerült lap olcsóbb */
   if (c.type === 'char' && p.nextCharDisc) v -= p.nextCharDisc;   /* Welcome Pezsgő */
-  if (id === 'a_kor') return 0;   /* Egy pohár víz: mindig ingyenes – a Budapest Park drágítása miatt eddig 1-be került, és nem adott semmit (2026-10-18, Peti) */
+  if (id === 'a_kor') return 0;
+  if (h && h.fix != null) return h.fix;   /* Korlátlan italfogyasztás: 1 energia */   /* Egy pohár víz: mindig ingyenes – a Budapest Park drágítása miatt eddig 1-be került, és nem adott semmit (2026-10-18, Peti) */
   if (locIs(s, 'l_park') && !isReg(s, pi)) v++;
   if (locIs(s, 'l_barhole')) v -= isReg(s, pi) ? 2 : 1;
   if (locIs(s, 'l_munkahely')) v += s.location.owner === pi ? -1 : 1;   // Dávid kánon eseménye
@@ -555,6 +566,7 @@ function playCard(s, pi, hi, t) {
     }
     if (bid(c.id) === 'c_sasimeselo') draw(s, pi);
     if (c.id === 'c_ah_barna') { ev(s, { t:'gift', side:pi, i:t.i, id:'i_gomba' }); addToHand(s, pi, 'i_gomba'); }   /* 2026-10-22 (Tomi): kézbe, nem a pakliba */
+    if (c.id === 'c_pg') { const c2 = e.board.map((x, k) => x && !isFixed(x) && !isEl(x) ? k : -1).filter(k => k >= 0); if (c2.length) kickOut(s, ei, c2[Math.floor(rnd() * c2.length)]); }   /* P.G.: kidob */
     if (c.id === 'c_portas') { const c2 = e.board.map((x, k) => x && !isFixed(x) && !isEl(x) ? k : -1).filter(k => k >= 0);   /* Peaches Portás: kézből kijátszva kidob egy véletlen ellenséget (a WC-s néni által hívott nem) */
       if (c2.length) kickOut(s, ei, c2[Math.floor(rnd() * c2.length)]); }
     if (c.id === 'c_pc_laszy') { ev(s, { t:'gift', side:pi, i:t.i, id:'a_kalinka' }); addToHand(s, pi, 'a_kalinka'); }
@@ -853,6 +865,7 @@ function playCard(s, pi, hi, t) {
         if (x && !isFixed(x)) { reveal(s, ei, j); ev(s, { t:'chomp', side:ei, i:j, from:-1 }); x.shield = false; x.hp = 0; cleanup(s); }
         if (!e.board[j]) { const u = makeUnit(s, 'c_capa', ei); u.owner = pi; u.fresh = false; u.swims = 4; e.board[j] = u; ev(s, { t:'summon', side:ei, i:j, id:'c_capa' }); }
         break; }
+      case 'f_korlatlan': { const D = DRINK_POOL(); for (let k = 0; k < 3; k++) { const d = D[Math.floor(rnd() * D.length)]; if (addToHand(s, pi, d)) p.hand[p.hand.length - 1].fix = 1; ev(s, { t:'drinkgift', side:pi, i:-1, id:d }); } break; }
       case 'a_kalinka': { const x = p.board[t.i]; if (!x) break; const lz = ['c_laszy', 'c_pc_laszy'].includes(bid(x.id)), n = lz ? 2 : 1;
         x.atk += n; x.hp += n; x.maxHp += n; if (lz) { x.haste = true; ev(s, { t:'boon', side:pi, i:t.i, b:'haste' }); } ev(s, { t:'buff', side:pi, i:t.i }); break; }   /* Laszy egy húzásra megissza: +2/+2 és Lendület */
       case 'a_jager': { const x = p.board[t.i]; if (!x) break; const m = isMidnight(s), n = m ? 3 + midBonus(p) : 2;
@@ -1236,6 +1249,7 @@ function finishTurn(s) {
     cleanup(s); checkWin(s);
   }
   if (locIs(s, 'l_morisson') && !isReg(s, pi) && p.board.some(u => u)) { ev(s, { t:'locfx', side:pi, id:'l_morisson' }); p.board.forEach((u, i) => { if (u) damageUnit(s, pi, i, 1); }); }
+  if (locOwn(s, 'l_csirkes', pi) && s.winner == null) { ev(s, { t:'locfx', side:pi, id:'l_csirkes' }); healHero(s, pi, 2); }   /* A Csirkés */
   if (locIs(s, 'l_korhaz') && p.board.some(u => u)) { ev(s, { t:'locfx', side:pi, id:'l_korhaz' }); p.board.forEach((u, i) => { if (u) healUnit(s, pi, i, isReg(s, pi) ? 2 : 1); }); }
   p.board.forEach((u, i) => { if (u && u.stun) { u.stun--; if (!u.stun) { if (u.items.includes('i_buffalo')) { u.items = u.items.filter(x => x !== 'i_buffalo'); u.foe = (u.foe || []).filter(x => x !== 'i_buffalo'); bury(s, other(pi), 'i_buffalo', 'item'); } ev(s, { t:'unstun', side:pi, i }); } } });
   // Vodka Kancsó: a mostani támadás után a következő saját körében bénult

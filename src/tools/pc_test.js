@@ -55,4 +55,17 @@ const B = s => s.players[0].board;
     play(s2, 0, 'c_portas', { k: 'slot', side: 0, i: 0 }); const h2 = s2.players[1].hand.find(h => h.id === 'c_vajda'); ok(h2 && h2.kickN === 2 && E.cardCost(s2, 1, 'c_vajda', h2) === 5, 'másodszor kidobva 2-vel drágább'); }
   const t = G(); play(t, 1, 'c_vajda', { k: 'slot', side: 1, i: 1 }); play(t, 0, 'c_wcneni', { k: 'slot', side: 0, i: 2 }); play(t, 1, 'c_gyuri', { k: 'slot', side: 1, i: 0 }); t.players[1].board[0].fresh = false; t.active = 1; E.runEndTurn(t);
   ok(t.players[0].board[2] && t.players[0].board[2].id === 'c_portas' && t.players[1].board[1], 'a WC-s néni Portása nem dob ki'); }
+// 2026-10-24 este: P.G., helyszínek, Korlátlan italfogyasztás
+{ const s = G('tomi', 3); play(s, 1, 'c_vajda', { k: 'slot', side: 1, i: 0 }); play(s, 1, 'c_gyuri', { k: 'slot', side: 1, i: 1 }); play(s, 0, 'c_pg', { k: 'slot', side: 0, i: 2 });
+  ok(s.players[1].board.filter(Boolean).length === 1 && B(s)[2].atk === 5, 'P.G. éjfél előtt: 1 kidobás, 5/4');
+  const t = G(); play(t, 1, 'c_vajda', { k: 'slot', side: 1, i: 0 }); play(t, 1, 'c_gyuri', { k: 'slot', side: 1, i: 1 }); play(t, 0, 'c_pg', { k: 'slot', side: 0, i: 2 });
+  ok(t.players[1].board.filter(Boolean).length === 0 && B(t)[2].atk === 7 && B(t)[2].hp === 5, 'P.G. éjfél után: 2 kidobás, 7/5'); }
+{ const s = G(); play(s, 0, 'l_vip', { k: 'none' }); play(s, 0, 'c_gyuri', { k: 'slot', side: 0, i: 0 }); play(s, 1, 'c_portas', { k: 'slot', side: 1, i: 0 });
+  ok(B(s)[0] && B(s)[0].id === 'c_gyuri', 'VIP szoba: a tulajdonosát nem dobják ki');
+  play(s, 1, 'c_vajda', { k: 'slot', side: 1, i: 1 }); play(s, 0, 'c_portas', { k: 'slot', side: 0, i: 3 }); ok(s.players[1].board.filter(Boolean).length === 1, 'VIP szoba: az ellenfelét igen'); }
+{ const s = G(); play(s, 0, 'l_csirkes', { k: 'none' }); s.players[0].hp = 10; s.players[1].hp = 10; s.active = 0; E.runEndTurn(s); ok(s.players[0].hp === 12, 'A Csirkés: a köröd végén +2');
+  s.active = 1; E.runEndTurn(s); ok(s.players[1].hp <= 11, 'A Csirkés: az ellenfélnek nem (Gabi saját +1-e lehet)'); }
+{ const s = G(); play(s, 0, 'l_peaches', { k: 'none' }); s.players[1].hand = []; s.active = 0; E.runEndTurn(s); ok(s.players[1].hand.some(h => E.CARD[h.id].drink), 'Peaches and Cream: kör elején ital a kézbe'); }
+{ const s = G(); s.players[0].hand = []; play(s, 0, 'f_korlatlan', { k: 'none' }); const h = s.players[0].hand;
+  ok(h.length === 3 && h.every(x => E.CARD[x.id].drink && x.fix === 1 && E.cardCost(s, 0, x.id, x) === 1), 'Korlátlan italfogyasztás: 3 ital, mind 1 energia'); }
 console.log(fails ? 'HIBÁK: ' + fails : 'PEACHES 2 OK');
