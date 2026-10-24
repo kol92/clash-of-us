@@ -397,6 +397,7 @@ function startTurn(s) {
   atiFlee(s, pi);
   sharkSwim(s, pi);
   if (has(p, 'extraDraw') && p.turns % 3 === 0) { ev(s, { t:'passive', side:pi, k:'extraDraw' }); draw(s, pi); }
+  if (s.half === 2 * MIDNIGHT - 1) ev(s, { t:'midnightstart', side:pi, i:-1 });   /* „Elmúlt ÉJFÉL” – a 6. kör legelején, egyszer (2026-10-24, Tomi) */
   if (isMidnight(s)) { p.board.forEach((u, j) => { if (u && CARD[u.id].mid && !u.midOn) midOn(s, pi, j); }); cleanup(s); }   /* éjfélkor a lent lévő Éjfél után lapok bekapcsolnak */
   checkWin(s);
 }

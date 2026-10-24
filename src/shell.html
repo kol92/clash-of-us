@@ -2239,6 +2239,24 @@ html:has(body.in-game){overscroll-behavior:none;}
 .bulk-head{display:grid;justify-items:center;gap:2px;color:#fff;text-align:center;} .bulk-head b{font-family:var(--display);font-size:22px;} .bulk-head small{color:var(--gold);font-weight:800;}
 .bulk-packs{display:flex;justify-content:center;margin:20px 0;} .bulk-packs>span{margin-left:-60px;transform:rotate(calc((var(--k) - 3) * 5deg));} .bulk-packs>span:first-child{margin-left:0;}
 .bulk-packs .pack{--pw:110px;}
+
+/* „Elmúlt ÉJFÉL” jelenet (2026-10-24) */
+.mid-intro{position:fixed;inset:0;z-index:80;overflow:hidden;}
+.mid-sky{position:absolute;inset:0;opacity:0;background:radial-gradient(ellipse at 50% 30%,rgba(40,60,130,.85),rgba(6,10,30,.97) 60%,#02030a 100%);}
+.mid-stars{position:absolute;inset:0;opacity:0;} .mid-stars i{position:absolute;width:var(--s);height:var(--s);border-radius:50%;background:#fff;box-shadow:0 0 6px #cfe0ff;animation:twinkle 1.8s ease-in-out var(--d) infinite alternate;}
+@keyframes twinkle{from{opacity:.25;}to{opacity:1;}}
+.mid-moon{position:absolute;left:50%;top:38%;width:min(220px,52vw);aspect-ratio:1;border-radius:50%;opacity:0;transform:translate(-50%,-50%);
+  background:radial-gradient(circle at 38% 34%,#fffdf2 0,#f3ecd2 38%,#d9cfae 70%,#b9ad8a 100%);box-shadow:0 0 40px 10px rgba(235,230,200,.55),0 0 120px 40px rgba(150,170,255,.35),inset -18px -14px 40px rgba(120,110,80,.45);}
+.mid-moon i{position:absolute;border-radius:50%;background:rgba(150,140,110,.35);box-shadow:inset 3px 3px 6px rgba(90,80,60,.35);}
+.mid-moon i:nth-child(1){left:22%;top:30%;width:18%;height:18%;} .mid-moon i:nth-child(2){left:58%;top:52%;width:24%;height:24%;} .mid-moon i:nth-child(3){left:40%;top:70%;width:11%;height:11%;}
+.mid-moon.glow{animation:moonGlow 2.4s ease-in-out infinite alternate;}
+@keyframes moonGlow{from{box-shadow:0 0 40px 10px rgba(235,230,200,.55),0 0 120px 40px rgba(150,170,255,.35),inset -18px -14px 40px rgba(120,110,80,.45);}to{box-shadow:0 0 60px 18px rgba(245,240,210,.75),0 0 170px 60px rgba(150,170,255,.5),inset -18px -14px 40px rgba(120,110,80,.45);}}
+.mid-title{position:absolute;left:50%;bottom:calc(14% + env(safe-area-inset-bottom));transform:translate(-50%,0);width:94vw;text-align:center;opacity:0;pointer-events:none;}
+.mid-title small{display:block;font-family:var(--display);font-size:clamp(18px,5.5vw,24px);color:#a9c1ff;letter-spacing:.2em;}
+.mid-title b{display:block;font-family:var(--display);font-weight:400;font-size:clamp(40px,13vw,72px);line-height:1;text-transform:uppercase;color:#eef3ff;text-shadow:0 0 18px rgba(170,200,255,.95),0 0 46px rgba(120,150,255,.7),0 4px 0 rgba(0,0,20,.6);}
+.mid-title em{display:block;margin-top:8px;font-style:normal;font-weight:700;font-size:15px;color:#cbd5f5;}
+.mid-flash{position:absolute;inset:0;background:#dfe8ff;opacity:0;pointer-events:none;}
+.mid-intro .fin-skip{bottom:calc(5% + env(safe-area-inset-bottom));}
 </style>
 
 <div id="app">

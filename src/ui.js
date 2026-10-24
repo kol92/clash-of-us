@@ -783,6 +783,7 @@ function logEvents(evs, snap) {
       case 'shield': L(`🛡 ${unitName(e.side, e.i)} pajzsa elnyelte az ütést`); break;
       case 'bounce': L(`↩ ${unitName(e.side, e.i)} visszakerült a kézbe`); break;
       case 'stolen': L(`🫳 ${unitName(e.side, e.i)} átállt a másik oldalra`); break;
+      case 'midnightstart': L('🌙 <b>Elmúlt ÉJFÉL</b> – az „Éjfél után” lapok mostantól élnek'); break;
       case 'belvedere': L(`🍾 Három Literes Belvedere: a mellette állók +1/+1`); break;
       case 'midnight': L(`🌙 Éjfél után: <b class="lc" data-lc="${e.id}">${escH(CARD[e.id].name)}</b> bekapcsolt${e.b ? ' (Laszy: +1)' : ''}`); break;
       case 'kickout': L(`🚪 Kidobták: <b class="lc" data-lc="${e.id}">${escH(CARD[e.id].name)}</b> (vissza a kézbe)`); break;
@@ -1016,6 +1017,7 @@ async function animateEvents(evs) {
       case 'gift': floatAt(anchor, `${e.id === 'i_ing' ? '👔' : e.id === 'i_gomba' ? '🍄' : e.id === 'a_irkave' ? '☕' : '🍗'} ${CARD[e.id].name} a ${e.side === ME ? 'kezedbe' : 'kezébe'}!`, 'info'); hold = Math.max(hold, 700); break;
       case 'drinkgift': floatAt(anchor, e.side === ME ? `🍸 ${CARD[e.id].name} a kezedbe!` : '🍸 Ital a kezébe!', 'info'); hold = Math.max(hold, 700); break;
       case 'deathblast': floatAt(anchor, '💥 Utolsó ütés!', 'dmg'); hold = Math.max(hold, 450); break;
+      case 'midnightstart': await midnightIntro(); break;
       case 'zap': await zapFx(e); break;
       case 'party': await partyFx(e); break;
       case 'locgone': floatAt(anchor, `🚫 ${CARD[e.id].name} bezárt`, 'info'); hold = Math.max(hold, 600); break;
@@ -1078,6 +1080,32 @@ async function runFx(fn) {
 
 // ---------- kánon esemény lapok ----------
 // Bevonulás: elsötétül a pálya, fénysugarak, a lap becsapódik középre, „KIVÉGZŐ” felirat
+/* „Elmúlt ÉJFÉL” (2026-10-24, Tomi): a 6. kör elején – éjszakai égbolt, csillagok, felkelő telihold, óriás felirat; Kánon-szintű jelenet */
+async function midnightIntro() {
+  const o = document.createElement('div'); o.className = 'mid-intro';
+  o.innerHTML = `<div class="mid-sky"></div><div class="mid-stars">${Array.from({ length: 70 }, () => `<i style="left:${(Math.random() * 100).toFixed(1)}%;top:${(Math.random() * 70).toFixed(1)}%;--d:${(Math.random() * 2).toFixed(2)}s;--s:${(1 + Math.random() * 2.2).toFixed(1)}px"></i>`).join('')}</div>
+    <div class="mid-moon"><i></i><i></i><i></i></div><div class="mid-title" role="status"><small>00:00</small><b>Elmúlt ÉJFÉL</b><em>Az „Éjfél után” lapok mostantól élnek</em></div><div class="mid-flash"></div>`;
+  $('#layer').appendChild(o);
+  const sky = o.querySelector('.mid-sky'), moon = o.querySelector('.mid-moon'), title = o.querySelector('.mid-title'), stars = o.querySelector('.mid-stars'), flash = o.querySelector('.mid-flash');
+  const skip = () => new Promise(r => { const t0 = performance.now(); o.addEventListener('pointerdown', () => { if (performance.now() - t0 > 300) r(); }); });
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) { [sky, moon, title, stars].forEach(x => x.style.opacity = 1); moon.style.transform = 'translate(-50%,-50%)'; await Promise.race([sleep(2500), skip()]); o.remove(); return; }
+  await sky.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 450, easing: 'ease-in', fill: 'forwards' }).finished;
+  stars.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 700, fill: 'forwards' });
+  const rise = moon.animate([{ transform: 'translate(-50%, 70vh) scale(.6)', opacity: 0, filter: 'brightness(.6)' },
+                             { transform: 'translate(-50%,-50%) scale(1.06)', opacity: 1, filter: 'brightness(1.25)', offset: .8 },
+                             { transform: 'translate(-50%,-50%) scale(1)', opacity: 1, filter: 'brightness(1)' }], { duration: 1300, easing: 'cubic-bezier(.2,.8,.25,1)', fill: 'forwards' });
+  await sleep(950);
+  fx($('#app'), 'fx-quake');
+  flash.animate([{ opacity: .55 }, { opacity: 0 }], { duration: 420, easing: 'ease-out', fill: 'forwards' });
+  title.animate([{ opacity: 0, transform: 'translate(-50%,0) scale(2.2)', letterSpacing: '.45em', filter: 'blur(6px)' }, { opacity: 1, transform: 'translate(-50%,0) scale(1)', letterSpacing: '.03em', filter: 'blur(0)' }],
+                { duration: 560, easing: 'cubic-bezier(.2,1.3,.4,1)', fill: 'forwards' });
+  await rise.finished;
+  moon.classList.add('glow');
+  const hint = document.createElement('small'); hint.className = 'fin-skip'; hint.textContent = 'Koppints a folytatáshoz'; o.appendChild(hint);
+  await Promise.race([sleep(2600), skip()]);
+  await o.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 420, fill: 'forwards' }).finished;
+  o.remove();
+}
 async function finisherIntro(e) {
   // Sorrend (a csapat leírása szerint): 1) a háttér elsötétül, 2) a Kánon-jelvény és a lap felső kristálya felragyog,
   // 3) vörös fényimpulzus fut végig a kereten, 4) jön a hatás. Maga a fényeffekt ~1,1 mp; koppintásra hamarabb továbbmegy.
