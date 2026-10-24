@@ -1115,6 +1115,13 @@ body.ev-hw #scr-menu .fan{filter:drop-shadow(0 0 22px rgba(255,140,40,.35));}
 .pk.set-ah.shiny .pk-part{background-image:url('art/ui/sm/pack-ahshiny.webp?v=85d231f6');}
 .op-pack .pk.set-ah.shiny .pk-part{background-image:url('art/ui/pack-ahshiny.webp?v=66d11276');}
 .pk.set-ah.shiny .pk-sheen,.pk.set-ah.shiny .pk-holo{-webkit-mask-image:url('art/ui/sm/pack-ahshiny.webp?v=85d231f6');mask-image:url('art/ui/sm/pack-ahshiny.webp?v=85d231f6');}
+.pk.set-pc .pk-part{background-image:url('art/ui/sm/pack-pc.webp?v=72bdd448');}
+.op-pack .pk.set-pc .pk-part{background-image:url('art/ui/pack-pc.webp?v=2455e50f');}
+.pk.set-pc .pk-sheen{-webkit-mask-image:url('art/ui/sm/pack-pc.webp?v=72bdd448');mask-image:url('art/ui/sm/pack-pc.webp?v=72bdd448');}
+.pk.set-pc.shiny .pk-part{background-image:url('art/ui/sm/pack-pcshiny.webp?v=d0ddff56');}
+.op-pack .pk.set-pc.shiny .pk-part{background-image:url('art/ui/pack-pcshiny.webp?v=27d92741');}
+.pk.set-pc.shiny .pk-sheen,.pk.set-pc.shiny .pk-holo{-webkit-mask-image:url('art/ui/sm/pack-pcshiny.webp?v=d0ddff56');mask-image:url('art/ui/sm/pack-pcshiny.webp?v=d0ddff56');}
+.q-pack.pc{background-image:url('art/ui/sm/pack-pc.webp?v=72bdd448');} .q-pack.shiny.pc{background-image:url('art/ui/sm/pack-pcshiny.webp?v=d0ddff56');}
 .kwt{display:inline-grid;place-items:center;width:17px;height:17px;border-radius:50%;font-size:10px;line-height:1;background:#10202ccc;border:1px solid #9fd3ff88;margin-left:1px;}
 .kwt.rv{border-color:#ffd27a99;} .kwt.nk{border-color:#e0a36b99;}
 .ah-news{text-align:center;}
@@ -2449,7 +2456,7 @@ html:has(body.in-game){overscroll-behavior:none;}
 <script src="vendor/firebase-auth-compat.js"></script>
 <script src="vendor/firebase-firestore-compat.js"></script>
 <script src="vendor/firebase-database-compat.js"></script>
-<script>window.APP_VERSION = "2026.10.24-1304"; window.APP_BUILD = "2026.10.24-1305";</script>
+<script>window.APP_VERSION = "2026.10.24-1304"; window.APP_BUILD = "2026.10.24-1308";</script>
 <script>// ===== Best of Us – saját szerver (Firebase) =====
 // A játék eredetileg a Claude-os tárolót használta (window.claude.use('db' | 'user' | 'room')).
 // Ez a fájl ugyanazt a felületet adja Firebase-ből, így a játék kódja szinte változatlan maradhat:
@@ -6071,7 +6078,9 @@ const ECON = { goldPlain: 0.005, goldShiny: 0.05, goldDupe: 100, heroFaChance: 0
 const PLAYABLE = CARDS.filter(c => !c.token && !c.off);   // off: kánon esemény lap, amíg nincs hozzá grafika – sehol nem látszik
 const SETS = { base: { name: 'Base set', cards: PLAYABLE.filter(c => !c.set && !c.variantOf && !c.passOnly && !c.eventOnly && !c.shopOnly).map(c => c.id) },
   /* Amszterdam hősei (első mini-szett, 2026-10-16, teszt ág): saját booster és Shiny booster, csak ennek a szettnek a lapjaival */
-  ah: { name: 'Amsterdam Hősei', short: 'Amsterdam', cards: PLAYABLE.filter(c => c.set === 'ah' && !c.variantOf).map(c => c.id) } };   // passOnly: csak a Season Passból; eventOnly: csak eventből; shopOnly: csak a Boltból
+  ah: { name: 'Amsterdam Hősei', short: 'Amsterdam', cards: PLAYABLE.filter(c => c.set === 'ah' && !c.variantOf).map(c => c.id) },
+  /* Egy Éjszaka a Peaches and Creamben (teszt ág, 2026-10-24) */
+  pc: { name: 'Egy Éjszaka a Peaches and Creamben', short: 'Peaches', cards: PLAYABLE.filter(c => c.set === 'pc' && !c.variantOf).map(c => c.id) } };   // passOnly: csak a Season Passból; eventOnly: csak eventből; shopOnly: csak a Boltból
 const VARIANT_CHANCE = 0.2;   // ha az alaplap jön, 1 az 5-höz eséllyel a ritkább változata lesz belőle
 const DECK_SIZE = 20;
 const maxCopies = id => CARD[id].rarity === 'l' ? 1 : 2;
@@ -6851,7 +6860,9 @@ function renderShop() {
     <div class="lbl shop-lbl">Boosterek</div>
     <div class="shop-gifts">${gifts}</div>
     <div class="shop-grid">
-      ${setLive('ah') ? `${shopPanelHTML({ attr: 'data-pack="ah"', img: 'art/ui/pack-ah.webp?v=920fcfff', contain: true, name: SETS.ah.name, sub: 'Új szett · 3 lap', price: ECON.packPrice, have: false })}
+      ${setLive('pc') && SETS.pc.cards.length ? `${shopPanelHTML({ attr: 'data-pack="pc"', img: 'art/ui/pack-pc.webp?v=2455e50f', contain: true, name: 'Peaches and Cream', sub: 'Új szett · 3 lap', price: ECON.packPrice, have: false })}
+      ${shopPanelHTML({ attr: 'data-pack="pcshiny"', img: 'art/ui/pack-pcshiny.webp?v=27d92741', contain: true, name: 'Peaches Shiny', sub: '1 biztos Full Art', price: ECON.shinyPrice, have: false, holo: true })}` : ''}
+      ${setLive('ah') ? `${shopPanelHTML({ attr: 'data-pack="ah"', img: 'art/ui/pack-ah.webp?v=920fcfff', contain: true, name: SETS.ah.name, sub: setLive('pc') && SETS.pc.cards.length ? '3 lap' : 'Új szett · 3 lap', price: ECON.packPrice, have: false })}
       ${shopPanelHTML({ attr: 'data-pack="ahshiny"', img: 'art/ui/pack-ahshiny.webp?v=66d11276', contain: true, name: 'Amsterdam Shiny', sub: '1 biztos Full Art', price: ECON.shinyPrice, have: false, holo: true })}` : ''}
       ${shopPanelHTML({ attr: 'data-pack="base"', img: 'art/ui/pack-base.webp?v=d38f1f0c', contain: true, name: SETS.base.name, sub: '3 lap', price: ECON.packPrice, have: false })}
       ${shopPanelHTML({ attr: 'data-pack="shiny"', img: 'art/ui/pack-shiny.webp?v=ca07ac74', contain: true, name: 'Shiny pack', sub: '1 biztos különleges', price: ECON.shinyPrice, have: false, holo: true })}   
@@ -6873,9 +6884,9 @@ function renderShop() {
   $('#shopBody').querySelectorAll('[data-buy]').forEach(b => b.onclick = () => buyShopItem(b.dataset.buy));
   $('#shopBody').querySelectorAll('[data-port]').forEach(b => b.onclick = () => buyPortrait(b.dataset.port));
   $('#shopBody').querySelectorAll('[data-pack]').forEach(b => b.onclick = () => {
-    const k = b.dataset.pack, sh = k === 'shiny' || k === 'ahshiny', pr = sh ? ECON.shinyPrice : ECON.packPrice;
+    const k = b.dataset.pack, sh = k === 'shiny' || k === 'ahshiny' || k === 'pcshiny', pr = sh ? ECON.shinyPrice : ECON.packPrice;
     if (Store.p.coins < pr) return toast(`Nincs elég coinod (${Store.p.coins}/${pr})`);
-    buyPack(k.startsWith('ah') ? 'ah' : 'base', sh ? 'shiny' : false); });
+    buyPack(k.startsWith('ah') ? 'ah' : k.startsWith('pc') ? 'pc' : 'base', sh ? 'shiny' : false); });
   const jb = $('#shopBody').querySelector('[data-jump]'); if (jb) jb.onclick = () => $('#shopBody .shop-limited')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   $('#freePack').onclick = () => buyPack(freePackSet(), true);
   if ($('#chestBtn')) $('#chestBtn').onclick = () => buyChest();

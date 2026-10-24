@@ -5,7 +5,9 @@ const ECON = { goldPlain: 0.005, goldShiny: 0.05, goldDupe: 100, heroFaChance: 0
 const PLAYABLE = CARDS.filter(c => !c.token && !c.off);   // off: kánon esemény lap, amíg nincs hozzá grafika – sehol nem látszik
 const SETS = { base: { name: 'Base set', cards: PLAYABLE.filter(c => !c.set && !c.variantOf && !c.passOnly && !c.eventOnly && !c.shopOnly).map(c => c.id) },
   /* Amszterdam hősei (első mini-szett, 2026-10-16, teszt ág): saját booster és Shiny booster, csak ennek a szettnek a lapjaival */
-  ah: { name: 'Amsterdam Hősei', short: 'Amsterdam', cards: PLAYABLE.filter(c => c.set === 'ah' && !c.variantOf).map(c => c.id) } };   // passOnly: csak a Season Passból; eventOnly: csak eventből; shopOnly: csak a Boltból
+  ah: { name: 'Amsterdam Hősei', short: 'Amsterdam', cards: PLAYABLE.filter(c => c.set === 'ah' && !c.variantOf).map(c => c.id) },
+  /* Egy Éjszaka a Peaches and Creamben (teszt ág, 2026-10-24) */
+  pc: { name: 'Egy Éjszaka a Peaches and Creamben', short: 'Peaches', cards: PLAYABLE.filter(c => c.set === 'pc' && !c.variantOf).map(c => c.id) } };   // passOnly: csak a Season Passból; eventOnly: csak eventből; shopOnly: csak a Boltból
 const VARIANT_CHANCE = 0.2;   // ha az alaplap jön, 1 az 5-höz eséllyel a ritkább változata lesz belőle
 const DECK_SIZE = 20;
 const maxCopies = id => CARD[id].rarity === 'l' ? 1 : 2;
@@ -785,7 +787,9 @@ function renderShop() {
     <div class="lbl shop-lbl">Boosterek</div>
     <div class="shop-gifts">${gifts}</div>
     <div class="shop-grid">
-      ${setLive('ah') ? `${shopPanelHTML({ attr: 'data-pack="ah"', img: 'art/ui/pack-ah.webp', contain: true, name: SETS.ah.name, sub: 'Új szett · 3 lap', price: ECON.packPrice, have: false })}
+      ${setLive('pc') && SETS.pc.cards.length ? `${shopPanelHTML({ attr: 'data-pack="pc"', img: 'art/ui/pack-pc.webp', contain: true, name: 'Peaches and Cream', sub: 'Új szett · 3 lap', price: ECON.packPrice, have: false })}
+      ${shopPanelHTML({ attr: 'data-pack="pcshiny"', img: 'art/ui/pack-pcshiny.webp', contain: true, name: 'Peaches Shiny', sub: '1 biztos Full Art', price: ECON.shinyPrice, have: false, holo: true })}` : ''}
+      ${setLive('ah') ? `${shopPanelHTML({ attr: 'data-pack="ah"', img: 'art/ui/pack-ah.webp', contain: true, name: SETS.ah.name, sub: setLive('pc') && SETS.pc.cards.length ? '3 lap' : 'Új szett · 3 lap', price: ECON.packPrice, have: false })}
       ${shopPanelHTML({ attr: 'data-pack="ahshiny"', img: 'art/ui/pack-ahshiny.webp', contain: true, name: 'Amsterdam Shiny', sub: '1 biztos Full Art', price: ECON.shinyPrice, have: false, holo: true })}` : ''}
       ${shopPanelHTML({ attr: 'data-pack="base"', img: 'art/ui/pack-base.webp', contain: true, name: SETS.base.name, sub: '3 lap', price: ECON.packPrice, have: false })}
       ${shopPanelHTML({ attr: 'data-pack="shiny"', img: 'art/ui/pack-shiny.webp', contain: true, name: 'Shiny pack', sub: '1 biztos különleges', price: ECON.shinyPrice, have: false, holo: true })}   
@@ -807,9 +811,9 @@ function renderShop() {
   $('#shopBody').querySelectorAll('[data-buy]').forEach(b => b.onclick = () => buyShopItem(b.dataset.buy));
   $('#shopBody').querySelectorAll('[data-port]').forEach(b => b.onclick = () => buyPortrait(b.dataset.port));
   $('#shopBody').querySelectorAll('[data-pack]').forEach(b => b.onclick = () => {
-    const k = b.dataset.pack, sh = k === 'shiny' || k === 'ahshiny', pr = sh ? ECON.shinyPrice : ECON.packPrice;
+    const k = b.dataset.pack, sh = k === 'shiny' || k === 'ahshiny' || k === 'pcshiny', pr = sh ? ECON.shinyPrice : ECON.packPrice;
     if (Store.p.coins < pr) return toast(`Nincs elég coinod (${Store.p.coins}/${pr})`);
-    buyPack(k.startsWith('ah') ? 'ah' : 'base', sh ? 'shiny' : false); });
+    buyPack(k.startsWith('ah') ? 'ah' : k.startsWith('pc') ? 'pc' : 'base', sh ? 'shiny' : false); });
   const jb = $('#shopBody').querySelector('[data-jump]'); if (jb) jb.onclick = () => $('#shopBody .shop-limited')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   $('#freePack').onclick = () => buyPack(freePackSet(), true);
   if ($('#chestBtn')) $('#chestBtn').onclick = () => buyChest();
