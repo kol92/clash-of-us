@@ -247,6 +247,15 @@ const ART = {
   c_amszterdam: { src:'art/amszterdam.webp', av:'60% 22%', pos:'58% 24%' },
   c_barnaelet: { src:'art/barnaelet.webp', av:'54% 26%', pos:'54% 26%' },
   f_bender: { src:'art/f_bender.webp', av:'55% 40%', pos:'55% 34%' },   // Kánon esemény lapok
+  c_pc_barna: { src:'art/pc_barna.webp', av:'49% 20%', pos:'49% 18%' },   /* Peaches and Cream (teszt) */
+  c_pc_tomi:  { src:'art/pc_tomi.webp',  av:'52% 18%', pos:'52% 16%' },
+  c_pc_krisz: { src:'art/pc_krisz.webp', av:'45% 17%', pos:'45% 15%' },
+  c_pc_laszy: { src:'art/pc_laszy.webp', av:'50% 16%', pos:'50% 14%' },
+  c_pc_zoli:  { src:'art/pc_zoli.webp',  av:'57% 14%', pos:'57% 12%' },
+  c_pc_boros: { src:'art/pc_boros.webp', av:'40% 20%', pos:'40% 18%' },
+  c_pc_david: { src:'art/pc_david.webp', av:'40% 25%', pos:'40% 22%' },
+  c_pc_sasi:  { src:'art/pc_sasi.webp',  av:'55% 17%', pos:'55% 15%' },
+  c_belvedere:{ src:'art/belvedere.webp', av:'60% 55%', pos:'60% 50%' },
   f_csoves:  { src:'art/f_csoves.webp', av:'40% 22%', pos:'40% 20%' },   /* Laszy Kánonja (teszt) */
   c_szolga1: { src:'art/c_szolga1.webp', av:'50% 30%', pos:'50% 28%' },
   c_szolga2: { src:'art/c_szolga2.webp', av:'60% 35%', pos:'60% 32%' },
@@ -475,7 +484,7 @@ $('#rkBotRow input').onchange = e => { if (Store.p) { Store.p.rkBot = e.target.c
 // ---- gyűjtemény-szűrő (Astra UI): név, típus, ritkaság, költség, megvan/hiányzik ----
 const CF = { q: '', type: new Set(), rar: new Set(), cost: new Set(), own: '', set: new Set() };
 /* szettek (2026-10-16): a lap `set` mezője (engine.js), ha nincs: Base set */
-const CF_SETS_ALL = [['base', 'Base set'], ['hw', 'Halloween'], ['ah', 'Amsterdam Hősei']];
+const CF_SETS_ALL = [['base', 'Base set'], ['hw', 'Halloween'], ['ah', 'Amsterdam Hősei'], ['pc', 'Peaches and Cream']];
 const cfSets = () => CF_SETS_ALL.filter(([k]) => setLive(k));
 const cardSet = c => c.set || 'base';
 const CF_TYPES = [['char', 'Karakter'], ['action', 'Akció'], ['item', 'Eszköz'], ['loc', 'Helyszín']];
@@ -498,7 +507,7 @@ function renderCollFilters() {
   const el = $('#collFilters'); if (!el) return;
   const chip = (grp, val, inner, on, label) => `<button class="cf-chip${on ? ' on' : ''}" data-cf="${grp}" data-v="${val}" aria-pressed="${on}" aria-label="${label}">${inner}</button>`;
   el.innerHTML = `<label class="cf-search"><span class="sr-only">Keresés</span><input id="cfQ" type="search" placeholder="Keresés…" value="${escH(CF.q)}" autocomplete="off"></label>
-    <div class="cf-row">${cfSets().map(([k, n]) => chip('set', k, `<span class="lbl-t">${k === 'hw' ? '🎃 ' : k === 'ah' ? '🌷 ' : ''}${n}</span>`, CF.set.has(k), n + ' szett')).join('')}</div>
+    <div class="cf-row">${cfSets().map(([k, n]) => chip('set', k, `<span class="lbl-t">${k === 'hw' ? '🎃 ' : k === 'ah' ? '🌷 ' : k === 'pc' ? '🍑 ' : ''}${n}</span>`, CF.set.has(k), n + ' szett')).join('')}</div>
     <div class="cf-row">${CF_TYPES.map(([k, n]) => chip('type', k, `<img src="art/ui/ic-type-${k}.webp" alt=""><span class="lbl-t">${n}</span>`, CF.type.has(k), n)).join('')}</div>
     <div class="cf-row">${CF_RARS.map(([k, n]) => chip('rar', k, `<i class="rar r-${k}"></i>`, CF.rar.has(k), n)).join('')}
       ${chip('own', 'have', '<img src="art/ui/ic-owned.webp" alt="">', CF.own === 'have', 'Megvan')}${chip('own', 'miss', '<img src="art/ui/ic-missing.webp" alt="">', CF.own === 'miss', 'Hiányzik')}</div>
@@ -774,6 +783,9 @@ function logEvents(evs, snap) {
       case 'shield': L(`🛡 ${unitName(e.side, e.i)} pajzsa elnyelte az ütést`); break;
       case 'bounce': L(`↩ ${unitName(e.side, e.i)} visszakerült a kézbe`); break;
       case 'stolen': L(`🫳 ${unitName(e.side, e.i)} átállt a másik oldalra`); break;
+      case 'midnight': L(`🌙 Éjfél után: <b class="lc" data-lc="${e.id}">${escH(CARD[e.id].name)}</b> bekapcsolt${e.b ? ' (Laszy: +1)' : ''}`); break;
+      case 'kickout': L(`🚪 Kidobták: <b class="lc" data-lc="${e.id}">${escH(CARD[e.id].name)}</b> (vissza a kézbe)`); break;
+      case 'zoliblast': L(`💥 Gál Zoli kidőlt: ${e.n} sebzés minden ellenséges karakternek`); break;
       case 'itemsteal': L(`🫳 ${unitName(e.side, e.i)} ellopta: ${e.ids.map(id => `<b class="lc" data-lc="${id}">${escH(CARD[id].name)}</b>`).join(', ')} (${unitName(e.from.side, e.from.i)} eszköz${e.ids.length > 1 ? 'ei' : 'e'})`); break;
       case 'push': L(`➡ Egy karakter arrébb tolva`); break;
       case 'misfire': L(`🍺 ${unitName(e.side, e.i)} mellé ütött`); break;
@@ -1010,6 +1022,9 @@ async function animateEvents(evs) {
       case 'move': floatAt(anchor, e.swap ? '👞 Helycsere!' : '👞 Áthelyezve', 'info'); hold = Math.max(hold, 350); break;
       case 'push': floatAt(anchor, 'Arrébb tolva!', 'info'); hold = Math.max(hold, 300); break;
       case 'stolen': fx(el, e.side === ME ? 'fx-bounce-up' : 'fx-bounce-down'); floatAt(anchor, '🫳 Ellopták!', 'dmg'); hold = Math.max(hold, 650); break;
+      case 'midnight': floatAt(anchor, '🌙 Éjfél után!', 'buff'); hold = Math.max(hold, 700); break;
+      case 'kickout': fx(el, e.side === ME ? 'fx-bounce-up' : 'fx-bounce-down'); floatAt(anchor, '🚪 Kidobták!', 'dmg'); hold = Math.max(hold, 650); break;
+      case 'zoliblast': fx($('#app'), 'fx-quake'); floatAt(anchor, `💥 ${e.n} mindenkinek!`, 'dmg'); hold = Math.max(hold, 700); break;
       case 'itemsteal': floatAt(anchor, `🫳 Ellopta: ${e.ids.length > 1 ? e.ids.length + ' eszköz' : CARD[e.ids[0]].name}!`, 'buff'); hold = Math.max(hold, 800); break;
       case 'steal': floatAt(anchor, `🫳 ${CARD[e.id].name} átállt!`, 'buff'); hold = Math.max(hold, 700); break;
       case 'handswap': fx($('#app'), 'fx-quake'); floatAt(anchor, '🎭 Álarcos bál! Kézcsere!', 'info'); hold = Math.max(hold, 1000); break;
@@ -1294,7 +1309,7 @@ function render() {
   setHTML(loc, L ? `<span class="pin${ART[L.id] ? ' has-art' : ''}" style="--h:${hueOf(L.id)};${ART[L.id] ? `background-image:url('${artSrc(L.id, false)}');background-position:${ART[L.id].pos}` : ''}">${ART[L.id] ? '' : initials(lc.name)}</span><span><b>${lc.name}</b><small>${lc.text}</small></span>`
                     : `<span class="pin">–</span><span><b>Nincs helyszín</b><small>Játssz ki egy helyszínkártyát, ami mindkét félre hat.</small></span>`);
   const R = MAX_HALF / 2, rnd = Math.min(R, Math.ceil(S.half / 2));
-  $('#round').textContent = `${rnd}. kör / ${R}`; $('#round').className = 'round' + (rnd >= R - 1 ? ' last' : '');
+  $('#round').textContent = `${rnd >= 8 ? '🌙 ' : ''}${rnd}. kör / ${R}`;   /* 🌙 = Éjfél után (a 8. körtől) */ $('#round').className = 'round' + (rnd >= R - 1 ? ' last' : '');
   const end = $('#endBtn');
   end.disabled = !myTurn; end.textContent = S.active === ME ? 'Kör vége' : 'Ellenfél köre';
   end.classList.toggle('wait', S.active !== ME); end.setAttribute('aria-label', end.textContent);

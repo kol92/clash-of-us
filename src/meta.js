@@ -1271,7 +1271,7 @@ function renderEditor() {
   }).join('') || `<p class="ed-empty">${ED.set && ED.set !== 'all' ? 'Ebből a szettből és fajtából' : 'Ebből a fajtából'} nincs még lapod.</p>`;
   document.querySelectorAll('#edFilter button').forEach(b => b.setAttribute('aria-pressed', b.dataset.f === ED.filter));
   { const sets = cfSets(); if (ED.set && ED.set !== 'all' && !sets.some(([k]) => k === ED.set)) ED.set = 'all';
-    $('#edSetFilter').innerHTML = [['all', 'Minden szett'], ...sets].map(([k, n]) => `<button data-s="${k}" aria-pressed="${(ED.set || 'all') === k}">${k === 'hw' ? '🎃 ' : k === 'ah' ? '🌷 ' : ''}${k === 'ah' ? 'Amsterdam' : n}</button>`).join(''); }
+    $('#edSetFilter').innerHTML = [['all', 'Minden szett'], ...sets].map(([k, n]) => `<button data-s="${k}" aria-pressed="${(ED.set || 'all') === k}">${k === 'hw' ? '🎃 ' : k === 'ah' ? '🌷 ' : k === 'pc' ? '🍑 ' : ''}${k === 'ah' ? 'Amsterdam' : k === 'pc' ? 'Peaches' : n}</button>`).join(''); }
   $('#edSave').hidden = ED.readonly; $('#edDelete').hidden = ED.readonly || ED.isNew; $('#edCopy').hidden = !ED.readonly;
   $('#edHelp').parentNode.hidden = ED.readonly;
   $('#edHelp').textContent = ED.undo ? '↶ Visszavonás' : n >= DECK_SIZE ? '🪄 Kész a pakli' : `🪄 Segíts! (+${DECK_SIZE - n} lap)`;
@@ -3033,7 +3033,7 @@ async function frTradeModal(uid) {
       && (!TF.rar || C.rarity === TF.rar) && (!TF.fa || (TF.fa === 'fa') === !!c.foil); };
   const tfBar = rar => { const ch = (g, v, t) => `<button class="cf-chip${TF[g] === v ? ' on' : ''}" data-tf="${g}" data-v="${v}" aria-pressed="${TF[g] === v}">${t}</button>`;
     return `<div class="tr-filt"><label class="cf-search"><span class="sr-only">Keresés</span><input class="tr-q" type="search" placeholder="Keresés…" value="${escH(TF.q)}" autocomplete="off"></label>
-      <div class="cf-row">${cfSets().map(([k, n]) => ch('set', k, `<span class="lbl-t">${k === 'hw' ? '🎃 ' : k === 'ah' ? '🌷 ' : ''}${k === 'ah' ? 'Amsterdam' : n}</span>`)).join('')}</div>
+      <div class="cf-row">${cfSets().map(([k, n]) => ch('set', k, `<span class="lbl-t">${k === 'hw' ? '🎃 ' : k === 'ah' ? '🌷 ' : k === 'pc' ? '🍑 ' : ''}${k === 'ah' ? 'Amsterdam' : k === 'pc' ? 'Peaches' : n}</span>`)).join('')}</div>
       <div class="cf-row">${CF_TYPES.map(([k, n]) => ch('type', k, `<img src="art/ui/ic-type-${k}.webp" alt=""><span class="lbl-t">${n}</span>`)).join('')}</div>
       ${rar ? `<div class="cf-row">${['k', 'r', 'e', 'l'].map(k => ch('rar', k, `<i class="rar r-${k}" aria-label="${RAR[k]}"></i>`)).join('')}${ch('fa', 'n', '<span class="lbl-t">Sima</span>')}${ch('fa', 'fa', '<span class="lbl-t">Full Art</span>')}</div>` : ''}</div>`; };
   const tfReset = () => { TF.q = TF.set = TF.type = TF.rar = TF.fa = ''; };
