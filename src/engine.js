@@ -181,6 +181,8 @@ const CARDS = [
   { id:'i_telefon', set:'pc', type:'item', name:'Elveszett telefon', cost:1, tgt:'enemy', rarity:'r', stun:1, text:'Ellenséges karakterre: a következő körében nem támad, a gazdája pedig abban a körben nem kap extra húzást.' },
   { id:'c_alina', set:'pc', type:'char', name:'Alina', cost:3, atk:5, hp:1, rarity:'e', text:'Amikor lerakod, egy véletlen 1 energiás karakter alakját veszi fel (az értékeivel együtt). Az első sebzés helyett lelepleződik – CSAPDA! –, és 5/1-es Alinává változik.' },
   { id:'a_royal', set:'pc', drink:true, noParty:true, type:'action', name:'Royal Vodka + Burn', cost:0, tgt:'own', rarity:'k', text:'Egy karaktered +3/+0 és Lendület. A következő köröd elején 2 sebzést kap, és bénult lesz egy körre.' },
+  { id:'i_vodor', set:'pc', drink:true, type:'item', name:'Pezsgős vödör', cost:3, atk:0, hp:3, rarity:'r', text:'+0/+3. Minden köröd végén a viselője és a mellette álló karaktereid 1 életet gyógyulnak.' },
+  { id:'i_adoveo', set:'pc', type:'item', name:'Portás adóvevő', cost:2, atk:0, hp:0, rarity:'e', text:'Ha a viselője megüt egy ellenséges karaktert, és az túléli, a biztonságiak kidobják.' },
   { id:'c_belvedere', set:'pc', drink:true, noParty:true, type:'char', name:'Három Literes Belvedere', cost:4, atk:0, hp:10, rarity:'l', noAttack:true, text:'Nem támad. Minden köröd végén, a támadás előtt a mellette álló karaktereid +1/+1-et kapnak.' },   /* 2026-10-24 (Tomi): gyűjthető legendás Ital-karakter; Tomi, éjfél után is ezt teszi le */
   { id:'a_kalinka', set:'pc', drink:true, type:'action', name:'0,2 Kalinka', cost:0, tgt:'own', rarity:'k', noParty:true, text:'Egy karaktered +1/+1. Ha Laszy issza meg: +2/+2 és Lendület.' },
   { id:'a_jager', set:'pc', drink:true, type:'action', name:'Jägermeister', cost:2, tgt:'own', rarity:'r', text:'Egy karaktered +2/+2. Éjfél után: helyette +3/+3 és Lendület.' },
@@ -1155,11 +1157,13 @@ function strike(s, i) {
   const r = x.stun || isInv(u) ? 0 : effAtk(s, ei, j);   // Láthatatlan támadót nem lehet visszaütni
   const sh = x.shield;
   damageUnit(s, ei, j, x.id === 'c_ppvar' ? Math.max(0, a - 2) : a);   /* PP, a váratlan: aki megtámadja, 2-vel kisebbet üt rá */
+  const adv = (u.items || []).includes('i_adoveo');
   let r2 = r; if (x.trapNow) { x.trapNow = false; r2 = x.stun || isInv(u) ? 0 : effAtk(s, ei, j); }   /* CSAPDA: Alina üt vissza */
   if (x.id === 'c_vizipipa' && x.hp <= 0 && s.players[pi].board[i] === u) { u.atk += 2; u.hp += 2; u.maxHp += 2; ev(s, { t:'pipabuff', side:pi, i }); }   /* Barna vízipipája: aki elpusztítja, +2/+2 */
   // Izom: ami sebzés a karakter halála után megmarad, az ellenfél hősét éri (a Pajzs elnyeli az egészet)
   if ((kwC(u, 'muscle') || u.muscle) && !sh && x.hp < 0) { ev(s, { t:'overflow', side:ei, i:-1, n:-x.hp }); damageHero(s, ei, -x.hp, true); }
   damageUnit(s, pi, i, r2); cleanup(s);
+  if (adv && s.winner == null) { const y = s.players[ei].board[j]; if (y === x && x.hp > 0 && !isFixed(x)) { ev(s, { t:'radio', side:pi, i }); kickOut(s, ei, j); } }   /* Portás adóvevő */
   if (u.healAtk && s.winner == null) healHero(s, pi, u.healAtk);   /* Bence, éjfél után */
 }
 /* Szolga (Laszy Kánonja): a támadó SAJÁT eszközei (az ellenfél által rárakottak nem) a hatásukkal együtt átkerülnek a Szolgára */
@@ -1301,6 +1305,8 @@ function finishTurn(s) {
     cleanup(s); checkWin(s);
   }
   if (locIs(s, 'l_morisson') && !isReg(s, pi) && p.board.some(u => u)) { ev(s, { t:'locfx', side:pi, id:'l_morisson' }); p.board.forEach((u, i) => { if (u) damageUnit(s, pi, i, 1); }); }
+  p.board.forEach((u, j) => { if (!u || !(u.items || []).includes('i_vodor')) return; const n = u.items.filter(x => x === 'i_vodor').length;   /* Pezsgős vödör */
+    ev(s, { t:'locfx', side:pi, id:'i_vodor' }); for (const k of [j - 1, j, j + 1]) if (p.board[k] && !isFixed(p.board[k])) healUnit(s, pi, k, n); });
   if (locOwn(s, 'l_csirkes', pi) && s.winner == null) { ev(s, { t:'locfx', side:pi, id:'l_csirkes' }); healHero(s, pi, 2); }   /* A Csirkés */
   if (locIs(s, 'l_korhaz') && p.board.some(u => u)) { ev(s, { t:'locfx', side:pi, id:'l_korhaz' }); p.board.forEach((u, i) => { if (u) healUnit(s, pi, i, isReg(s, pi) ? 2 : 1); }); }
   p.board.forEach((u, i) => { if (u && u.stun) { u.stun--; if (!u.stun) { if (u.items.includes('i_buffalo')) { u.items = u.items.filter(x => x !== 'i_buffalo'); u.foe = (u.foe || []).filter(x => x !== 'i_buffalo'); bury(s, other(pi), 'i_buffalo', 'item'); } ev(s, { t:'unstun', side:pi, i }); } } });

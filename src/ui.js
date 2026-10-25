@@ -798,7 +798,9 @@ function logEvents(evs, snap) {
         const PT = { regular: `van helyszín a pályán → ${e.id ? `<b class="lc" data-lc="${e.id}">${escH(CARD[e.id].name)}</b>` : 'egy karaktere'} végleg +1/+1`, deathPing: 'meghalt egy karaktere → 1 sebzés az ellenfél hősének', teamPing: 'legalább 2 karaktere áll a táblán → 1 sebzés az ellenfél hősének',
                      wildParty: e.own ? `vad buli – mellé! ${e.ti === -1 ? 'a saját hősét' : e.id ? `a saját <b class="lc" data-lc="${e.id}">${escH(CARD[e.id].name)}</b> lapját` : 'a sajátját'} találta el (1 sebzés)` : `vad buli → ${e.ti === -1 ? 'az ellenfél hőse' : e.id ? `<b class="lc" data-lc="${e.id}">${escH(CARD[e.id].name)}</b>` : 'egy ellenség'}: 1 sebzés`, endHeal: 'a köre végén 1 életet gyógyít', extraDraw: 'minden 3. körében húz egy extra lapot', firstCharAtk: `+1 támadás: ${e.id ? `<b class="lc" data-lc="${e.id}">${escH(CARD[e.id].name)}</b>` : 'az első karaktere'}` };
         L(`✨ ${w} képessége: ${PT[e.k] || ''}`); break; }
-      case 'locfx': if (e.id === 'l_peaches' || e.id === 'l_vip' || e.id === 'l_csirkes') { const w = e.side === ME ? 'neked' : 'az ellenfélnek';
+      case 'radio': L(`📻 Portás adóvevő: „Kidobni!” – a biztonságiak jönnek`); break;
+      case 'locfx': if (e.id === 'i_vodor') { L(`🍾 Pezsgős vödör: ${e.side === ME ? 'a karaktereid' : 'az ellenfél karakterei'} gyógyulnak`); break; }
+        if (e.id === 'l_peaches' || e.id === 'l_vip' || e.id === 'l_csirkes') { const w = e.side === ME ? 'neked' : 'az ellenfélnek';
           L(`📍 <b class="lc" data-lc="${e.id}">${escH(CARD[e.id].name)}</b>: ${e.id === 'l_peaches' ? `egy ital ${w}` : e.id === 'l_vip' ? 'VIP – nem dobható ki' : `${e.side === ME ? 'a hősöd' : 'az ellenfél hőse'} 2 életet gyógyul`}`); break; }
         if (e.id === 'l_voros') { L(`📍 <b class="lc" data-lc="${e.id}">${escH(CARD[e.id].name)}</b>: ${e.side === ME ? 'egy karaktered' : 'az ellenfél egyik karaktere'} végleg +1 támadást kap`); break; }
         L(`📍 <b class="lc" data-lc="${e.id}">${escH(CARD[e.id].name)}</b>: ${e.id === 'l_korhaz' ? (e.side === ME ? 'a karaktereid gyógyulnak' : 'az ellenfél karakterei gyógyulnak') : (e.side === ME ? 'minden karaktered 1 sebzést kap' : 'az ellenfél minden karaktere 1 sebzést kap')}`); break;
@@ -1066,6 +1068,7 @@ async function animateEvents(evs) {
       case 'ruhatar': if (e.i >= 0) { fx(el, e.side === ME ? 'fx-bounce-down' : 'fx-bounce-up'); floatAt(anchor, '🧥 Ruhatárba!', 'info'); } hold = Math.max(hold, 600); break;
       case 'wcneni': fx(el, e.side === ME ? 'fx-bounce-down' : 'fx-bounce-up'); floatAt(anchor, '🚽 „Na majd adok én neked!”', 'info'); hold = Math.max(hold, 900); break;
       case 'alinatrap': await alinaTrapFx(e, el); break;
+      case 'radio': floatAt(anchor, '📻 „Kidobni!”', 'info'); hold = Math.max(hold, 600); break;
       case 'royalno': if (el) sayBubble(el, 'Vidd innen ezt a szart!', e.side); floatAt(anchor, '🍸 Dinnyés a kezedbe', 'info'); hold = Math.max(hold, 1400); break;
       case 'royalbad': floatAt(anchor, '🤢 Royal + Burn: másnap…', 'dmg'); hold = Math.max(hold, 700); break;
       case 'midnightstart': await midnightIntro(); break;

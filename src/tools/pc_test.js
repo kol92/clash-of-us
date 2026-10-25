@@ -100,4 +100,8 @@ const B = s => s.players[0].board;
   B(s)[0].hp = 5; B(s)[0].maxHp = 5; s.active = 0; E.runEndTurn(s); s.active = 1; E.runEndTurn(s); ok(B(s)[0] && B(s)[0].hp === 3 && B(s)[0].stun === 1, 'Royal: másnap 2 sebzés és bénult');
   const t = G(); play(t, 0, 'c_ah_laci', { k: 'slot', side: 0, i: 0 }); t.players[0].hand = []; const a0 = t.players[0].board[0].atk; play(t, 0, 'a_royal', { k: 'unit', side: 0, i: 0 });
   ok(t.players[0].board[0].atk === a0 && t.players[0].hand.some(h => h.id === 'a_dinnyes'), 'Royal Lacira: „Vidd innen” – Dinnyés a kézbe'); }
+{ const s = G(); play(s, 0, 'c_gyuri', { k: 'slot', side: 0, i: 0 }); play(s, 0, 'c_gyuri', { k: 'slot', side: 0, i: 1 }); play(s, 0, 'i_vodor', { k: 'unit', side: 0, i: 1 });
+  B(s)[0].hp = 1; B(s)[1].hp = 2; s.players[1].board = [null, null, null, null]; s.active = 0; E.runEndTurn(s); ok(B(s)[1].maxHp === 6 && B(s)[0].hp === 2 && B(s)[1].hp === 3, `Pezsgős vödör: +0/+3, köröd végén ő és a szomszédja +1 (${B(s)[0].hp}, ${B(s)[1].hp})`); }
+{ const s = G(); play(s, 1, 'c_vajda', { k: 'slot', side: 1, i: 0 }); play(s, 0, 'c_gyuri', { k: 'slot', side: 0, i: 0 }); play(s, 0, 'i_adoveo', { k: 'unit', side: 0, i: 0 }); B(s)[0].fresh = false; B(s)[0].hp = 9; B(s)[0].maxHp = 9;
+  s.active = 0; E.runEndTurn(s); ok(!s.players[1].board[0] && s.players[1].hand.some(h => h.id === 'c_vajda'), 'Portás adóvevő: a túlélő ellenséget kidobják'); }
 console.log(fails ? 'HIBÁK: ' + fails : 'PEACHES 2 OK');
