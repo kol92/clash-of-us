@@ -68,4 +68,25 @@ const B = s => s.players[0].board;
 { const s = G(); play(s, 0, 'l_peaches', { k: 'none' }); s.players[1].hand = []; s.active = 0; E.runEndTurn(s); ok(s.players[1].hand.some(h => E.CARD[h.id].drink), 'Peaches and Cream: kör elején ital a kézbe'); }
 { const s = G(); s.players[0].hand = []; play(s, 0, 'f_korlatlan', { k: 'none' }); const h = s.players[0].hand;
   ok(h.length === 3 && h.every(x => E.CARD[x.id].drink && x.fix === 1 && E.cardCost(s, 0, x.id, x) === 1), 'Korlátlan italfogyasztás: 3 ital, mind 1 energia'); }
+// 2026-10-25: 14 új lap
+{ const s = G(); play(s, 0, 'c_pc_gabi', { k: 'slot', side: 0, i: 0 }); ok(B(s)[0].taunt && B(s)[0].maxHp === 6, 'Gabi é.u.: Provokáció +0/+2'); }
+{ const s = G(); s.players[0].hand = []; play(s, 0, 'c_pc_laci', { k: 'slot', side: 0, i: 0 }); ok(s.players[0].hand.length === 2, 'Laci é.u.: 2 húzás');
+  const t = G('tomi', 3); t.players[0].hand = []; play(t, 0, 'c_pc_laci', { k: 'slot', side: 0, i: 0 }); ok(t.players[0].hand.length === 1, 'Laci éjfél előtt: 1 húzás'); }
+{ const s = G(); play(s, 0, 'c_pc_bence', { k: 'slot', side: 0, i: 0 }); s.players[0].hp = 10; s.active = 0; E.runEndTurn(s); ok(s.players[0].hp >= 12 && s.players[1].hp < 20, `Bence é.u.: Lendülettel támad, +2 élet (${s.players[0].hp})`); }
+{ const s = G(); play(s, 0, 'c_pc_sasi', { k: 'slot', side: 0, i: 0 }); const a0 = B(s)[0].atk; play(s, 0, 'c_ani', { k: 'slot', side: 0, i: 1 }); ok(B(s)[1].atk === 3 && B(s)[1].taunt && B(s)[0].atk === a0 + 1, 'Ani Sasi mellett: +1/+1 mindkettő, Provokáció'); }
+{ const s = G(); play(s, 1, 'c_vajda', { k: 'slot', side: 1, i: 2 }); play(s, 0, 'c_noemi', { k: 'slot', side: 0, i: 2 }); B(s)[2].fresh = false; s.active = 0; E.runEndTurn(s);
+  ok(!s.players[1].board[2] && s.players[1].hand.some(h => h.id === 'c_vajda'), 'Noémi: felfordul, kidobja a szemben állót'); }
+{ const s = G(); s.players[0].hand = []; play(s, 0, 'c_pultos', { k: 'slot', side: 0, i: 0 }); const h = s.players[0].hand[0]; ok(h && E.CARD[h.id].drink && E.cardCost(s, 0, h.id, h) === 0, 'Pultos: ital ingyen ebben a körben');
+  s.half += 1; ok(E.cardCost(s, 0, h.id, h) > 0 || E.CARD[h.id].cost <= 1, 'Pultos: a következő körben már nem ingyen'); }
+{ const s = G('tomi', 3); play(s, 0, 'c_idegen', { k: 'eslot', side: 1, i: 0 }); ok(s.players[1].board[0] && s.players[1].board[0].id === 'c_idegen', 'Részeg idegen: az ellenfélhez kerül');
+  s.half = 10; s.active = 1; const h = s.players[1].hp; E.startTurn ? 0 : 0; s.active = 0; E.runEndTurn(s); ok(!s.players[1].board[0] && s.players[1].hp === h - 1, `Részeg idegen éjfélkor kidől, 1 sebzés a gazdájának (${s.players[1].hp}/${h})`); }
+{ const s = G(); play(s, 0, 'c_gyuri', { k: 'slot', side: 0, i: 0 }); play(s, 0, 'c_dj', { k: 'slot', side: 0, i: 3 }); ok(E.effAtk(s, 0, 0) === 4, 'DJ éjfél után: +2 támadás'); }
+{ const s = G(); play(s, 0, 'c_gyuri', { k: 'slot', side: 0, i: 0 }); s.players[0].hand = []; play(s, 0, 'a_utolso', { k: 'unit', side: 0, i: 0 }); ok(B(s)[0].atk === 4 && B(s)[0].haste && s.players[0].hand.length === 1, 'Utolsó kör: +2/+0, Lendület, éjfél után húzás'); }
+{ const s = G(); play(s, 0, 'a_sor', { k: 'none' }); ok(E.cardCost(s, 1, 'c_gyuri') === 4, 'Sorban állás: +2 a következő karakterre'); play(s, 1, 'c_gyuri', { k: 'slot', side: 1, i: 0 }); ok(E.cardCost(s, 1, 'c_gyuri') === 2, 'Sorban állás: utána normál'); }
+{ const s = G(); play(s, 1, 'c_vajda', { k: 'slot', side: 1, i: 0 }); play(s, 1, 'c_gyuri', { k: 'slot', side: 1, i: 1 }); play(s, 0, 'c_pifti', { k: 'slot', side: 0, i: 0 }); play(s, 0, 'a_kidobtak', { k: 'none' });
+  ok(!s.players[1].board.some(Boolean) && !B(s)[0], 'Kidobtak minket!: 2 ellenség + 1 saját'); }
+{ const s = G(); play(s, 0, 'c_vajda', { k: 'slot', side: 0, i: 0 }); s.players[0].hand = []; play(s, 0, 'a_taxi', { k: 'unit', side: 0, i: 0 }); const v = s.players[0].hand.find(h => h.id === 'c_vajda');
+  ok(!B(s)[0] && v && !v.kickN && s.players[0].hand.length === 2, 'Hazafelé taxi: vissza a kézbe drágulás nélkül + húzás'); }
+{ const s = G(); play(s, 0, 'l_tanc', { k: 'none' }); play(s, 0, 'c_gyuri', { k: 'slot', side: 0, i: 1 }); play(s, 0, 'c_gyuri', { k: 'slot', side: 0, i: 0 }); ok(E.effAtk(s, 0, 1) === 3 && E.effAtk(s, 0, 0) === 2, 'Tánctér: középen +1'); }
+{ const s = G(); play(s, 1, 'c_vajda', { k: 'slot', side: 1, i: 0 }); play(s, 0, 'i_telefon', { k: 'unit', side: 1, i: 0 }); ok(s.players[1].board[0].stun === 1 && s.players[1].noExtra, 'Elveszett telefon: bénult, nincs extra húzás'); }
 console.log(fails ? 'HIBÁK: ' + fails : 'PEACHES 2 OK');

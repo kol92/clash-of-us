@@ -800,6 +800,8 @@ function logEvents(evs, snap) {
       case 'midnightstart': L('🌙 <b>Elmúlt ÉJFÉL</b> – az „Éjfél után” lapok mostantól élnek'); break;
       case 'belvedere': L(`🍾 Három Literes Belvedere: a mellette állók +1/+1`); break;
       case 'midnight': L(`🌙 Éjfél után: <b class="lc" data-lc="${e.id}">${escH(CARD[e.id].name)}</b> bekapcsolt${e.b ? ' (Laszy: +1)' : ''}`); break;
+      case 'sortax': L(`🚶 Sorban állás: ${e.side === ME ? 'a következő karaktered' : 'az ellenfél következő karaktere'} 2-vel drágább`); break;
+      case 'taxi': L(`🚕 Hazafelé taxi: <b class="lc" data-lc="${e.id}">${escH(CARD[e.id].name)}</b> hazament (vissza a kézbe)`); break;
       case 'kickcost': L(`💸 ${e.side === ME ? 'A' : 'Az ellenfél'} <b class="lc" data-lc="${e.id}">${escH(CARD[e.id].name)}</b> lapja mostantól +${e.n} energiába kerül`); break;
       case 'kickout': L(`🚪 Kidobták: <b class="lc" data-lc="${e.id}">${escH(CARD[e.id].name)}</b> (vissza a kézbe)`); break;
       case 'zoliblast': L(`💥 Gál Zoli kidőlt: ${e.n} sebzés minden ellenséges karakternek`); break;
@@ -1045,6 +1047,8 @@ async function animateEvents(evs) {
       case 'stolen': fx(el, e.side === ME ? 'fx-bounce-up' : 'fx-bounce-down'); floatAt(anchor, '🫳 Ellopták!', 'dmg'); hold = Math.max(hold, 650); break;
       case 'belvedere': floatAt(anchor, '🍾 Belvedere: +1/+1 a szomszédoknak', 'buff'); hold = Math.max(hold, 600); break;
       case 'midnight': floatAt(anchor, '🌙 Éjfél után!', 'buff'); hold = Math.max(hold, 700); break;
+      case 'taxi': fx(el, e.side === ME ? 'fx-bounce-down' : 'fx-bounce-up'); floatAt(anchor, '🚕 Hazafelé!', 'info'); hold = Math.max(hold, 600); break;
+      case 'sortax': floatAt(anchor, '🚶 Sorban állás: +2', 'dmg'); hold = Math.max(hold, 600); break;
       case 'kickout': fx(el, e.side === ME ? 'fx-bounce-up' : 'fx-bounce-down'); floatAt(anchor, '🚪 Kidobták!', 'dmg'); hold = Math.max(hold, 650); break;
       case 'zoliblast': fx($('#app'), 'fx-quake'); floatAt(anchor, `💥 ${e.n} mindenkinek!`, 'dmg'); hold = Math.max(hold, 700); break;
       case 'itemsteal': floatAt(anchor, `🫳 Ellopta: ${e.ids.length > 1 ? e.ids.length + ' eszköz' : CARD[e.ids[0]].name}!`, 'buff'); hold = Math.max(hold, 800); break;
