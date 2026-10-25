@@ -271,6 +271,7 @@ const ART = {
   c_ani:      { src:'art/pc_ani.webp', av:'55% 22%', pos:'55% 20%' },
   c_noemi:    { src:'art/pc_noemi.webp', av:'62% 25%', pos:'60% 22%' },
   c_dj:       { src:'art/pc_dj.webp', av:'50% 15%', pos:'50% 14%' },
+  a_sor:      { src:'art/pc_sor.webp', pos:'50% 55%' },
   c_alina:    { src:'art/pc_alina.webp', av:'52% 22%', pos:'52% 20%' },
   c_pc_laci:  { src:'art/pc_laci.webp', av:'38% 22%', pos:'38% 20%' },
   c_pg:       { src:'art/pc_pg.webp', av:'45% 15%', pos:'45% 14%' },
