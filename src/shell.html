@@ -2274,6 +2274,14 @@ html:has(body.in-game){overscroll-behavior:none;}
 .hport-vid{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .4s;pointer-events:none;z-index:0;}
 .hport-vid.on{opacity:1;}
 @media (prefers-reduced-motion:reduce){.hport-vid{display:none;}}
+
+/* Alina CSAPDA (2026-10-25) */
+.trap-fx{position:fixed;inset:0;z-index:80;pointer-events:auto;}
+.trap-dark{position:absolute;inset:0;opacity:0;background:radial-gradient(circle at 50% 45%,rgba(120,0,40,.55),rgba(0,0,0,.92) 65%);}
+.trap-word{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-family:var(--display);font-size:clamp(54px,18vw,110px);line-height:1;color:#ffe34d;letter-spacing:.04em;opacity:0;white-space:nowrap;
+  -webkit-text-stroke:3px #7a0014;text-shadow:0 0 24px rgba(255,40,80,.95),0 6px 0 #4a000c;}
+.trap-card{position:absolute;left:50%;top:52%;transform:translate(-50%,-50%);opacity:0;} .trap-card .card{--cw:min(230px,56vw);}
+.trap-sub{position:absolute;left:0;right:0;bottom:calc(10% + env(safe-area-inset-bottom));text-align:center;color:#fff;font:800 17px var(--body);opacity:0;text-shadow:0 2px 6px #000;} .trap-sub b{color:#ff9ac0;}
 </style>
 
 <div id="app">

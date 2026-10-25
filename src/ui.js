@@ -266,6 +266,7 @@ const ART = {
   a_ruhatar:  { src:'art/pc_ruhatar.webp', av:'50% 22%', pos:'50% 25%' },
   a_pezsgo:   { src:'art/pc_pezsgo.webp', pos:'50% 50%' },
   a_kalinka:  { src:'art/pc_kalinka.webp', pos:'40% 50%' },
+  c_alina:    { src:'art/pc_alina.webp', av:'52% 22%', pos:'52% 20%' },
   c_pc_laci:  { src:'art/pc_laci.webp', av:'38% 22%', pos:'38% 20%' },
   c_pg:       { src:'art/pc_pg.webp', av:'45% 15%', pos:'45% 14%' },
   c_idegen:   { src:'art/pc_idegen.webp', av:'45% 30%', pos:'45% 28%' },
@@ -806,6 +807,7 @@ function logEvents(evs, snap) {
       case 'purple': L(`💜 Peaches Purple Card: ${unitName(e.side, e.i)} nem dobható ki`); break;
       case 'ruhatar': L(e.o === 1 ? `🧥 Ruhatár: <b class="lc" data-lc="${e.id}">${escH(CARD[e.id].name)}</b> kiváltva – vissza a kézbe` : `🧥 Ruhatár: <b class="lc" data-lc="${e.id}">${escH(CARD[e.id].name)}</b> leadva – a kézbe, 1-gyel olcsóbban`); break;
       case 'wcneni': L(`🚽 A WC-s néni elviharzott (vissza a kézbe) – jön a Peaches Portás!`); break;
+      case 'alinatrap': L(`🪤 CSAPDA! A(z) <b class="lc" data-lc="${e.from}">${escH(CARD[e.from].name)}</b> valójában <b class="lc" data-lc="c_alina">Alina</b> volt (5/1)`); break;
       case 'midnightstart': L('🌙 <b>Elmúlt ÉJFÉL</b> – az „Éjfél után” lapok mostantól élnek'); break;
       case 'belvedere': L(`🍾 Három Literes Belvedere: a mellette állók +1/+1`); break;
       case 'midnight': L(`🌙 Éjfél után: <b class="lc" data-lc="${e.id}">${escH(CARD[e.id].name)}</b> bekapcsolt${e.b ? ' (Laszy: +1)' : ''}`); break;
@@ -1046,6 +1048,7 @@ async function animateEvents(evs) {
       case 'purple': floatAt(anchor, '💜 VIP – nem dobható ki!', 'buff'); hold = Math.max(hold, 600); break;
       case 'ruhatar': if (e.i >= 0) { fx(el, e.side === ME ? 'fx-bounce-down' : 'fx-bounce-up'); floatAt(anchor, '🧥 Ruhatárba!', 'info'); } hold = Math.max(hold, 600); break;
       case 'wcneni': fx(el, e.side === ME ? 'fx-bounce-down' : 'fx-bounce-up'); floatAt(anchor, '🚽 „Na majd adok én neked!”', 'info'); hold = Math.max(hold, 900); break;
+      case 'alinatrap': await alinaTrapFx(e, el); break;
       case 'midnightstart': await midnightIntro(); break;
       case 'zap': await zapFx(e); break;
       case 'party': await partyFx(e); break;
@@ -1111,6 +1114,23 @@ async function runFx(fn) {
 
 // ---------- kánon esemény lapok ----------
 // Bevonulás: elsötétül a pálya, fénysugarak, a lap becsapódik középre, „KIVÉGZŐ” felirat
+/* Alina CSAPDA (2026-10-25, Tomi): óriás „CSAPDA!” felirat, majd az Alina lap beúszik középre – mindkét játékos látja */
+async function alinaTrapFx(e, el) {
+  const o = document.createElement('div'); o.className = 'trap-fx';
+  o.innerHTML = `<div class="trap-dark"></div><div class="trap-word">CSAPDA!</div><div class="trap-card">${cardHTML('c_alina', { big: true })}</div><div class="trap-sub">${escH(CARD[e.from].name)} valójában… <b>Alina</b> volt!</div>`;
+  $('#layer').appendChild(o);
+  const skip = () => new Promise(r => { const t0 = performance.now(); o.addEventListener('pointerdown', () => { if (performance.now() - t0 > 300) r(); }); });
+  if (el) fx(el, 'fx-quake');
+  o.querySelector('.trap-dark').animate([{ opacity: 0 }, { opacity: 1 }], { duration: 220, fill: 'forwards' });
+  await o.querySelector('.trap-word').animate([{ transform: 'translate(-50%,-50%) scale(3.2) rotate(-8deg)', opacity: 0 }, { transform: 'translate(-50%,-50%) scale(.92) rotate(2deg)', opacity: 1, offset: .7 }, { transform: 'translate(-50%,-50%) scale(1) rotate(-3deg)', opacity: 1 }], { duration: 480, easing: 'cubic-bezier(.2,1.3,.4,1)', fill: 'forwards' }).finished;
+  fx($('#app'), 'fx-quake');
+  await sleep(450);
+  o.querySelector('.trap-word').animate([{ transform: 'translate(-50%,-50%) rotate(-3deg)', top: '50%' }, { transform: 'translate(-50%,-50%) scale(.6) rotate(-3deg)', top: '14%' }], { duration: 380, easing: 'ease-in-out', fill: 'forwards' });
+  o.querySelector('.trap-card').animate([{ transform: 'translate(-50%,-50%) scale(.3) rotateY(180deg)', opacity: 0 }, { transform: 'translate(-50%,-50%) scale(1.05) rotateY(0)', opacity: 1, offset: .75 }, { transform: 'translate(-50%,-50%) scale(1)', opacity: 1 }], { duration: 650, easing: 'cubic-bezier(.2,.9,.3,1)', fill: 'forwards' });
+  o.querySelector('.trap-sub').animate([{ opacity: 0 }, { opacity: 1 }], { duration: 300, delay: 500, fill: 'forwards' });
+  await Promise.race([sleep(2300), skip()]);
+  await o.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 300, fill: 'forwards' }).finished; o.remove();
+}
 /* „Elmúlt ÉJFÉL” (2026-10-24, Tomi): a 6. kör elején – éjszakai égbolt, csillagok, felkelő telihold, óriás felirat; Kánon-szintű jelenet */
 async function midnightIntro() {
   const o = document.createElement('div'); o.className = 'mid-intro';
@@ -1295,7 +1315,8 @@ function unitHTML(u, side, i) {
     + ((c.taunt && !u.noKw) || u.taunt ? '<span class="stb taunt" role="img" aria-label="Provokál" title="Provokáció: mindenki őt támadja"></span>' : '')
     + ((c.elusive && !u.noKw) || u.elusive ? '<span class="kwt el" role="img" aria-label="Igézhetetlen" title="Igézhetetlen: akcióval nem célozható">🛡</span>' : '')
     + (c.revive && !u.noKw && !u.revived ? '<span class="kwt rv" role="img" aria-label="Feltámadás" title="Feltámadás: egyszer feléled">♻</span>' : '')
-    + (u.noKw ? '<span class="kwt nk" role="img" aria-label="Süti: nincs kulcsszava" title="Süti: elvesztette a kulcsszavait">🍪</span>' : '');
+    + (u.noKw ? '<span class="kwt nk" role="img" aria-label="Süti: nincs kulcsszava" title="Süti: elvesztette a kulcsszavait">🍪</span>' : '')
+    + (u.alina && !u.alinaOn && side === ME ? '<span class="kwt al" role="img" aria-label="Valójában Alina" title="Csak te látod: valójában Alina (álca)">🪤</span>' : '');   /* csak a gazdája látja */
   const fa = CARD[u.id].foilOnly || !!u.foil;
   return `<button data-uid="${u.uid}" class="unit ${TYPE.char[1]}${fa ? ' fa' : ''}${CARD[u.id].diamond ? ' diamond' : ''}${u.shield ? ' shield' : ''}${sleeping ? ' sleep' : ''}" style="--h:${hueOf(u.id)}">
     <span class="uin">${ART[u.id] ? `<span class="art has-art" style="${artStyle(u.id)}"></span>` : `<span class="art"><span class="mono">${initials(c.name)}</span></span>`}<span class="uname${c.name.length > 14 ? ' long' : ''}${longWord(c.name) > 10 ? ' xl' : ''}">${c.name}</span></span>

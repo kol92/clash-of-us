@@ -89,4 +89,11 @@ const B = s => s.players[0].board;
   ok(!B(s)[0] && v && !v.kickN && s.players[0].hand.length === 2, 'Hazafelé taxi: vissza a kézbe drágulás nélkül + húzás'); }
 { const s = G(); play(s, 0, 'l_tanc', { k: 'none' }); play(s, 0, 'c_gyuri', { k: 'slot', side: 0, i: 1 }); play(s, 0, 'c_gyuri', { k: 'slot', side: 0, i: 0 }); ok(E.effAtk(s, 0, 1) === 3 && E.effAtk(s, 0, 0) === 2, 'Tánctér: középen +1'); }
 { const s = G(); play(s, 1, 'c_vajda', { k: 'slot', side: 1, i: 0 }); play(s, 0, 'i_telefon', { k: 'unit', side: 1, i: 0 }); ok(s.players[1].board[0].stun === 1 && s.players[1].noExtra, 'Elveszett telefon: bénult, nincs extra húzás'); }
+// Alina (2026-10-25)
+{ const s = G(); s.events = []; play(s, 0, 'c_alina', { k: 'slot', side: 0, i: 1 }); const u = B(s)[1], pe = s.events.find(e => e.t === 'play');
+  ok(u.alina && u.id !== 'c_alina' && E.CARD[u.id].cost === 1 && pe.id === u.id, `Alina álcában: ${u.id} (a play esemény is az álcát mutatja)`);
+  play(s, 1, 'c_vajda', { k: 'slot', side: 1, i: 1 }); s.players[1].board[1].fresh = false; s.active = 1; s.events = []; E.runEndTurn(s);
+  const a = B(s)[1]; ok(a && a.id === 'c_alina' && a.atk === 5 && s.events.some(e => e.t === 'alinatrap'), 'CSAPDA: megütik → Alina 5/1, nem sebződik');
+  ok(!s.players[1].board[1] || s.players[1].board[1].hp <= 4 - 5, 'Alina 5-tel üt vissza'); }
+{ const s = G(); play(s, 0, 'c_alina', { k: 'slot', side: 0, i: 0 }); B(s)[0].hp = 0; play(s, 0, 'c_gyuri', { k: 'slot', side: 0, i: 3 }); ok(s.players[0].grave.some(g => g.id === 'c_alina'), 'álcában meghalva Alinaként kerül a temetőbe'); }
 console.log(fails ? 'HIBÁK: ' + fails : 'PEACHES 2 OK');
