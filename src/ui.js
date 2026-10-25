@@ -169,6 +169,7 @@ const ART = {
   p_laci_hw:      { src:'art/p_laci_hw.webp', av:'72% 25%', pos:'66% 24%', port:'72% 22%' },
   p_sasi_mage:    { src:'art/p_sasi_mage.webp', av:'68% 16%', pos:'64% 18%', port:'68% 14%' },
   p_krisz_doffy:  { src:'art/p_krisz_doffy.webp', av:'52% 30%', pos:'52% 28%', port:'52% 26%' },
+  p_barna_dia:    { src:'art/p_barna_dia.webp', vid:'art/vid/p_barna_dia.mp4', av:'64% 18%', pos:'62% 20%', port:'64% 16%' },   /* mozgó gyémánt portré – 2. ranked szezon Legenda jutalma (2026-10-25) */
   p_gabi_beton:   { src:'art/p_gabi_beton.webp', av:'58% 26%', pos:'56% 26%', port:'58% 22%' },
   c_nyitinap:     { src:'art/nyitinap.webp', av:'72% 34%', pos:'66% 36%' },
   g_barna: { src:'art/g_barna.webp', av:'64% 20%', pos:'62% 20%', port:'64% 16%' },
@@ -391,6 +392,7 @@ const PORTRAITS = {
   p_tomi_hw:      { hero: 'tomi',  name: 'Tomi, a holdfény fotósa', passOnly: true, ev: 'hw26' },
   p_laci_hw:      { hero: 'laci',  name: 'Laci, az éjféli úriember', passOnly: true, ev: 'hw26' },
   p_krisz_doffy:  { hero: 'krisz', name: 'Krisz, Doflamingo style', price: 150, from: '2026-10-19' },
+  p_barna_dia:    { hero: 'barna', name: 'Gyémánt Barna', passOnly: true },   /* mozgó; csak a ranked Legendáért (2. szezon) */
   p_gabi_beton:   { hero: 'gabi',  name: 'Gabi, a Beton', passOnly: true },   /* 2. ranked szezon, Ezüst 5 jutalma (2026-10-23, Tomi) – boltban, ládában nincs */   /* bolt, 2026-10-19 (Tomi) */
   p_sasi_mage:    { hero: 'sasi',  name: 'Sasi, a mágus', price: 250, from: '2026-10-16' },   // bolt: a következő rotációtól (from = ettől a naptól kapható)   // event: a heti ládából is jöhet   // ajándék: Best of Us TCG nap (2026-10-12)
 };
@@ -402,7 +404,7 @@ function heroCardHTML(h, o = {}) {
   const htl = h.text.length, htc = htl > 150 ? ' tl-l tl-xl' : htl > 95 ? ' tl-l' : htl > 62 ? ' tl-m' : '';
   return `<div class="card t-hero${o.big ? ' big' : ''}${fk === 'gold' ? ' framed xf xf-gold gold' + htc : fk === 'foil' ? ' foil' : ' framed'}" style="--h:${h.hue}" ${o.attrs || ''}>
     <div class="cframe">
-      ${ART[aid] ? `<div class="art has-art" style="${artStyle(aid, o.big)}"></div>`
+      ${ART[aid] ? `<div class="art has-art" style="${artStyle(aid, o.big)}">${ART[aid].vid && (o.big || o.vid) ? artVidHTML(aid) : ''}</div>`
         : `<div class="art"><span class="mono">${initials(h.name)}</span>${o.big && !o.foil ? '<span class="artnote">Illusztráció helye</span>' : ''}</div>`}
       <div class="ctype">${gold ? 'Arany hős' : 'Hős'} · ${h.id === 'baszo' ? 12 : h.id === PASSIVE.bigHp ? 24 : 20} élet<i class="rar ${gold ? 'r-g' : 'r-l'}"></i></div>${gold ? '<i class="gold-dust"></i>' : ''}
       <div class="name">${port ? PORTRAITS[port].name : h.name}</div>
@@ -1247,6 +1249,17 @@ const BASZO = { id:'baszo', name:'Baszó', hue:330, text:'A köröd végén a ka
 const heroOf = pi => S.players[pi].baszo ? BASZO
   : S.players[pi].machine === 2 ? { ...HERO[S.players[pi].heroId], id:'milo_gep', text: HERO[S.players[pi].heroId].text + ' Gépüzemmódban: már visszatért 10 élettel.' }
   : HERO[S.players[pi].heroId];
+/* mozgó portré a meccsen (2026-10-25): egy megmaradó <video> elemet teszünk a portré alá – a sáv újrarajzolásakor sem indul újra */
+const HVID = {};
+function heroVidAttach(pi) {
+  const bar = $(pi === ME ? '#pBar' : '#eBar'), hp = bar && bar.querySelector('.hport'); if (!hp) return;
+  const p = S.players[pi], bz = !!p.baszo || p.machine === 2, port = !bz && heroPortOf(pi), src = port && ART[port].vid;
+  let v = HVID[pi];
+  if (!src) { if (v) { v.remove(); delete HVID[pi]; } return; }
+  if (!v || v.dataset.src !== src) { if (v) v.remove(); v = document.createElement('video'); v.className = 'hport-vid'; v.dataset.src = src; v.src = src; v.muted = true; v.loop = true; v.autoplay = true; v.playsInline = true;
+    v.setAttribute('playsinline', ''); v.setAttribute('aria-hidden', 'true'); v.style.objectPosition = ART[port].port || '50% 15%'; v.oncanplay = () => { v.muted = true; v.play().catch(() => {}); }; v.onplaying = () => v.classList.add('on'); HVID[pi] = v; }
+  if (v.parentNode !== hp) hp.prepend(v);
+}
 function heroBar(pi) {
   const p = S.players[pi], h = heroOf(pi), bz = !!p.baszo || p.machine === 2;   // átváltozott hős: saját portré, arany/Full Art nélkül
   const pips = Array.from({ length: Math.max(6, p.energy) }, (_, k) => `<i class="${k < p.energy ? 'on' + (k >= 6 ? ' bonus' : '') : k < p.maxEnergy ? 'used' : 'locked'}"></i>`).join('');   // Egy pohár víz: 6 fölött a 7. kristály is kigyullad
@@ -1347,7 +1360,7 @@ function render() {
   const mvOk = ui.mv != null && ui.sel == null && !busy && canMove(S, ME, ui.mv);   /* Laci cipőkanala: áthelyezés módban a lehetséges új helyek */
   if (ui.mv != null && !mvOk) ui.mv = null;
   const tg = mvOk ? moveTargets(S, ME, ui.mv) : ui.pend != null ? pendNext(all) : all;
-  setHTML($('#eBar'), heroBar(BOT)); setHTML($('#pBar'), heroBar(ME));
+  setHTML($('#eBar'), heroBar(BOT)); setHTML($('#pBar'), heroBar(ME)); heroVidAttach(BOT); heroVidAttach(ME);
   $('#eBar').classList.remove('aim'); $('#pBar').classList.remove('aim');
   $('#eBar').classList.toggle('active', S.active === BOT && S.winner == null); $('#pBar').classList.toggle('active', S.active === ME && S.winner == null);
   $('#eBar').classList.toggle('tgt', tg.some(t => t.k === 'hero' && t.side === BOT));
@@ -1799,7 +1812,7 @@ function vsIntro() {
       const who = pi === ME ? (Store.p?.name || 'Te') : S.pvp ? (S.names?.[pi] || 'Ellenfél') : 'Bot';
       const pos = ART[aid]?.port || ART[aid]?.pos || ART[aid]?.av || '50% 15%';
       return `<div class="vs-side ${pi === ME ? 'me' : 'foe'}${gold ? ' gold' : ''}${port || gold || heroFaOf(pi) ? ' fa' : ''}" style="--h:${h.hue}">
-        <div class="vs-art" style="${ART[aid] ? `background-image:url('${artSrc(aid, false)}');` : ''}background-position:${pos}"></div>
+        <div class="vs-art" style="${ART[aid] ? `background-image:url('${artSrc(aid, false)}');` : ''}background-position:${pos}">${ART[aid] && ART[aid].vid ? `<video class="art-vid" src="${ART[aid].vid}" muted loop autoplay playsinline aria-hidden="true" style="object-position:${pos}" oncanplay="this.muted=true;this.play().catch(()=>{})" onplaying="this.classList.add('on')"></video>` : ''}</div>
         <div class="vs-plate"><small>${pi === ME ? `Te · ${escH(who)}` : S.pvp ? `Ellenfél · ${escH(who)}` : `Bot · ${BOT_LV_NAME[S.botLv || 2]}${S.botLv === 4 ? ' (+6 élet)' : ''}`}</small><b>${crownHTML(crownOf(pi), 'cr-vs')}${escH(h.name)}</b></div></div>`;
     };
     const firstTxt = S.active === ME ? 'Te kezdesz' : `${S.pvp ? escH(S.names?.[BOT] || 'Az ellenfél') : 'Az ellenfél'} kezd`;
