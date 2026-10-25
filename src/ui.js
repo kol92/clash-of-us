@@ -266,6 +266,7 @@ const ART = {
   a_ruhatar:  { src:'art/pc_ruhatar.webp', av:'50% 22%', pos:'50% 25%' },
   a_pezsgo:   { src:'art/pc_pezsgo.webp', pos:'50% 50%' },
   a_kalinka:  { src:'art/pc_kalinka.webp', pos:'40% 50%' },
+  c_pc_bence: { src:'art/pc_bence.webp', av:'42% 25%', pos:'42% 22%' },
   c_alina:    { src:'art/pc_alina.webp', av:'52% 22%', pos:'52% 20%' },
   c_pc_laci:  { src:'art/pc_laci.webp', av:'38% 22%', pos:'38% 20%' },
   c_pg:       { src:'art/pc_pg.webp', av:'45% 15%', pos:'45% 14%' },
