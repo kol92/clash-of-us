@@ -277,6 +277,7 @@ const ART = {
   l_csirkes:  { src:'art/pc_csirkes.webp', av:'50% 65%', pos:'50% 60%' },
   l_tanc:     { src:'art/pc_tanc.webp', av:'50% 40%', pos:'50% 40%' },
   a_utolso:   { src:'art/pc_utolso.webp', pos:'50% 35%' },
+  c_pultos:   { src:'art/pc_pultos.webp', av:'52% 12%', pos:'52% 12%' },
   c_alina:    { src:'art/pc_alina.webp', av:'52% 22%', pos:'52% 20%' },
   c_pc_laci:  { src:'art/pc_laci.webp', av:'38% 22%', pos:'38% 20%' },
   c_pg:       { src:'art/pc_pg.webp', av:'45% 15%', pos:'45% 14%' },
