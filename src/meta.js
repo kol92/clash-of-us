@@ -3216,7 +3216,7 @@ const RK_LATER = { r2: [
   { min: 10, key: 'r2_back',  name: 'S2 Ranked hátlap' },
   { min: 15, key: 'r2_var',   name: 'Legendás ??? változat' },
   { min: 20, key: 'r2_dia',   name: 'új Gyémánt lap' },
-  { min: 25, key: 'r2_port',  name: 'mozgó Gyémánt hős-portré' },
+  { min: 25, key: 'r2_port',  name: 'Gyémánt Barna – mozgó hős-portré', grant: p => { if (!(p.portraits || []).includes('p_barna_dia')) p.portraits = [...(p.portraits || []), 'p_barna_dia']; p.heroSkin = { ...(p.heroSkin || {}), barna: 'p_barna_dia' }; }, show: () => heroCardHTML(HERO.barna, { big: true, port: 'p_barna_dia' }), note: 'Barna mostantól ezt a mozgó gyémánt portrét viseli – a meccseken is mozog. A Gyűjteményben a hősre koppintva visszaválthatsz.' },   /* 2026-10-25 (Tomi) */
 ] };
 const rkLaterFor = (sid, min) => (RK_LATER[sid] || []).filter(x => x.min === min);
 function rkLaterCheck(p) {   /* elkészült extra jutalmak kiosztása (egyszer, p.rkLater[key]) */
