@@ -267,6 +267,7 @@ const ART = {
   a_pezsgo:   { src:'art/pc_pezsgo.webp', pos:'50% 50%' },
   a_kalinka:  { src:'art/pc_kalinka.webp', pos:'40% 50%' },
   c_pc_bence: { src:'art/pc_bence.webp', av:'42% 25%', pos:'42% 22%' },
+  a_royal:    { src:'art/pc_royal.webp', pos:'45% 40%' },
   c_alina:    { src:'art/pc_alina.webp', av:'52% 22%', pos:'52% 20%' },
   c_pc_laci:  { src:'art/pc_laci.webp', av:'38% 22%', pos:'38% 20%' },
   c_pg:       { src:'art/pc_pg.webp', av:'45% 15%', pos:'45% 14%' },
@@ -808,6 +809,8 @@ function logEvents(evs, snap) {
       case 'purple': L(`💜 Peaches Purple Card: ${unitName(e.side, e.i)} nem dobható ki`); break;
       case 'ruhatar': L(e.o === 1 ? `🧥 Ruhatár: <b class="lc" data-lc="${e.id}">${escH(CARD[e.id].name)}</b> kiváltva – vissza a kézbe` : `🧥 Ruhatár: <b class="lc" data-lc="${e.id}">${escH(CARD[e.id].name)}</b> leadva – a kézbe, 1-gyel olcsóbban`); break;
       case 'wcneni': L(`🚽 A WC-s néni elviharzott (vissza a kézbe) – jön a Peaches Portás!`); break;
+      case 'royalno': L(`🗯️ ${unitName(e.side, e.i)}: „Vidd innen ezt a szart!” – a Royal helyett egy Dinnyés Absolute Vodka a kézbe`); break;
+      case 'royalbad': L(`🤢 Royal Vodka + Burn: ${unitName(e.side, e.i)} másnap – 2 sebzés és bénult`); break;
       case 'alinatrap': L(`🪤 CSAPDA! A(z) <b class="lc" data-lc="${e.from}">${escH(CARD[e.from].name)}</b> valójában <b class="lc" data-lc="c_alina">Alina</b> volt (5/1)`); break;
       case 'midnightstart': L('🌙 <b>Elmúlt ÉJFÉL</b> – az „Éjfél után” lapok mostantól élnek'); break;
       case 'belvedere': L(`🍾 Három Literes Belvedere: a mellette állók +1/+1`); break;
@@ -1050,6 +1053,8 @@ async function animateEvents(evs) {
       case 'ruhatar': if (e.i >= 0) { fx(el, e.side === ME ? 'fx-bounce-down' : 'fx-bounce-up'); floatAt(anchor, '🧥 Ruhatárba!', 'info'); } hold = Math.max(hold, 600); break;
       case 'wcneni': fx(el, e.side === ME ? 'fx-bounce-down' : 'fx-bounce-up'); floatAt(anchor, '🚽 „Na majd adok én neked!”', 'info'); hold = Math.max(hold, 900); break;
       case 'alinatrap': await alinaTrapFx(e, el); break;
+      case 'royalno': if (el) sayBubble(el, 'Vidd innen ezt a szart!', e.side); floatAt(anchor, '🍸 Dinnyés a kezedbe', 'info'); hold = Math.max(hold, 1400); break;
+      case 'royalbad': floatAt(anchor, '🤢 Royal + Burn: másnap…', 'dmg'); hold = Math.max(hold, 700); break;
       case 'midnightstart': await midnightIntro(); break;
       case 'zap': await zapFx(e); break;
       case 'party': await partyFx(e); break;

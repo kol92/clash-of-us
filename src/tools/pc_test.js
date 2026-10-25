@@ -96,4 +96,8 @@ const B = s => s.players[0].board;
   const a = B(s)[1]; ok(a && a.id === 'c_alina' && a.atk === 5 && s.events.some(e => e.t === 'alinatrap'), 'CSAPDA: megütik → Alina 5/1, nem sebződik');
   ok(!s.players[1].board[1] || s.players[1].board[1].hp <= 4 - 5, 'Alina 5-tel üt vissza'); }
 { const s = G(); play(s, 0, 'c_alina', { k: 'slot', side: 0, i: 0 }); B(s)[0].hp = 0; play(s, 0, 'c_gyuri', { k: 'slot', side: 0, i: 3 }); ok(s.players[0].grave.some(g => g.id === 'c_alina'), 'álcában meghalva Alinaként kerül a temetőbe'); }
+{ const s = G(); play(s, 0, 'c_gyuri', { k: 'slot', side: 0, i: 0 }); play(s, 0, 'a_royal', { k: 'unit', side: 0, i: 0 }); ok(B(s)[0].atk === 5 && B(s)[0].haste, 'Royal: +3/+0 és Lendület');
+  B(s)[0].hp = 5; B(s)[0].maxHp = 5; s.active = 0; E.runEndTurn(s); s.active = 1; E.runEndTurn(s); ok(B(s)[0] && B(s)[0].hp === 3 && B(s)[0].stun === 1, 'Royal: másnap 2 sebzés és bénult');
+  const t = G(); play(t, 0, 'c_ah_laci', { k: 'slot', side: 0, i: 0 }); t.players[0].hand = []; const a0 = t.players[0].board[0].atk; play(t, 0, 'a_royal', { k: 'unit', side: 0, i: 0 });
+  ok(t.players[0].board[0].atk === a0 && t.players[0].hand.some(h => h.id === 'a_dinnyes'), 'Royal Lacira: „Vidd innen” – Dinnyés a kézbe'); }
 console.log(fails ? 'HIBÁK: ' + fails : 'PEACHES 2 OK');
