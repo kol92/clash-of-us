@@ -228,7 +228,7 @@ const HERO = Object.fromEntries(HEROES.map(h => [h.id, h]));
 const PASSIVE = { firstCharAtk:'barna', endHeal:'gabi', firstTwo:'krisz', itemHp:'tomi', regular:'david', bigHp:'bence', deathPing:'milo', extraDraw:'laci', teamPing:'sasi', wildParty:'laszy', midnightPlus:'laszy' };
 /* Laszy: az „Éjfél után” hatások +1-gyel erősebbek (+1/+1, +1 sebzés vagy +1 gyógyítás) – a Peaches lapok ezt használják: midBonus(p) */
 const midBonus = p => has(p, 'midnightPlus') ? 1 : 0;
-const ALINA_POOL = () => CARDS.filter(c => c.type === 'char' && c.cost === 1 && !c.token && !c.hero && !c.variantOf && !c.off && !c.enemySide && !c.mid && !c.sneak && (!c.set || c.set === 'ah' || c.set === 'pc')).map(c => c.id);
+const ALINA_POOL = () => CARDS.filter(c => c.type === 'char' && c.cost === 1 && !c.token && !c.hero && !c.variantOf && !c.off && !c.enemySide && !c.mid && !c.sneak && !c.invis && (!c.set || c.set === 'ah' || c.set === 'pc')).map(c => c.id);   /* Láthatatlan álca nem: azt nem lehetne megütni */
 const realId = u => u && u.alina && !u.alinaOn ? 'c_alina' : u && u.id;   /* Alina álcában: a valódi lap */
 function alinaTrap(s, side, i) {   /* CSAPDA: az álca lehull – 5/1-es Alina (a rajta lévő eszközök bónusza megmarad) */
   const u = s.players[side].board[i], dc = CARD[u.id];
