@@ -2466,7 +2466,7 @@ html:has(body.in-game){overscroll-behavior:none;}
 <script src="vendor/firebase-auth-compat.js"></script>
 <script src="vendor/firebase-firestore-compat.js"></script>
 <script src="vendor/firebase-database-compat.js"></script>
-<script>window.APP_VERSION = "2026.10.25-1016"; window.APP_BUILD = "2026.10.25-1414";</script>
+<script>window.APP_VERSION = "2026.10.25-1016"; window.APP_BUILD = "2026.10.25-1416";</script>
 <script>// ===== Best of Us – saját szerver (Firebase) =====
 // A játék eredetileg a Claude-os tárolót használta (window.claude.use('db' | 'user' | 'room')).
 // Ez a fájl ugyanazt a felületet adja Firebase-ből, így a játék kódja szinte változatlan maradhat:
@@ -6397,6 +6397,9 @@ async function bootProfile() {
   if (Store.mode === 'local' && !Store.p) Store.p = migrate(lsGet());
   if (Store.p && Store.p._dirty) { delete Store.p._dirty; save(); }
   if (TEST_MODE && Store.p && TEST_ALL_CARDS.includes(String(Store.p.name || '').trim().toLowerCase())) testGrantAll(Store.p);   /* teszt: minden lap ennek a profilnak */
+  if (TEST_MODE && Store.p && !(Store.p.portraits || []).includes('p_barna_dia')) {   /* teszt (2026-10-25, Tomi): mindenki kipróbálhatja a mozgó Gyémánt Barna portrét */
+    const p = Store.p; p.portraits = [...(p.portraits || []), 'p_barna_dia']; p.heroSkin = { ...(p.heroSkin || {}), barna: 'p_barna_dia' }; save();
+    setTimeout(() => toast('🧪 Teszt: megkaptad a mozgó Gyémánt Barna portrét (Barna már ezt viseli)'), 1600); }
   if (Store.giftMsg) { const m = Store.giftMsg; Store.giftMsg = null; setTimeout(() => toast(m), 600); }
   if (Store.faMsg) { const m = Store.faMsg; Store.faMsg = null; setTimeout(() => toast(m), 4200); }
   if (Store.dupeMsg) { const m = Store.dupeMsg; Store.dupeMsg = null; setTimeout(() => toast(m), Store.giftMsg === null ? 2400 : 600); }
