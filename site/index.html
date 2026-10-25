@@ -2441,7 +2441,7 @@ html:has(body.in-game){overscroll-behavior:none;}
 <script src="vendor/firebase-auth-compat.js"></script>
 <script src="vendor/firebase-firestore-compat.js"></script>
 <script src="vendor/firebase-database-compat.js"></script>
-<script>window.APP_VERSION = "2026.10.25-1414"; window.APP_BUILD = "2026.10.25-1414";</script>
+<script>window.APP_VERSION = "2026.10.25-1513"; window.APP_BUILD = "2026.10.25-1513";</script>
 <script>// ===== Best of Us – saját szerver (Firebase) =====
 // A játék eredetileg a Claude-os tárolót használta (window.claude.use('db' | 'user' | 'room')).
 // Ez a fájl ugyanazt a felületet adja Firebase-ből, így a játék kódja szinte változatlan maradhat:
@@ -4122,6 +4122,7 @@ const ART = {
   p_laci_hw:      { src:'art/p_laci_hw.webp?v=527c7a858048bb7b', av:'72% 25%', pos:'66% 24%', port:'72% 22%' },
   p_sasi_mage:    { src:'art/p_sasi_mage.webp?v=93208683e1286d47', av:'68% 16%', pos:'64% 18%', port:'68% 14%' },
   p_krisz_doffy:  { src:'art/p_krisz_doffy.webp?v=afd6437cba284431', av:'52% 30%', pos:'52% 28%', port:'52% 26%' },
+  p_barna_fa:     { src:'art/p_barna_fa.webp?v=f9eca12166f3ebad', av:'70% 14%', pos:'68% 14%', port:'70% 12%' },   /* bolt, 2026-10-25 (Tomi) */
   p_barna_dia:    { src:'art/p_barna_dia.webp?v=b86771320c609444', vid:'art/vid/p_barna_dia.mp4?v=4279c903', av:'64% 18%', pos:'62% 20%', port:'64% 16%' },   /* mozgó gyémánt portré – 2. ranked szezon Legenda jutalma (2026-10-25) */
   p_gabi_beton:   { src:'art/p_gabi_beton.webp?v=c59e0018cd6d061c', av:'58% 26%', pos:'56% 26%', port:'58% 22%' },
   c_nyitinap:     { src:'art/nyitinap.webp?v=cdbcc561b41ba1d1', av:'72% 34%', pos:'66% 36%' },
@@ -4323,6 +4324,7 @@ const PORTRAITS = {
   p_tomi_hw:      { hero: 'tomi',  name: 'Tomi, a holdfény fotósa', passOnly: true, ev: 'hw26' },
   p_laci_hw:      { hero: 'laci',  name: 'Laci, az éjféli úriember', passOnly: true, ev: 'hw26' },
   p_krisz_doffy:  { hero: 'krisz', name: 'Krisz, Doflamingo style', price: 150, from: '2026-10-19' },
+  p_barna_fa:     { hero: 'barna', name: 'Barna, a favágó', price: 100, from: '2026-10-25' },   /* bolt, 2026-10-25 (Tomi) */
   p_barna_dia:    { hero: 'barna', name: 'Gyémánt Barna', passOnly: true },   /* mozgó; csak a ranked Legendáért (2. szezon) */
   p_gabi_beton:   { hero: 'gabi',  name: 'Gabi, a Beton', passOnly: true },   /* 2. ranked szezon, Ezüst 5 jutalma (2026-10-23, Tomi) – boltban, ládában nincs */   /* bolt, 2026-10-19 (Tomi) */
   p_sasi_mage:    { hero: 'sasi',  name: 'Sasi, a mágus', price: 250, from: '2026-10-16' },   // bolt: a következő rotációtól (from = ettől a naptól kapható)   // event: a heti ládából is jöhet   // ajándék: Best of Us TCG nap (2026-10-12)

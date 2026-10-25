@@ -497,6 +497,9 @@ Hősképesség-ötletek a táblázatban (még nem zöldek, nincsenek beépítve)
 - Új: „Kijátszáskor a kezedbe kerül egy Varázsgomba.” (eddig a paklidba keverte), és **2/2** lett (3/2 helyett). A sima „kézbe” változat mérve nagy erősítés volt (Amsterdam kezdőpaklik a Base kezdőpaklik ellen, 480 meccs/pakli: Barna 44→59%, Bence 48→65%, Tomi 58→73%, Krisz 46→63%); Tomi döntése a mérés után: kézbe + 2/2 (Barna 54%, Bence 59%, Tomi 68%, Krisz 64%). Megjegyzés: az Amsterdam paklik a Base kezdőpaklik ellen eleve 45–60% körül voltak.
 - **Mérés (nem élesített): Varázsgomba + 1 lap húzás.** Ugyanezzel a módszerrel a gombás paklik +4–16 ponttal erősödnének (pl. Tomi gombás paklija 68→85%, Bence AH 65→77%, Milo AH 61→74%) – túl erős.
 
+## Bolti portré: Barna, a favágó (2026-10-25, Tomi)
+- `p_barna_fa` – Barna hős-portré (fagerendával a vállán, őszi kert), **100 coin**, a limitált kínálatban 2026-10-25-től (a 10-29-i rotációig, ha addig nem jön más kérés).
+
 ## Mozgó Gyémánt Barna portré – ranked Legenda jutalom (2026-10-25, Tomi)
 - `p_barna_dia` („Gyémánt Barna”, `passOnly`): Tomi videójából (1080×1440, 5 mp) → `art/vid/p_barna_dia.mp4` (H.264 600×800, crf 29, hang nélkül, ~0,5 MB) + állókép `art/p_barna_dia.webp` (1,2 mp-nél). A 2. ranked szezon **Legenda** jutalma (`RK_LATER.r2` `r2_port` – kész a grant): aki eléri, megkapja és Barna rögtön ezt viseli (felugró nagy portré). Aki a szezonban elérte, utólag is megkapja.
 - **Mozog:** a nagy lapnézetben (`heroCardHTML` + `artVidHTML`), a VS képernyőn és **meccs közben a hős-sávban** is (`heroVidAttach`: egy megmaradó `<video>` a `.hport`-ban, a sáv újrarajzolásakor nem indul újra; PvP-ben az ellenfél is látja, mert a portré a `cos.port`-ban megy át). Csökkentett mozgás beállításnál álló kép. A service worker a videót nem tárolja (mint a többi .mp4-et).
