@@ -266,6 +266,11 @@ const ART = {
   a_ruhatar:  { src:'art/pc_ruhatar.webp', av:'50% 22%', pos:'50% 25%' },
   a_pezsgo:   { src:'art/pc_pezsgo.webp', pos:'50% 50%' },
   a_kalinka:  { src:'art/pc_kalinka.webp', pos:'40% 50%' },
+  c_pc_laci:  { src:'art/pc_laci.webp', av:'38% 22%', pos:'38% 20%' },
+  c_pg:       { src:'art/pc_pg.webp', av:'45% 15%', pos:'45% 14%' },
+  c_idegen:   { src:'art/pc_idegen.webp', av:'45% 30%', pos:'45% 28%' },
+  c_pc_gabi:  { src:'art/pc_gabi.webp', av:'45% 12%', pos:'45% 12%' },
+  f_korlatlan:{ src:'art/pc_korlatlan.webp', av:'50% 30%', pos:'50% 30%' },
   c_belvedere:{ src:'art/belvedere.webp', av:'50% 40%', pos:'50% 35%' },
   f_csoves:  { src:'art/f_csoves.webp', av:'40% 22%', pos:'40% 20%' },   /* Laszy Kánonja (teszt) */
   c_szolga1: { src:'art/c_szolga1.webp', av:'50% 30%', pos:'50% 28%' },
