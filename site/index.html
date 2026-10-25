@@ -2474,7 +2474,7 @@ html:has(body.in-game){overscroll-behavior:none;}
 <script src="vendor/firebase-auth-compat.js"></script>
 <script src="vendor/firebase-firestore-compat.js"></script>
 <script src="vendor/firebase-database-compat.js"></script>
-<script>window.APP_VERSION = "2026.10.25-1751"; window.APP_BUILD = "2026.10.25-1752";</script>
+<script>window.APP_VERSION = "2026.10.25-1805"; window.APP_BUILD = "2026.10.25-1805";</script>
 <script>// ===== Best of Us – saját szerver (Firebase) =====
 // A játék eredetileg a Claude-os tárolót használta (window.claude.use('db' | 'user' | 'room')).
 // Ez a fájl ugyanazt a felületet adja Firebase-ből, így a játék kódja szinte változatlan maradhat:
@@ -2913,7 +2913,7 @@ const CARDS = [
   { id:'a_taxi', set:'pc', type:'action', name:'Hazafelé taxi', cost:3, tgt:'own', rarity:'r', text:'Egy saját karaktered visszakerül a kezedbe (nem drágul, az eszközei elvesznek), és húzol egy lapot.' },
   { id:'l_tanc', set:'pc', type:'loc', name:'Tánctér', cost:2, rarity:'k', text:'A középső két helyen álló karakterek +1 támadással ütnek.' },
   { id:'i_telefon', set:'pc', type:'item', name:'Elveszett telefon', cost:1, tgt:'enemy', rarity:'r', stun:1, text:'Ellenséges karakterre: a következő körében nem támad, a gazdája pedig abban a körben nem kap extra húzást.' },
-  { id:'c_alina', set:'pc', type:'char', name:'Alina', cost:3, atk:5, hp:1, rarity:'r', text:'Amikor lerakod, egy véletlen 1 energiás karakter alakját veszi fel (az értékeivel együtt). Az első sebzés helyett lelepleződik – CSAPDA! –, és 5/1-es Alinává változik.' },
+  { id:'c_alina', set:'pc', type:'char', name:'Alina', cost:3, atk:5, hp:1, rarity:'e', text:'Amikor lerakod, egy véletlen 1 energiás karakter alakját veszi fel (az értékeivel együtt). Az első sebzés helyett lelepleződik – CSAPDA! –, és 5/1-es Alinává változik.' },
   { id:'c_belvedere', set:'pc', drink:true, noParty:true, type:'char', name:'Három Literes Belvedere', cost:4, atk:0, hp:10, rarity:'l', noAttack:true, text:'Nem támad. Minden köröd végén, a támadás előtt a mellette álló karaktereid +1/+1-et kapnak.' },   /* 2026-10-24 (Tomi): gyűjthető legendás Ital-karakter; Tomi, éjfél után is ezt teszi le */
   { id:'a_kalinka', set:'pc', drink:true, type:'action', name:'0,2 Kalinka', cost:0, tgt:'own', rarity:'k', noParty:true, text:'Egy karaktered +1/+1. Ha Laszy issza meg: +2/+2 és Lendület.' },
   { id:'a_jager', set:'pc', drink:true, type:'action', name:'Jägermeister', cost:2, tgt:'own', rarity:'r', text:'Egy karaktered +2/+2. Éjfél után: helyette +3/+3 és Lendület.' },
