@@ -1169,23 +1169,28 @@ async function alinaTrapFx(e, el) {
   await o.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 300, fill: 'forwards' }).finished; o.remove();
 }
 /* „Elmúlt ÉJFÉL” (2026-10-24, Tomi): a 6. kör elején – éjszakai égbolt, csillagok, felkelő telihold, óriás felirat; Kánon-szintű jelenet */
-async function midnightIntro() {   /* 2026-10-26: Astra-kép (art/ui/midnight.webp) – a felirat a képen van; mozgás: beúszás, holdfény-pulzálás, villanás, csillagok */
-  const o = document.createElement('div'); o.className = 'mid-intro img';
-  o.innerHTML = `<div class="mid-bg" role="status" aria-label="Elmúlt éjfél – az „Éjfél után” lapok mostantól élnek"></div><div class="mid-glow"></div><div class="mid-stars">${Array.from({ length: 40 }, () => `<i style="left:${(Math.random() * 100).toFixed(1)}%;top:${(Math.random() * 60).toFixed(1)}%;--d:${(Math.random() * 2).toFixed(2)}s;--s:${(1 + Math.random() * 2).toFixed(1)}px"></i>`).join('')}</div><i class="mid-sweep"></i><div class="mid-flash"></div>`;
+async function midnightIntro() {   /* 2026-10-26 (Tomi): bulis videó (art/vid/midnight.mp4, 6 mp) – közben feljön az „ELMÚLT ÉJFÉL!” felirat */
+  const o = document.createElement('div'); o.className = 'mid-intro vid';
+  o.innerHTML = `<div class="mid-still"></div><video class="mid-vid" src="art/vid/midnight.mp4" muted autoplay playsinline disablepictureinpicture preload="auto" aria-hidden="true"></video>
+    <div class="mid-shade"></div><div class="mid-banner" role="status"><small>00:00</small><b>Elmúlt éjfél!</b><em>Az „Éjfél után” lapok mostantól élnek</em></div><div class="mid-flash"></div>`;
   $('#layer').appendChild(o);
-  const bg = o.querySelector('.mid-bg'), glow = o.querySelector('.mid-glow'), stars = o.querySelector('.mid-stars'), flash = o.querySelector('.mid-flash'), sweep = o.querySelector('.mid-sweep');
-  const skip = () => new Promise(r => { const t0 = performance.now(); o.addEventListener('pointerdown', () => { if (performance.now() - t0 > 300) r(); }); });
-  if (matchMedia('(prefers-reduced-motion: reduce)').matches) { bg.style.opacity = 1; await Promise.race([sleep(2500), skip()]); o.remove(); return; }
-  const inA = bg.animate([{ opacity: 0, transform: 'scale(1.14)', filter: 'brightness(.35) blur(4px)' }, { opacity: 1, transform: 'scale(1.02)', filter: 'brightness(1.15) blur(0)', offset: .75 }, { opacity: 1, transform: 'scale(1)', filter: 'brightness(1)' }],
-                         { duration: 1300, easing: 'cubic-bezier(.2,.8,.25,1)', fill: 'forwards' });
-  await sleep(950);
-  fx($('#app'), 'fx-quake');
-  flash.animate([{ opacity: .6 }, { opacity: 0 }], { duration: 450, easing: 'ease-out', fill: 'forwards' });
-  await inA.finished;
-  glow.classList.add('on'); stars.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 700, fill: 'forwards' });
-  sweep.animate([{ transform: 'translateX(-130%) skewX(-18deg)' }, { transform: 'translateX(130%) skewX(-18deg)' }], { duration: 1100, easing: 'ease-in-out' });
-  await Promise.race([sleep(3000), skip()]);
-  await o.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 420, fill: 'forwards' }).finished;
+  const v = o.querySelector('.mid-vid'), ban = o.querySelector('.mid-banner'), flash = o.querySelector('.mid-flash');
+  v.oncanplay = () => { v.muted = true; v.play().catch(() => {}); }; v.onplaying = () => v.classList.add('on');
+  let tapped = false; const t0 = performance.now(); o.addEventListener('pointerdown', () => { if (performance.now() - t0 > 400) tapped = true; });
+  const wait = ms => new Promise(r => { const s = performance.now(), k = () => (tapped || performance.now() - s >= ms) ? r() : setTimeout(k, 50); k(); });
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) { ban.style.opacity = 1; ban.style.transform = 'translate(-50%,0)'; await wait(2500); o.remove(); return; }
+  await o.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 350, fill: 'forwards' }).finished;
+  await wait(900);
+  if (!tapped) {
+    ban.animate([{ opacity: 0, transform: 'translate(-50%, 60vh) scale(.9)', filter: 'blur(6px)' }, { opacity: 1, transform: 'translate(-50%,-6px) scale(1.04)', filter: 'blur(0)', offset: .75 }, { opacity: 1, transform: 'translate(-50%,0) scale(1)', filter: 'blur(0)' }],
+                { duration: 900, easing: 'cubic-bezier(.2,.8,.25,1)', fill: 'forwards' });
+    await wait(650); fx($('#app'), 'fx-quake');
+    flash.animate([{ opacity: .5 }, { opacity: 0 }], { duration: 420, easing: 'ease-out', fill: 'forwards' });
+    setTimeout(() => ban.classList.add('glow'), 300);
+    const hint = document.createElement('small'); hint.className = 'fin-skip'; hint.textContent = 'Koppints a folytatáshoz'; o.appendChild(hint);
+    await wait(3400);
+  }
+  await o.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 450, fill: 'forwards' }).finished;
   o.remove();
 }
 async function finisherIntro(e) {

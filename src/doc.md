@@ -867,3 +867,7 @@ Hősképesség-ötletek a táblázatban (még nem zöldek, nincsenek beépítve)
 ## „Elmúlt ÉJFÉL” jelenet – új kép (2026-10-26, Astra)
 - A CSS-sel rajzolt hold helyett Astra képe (`art/ui/midnight.webp`, 852×1846; a felirat és a „Koppints a folytatáshoz” a képen van). Mozgás: sötétből, enyhe ráközelítésből beúszik, a 0,95. mp-nél villanás + rázkódás, utána a holdon finom pulzáló fény (`.mid-glow`), egy fénycsík fut át rajta és csillagok szikráznak; ~3 mp után (vagy koppintásra) eltűnik. Széles kijelzőn a kép nem vágódik le (`contain`). Élesben a Peaches megjelenéséig nem fut.
 
+## „Elmúlt ÉJFÉL” – videóval + Peaches főmenü-háttér (2026-10-26 este, Tomi; teszt)
+- A képes változat helyett (Tominak nem tetszett) **bulis videó**: `art/vid/midnight.mp4` (Tomi videójának 2,5–8,5 mp-e, 720×1120-ra vágva – az eredeti alján lévő üres keret kimarad –, 540×840, hang nélkül, ~1,1 MB), állókép: `art/ui/midnight-still.webp`. A videó teljes képernyőn megy, kb. 1,2 mp után alulról feljön a felirat egy arany keretes lila táblán: „00:00 / ELMÚLT ÉJFÉL! / Az „Éjfél után” lapok mostantól élnek”, villanás + rázkódás, a tábla pulzálva világít; ~5 mp után (vagy koppintásra) eltűnik.
+- **Peaches főmenü-háttér** (`art/ui/menu-pc.webp`, Tomi képe): `html.pc-live` alatt – a teszt oldalon mindig, élesben csak akkor, ha a teszt ág bekerül a mainbe (a megjelenéstől; a Halloween-háttérnél erősebb).
+
