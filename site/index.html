@@ -2518,7 +2518,7 @@ html.pc-live #scr-game{background-image:radial-gradient(ellipse 78% 72% at 50% 5
 <script src="vendor/firebase-auth-compat.js"></script>
 <script src="vendor/firebase-firestore-compat.js"></script>
 <script src="vendor/firebase-database-compat.js"></script>
-<script>window.APP_VERSION = "2026.10.26-1312"; window.APP_BUILD = "2026.10.26-2155";</script>
+<script>window.APP_VERSION = "2026.10.26-1312"; window.APP_BUILD = "2026.10.26-2159";</script>
 <script>// ===== Best of Us – saját szerver (Firebase) =====
 // A játék eredetileg a Claude-os tárolót használta (window.claude.use('db' | 'user' | 'room')).
 // Ez a fájl ugyanazt a felületet adja Firebase-ből, így a játék kódja szinte változatlan maradhat:
@@ -5554,6 +5554,21 @@ const heroOf = pi => S.players[pi].baszo ? BASZO
   : HERO[S.players[pi].heroId];
 /* mozgó portré a meccsen (2026-10-25): egy megmaradó <video> elemet teszünk a portré alá – a sáv újrarajzolásakor sem indul újra */
 const HVID = {};
+/* mozgó lap a kézben is mozog (2026-10-26, Tomi): lapanként egy megmaradó <video>, újrarajzoláskor csak áttesszük (nem indul újra, nem villan) */
+const HANDVID = {};
+function handVidAttach(h) {
+  const live = new Set();
+  h.querySelectorAll('.card[data-uid]').forEach(el => {
+    const uid = el.dataset.uid, c = S.players[ME].hand.find(x => String(x.uid) === uid), A = c && ART[c.id]; if (!A || !A.vid || reduced) return;
+    const art = el.querySelector('.art.has-art'); if (!art) return; live.add(uid);
+    let v = HANDVID[uid];
+    if (!v) { v = document.createElement('video'); v.className = 'art-vid'; v.src = A.vid; v.muted = true; v.loop = true; v.autoplay = true; v.playsInline = true;
+      v.setAttribute('playsinline', ''); v.setAttribute('aria-hidden', 'true'); v.disablePictureInPicture = true; v.style.objectPosition = A.pos || '50% 18%';
+      v.oncanplay = () => { v.muted = true; v.play().catch(() => {}); }; v.onplaying = () => v.classList.add('on'); HANDVID[uid] = v; }
+    if (v.parentNode !== art) { art.prepend(v); if (v.paused) v.play().catch(() => {}); }
+  });
+  for (const k of Object.keys(HANDVID)) if (!live.has(k)) { HANDVID[k].remove(); delete HANDVID[k]; }
+}
 function heroVidAttach(pi) {
   const bar = $(pi === ME ? '#pBar' : '#eBar'), hp = bar && bar.querySelector('.hport'); if (!hp) return;
   const p = S.players[pi], bz = !!p.baszo || p.machine === 2, port = !bz && heroPortOf(pi), src = port && ART[port].vid;
@@ -5694,6 +5709,7 @@ function render() {
     cost: cardCost(S, ME, c.id, c), foil: !!c.foil,
     cls: (ui.sel === i ? 'sel' : '') + (myTurn && canPlay(S, ME, i) ? ' ok' : myTurn || S.active !== ME ? ' dim' : ''),   // az ellenfél körében a kéz elsötétül
     attrs: `data-hi="${i}" data-uid="${c.uid}" role="button" tabindex="0" aria-label="${CARD[c.id].name}${ui.sel === i ? ', kijelölve' : myTurn && canPlay(S, ME, i) ? ', kijátszható' : ''}"` })).join('') : '<span class="hand-empty">Üres a kezed</span>');
+  handVidAttach(h);
   const cw = parseFloat(getComputedStyle(h.querySelector('.card') || h).getPropertyValue('--cw')) || 82;
   const n = hand.length, avail = h.clientWidth - 44;
   h.style.setProperty('--ov', n > 1 ? Math.max(-4, (n * cw - avail) / (n - 1)) + 'px' : '0px');
