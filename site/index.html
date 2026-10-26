@@ -2301,15 +2301,23 @@ html:has(body.in-game){overscroll-behavior:none;}
 .mid-title b{display:block;font-family:var(--display);font-weight:400;font-size:clamp(40px,13vw,72px);line-height:1;text-transform:uppercase;color:#eef3ff;text-shadow:0 0 18px rgba(170,200,255,.95),0 0 46px rgba(120,150,255,.7),0 4px 0 rgba(0,0,20,.6);}
 .mid-title em{display:block;margin-top:8px;font-style:normal;font-weight:700;font-size:15px;color:#cbd5f5;}
 .mid-flash{position:absolute;inset:0;background:#dfe8ff;opacity:0;pointer-events:none;}
-.mid-intro.img{background:#070a22;}
-.mid-intro.img .mid-bg{position:absolute;inset:0;opacity:0;background:url('art/ui/midnight.webp?v=793ea0c1') center/cover no-repeat;}
-@media (min-aspect-ratio:3/5){.mid-intro.img .mid-bg{background-size:contain;}}
-.mid-glow{position:absolute;left:50%;top:28.5%;width:min(97vw,44.7vh);aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;opacity:0;pointer-events:none;
-  background:radial-gradient(circle,rgba(240,244,255,.2) 0,rgba(240,244,255,.08) 50%,rgba(205,218,255,.3) 61%,rgba(170,190,255,0) 66%);mix-blend-mode:screen;}
-.mid-glow.on{animation:midGlow 2.2s ease-in-out infinite alternate;}
-@keyframes midGlow{from{opacity:.25;transform:translate(-50%,-50%) scale(.98);}to{opacity:1;transform:translate(-50%,-50%) scale(1.04);}}
-.mid-intro.img .mid-stars{opacity:0;}
-.mid-sweep{position:absolute;inset:0;pointer-events:none;background:linear-gradient(90deg,transparent 35%,rgba(255,236,190,.28) 50%,transparent 65%);transform:translateX(-130%);mix-blend-mode:screen;}
+.mid-intro.vid{background:#0a0414;opacity:0;}
+.mid-still,.mid-vid{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
+.mid-still{background:url('art/ui/midnight-still.webp?v=d2ae0976') center/cover no-repeat;}
+.mid-vid{opacity:0;transition:opacity .4s;} .mid-vid.on{opacity:1;}
+video.mid-vid::-webkit-media-controls,video.mid-vid::-webkit-media-controls-start-playback-button,video.mid-vid::-webkit-media-controls-overlay-play-button{display:none!important;-webkit-appearance:none;opacity:0!important;}
+.mid-shade{position:absolute;left:0;right:0;bottom:0;height:52%;background:linear-gradient(to top,rgba(8,2,20,.92),rgba(8,2,20,.6) 45%,rgba(8,2,20,0));pointer-events:none;}
+.mid-banner{position:absolute;left:50%;bottom:calc(15% + env(safe-area-inset-bottom));transform:translate(-50%,60vh);opacity:0;width:min(92vw,520px);text-align:center;pointer-events:none;
+  padding:14px 12px 16px;border-radius:18px;background:linear-gradient(180deg,rgba(40,10,70,.82),rgba(18,4,36,.9));
+  border:2px solid #e8c56a;box-shadow:0 0 0 1px #6b4a10,0 0 28px rgba(220,120,255,.45),inset 0 0 22px rgba(255,200,120,.12);}
+.mid-banner small{display:block;font:400 clamp(16px,4.6vw,22px) var(--display);color:#f6dc9a;letter-spacing:.24em;}
+.mid-banner b{display:block;font-family:var(--display);font-weight:400;font-size:clamp(38px,11.5vw,66px);line-height:1.02;text-transform:uppercase;
+  background:linear-gradient(#fff7d6,#f5cf62 50%,#c98a1c);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 3px 0 #4a2a06) drop-shadow(0 0 12px rgba(255,190,90,.5));}
+.mid-banner em{display:block;margin-top:6px;font-style:normal;font-weight:800;font-size:15px;color:#f1e4ff;text-shadow:0 2px 6px #000;}
+.mid-banner.glow{animation:midBan 1.6s ease-in-out infinite alternate;}
+@keyframes midBan{from{box-shadow:0 0 0 1px #6b4a10,0 0 22px rgba(220,120,255,.35),inset 0 0 22px rgba(255,200,120,.1);}to{box-shadow:0 0 0 1px #6b4a10,0 0 44px rgba(255,140,255,.75),inset 0 0 26px rgba(255,200,120,.2);}}
+/* Peaches főmenü-háttér (teszt, 2026-10-26) – a megjelenéstől (html.pc-live); a Halloween-háttérnél erősebb */
+html.pc-live body #scr-menu{background:linear-gradient(180deg,rgba(10,4,24,.15),rgba(10,4,24,.42) 38%,rgba(10,4,24,.6)),url('art/ui/menu-pc.webp?v=e6943d85') center top/cover no-repeat #0a0418;}
 .mid-intro .fin-skip{bottom:calc(5% + env(safe-area-inset-bottom));}
 /* több pack vásárlása (2026-10-24) */
 .pb-box{display:grid;justify-items:center;gap:10px;} .pb-pack .pack{--pw:96px;}
@@ -2510,7 +2518,7 @@ html.pc-live #scr-game{background-image:radial-gradient(ellipse 78% 72% at 50% 5
 <script src="vendor/firebase-auth-compat.js"></script>
 <script src="vendor/firebase-firestore-compat.js"></script>
 <script src="vendor/firebase-database-compat.js"></script>
-<script>window.APP_VERSION = "2026.10.26-1312"; window.APP_BUILD = "2026.10.26-2112";</script>
+<script>window.APP_VERSION = "2026.10.26-1312"; window.APP_BUILD = "2026.10.26-2155";</script>
 <script>// ===== Best of Us – saját szerver (Firebase) =====
 // A játék eredetileg a Claude-os tárolót használta (window.claude.use('db' | 'user' | 'room')).
 // Ez a fájl ugyanazt a felületet adja Firebase-ből, így a játék kódja szinte változatlan maradhat:
@@ -5401,23 +5409,28 @@ async function alinaTrapFx(e, el) {
   await o.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 300, fill: 'forwards' }).finished; o.remove();
 }
 /* „Elmúlt ÉJFÉL” (2026-10-24, Tomi): a 6. kör elején – éjszakai égbolt, csillagok, felkelő telihold, óriás felirat; Kánon-szintű jelenet */
-async function midnightIntro() {   /* 2026-10-26: Astra-kép (art/ui/midnight.webp?v=793ea0c1) – a felirat a képen van; mozgás: beúszás, holdfény-pulzálás, villanás, csillagok */
-  const o = document.createElement('div'); o.className = 'mid-intro img';
-  o.innerHTML = `<div class="mid-bg" role="status" aria-label="Elmúlt éjfél – az „Éjfél után” lapok mostantól élnek"></div><div class="mid-glow"></div><div class="mid-stars">${Array.from({ length: 40 }, () => `<i style="left:${(Math.random() * 100).toFixed(1)}%;top:${(Math.random() * 60).toFixed(1)}%;--d:${(Math.random() * 2).toFixed(2)}s;--s:${(1 + Math.random() * 2).toFixed(1)}px"></i>`).join('')}</div><i class="mid-sweep"></i><div class="mid-flash"></div>`;
+async function midnightIntro() {   /* 2026-10-26 (Tomi): bulis videó (art/vid/midnight.mp4?v=b9817e2b, 6 mp) – közben feljön az „ELMÚLT ÉJFÉL!” felirat */
+  const o = document.createElement('div'); o.className = 'mid-intro vid';
+  o.innerHTML = `<div class="mid-still"></div><video class="mid-vid" src="art/vid/midnight.mp4?v=b9817e2b" muted autoplay playsinline disablepictureinpicture preload="auto" aria-hidden="true"></video>
+    <div class="mid-shade"></div><div class="mid-banner" role="status"><small>00:00</small><b>Elmúlt éjfél!</b><em>Az „Éjfél után” lapok mostantól élnek</em></div><div class="mid-flash"></div>`;
   $('#layer').appendChild(o);
-  const bg = o.querySelector('.mid-bg'), glow = o.querySelector('.mid-glow'), stars = o.querySelector('.mid-stars'), flash = o.querySelector('.mid-flash'), sweep = o.querySelector('.mid-sweep');
-  const skip = () => new Promise(r => { const t0 = performance.now(); o.addEventListener('pointerdown', () => { if (performance.now() - t0 > 300) r(); }); });
-  if (matchMedia('(prefers-reduced-motion: reduce)').matches) { bg.style.opacity = 1; await Promise.race([sleep(2500), skip()]); o.remove(); return; }
-  const inA = bg.animate([{ opacity: 0, transform: 'scale(1.14)', filter: 'brightness(.35) blur(4px)' }, { opacity: 1, transform: 'scale(1.02)', filter: 'brightness(1.15) blur(0)', offset: .75 }, { opacity: 1, transform: 'scale(1)', filter: 'brightness(1)' }],
-                         { duration: 1300, easing: 'cubic-bezier(.2,.8,.25,1)', fill: 'forwards' });
-  await sleep(950);
-  fx($('#app'), 'fx-quake');
-  flash.animate([{ opacity: .6 }, { opacity: 0 }], { duration: 450, easing: 'ease-out', fill: 'forwards' });
-  await inA.finished;
-  glow.classList.add('on'); stars.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 700, fill: 'forwards' });
-  sweep.animate([{ transform: 'translateX(-130%) skewX(-18deg)' }, { transform: 'translateX(130%) skewX(-18deg)' }], { duration: 1100, easing: 'ease-in-out' });
-  await Promise.race([sleep(3000), skip()]);
-  await o.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 420, fill: 'forwards' }).finished;
+  const v = o.querySelector('.mid-vid'), ban = o.querySelector('.mid-banner'), flash = o.querySelector('.mid-flash');
+  v.oncanplay = () => { v.muted = true; v.play().catch(() => {}); }; v.onplaying = () => v.classList.add('on');
+  let tapped = false; const t0 = performance.now(); o.addEventListener('pointerdown', () => { if (performance.now() - t0 > 400) tapped = true; });
+  const wait = ms => new Promise(r => { const s = performance.now(), k = () => (tapped || performance.now() - s >= ms) ? r() : setTimeout(k, 50); k(); });
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) { ban.style.opacity = 1; ban.style.transform = 'translate(-50%,0)'; await wait(2500); o.remove(); return; }
+  await o.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 350, fill: 'forwards' }).finished;
+  await wait(900);
+  if (!tapped) {
+    ban.animate([{ opacity: 0, transform: 'translate(-50%, 60vh) scale(.9)', filter: 'blur(6px)' }, { opacity: 1, transform: 'translate(-50%,-6px) scale(1.04)', filter: 'blur(0)', offset: .75 }, { opacity: 1, transform: 'translate(-50%,0) scale(1)', filter: 'blur(0)' }],
+                { duration: 900, easing: 'cubic-bezier(.2,.8,.25,1)', fill: 'forwards' });
+    await wait(650); fx($('#app'), 'fx-quake');
+    flash.animate([{ opacity: .5 }, { opacity: 0 }], { duration: 420, easing: 'ease-out', fill: 'forwards' });
+    setTimeout(() => ban.classList.add('glow'), 300);
+    const hint = document.createElement('small'); hint.className = 'fin-skip'; hint.textContent = 'Koppints a folytatáshoz'; o.appendChild(hint);
+    await wait(3400);
+  }
+  await o.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 450, fill: 'forwards' }).finished;
   o.remove();
 }
 async function finisherIntro(e) {
