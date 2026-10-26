@@ -115,6 +115,10 @@ Csak build (kitétel nélkül): `cd src && python3 build-app.py ""` → `src/dis
 ## Dávid (2026-10-18)
 - Új Törzsvendég (köre végén helyszín esetén véletlen saját karakter +1/+1, `finishTurn`), új Kánon `f_vezetek` (Bocsi, de vezetek, `p.driver`). A Munkahely (`f_munkahely`) `off:true`, a `migrate()` cseréli a paklikban. A teszt ágon az `ah_david` pakliban is cserélni kell.
 
+## Peaches and Cream + 2. Season Pass (2026-10-26)
+- A `teszt` ág beolvadt a `main`-be; a Peaches **2026-11-01 19:00-kor** jelenik meg élesben (`SET_RELEASE.pc`, `HEROES_ON()` – Laszy hős, éjféli jelenet is időzárral). Terv: Project `claude/peaches-and-cream.md`.
+- Season Pass: `s2` 11-01 19:00-kor zár, `s3` „2. szezon · Éjfél után” 12-01-ig (jutalmak: javaslat, Tomi jóváhagyására vár). Új ajándék-packok: `p.pcPacks` / `p.pcShinyPacks`, jutalomtípus `pc` / `pcShiny`.
+
 ## Jelenlegi állapot és teendők (2026-10-16 este, account-váltáskor)
 
 - **Halloween event fut** (`EVENTS` hw26): 2026-10-15 19:00 – 11-02 (vége 11-03 0:00), jutalmak 11-09-ig vehetők át, utána maguktól jóváíródnak. A menü-háttér és a zene csak az event alatt él, utána magától visszaáll.
