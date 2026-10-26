@@ -263,6 +263,7 @@ const ART = {
   c_wcneni:   { src:'art/pc_wcneni.webp', av:'45% 22%', pos:'45% 20%' },
   c_portas:   { src:'art/pc_portas.webp', av:'52% 16%', pos:'52% 14%' },
   a_lambo:    { src:'art/pc_lambo.webp', pos:'50% 40%' },
+  a_lambo_v:  { src:'art/pc_lambo_v.webp', pos:'50% 40%', vid:'art/vid/pc_lambo_v.mp4' },   /* mozgó változat (2. Season Pass) */
   a_bloody:   { src:'art/pc_bloody.webp', pos:'50% 40%' },
   a_jager:    { src:'art/pc_jager.webp', pos:'45% 45%' },
   i_purple:   { src:'art/pc_purple.webp', pos:'50% 50%' },
