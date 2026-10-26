@@ -86,6 +86,9 @@ function newProfile(name) {
 const ownsHeroFa = hid => (Store.p?.heroFa?.[hid] || 0) > 0;
 // Arany hősök: a legritkább lapok (p.heroGold[hősId] = darab); sima packban 0,5%, Shiny packban 5% eséllyel
 const GOLD_HEROES = HEROES.filter(h => ART['g_' + h.id]).map(h => h.id);
+/* szett-hősök arany portréja csak a saját szettjük packjából jön (Laszy: Peaches, 2026-10-26) – a Base packok a régi 9 hősből húznak */
+const SET_GOLD_HERO = { pc: ['laszy'] };
+const BASE_GOLD = () => GOLD_HEROES.filter(h => !Object.values(SET_GOLD_HERO).flat().includes(h));
 const ownsHeroGold = hid => (Store.p?.heroGold?.[hid] || 0) > 0;
 // melyik hős-portrét használja (sima / Full Art / arany): a választott, ha megvan; különben a legritkább, ami megvan
 const ownsPort = id => (Store.p?.portraits || []).includes(id);
@@ -107,8 +110,8 @@ function skinModal(hid) {
   if (typeof longPress === 'function') longPress(o, '[data-skin]', b => heroBigView(hid, b.dataset.skin));   /* hosszan nyomva: nagyban */
   $('#layer').appendChild(o);
 }
-function rollHeroGold(p) {
-  const h = GOLD_HEROES[Math.floor(Math.random() * GOLD_HEROES.length)];
+function rollHeroGold(p, pool) {
+  pool = pool || BASE_GOLD(); const h = pool[Math.floor(Math.random() * pool.length)];
   p.heroGold = p.heroGold || {}; const isNew = !p.heroGold[h]; p.heroGold[h] = (p.heroGold[h] || 0) + 1;
   return { id: 'gold:' + h, hero: h, gold: true, foil: true, isNew };
 }
@@ -415,9 +418,11 @@ function godPackRoll(setId) {
   else { const ids = pool.filter(id => CARD[id].rarity === 'r'), id = ids[Math.floor(Math.random() * ids.length)];
     const e = p.coll[id] || (p.coll[id] = { n: 0, f: 0 }); e.f++; out.splice(1, 0, { id, foil: true, isNew: e.f === 1 }); }
   const setGold = setId !== 'base' ? CARDS.filter(v => v.goldVar && v.set === setId).map(v => v.id) : [];
-  if (setGold.length) { const id = setGold[Math.floor(Math.random() * setGold.length)], isNew = owned(id) === 0;
+  const sgh = (SET_GOLD_HERO[setId] || []).filter(h => GOLD_HEROES.includes(h));
+  if (sgh.length && Math.random() < 1 / (setGold.length + sgh.length)) out.push(rollHeroGold(p, sgh));
+  else if (setGold.length) { const id = setGold[Math.floor(Math.random() * setGold.length)], isNew = owned(id) === 0;
     const e = p.coll[id] || (p.coll[id] = { n: 0, f: 0 }); e.n++; out.push({ id, foil: false, gold: true, isNew }); }
-  else if (setId === 'base' && GOLD_HEROES.length) out.push(rollHeroGold(p));
+  else if (setId === 'base' && BASE_GOLD().length) out.push(rollHeroGold(p));
   else { const ids = pool.filter(id => CARD[id].rarity === 'l'), id = ids[Math.floor(Math.random() * ids.length)], isNew = !ownsFoil(id);   /* nincs arany a szettben: még egy legendás Full Art */
     const e = p.coll[id] || (p.coll[id] = { n: 0, f: 0 }); e.f++; out.push({ id, foil: true, isNew }); }
   out.god = true; p.godPacks = (p.godPacks || 0) + 1;
@@ -441,10 +446,10 @@ function openPackRoll(setId, forceFoil = false, shiny = false) {
   const varSlot = shiny && allVars.length && sr < ECON.shinyVariant ? 2 : -1;
   // Full Art hős: sima packban kis eséllyel a leggyengébb lap helyén, Shiny packban a különleges helyen
   const heroSlot = extra ? -1 : shiny ? (varSlot < 0 && sr < ECON.shinyVariant + ECON.shinyHero ? 2 : -1) : (Math.random() < ECON.heroFaChance ? 0 : -1);
-  const setGold = extra ? CARDS.filter(v => v.goldVar && v.set === setId).map(v => v.id) : [];   /* kiegészítő: arany lap (0,5% / Shiny 5%) */
+  const setGold = extra ? CARDS.filter(v => v.goldVar && v.set === setId).map(v => v.id).concat((SET_GOLD_HERO[setId] || []).filter(h => GOLD_HEROES.includes(h)).map(h => 'gold:' + h)) : [];   /* kiegészítő: arany lap vagy a szett hősének arany portréja (0,5% / Shiny 5%) */
   const goldSlot = (extra ? setGold.length : GOLD_HEROES.length) && Math.random() < (shiny ? ECON.goldShiny : ECON.goldPlain) ? 0 : -1;   // Arany hős: a pack első lapja helyén
   return slots.map((rar, si) => {
-    if (si === goldSlot && extra) { const id = setGold[Math.floor(Math.random() * setGold.length)], isNew = owned(id) === 0;
+    if (si === goldSlot && extra) { const id = setGold[Math.floor(Math.random() * setGold.length)]; if (id.startsWith('gold:')) return rollHeroGold(p, [id.slice(5)]); const isNew = owned(id) === 0;
       const e = p.coll[id] || (p.coll[id] = { n: 0, f: 0 }); e.n++; return { id, foil: false, gold: true, isNew }; }
     if (si === goldSlot) return rollHeroGold(p);
     if (si === heroSlot) return rollHeroFa(p);

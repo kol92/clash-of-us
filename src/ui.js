@@ -175,6 +175,7 @@ const ART = {
   c_nyitinap:     { src:'art/nyitinap.webp', av:'72% 34%', pos:'66% 36%' },
   g_barna: { src:'art/g_barna.webp', av:'64% 20%', pos:'62% 20%', port:'64% 16%' },
   g_laci:  { src:'art/g_laci.webp',  av:'46% 20%', pos:'46% 20%', port:'46% 16%' },
+  g_laszy: { src:'art/g_laszy.webp', av:'50% 15%', pos:'50% 14%', port:'50% 12%' },   /* arany Laszy – Peaches packból (teszt) */
   g_sasi:  { src:'art/g_sasi.webp',  av:'46% 17%', pos:'46% 16%', port:'46% 12%' },
   g_gabi:  { src:'art/g_gabi.webp',  av:'55% 28%', pos:'55% 26%', port:'56% 24%' },
   g_bence: { src:'art/g_bence.webp', av:'55% 18%', pos:'55% 18%', port:'55% 9%' },
