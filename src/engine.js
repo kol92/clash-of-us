@@ -172,6 +172,7 @@ const CARDS = [
   { id:'c_ani', set:'pc', type:'char', name:'Ani', cost:2, atk:2, hp:3, rarity:'r', text:'Kijátszáskor: ha egy Sasi-lap áll mellette, mindketten +1/+1-et kapnak, és Ani Provokációt kap.' },
   { id:'c_noemi', set:'pc', type:'char', name:'Noémi', cost:2, atk:3, hp:2, rarity:'r', sneak:true, text:'Sunyulás. Amikor felfordul, kidobja a vele szemben álló ellenséges karaktert.' },
   { id:'c_pultos', set:'pc', type:'char', name:'A pultos', cost:4, atk:2, hp:3, rarity:'k', text:'Kijátszáskor egy véletlen Ital kerül a kezedbe – ebben a körben ingyen kijátszhatod.' },
+  { id:'c_mm', set:'pc', type:'char', name:'MM, a hívatlan vendég', cost:1, atk:1, hp:3, rarity:'k', enemySide:true, noAttack:true, maxPosts:3, text:'Az ellenfél oldalára kerül. Nem támad. Kijátszáskor elzavarja a mellette állókat (vissza a kézbe). A köröd végén beszámolót ír: felfedi a rejtett ellenségeket, és 1 sebzés az ellenfél hősének. 3 beszámoló után lelép.' },   /* 2026-10-26 (Tomi) */
   { id:'c_idegen', set:'pc', type:'char', name:'Részeg idegen', cost:1, atk:1, hp:1, rarity:'k', enemySide:true, noAttack:true, mid:true, text:'Az ellenfél oldalára teszed le. Nem támad. Éjfél után: kidől, és 1 sebzést okoz a gazdájának (annak, akinek az oldalán áll).' },
   { id:'c_dj', set:'pc', type:'char', name:'DJ', cost:4, atk:2, hp:5, rarity:'e', mid:true, text:'Amíg él, a karaktereid +1 támadással ütnek. Éjfél után: +2-vel.' },
   { id:'a_utolso', set:'pc', drink:true, noParty:true, type:'action', name:'Utolsó kör', cost:2, tgt:'own', rarity:'k', text:'Egy karaktered +2/+0 és Lendület. Éjfél után: húzol is egy lapot.' },
@@ -586,6 +587,9 @@ function playCard(s, pi, hi, t) {
     const u = makeUnit(s, disg || c.id, pi); if (disg) u.alina = true; if (h.foil) u.foil = true; if (h.kickN) u.kickN = h.kickN;
     if (c.enemySide) { u.owner = pi; e.board[t.i] = u; ev(s, { t:'pipa', side:ei, i:t.i }); }   /* Barna vízipipája: az ellenfélhez kerül */
     else { p.board[t.i] = u; p.lastPlaced = u.uid; }   // a Cápa erre vadászik
+    if (c.id === 'c_mm' && e.board[t.i] === u) { ev(s, { t:'mmshoo', side:ei, i:t.i });   /* MM: elzavarja a mellette állókat */
+      const nb = [t.i - 1, t.i + 1].filter(k => { const x = e.board[k]; return x && !isFixed(x) && !isEl(x) && !CARD[x.id].noKick; });
+      (CARD.c_mm.shoo === 1 && nb.length > 1 ? [nb[Math.floor(rnd() * nb.length)]] : nb).forEach(k => kickOut(s, ei, k)); }
     if (has(p, 'firstCharAtk') && !p.charThisTurn && c.id !== 'c_korso' && !c.enemySide && c.cost <= 2) { u.atk += 1; ev(s, { t:'passive', side:pi, k:'firstCharAtk', id:c.id }); ev(s, { t:'buff', side:pi, i:t.i }); }
     p.charThisTurn = true;
     if (p.driver && !c.enemySide && p.board[t.i] === u) {   /* Bocsi, de vezetek */
@@ -1266,6 +1270,11 @@ function sharkSwim(s, pi) {
 function finishTurn(s) {
   const pi = s.active, p = s.players[pi];
   baszoStrike(s);
+  // MM, a hívatlan vendég (2026-10-26): aki lerakta, annak a köre végén „beszámolót ír” – felfedi az ellenfél rejtett karaktereit, és 1 sebzés az ellenfél hősének
+  { const ei = other(pi); s.players[ei].board.forEach((u, i) => {
+    if (!u || u.id !== 'c_mm' || u.owner !== pi || s.winner != null) return;
+    ev(s, { t:'mmpost', side:ei, i }); s.players[ei].board.forEach((x, j) => { if (x && x.hidden) reveal(s, ei, j); }); if (CARD.c_mm.post !== 0) damageHero(s, ei, CARD.c_mm.post || 1);
+    u.posts = (u.posts || 0) + 1; if (CARD.c_mm.maxPosts && u.posts >= CARD.c_mm.maxPosts) { ev(s, { t:'mmleave', side:ei, i }); s.players[ei].board[i] = null; buryItems(s, ei, u); bury(s, u.owner, u.id, 'leave', !!u.foil); } }); }
   // JBL hangfal: a gazdája körének végén 1 sebzés minden ellenséges karakternek és az ellenfél hősének (hangfalanként)
   p.board.forEach((u, i) => {
     if (!u || u.id !== 'c_jbl' || s.winner != null) return;
@@ -1362,6 +1371,7 @@ function evalState(s, me) {
     if (CARD[u.id].noAttack) x = u.hp * 0.5;   // JBL hangfal: fal, nem üt
     if (CARD[u.id].fixed) x = -7;              // Cápa: annak az oldalnak árt, ahol áll
     if (u.id === 'c_vizipipa') x = -2.5;      /* vízipipa: annak jó, aki elpusztíthatja */
+    if (u.id === 'c_mm') x = -3;              /* MM: foglalja a helyet, minden körben 1 sebzés a hősnek */
     if (u.id === 'c_idegen') x = -1.5;        /* Részeg idegen: éjfélkor 1 sebzés a gazdájának, foglalja a helyet */
     return x;
   };

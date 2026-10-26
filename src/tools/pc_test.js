@@ -107,4 +107,10 @@ const B = s => s.players[0].board;
 { let ok1 = true; for (let k = 0; k < 30; k++) { const s = G(); play(s, 1, 'c_pc_pifti', { k: 'slot', side: 1, i: 0 }); play(s, 1, 'c_vajda', { k: 'slot', side: 1, i: 1 }); play(s, 0, 'c_portas', { k: 'slot', side: 0, i: 0 });
     if (!(s.players[1].board[0] && s.players[1].board[0].id === 'c_pc_pifti' && !s.players[1].board[1])) ok1 = false; } ok(ok1, 'Pifti: a véletlen kidobás nem őt választja');
   const s = G(); play(s, 1, 'c_pc_pifti', { k: 'slot', side: 1, i: 0 }); E.kickOut(s, 1, 0); ok(s.players[1].board[0] && s.players[1].board[0].id === 'c_pc_pifti', 'Pifti: célzott kidobásnál is marad'); }
+{ const s = G(); play(s, 1, 'c_vajda', { k: 'slot', side: 1, i: 0 }); play(s, 1, 'c_gyuri', { k: 'slot', side: 1, i: 2 }); play(s, 1, 'c_pc_pifti', { k: 'slot', side: 1, i: 3 });
+  play(s, 0, 'c_mm', { k: 'eslot', side: 1, i: 1 });
+  ok(s.players[1].board[1] && s.players[1].board[1].id === 'c_mm' && !s.players[1].board[0] && !s.players[1].board[2], 'MM: az ellenfélhez kerül, a mellette állókat elzavarja');
+  play(s, 1, 'c_noemi', { k: 'slot', side: 1, i: 0 }); const hp = s.players[1].hp; s.active = 0; E.runEndTurn(s);
+  ok(s.players[1].hp === hp - 1 && s.players[1].board[0] && !s.players[1].board[0].hidden, `MM beszámoló: −1 hős, a rejtett felfedve (${hp}→${s.players[1].hp})`);
+  for (let k = 0; k < 2; k++) { s.active = 0; E.runEndTurn(s); } ok(!s.players[1].board[1] && s.players[1].hp === hp - 3, `MM: 3 beszámoló után lelép (${s.players[1].hp})`); }
 console.log(fails ? 'HIBÁK: ' + fails : 'PEACHES 2 OK');

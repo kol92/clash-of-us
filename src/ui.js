@@ -293,6 +293,7 @@ const ART = {
   c_alina:    { src:'art/pc_alina.webp', av:'52% 22%', pos:'52% 20%' },
   c_pc_laci:  { src:'art/pc_laci.webp', av:'38% 22%', pos:'38% 20%' },
   c_pg:       { src:'art/pc_pg.webp', av:'45% 15%', pos:'45% 14%' },
+  c_mm:       { src:'art/pc_mm.webp', av:'56% 20%', pos:'56% 18%' },
   c_idegen:   { src:'art/pc_idegen.webp', av:'45% 30%', pos:'45% 28%' },
   c_pc_gabi:  { src:'art/pc_gabi.webp', av:'45% 12%', pos:'45% 12%' },
   a_kidobtak: { src:'art/pc_kidobtak.webp', av:'50% 30%', pos:'50% 30%' },
@@ -834,6 +835,9 @@ function logEvents(evs, snap) {
       case 'shield': L(`🛡 ${unitName(e.side, e.i)} pajzsa elnyelte az ütést`); break;
       case 'bounce': L(`↩ ${unitName(e.side, e.i)} visszakerült a kézbe`); break;
       case 'stolen': L(`🫳 ${unitName(e.side, e.i)} átállt a másik oldalra`); break;
+      case 'mmshoo': L(`🙄 ${unitName(e.side, e.i)} odajött – a mellette állók elmenekülnek`); break;
+      case 'mmpost': L(`📱 ${unitName(e.side, e.i)} beszámolót írt a netre – ${e.side === ME ? 'a hősöd' : 'az ellenfél hőse'} 1 sebzést kap a szégyentől`); break;
+      case 'mmleave': L(`👋 ${CARD.c_mm.name} megírta a harmadik beszámolót is, és lelépett`); break;
       case 'nokick': L(`😈 ${unitName(e.side, e.i)}: a buli ördögét nem lehet kidobni`); break;
       case 'purple': L(`💜 Peaches Purple Card: ${unitName(e.side, e.i)} nem dobható ki`); break;
       case 'ruhatar': L(e.o === 1 ? `🧥 Ruhatár: <b class="lc" data-lc="${e.id}">${escH(CARD[e.id].name)}</b> kiváltva – vissza a kézbe` : `🧥 Ruhatár: <b class="lc" data-lc="${e.id}">${escH(CARD[e.id].name)}</b> leadva – a kézbe, 1-gyel olcsóbban`); break;
@@ -1078,6 +1082,9 @@ async function animateEvents(evs) {
       case 'gift': floatAt(anchor, `${e.id === 'i_ing' ? '👔' : e.id === 'i_gomba' ? '🍄' : e.id === 'a_irkave' ? '☕' : '🍗'} ${CARD[e.id].name} a ${e.side === ME ? 'kezedbe' : 'kezébe'}!`, 'info'); hold = Math.max(hold, 700); break;
       case 'drinkgift': floatAt(anchor, e.side === ME ? `🍸 ${CARD[e.id].name} a kezedbe!` : '🍸 Ital a kezébe!', 'info'); hold = Math.max(hold, 700); break;
       case 'deathblast': floatAt(anchor, '💥 Utolsó ütés!', 'dmg'); hold = Math.max(hold, 450); break;
+      case 'mmshoo': floatAt(anchor, '🙄 Na, megjött MM…', 'info'); hold = Math.max(hold, 700); break;
+      case 'mmpost': floatAt(anchor, '📱 Beszámoló a netre!', 'dmg'); hold = Math.max(hold, 700); break;
+      case 'mmleave': floatAt(anchor, '👋 MM lelépett', 'info'); hold = Math.max(hold, 700); break;
       case 'nokick': floatAt(anchor, '😈 Nem lehet kidobni!', 'buff'); hold = Math.max(hold, 600); break;
       case 'purple': floatAt(anchor, '💜 VIP – nem dobható ki!', 'buff'); hold = Math.max(hold, 600); break;
       case 'ruhatar': if (e.i >= 0) { fx(el, e.side === ME ? 'fx-bounce-down' : 'fx-bounce-up'); floatAt(anchor, '🧥 Ruhatárba!', 'info'); } hold = Math.max(hold, 600); break;

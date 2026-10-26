@@ -874,3 +874,6 @@ Hősképesség-ötletek a táblázatban (még nem zöldek, nincsenek beépítve)
 ## Mozgó lap a kézben is mozog (2026-10-26, Tomi; teszt)
 - Ha a kezedben mozgó lap van (most: a mozgó Flaming Lamborghini), a kis lapon is fut a videó, nem csak nagy nézetben (`handVidAttach` a ui.js-ben: lapanként egy megmaradó `<video>`, a kéz újrarajzolásakor csak áttesszük – nem indul újra, nem villan; ha a lap elhagyja a kezet, törlődik). A táblán lévő lapokon (és a gyűjteményben) továbbra csak nagy nézetben mozog.
 
+## Új Peaches lap: MM, a hívatlan vendég (2026-10-26, teszt)
+- **MM, a hívatlan vendég** (`c_mm`, gyakori, **1 energia**, 1/3; Tomi, 2026-10-26, saját kép): az ellenfél oldalára kerül, nem támad. Kijátszáskor **elzavarja a mellette álló ellenséges karaktereket** (kidobás – vissza a kézbe, 1-gyel drágábban; Pifti / VIP / Purple Card védi). A lerakója köre végén **beszámolót ír**: felfedi az ellenfél rejtett karaktereit, és 1 sebzés az ellenfél hősének; **3 beszámoló után lelép** (`maxPosts`). Mérés (1–2 energiás helyen): korlát nélkül 60,5% (túl erős – a sebzés halmozódott), 3 beszámolóval **51,1%** (Részeg idegen 44,8%, vízipipa 44,9%). Bot: a saját oldalán –3 értékű. Teszt: pc_test.
+
