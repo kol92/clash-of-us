@@ -861,3 +861,6 @@ Hősképesség-ötletek a táblázatban (még nem zöldek, nincsenek beépítve)
 ## Meccs-háttér: Peaches csak a megjelenéstől (2026-10-26, javítás)
 - A teszt ág beolvasztásakor a Peaches meccs-háttér (`art/ui/board-pc.webp`) véletlenül élesbe került az Amsterdam-háttér (`art/ui/board.webp`) helyett. Visszaállítva: alapból az Amsterdam-háttér, a Peaches-háttér csak `html.pc-live` alatt él – ezt a ui.js `pcBg()` teszi fel a megjelenéskor (`setLive('pc')`, 11-01 19:00; ha az app közben nyitva van, akkor is átvált). A teszt oldalon mindig a Peaches-háttér látszik.
 
+## Győzelmi képernyő mozgó portréval (2026-10-26, Tomi; teszt)
+- Ha mozgó hős-portréval (most: Gyémánt Barna, Laci, az éjféli zápor) nyersz, a „Nyertél” tábla helyett a portré videója jelenik meg nagyban, arany keretben, forgó sugarakkal és fényvillanással; alul „NYERTÉL” + a portré neve, alatta „Folytatás” gomb (`resultVidArt()` a ui.js-ben, a `resultArt` hívja – bot, ranked és PvP meccsnél is). Előbb az állókép, a videó csak elinduláskor úszik be; a natív ▶ gomb rejtve.
+

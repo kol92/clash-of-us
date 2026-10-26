@@ -1971,7 +1971,18 @@ function showMulligan(first) {
 }
 
 // Nyertél / Vesztettél tábla: a képen lévő „Folytatás” gomb a menübe visz
-const resultArt = win => `<div class="res-art${win ? ' win' : ' lose'}"><img src="art/ui/result-${win ? 'win' : 'lose'}.webp" alt="${win ? 'Nyertél – szép győzelem!' : 'Vesztettél – a következő csata a tiéd lehet!'}"><button class="res-go" data-r="menu" aria-label="Folytatás"></button></div>`;
+/* Mozgó hős-portréval nyert meccs (2026-10-26, Tomi): a „Nyertél” tábla helyett a portré videója nagyban, rajta a felirat */
+function resultVidArt() {
+  const port = typeof S !== 'undefined' && S && heroPortOf(ME), A = port && ART[port]; if (!A || !A.vid) return '';
+  const pos = A.port || A.pos || '50% 18%';
+  return `<div class="res-art win rv"><div class="rv-rays" aria-hidden="true"></div>
+    <div class="rv-frame"><img class="rv-still" src="${artSrc(port, true)}" alt="" style="object-position:${pos}">
+      <video class="rv-vid" src="${A.vid}" muted loop autoplay playsinline disablepictureinpicture preload="auto" aria-hidden="true" style="object-position:${pos}" oncanplay="this.muted=true;this.play().catch(()=>{})" onplaying="this.classList.add('on')"></video>
+      <i class="rv-shine" aria-hidden="true"></i><div class="rv-shade" aria-hidden="true"></div>
+      <div class="rv-txt" role="status"><b>Nyertél</b><small>${escH(PORTRAITS[port].name)}</small></div></div>
+    <button class="rv-go" data-r="menu">Folytatás</button></div>`;
+}
+const resultArt = win => (win && resultVidArt()) || `<div class="res-art${win ? ' win' : ' lose'}"><img src="art/ui/result-${win ? 'win' : 'lose'}.webp" alt="${win ? 'Nyertél – szép győzelem!' : 'Vesztettél – a következő csata a tiéd lehet!'}"><button class="res-go" data-r="menu" aria-label="Folytatás"></button></div>`;
 function endMatch() {
   if (S.tut) { tutHide(); return tutFinish(); }
   if (S.pvp) return pvpEndMatch();
