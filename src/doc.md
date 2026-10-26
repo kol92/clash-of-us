@@ -851,3 +851,7 @@ Hősképesség-ötletek a táblázatban (még nem zöldek, nincsenek beépítve)
 - A ranked szezonok (`RK_SEASONS`) ettől függetlenek, a 2. ranked szezon továbbra is 11-11-ig tart.
 - Még nyitott a megjelenésig: Peaches egyensúly (Portás, Tomi éjfél után, Boros; tiszta Peaches Laszy-pakli 73–80%), a Kánon neve („Csövesek és Cigányok”), megjelenési extrák (ajándék packok, előzetes ablak, küldetések – az Amsterdam mintájára), és hogy a napi ingyen pack / küldetés-pack Peaches legyen-e.
 
+## Mozgó portrék: nincs ▶ gomb iPhone-on (2026-10-26)
+- Energiatakarékos módban (vagy ha az iPhone nem engedi az automatikus lejátszást) a videó helyén a natív ▶ gomb látszott (Laci jelezte a „Laci, az éjféli zápor” skinnél). CSS-sel elrejtve (`::-webkit-media-controls-start-playback-button`), ilyenkor az állókép marad.
+- Működés (eddig is): előbb az állókép (webp) tölt be azonnal, a videó láthatatlanul töltődik, és csak amikor ténylegesen elindult (`playing`), akkor úszik be (`.art-vid.on` / `.hport-vid.on`). Az állókép a videó **első képkockája** legyen, hogy az átmenet ne ugorjon.
+
