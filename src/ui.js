@@ -1322,11 +1322,13 @@ function handVidAttach(h) {
     const uid = el.dataset.uid, c = S.players[ME].hand.find(x => String(x.uid) === uid), A = c && ART[c.id]; if (!A || !A.vid || reduced) return;
     const art = el.querySelector('.art.has-art'); if (!art) return; live.add(uid);
     let v = HANDVID[uid];
-    if (!v) { v = document.createElement('video'); v.className = 'art-vid'; v.src = A.vid; v.muted = true; v.loop = true; v.autoplay = true; v.playsInline = true;
+    if (!v) { v = document.createElement('video'); v.className = 'art-vid'; v.preload = 'auto'; v.src = A.vid; v.muted = true; v.loop = true; v.autoplay = true; v.playsInline = true;
       v.setAttribute('playsinline', ''); v.setAttribute('aria-hidden', 'true'); v.disablePictureInPicture = true; v.style.objectPosition = A.pos || '50% 18%';
-      v.oncanplay = () => { v.muted = true; v.play().catch(() => {}); }; v.onplaying = () => v.classList.add('on'); HANDVID[uid] = v; }
-    if (v.parentNode !== art) { art.prepend(v); if (v.paused) v.play().catch(() => {}); }
+      v.oncanplay = () => { v.muted = true; v.play().catch(() => {}); }; v.onplaying = () => v.classList.add('on'); v.onpause = () => setTimeout(() => { if (v.isConnected && v.paused) v.play().catch(() => {}); }, 400); HANDVID[uid] = v; }
+    if (v.parentNode !== art) art.prepend(v);
+    if (v.paused) v.play().catch(() => {});   /* iPhone: áttételkor / több videónál megállhat – minden rajzoláskor újraindítjuk */
   });
+  clearTimeout(handVidAttach.t); handVidAttach.t = setTimeout(() => { for (const v of Object.values(HANDVID)) if (v.isConnected && v.paused) v.play().catch(() => {}); }, 700);
   for (const k of Object.keys(HANDVID)) if (!live.has(k)) { HANDVID[k].remove(); delete HANDVID[k]; }
 }
 function heroVidAttach(pi) {
