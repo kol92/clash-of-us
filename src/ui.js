@@ -345,6 +345,9 @@ const ART = {
   a_welcome:   { src:'art/ah_welcome.webp', av:'50% 55%', pos:'50% 50%' },
   a_welcome_g: { src:'art/ah_welcome_g.webp', av:'50% 55%', pos:'50% 50%' },
   a_hawaiians_g:{ src:'art/ah_hawaiians_g.webp', av:'50% 45%', pos:'50% 45%' },
+  c_pg_g:       { src:'art/pc_pg_g.webp', av:'45% 15%', pos:'45% 14%' },   /* Peaches arany (teszt) */
+  c_wcneni_g:   { src:'art/pc_wcneni_g.webp', av:'48% 20%', pos:'48% 18%' },
+  c_belvedere_g:{ src:'art/pc_belvedere_g.webp', av:'50% 40%', pos:'50% 35%' },
   f_gameover_g:{ src:'art/ah_gameover_g.webp', av:'50% 40%', pos:'50% 40%' },
   c_ppvar:     { src:'art/ah_ppvar.webp', av:'47% 20%', pos:'47% 22%' },
   a_legeny: { src:'art/legeny.webp', pos:'50% 35%' },
@@ -620,7 +623,7 @@ $('#collBody').onclick = e => {
   if (hg && ownsHeroGold(hg.dataset.hgold) && heroSkins(hg.dataset.hgold).length > 1) return skinModal(hg.dataset.hgold);
   if (hg) { const hid = hg.dataset.hgold; openModal(heroCardHTML(HERO[hid], { big: true, gold: true }), ownsHeroGold(hid) ? '✦ Arany hős · a tiéd!' : `✦ Arany hős · boosterből ${ECON.goldPlain * 100}%, Shiny boosterből ${ECON.goldShiny * 100}% eséllyel`); return; }
   if (c) { const id = c.dataset.card, e = Store.p?.coll[id] || { n: 0, f: 0 };
-    if (CARD[id].goldVar) return collCardModal(id, `★ Arany lap: a(z) ${CARD[CARD[id].variantOf].name} arany kinézete – ugyanúgy játszható, ugyanaz a hatása · ${e.n + e.f} db · Amszterdam hősei boosterből (0,5%, Shiny packból 5%)`, null);
+    if (CARD[id].goldVar) return collCardModal(id, `★ Arany lap: a(z) ${CARD[CARD[id].variantOf].name} arany kinézete – ugyanúgy játszható, ugyanaz a hatása · ${e.n + e.f} db · ${SETS[CARD[id].set]?.name || 'kiegészítő'} boosterből (0,5%, Shiny packból 5%)`, null);
     if (CARD[id].variantOf) return collCardModal(id, `✦ Ritka változat: a(z) ${CARD[CARD[id].variantOf].name} különleges kinézete – ugyanúgy játszható, ugyanaz a hatása · ${e.n + e.f} db${CARD[id].passOnly ? ' · csak a Season Passból' : CARD[id].shopOnly ? (CARD[id].until ? ' · korábban a Boltban volt kapható' : ` · csak a Boltban kapható (${CARD[id].price || 100} coin)`) : !e.n && !e.f ? ' · Shiny boosterből szerezhető' : ''}`, null);
     collCardModal(id); }
   if (h) openModal(heroCardHTML(HERO[h.dataset.hcard], { big: true, foil: ui.foil }), ui.foil ? (ownsHeroFa(h.dataset.hcard) ? 'Full Art hős' : 'Full Art hős · boosterből szerezhető') : 'Hős');

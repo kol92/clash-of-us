@@ -163,7 +163,7 @@ ok(rc('k') === 13 && rc('r') === 6 && rc('e') === 4 && rc('l') === 3, `ritkaság
   const add = s2.players[0].deck.length - d0;
   ok(add === 5 && s2.players[0].deck.slice(-99).filter(id => E.CARD[id].set === 'ah').length >= 5 && !s2.players[0].deck.includes('a_welcome'), 'Isten hozott: 5 Amszterdam-lap a pakliba (önmaga nem)'); }
 // --- Arany lapok ---
-{ const g = E.CARDS.filter(c => c.goldVar); ok(g.map(c => c.id).sort().join() === 'a_hawaiians_g,a_welcome_g,f_gameover_g' && g.every(c => c.set === 'ah'), 'Arany lapok: Isten hozott, High Hawaiians, Game Over');
+{ const g = E.CARDS.filter(c => c.goldVar && c.set === 'ah'); ok(g.map(c => c.id).sort().join() === 'a_hawaiians_g,a_welcome_g,f_gameover_g' && g.every(c => c.set === 'ah'), 'Arany lapok: Isten hozott, High Hawaiians, Game Over');
   const s = G(); const d0 = s.players[0].deck.length; play(s, 0, 'a_hawaiians_g', { k: 'none' });
   ok(s.players[0].deck.length === d0 + 4, 'Arany High Hawaiians: ugyanaz a hatás (5 gomba + 1 húzás)');
   const s2 = G(); s2.players[0].heroId = 'laci'; U(s2, 1, 0, 'c_vajda'); play(s2, 0, 'f_gameover_g', { k: 'none' });
