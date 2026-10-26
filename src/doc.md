@@ -840,3 +840,7 @@ Hősképesség-ötletek a táblázatban (még nem zöldek, nincsenek beépítve)
 - **Bolt (megjelenéstől):** az Amsterdam Hősei és az Amsterdam Shiny pack **elöl**, utánuk a Base set packok.
 - **Küldetések (megjelenéstől, `setLive('ah')`):** a napi küldetés **1 Amsterdam packot**, a heti **1 Amsterdam Shiny packot** ad (`p.ahPacks` / `p.ahShinyPacks`, a Boltban „🌷 Amsterdam pack bontása” / „🌷 Amsterdam Shiny pack” gomb; `buyPack('ah', 'ahGift' | 'ahShinyGift')`). Előtte a régi Base set pack / Shiny pack jár. A napi ingyen pack Base set maradt.
 - **Amsterdam hátlap (2026-10-18):** automatikusan jár annak, aki az Amsterdam Hősei szett mind a 26 lapjából legalább 1-et megszerzett (sima is elég; a Full Art és az arany változat is beszámít, de nem kell). Mint az Ametiszt: felugró „🎉 Új hátlap: Amsterdam!” ablak, „Ezt használom” gomb; a 🃏 Hátlap menüben a haladás („x/26 lap megvan”). A megjelenésig (`setLive('ah')`) a hátlap-listában sem látszik. Kód: `BACKS.amsterdam`, `backCollProg(p, 'ah')`, kép: `art/back_amsterdam.webp` (+`sm/`).
+
+## Barna vízipipája: hatással megölve is jár a +2/+2 (2026-10-26, Gourry jelezte)
+- Eddig csak az kapta meg a +2/+2-t, aki **támadással** ütötte le. Most annak a karakternek is jár, amelyik a **saját hatásával** öli meg: **Nyiti, a napszúrás túlélője** (köre végi 1 sebzés – a nálad álló pipát leszedve 5/5 lesz) és a **JBL hangfal**. (`damageUnit` új `src` paramétere.) Akció lappal (pl. Dinnyés) megölve nincs kinek adni.
+
