@@ -75,7 +75,9 @@ const KW_HELP = {
   nokw:['Süti', 'Elvesztette a lapra nyomtatott kulcsszavait (Lendület, Provokáció, Pajzs, Izom, Sunyulás, Láthatatlan, Igézhetetlen, Feltámadás).'],
 };
 function cardHelpHTML(id, u) {
-  const c = CARD[id], rows = [TYPE_HELP[c.type]];
+  const c = CARD[id], rows = [c.type === 'char' && c.enemySide ? ['Karakter · az ellenfélhez', `Az ellenfél oldalára, egy üres helyére teszed le, és ott marad.${c.noAttack ? ' Nem támad – az ellenfélnek kell leütnie, ha meg akar szabadulni tőle.' : ''}`]
+    : c.type === 'char' && c.noAttack ? ['Karakter', 'Lekerül a táblára egy üres helyre, és ott marad. Nem támad.'] : TYPE_HELP[c.type]];
+  if (c.help) rows.push(['Részletesen', c.help]);   /* hosszabb magyarázat, ha a lap szövege rövidített (2026-10-26) */
   const add = k => { if (!rows.includes(KW_HELP[k])) rows.push(KW_HELP[k]); };
   if (c.shield || u?.shield) add('shield');
   if (c.taunt || u?.taunt) add('taunt');
