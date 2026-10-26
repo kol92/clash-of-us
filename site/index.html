@@ -2518,7 +2518,7 @@ html.pc-live #scr-game{background-image:radial-gradient(ellipse 78% 72% at 50% 5
 <script src="vendor/firebase-auth-compat.js"></script>
 <script src="vendor/firebase-firestore-compat.js"></script>
 <script src="vendor/firebase-database-compat.js"></script>
-<script>window.APP_VERSION = "2026.10.26-2259"; window.APP_BUILD = "2026.10.26-2259";</script>
+<script>window.APP_VERSION = "2026.10.26-2302"; window.APP_BUILD = "2026.10.26-2302";</script>
 <script>// ===== Best of Us – saját szerver (Firebase) =====
 // A játék eredetileg a Claude-os tárolót használta (window.claude.use('db' | 'user' | 'room')).
 // Ez a fájl ugyanazt a felületet adja Firebase-ből, így a játék kódja szinte változatlan maradhat:
@@ -2950,7 +2950,7 @@ const CARDS = [
   { id:'c_ani', set:'pc', type:'char', name:'Ani', cost:2, atk:2, hp:3, rarity:'r', text:'Kijátszáskor: ha egy Sasi-lap áll mellette, mindketten +1/+1-et kapnak, és Ani Provokációt kap.' },
   { id:'c_noemi', set:'pc', type:'char', name:'Noémi', cost:2, atk:3, hp:2, rarity:'r', sneak:true, text:'Sunyulás. Amikor felfordul, kidobja a vele szemben álló ellenséges karaktert.' },
   { id:'c_pultos', set:'pc', type:'char', name:'A pultos', cost:4, atk:2, hp:3, rarity:'k', text:'Kijátszáskor egy véletlen Ital kerül a kezedbe – ebben a körben ingyen kijátszhatod.' },
-  { id:'c_mm', set:'pc', type:'char', name:'MM, a hívatlan vendég', cost:1, atk:1, hp:3, rarity:'k', enemySide:true, noAttack:true, maxPosts:3, text:'Az ellenfél oldalára kerül. Nem támad. Kijátszáskor elzavarja a mellette állókat (vissza a kézbe). A köröd végén beszámolót ír: felfedi a rejtett ellenségeket, és 1 sebzés az ellenfél hősének. 3 beszámoló után lelép.' },   /* 2026-10-26 (Tomi) */
+  { id:'c_mm', set:'pc', type:'char', name:'MM, a hívatlan vendég', cost:1, atk:1, hp:3, rarity:'k', enemySide:true, noAttack:true, maxPosts:3, text:'Az ellenfélhez kerül, nem támad. Elzavarja a szomszédait. A köröd végén beszámolót ír: 1 sebzés az ellenfél hősének. 3 után lelép.', help:'Kijátszáskor a mellette álló ellenséges karakterek visszakerülnek a gazdájuk kezébe (mint a kidobásnál: 1-gyel drágábban). A te köröd végén beszámolót ír a netre: felfedi az ellenfél rejtett (Sunyulós) karaktereit, és az ellenfél hőse 1 sebzést kap. A harmadik beszámoló után lelép a tábláról.' },   /* 2026-10-26 (Tomi) */
   { id:'c_idegen', set:'pc', type:'char', name:'Részeg idegen', cost:1, atk:1, hp:1, rarity:'k', enemySide:true, noAttack:true, mid:true, text:'Az ellenfél oldalára teszed le. Nem támad. Éjfél után: kidől, és 1 sebzést okoz a gazdájának (annak, akinek az oldalán áll).' },
   { id:'c_dj', set:'pc', type:'char', name:'DJ', cost:4, atk:2, hp:5, rarity:'e', mid:true, text:'Amíg él, a karaktereid +1 támadással ütnek. Éjfél után: +2-vel.' },
   { id:'a_utolso', set:'pc', drink:true, noParty:true, type:'action', name:'Utolsó kör', cost:2, tgt:'own', rarity:'k', text:'Egy karaktered +2/+0 és Lendület. Éjfél után: húzol is egy lapot.' },
@@ -4325,7 +4325,9 @@ const KW_HELP = {
   nokw:['Süti', 'Elvesztette a lapra nyomtatott kulcsszavait (Lendület, Provokáció, Pajzs, Izom, Sunyulás, Láthatatlan, Igézhetetlen, Feltámadás).'],
 };
 function cardHelpHTML(id, u) {
-  const c = CARD[id], rows = [TYPE_HELP[c.type]];
+  const c = CARD[id], rows = [c.type === 'char' && c.enemySide ? ['Karakter · az ellenfélhez', `Az ellenfél oldalára, egy üres helyére teszed le, és ott marad.${c.noAttack ? ' Nem támad – az ellenfélnek kell leütnie, ha meg akar szabadulni tőle.' : ''}`]
+    : c.type === 'char' && c.noAttack ? ['Karakter', 'Lekerül a táblára egy üres helyre, és ott marad. Nem támad.'] : TYPE_HELP[c.type]];
+  if (c.help) rows.push(['Részletesen', c.help]);   /* hosszabb magyarázat, ha a lap szövege rövidített (2026-10-26) */
   const add = k => { if (!rows.includes(KW_HELP[k])) rows.push(KW_HELP[k]); };
   if (c.shield || u?.shield) add('shield');
   if (c.taunt || u?.taunt) add('taunt');
