@@ -639,7 +639,7 @@ async function openAllPacks(kind) {
 }
 async function bulkOpen(setId, free, n, name) {   /* n pack egyszerre: ajándék packok (⚡ Mind) és több pack vásárlása (2026-10-24) */
   const p = Store.p; const all = [], conv = { coins: 0 }; let shiny = false, god = 0;
-  for (let k = 0; k < n; k++) { const r = packRollFull(setId, free); all.push(...r.cards); conv.coins += r.conv.coins; shiny = r.shinyMode; if (r.cards.god) god++; }
+  for (let k = 0; k < n; k++) { const r = packRollFull(setId, free); if (r.cards.god) { god++; r.cards.forEach(c => c.godc = true); } all.push(...r.cards); conv.coins += r.conv.coins; shiny = r.shinyMode; }   /* a God pack lapjai szivárványos hátlapot kapnak */
   await save(); renderProfileBar(); renderShop();
   const o = document.createElement('div'); o.className = 'overlay opening bulk-op';
   o.innerHTML = `<div class="op-stage"><div class="bulk-head"><b>${n} × ${escH(name)}</b><small>${all.length} lap${god ? ` · 🌈 ${god} GOD PACK!` : ''}</small></div></div>`;
@@ -648,6 +648,7 @@ async function bulkOpen(setId, free, n, name) {   /* n pack egyszerre: ajándék
   o.querySelector('.op-stage').appendChild(packs);
   await packs.animate([{ opacity: 0, transform: 'translateY(30px) scale(.8)' }, { opacity: 1, transform: 'none' }], { duration: 380, easing: 'cubic-bezier(.2,1.3,.4,1)' }).finished;
   await sleep(350);
+  if (god) { const pk = packs.querySelector('.pk'); await godIntro(o, pk, packs).catch(() => {}); o.classList.remove('god-pack'); packs.style.visibility = ''; }   /* tömeges bontásban is lefut a God pack jelenet (2026-10-26) */
   const flash = document.createElement('div'); flash.className = 'op-flash' + (all.some(c => c.gold) ? ' gold' : ''); o.appendChild(flash);
   flash.animate([{ opacity: 0 }, { opacity: 1 }, { opacity: 0 }], { duration: 500 });
   await packs.animate([{ opacity: 1 }, { opacity: 0, transform: 'scale(1.15)' }], { duration: 260, fill: 'forwards' }).finished; packs.remove(); flash.remove();
@@ -942,7 +943,7 @@ async function godIntro(o, pk, packEl) {
 // a lapok felfordítása (pack és heti láda közös része); opt.ten: 10 lapos rács + „Mindet felfordítom”
 async function cardReveal(o, cards, opt = {}) {
   const row = document.createElement('div'); row.className = 'op-cards' + (opt.ten ? ' ten' : '') + (opt.five ? ' five' : '') + (opt.god ? ' god' : '');
-  row.innerHTML = cards.map((c, i) => `<button class="flip${c.gold ? ' goldback' : ''}" data-i="${i}" style="--rc:${RAR_COLOR[pcRar(c)]}" aria-label="Lap felfordítása">
+  row.innerHTML = cards.map((c, i) => `<button class="flip${c.gold ? ' goldback' : ''}${c.godc ? ' godback' : ''}" data-i="${i}" style="--rc:${RAR_COLOR[pcRar(c)]}" aria-label="Lap felfordítása">
       <span class="flip-in"><span class="face back"></span><span class="face front">${pcHTML(c, { big: true, foil: c.foil })}${c.dupe ? `<em class="newtag dupetag">+${c.dupe} coin</em>` : c.have > 2 ? `<em class="newtag dupetag">×${c.have}</em>` : c.isNew ? '<em class="newtag">Új!</em>' : ''}</span></span></button>`).join('');
   o.querySelector('.op-stage').appendChild(row);
   const hint = document.createElement('div'); hint.className = 'op-hint'; hint.textContent = 'Fordítsd fel a lapokat'; o.querySelector('.op-stage').appendChild(hint);
