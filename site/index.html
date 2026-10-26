@@ -2518,7 +2518,7 @@ html.pc-live #scr-game{background-image:radial-gradient(ellipse 78% 72% at 50% 5
 <script src="vendor/firebase-auth-compat.js"></script>
 <script src="vendor/firebase-firestore-compat.js"></script>
 <script src="vendor/firebase-database-compat.js"></script>
-<script>window.APP_VERSION = "2026.10.26-1312"; window.APP_BUILD = "2026.10.26-2202";</script>
+<script>window.APP_VERSION = "2026.10.26-2259"; window.APP_BUILD = "2026.10.26-2259";</script>
 <script>// ===== Best of Us – saját szerver (Firebase) =====
 // A játék eredetileg a Claude-os tárolót használta (window.claude.use('db' | 'user' | 'room')).
 // Ez a fájl ugyanazt a felületet adja Firebase-ből, így a játék kódja szinte változatlan maradhat:
@@ -2950,6 +2950,7 @@ const CARDS = [
   { id:'c_ani', set:'pc', type:'char', name:'Ani', cost:2, atk:2, hp:3, rarity:'r', text:'Kijátszáskor: ha egy Sasi-lap áll mellette, mindketten +1/+1-et kapnak, és Ani Provokációt kap.' },
   { id:'c_noemi', set:'pc', type:'char', name:'Noémi', cost:2, atk:3, hp:2, rarity:'r', sneak:true, text:'Sunyulás. Amikor felfordul, kidobja a vele szemben álló ellenséges karaktert.' },
   { id:'c_pultos', set:'pc', type:'char', name:'A pultos', cost:4, atk:2, hp:3, rarity:'k', text:'Kijátszáskor egy véletlen Ital kerül a kezedbe – ebben a körben ingyen kijátszhatod.' },
+  { id:'c_mm', set:'pc', type:'char', name:'MM, a hívatlan vendég', cost:1, atk:1, hp:3, rarity:'k', enemySide:true, noAttack:true, maxPosts:3, text:'Az ellenfél oldalára kerül. Nem támad. Kijátszáskor elzavarja a mellette állókat (vissza a kézbe). A köröd végén beszámolót ír: felfedi a rejtett ellenségeket, és 1 sebzés az ellenfél hősének. 3 beszámoló után lelép.' },   /* 2026-10-26 (Tomi) */
   { id:'c_idegen', set:'pc', type:'char', name:'Részeg idegen', cost:1, atk:1, hp:1, rarity:'k', enemySide:true, noAttack:true, mid:true, text:'Az ellenfél oldalára teszed le. Nem támad. Éjfél után: kidől, és 1 sebzést okoz a gazdájának (annak, akinek az oldalán áll).' },
   { id:'c_dj', set:'pc', type:'char', name:'DJ', cost:4, atk:2, hp:5, rarity:'e', mid:true, text:'Amíg él, a karaktereid +1 támadással ütnek. Éjfél után: +2-vel.' },
   { id:'a_utolso', set:'pc', drink:true, noParty:true, type:'action', name:'Utolsó kör', cost:2, tgt:'own', rarity:'k', text:'Egy karaktered +2/+0 és Lendület. Éjfél után: húzol is egy lapot.' },
@@ -3364,6 +3365,9 @@ function playCard(s, pi, hi, t) {
     const u = makeUnit(s, disg || c.id, pi); if (disg) u.alina = true; if (h.foil) u.foil = true; if (h.kickN) u.kickN = h.kickN;
     if (c.enemySide) { u.owner = pi; e.board[t.i] = u; ev(s, { t:'pipa', side:ei, i:t.i }); }   /* Barna vízipipája: az ellenfélhez kerül */
     else { p.board[t.i] = u; p.lastPlaced = u.uid; }   // a Cápa erre vadászik
+    if (c.id === 'c_mm' && e.board[t.i] === u) { ev(s, { t:'mmshoo', side:ei, i:t.i });   /* MM: elzavarja a mellette állókat */
+      const nb = [t.i - 1, t.i + 1].filter(k => { const x = e.board[k]; return x && !isFixed(x) && !isEl(x) && !CARD[x.id].noKick; });
+      (CARD.c_mm.shoo === 1 && nb.length > 1 ? [nb[Math.floor(rnd() * nb.length)]] : nb).forEach(k => kickOut(s, ei, k)); }
     if (has(p, 'firstCharAtk') && !p.charThisTurn && c.id !== 'c_korso' && !c.enemySide && c.cost <= 2) { u.atk += 1; ev(s, { t:'passive', side:pi, k:'firstCharAtk', id:c.id }); ev(s, { t:'buff', side:pi, i:t.i }); }
     p.charThisTurn = true;
     if (p.driver && !c.enemySide && p.board[t.i] === u) {   /* Bocsi, de vezetek */
@@ -4044,6 +4048,11 @@ function sharkSwim(s, pi) {
 function finishTurn(s) {
   const pi = s.active, p = s.players[pi];
   baszoStrike(s);
+  // MM, a hívatlan vendég (2026-10-26): aki lerakta, annak a köre végén „beszámolót ír” – felfedi az ellenfél rejtett karaktereit, és 1 sebzés az ellenfél hősének
+  { const ei = other(pi); s.players[ei].board.forEach((u, i) => {
+    if (!u || u.id !== 'c_mm' || u.owner !== pi || s.winner != null) return;
+    ev(s, { t:'mmpost', side:ei, i }); s.players[ei].board.forEach((x, j) => { if (x && x.hidden) reveal(s, ei, j); }); if (CARD.c_mm.post !== 0) damageHero(s, ei, CARD.c_mm.post || 1);
+    u.posts = (u.posts || 0) + 1; if (CARD.c_mm.maxPosts && u.posts >= CARD.c_mm.maxPosts) { ev(s, { t:'mmleave', side:ei, i }); s.players[ei].board[i] = null; buryItems(s, ei, u); bury(s, u.owner, u.id, 'leave', !!u.foil); } }); }
   // JBL hangfal: a gazdája körének végén 1 sebzés minden ellenséges karakternek és az ellenfél hősének (hangfalanként)
   p.board.forEach((u, i) => {
     if (!u || u.id !== 'c_jbl' || s.winner != null) return;
@@ -4140,6 +4149,7 @@ function evalState(s, me) {
     if (CARD[u.id].noAttack) x = u.hp * 0.5;   // JBL hangfal: fal, nem üt
     if (CARD[u.id].fixed) x = -7;              // Cápa: annak az oldalnak árt, ahol áll
     if (u.id === 'c_vizipipa') x = -2.5;      /* vízipipa: annak jó, aki elpusztíthatja */
+    if (u.id === 'c_mm') x = -3;              /* MM: foglalja a helyet, minden körben 1 sebzés a hősnek */
     if (u.id === 'c_idegen') x = -1.5;        /* Részeg idegen: éjfélkor 1 sebzés a gazdájának, foglalja a helyet */
     return x;
   };
@@ -4533,6 +4543,7 @@ const ART = {
   c_alina:    { src:'art/pc_alina.webp?v=fffeb1ce2e32165b', av:'52% 22%', pos:'52% 20%' },
   c_pc_laci:  { src:'art/pc_laci.webp?v=577d424063fa919c', av:'38% 22%', pos:'38% 20%' },
   c_pg:       { src:'art/pc_pg.webp?v=e54c8087175fd1cf', av:'45% 15%', pos:'45% 14%' },
+  c_mm:       { src:'art/pc_mm.webp?v=c36c7af37da07f52', av:'56% 20%', pos:'56% 18%' },
   c_idegen:   { src:'art/pc_idegen.webp?v=e9ace6a67101cc61', av:'45% 30%', pos:'45% 28%' },
   c_pc_gabi:  { src:'art/pc_gabi.webp?v=8d6e61715169e3fa', av:'45% 12%', pos:'45% 12%' },
   a_kidobtak: { src:'art/pc_kidobtak.webp?v=1595eb66802c19a6', av:'50% 30%', pos:'50% 30%' },
@@ -5074,6 +5085,9 @@ function logEvents(evs, snap) {
       case 'shield': L(`🛡 ${unitName(e.side, e.i)} pajzsa elnyelte az ütést`); break;
       case 'bounce': L(`↩ ${unitName(e.side, e.i)} visszakerült a kézbe`); break;
       case 'stolen': L(`🫳 ${unitName(e.side, e.i)} átállt a másik oldalra`); break;
+      case 'mmshoo': L(`🙄 ${unitName(e.side, e.i)} odajött – a mellette állók elmenekülnek`); break;
+      case 'mmpost': L(`📱 ${unitName(e.side, e.i)} beszámolót írt a netre – ${e.side === ME ? 'a hősöd' : 'az ellenfél hőse'} 1 sebzést kap a szégyentől`); break;
+      case 'mmleave': L(`👋 ${CARD.c_mm.name} megírta a harmadik beszámolót is, és lelépett`); break;
       case 'nokick': L(`😈 ${unitName(e.side, e.i)}: a buli ördögét nem lehet kidobni`); break;
       case 'purple': L(`💜 Peaches Purple Card: ${unitName(e.side, e.i)} nem dobható ki`); break;
       case 'ruhatar': L(e.o === 1 ? `🧥 Ruhatár: <b class="lc" data-lc="${e.id}">${escH(CARD[e.id].name)}</b> kiváltva – vissza a kézbe` : `🧥 Ruhatár: <b class="lc" data-lc="${e.id}">${escH(CARD[e.id].name)}</b> leadva – a kézbe, 1-gyel olcsóbban`); break;
@@ -5318,6 +5332,9 @@ async function animateEvents(evs) {
       case 'gift': floatAt(anchor, `${e.id === 'i_ing' ? '👔' : e.id === 'i_gomba' ? '🍄' : e.id === 'a_irkave' ? '☕' : '🍗'} ${CARD[e.id].name} a ${e.side === ME ? 'kezedbe' : 'kezébe'}!`, 'info'); hold = Math.max(hold, 700); break;
       case 'drinkgift': floatAt(anchor, e.side === ME ? `🍸 ${CARD[e.id].name} a kezedbe!` : '🍸 Ital a kezébe!', 'info'); hold = Math.max(hold, 700); break;
       case 'deathblast': floatAt(anchor, '💥 Utolsó ütés!', 'dmg'); hold = Math.max(hold, 450); break;
+      case 'mmshoo': floatAt(anchor, '🙄 Na, megjött MM…', 'info'); hold = Math.max(hold, 700); break;
+      case 'mmpost': floatAt(anchor, '📱 Beszámoló a netre!', 'dmg'); hold = Math.max(hold, 700); break;
+      case 'mmleave': floatAt(anchor, '👋 MM lelépett', 'info'); hold = Math.max(hold, 700); break;
       case 'nokick': floatAt(anchor, '😈 Nem lehet kidobni!', 'buff'); hold = Math.max(hold, 600); break;
       case 'purple': floatAt(anchor, '💜 VIP – nem dobható ki!', 'buff'); hold = Math.max(hold, 600); break;
       case 'ruhatar': if (e.i >= 0) { fx(el, e.side === ME ? 'fx-bounce-down' : 'fx-bounce-up'); floatAt(anchor, '🧥 Ruhatárba!', 'info'); } hold = Math.max(hold, 600); break;
