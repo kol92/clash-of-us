@@ -281,6 +281,8 @@ const ART = {
   f_korlatlan:{ src:'art/pc_korlatlan.webp', av:'50% 50%', pos:'50% 45%' },
   a_taxi:     { src:'art/pc_taxi.webp', pos:'50% 60%' },
   i_telefon:  { src:'art/pc_telefon.webp', pos:'50% 45%' },
+  i_vodor:    { src:'art/pc_vodor.webp', pos:'55% 50%' },
+  i_adoveo:   { src:'art/pc_adoveo.webp', pos:'45% 45%' },
   c_alina:    { src:'art/pc_alina.webp', av:'52% 22%', pos:'52% 20%' },
   c_pc_laci:  { src:'art/pc_laci.webp', av:'38% 22%', pos:'38% 20%' },
   c_pg:       { src:'art/pc_pg.webp', av:'45% 15%', pos:'45% 14%' },
