@@ -198,6 +198,11 @@ async function bootProfile() {
   if (TEST_MODE && Store.p && !(Store.p.portraits || []).includes('p_barna_dia')) {   /* teszt (2026-10-25, Tomi): mindenki kipróbálhatja a mozgó Gyémánt Barna portrét */
     const p = Store.p; p.portraits = [...(p.portraits || []), 'p_barna_dia']; p.heroSkin = { ...(p.heroSkin || {}), barna: 'p_barna_dia' }; save();
     setTimeout(() => toast('🧪 Teszt: megkaptad a mozgó Gyémánt Barna portrét (Barna már ezt viseli)'), 1600); }
+  if (TEST_MODE && Store.p && !(Store.p.portraits || []).includes('p_laci_eso')) {   /* teszt (2026-10-26, Tomi): a mozgó Laci portré (2. Season Pass, 25. szint) mindenkinek */
+    const p = Store.p; p.portraits = [...(p.portraits || []), 'p_laci_eso']; p.heroSkin = { ...(p.heroSkin || {}), laci: 'p_laci_eso' }; save();
+    setTimeout(() => toast('🧪 Teszt: megkaptad a mozgó Laci portrét (Laci már ezt viseli)'), 3400); }
+  if (TEST_MODE && Store.p && curSeason() && curSeason().id === TEST_PASS) {   /* teszt: a 2. szezon mind a 30 szintje rögtön átvehető */
+    const P = ensurePass(Store.p), full = curSeason().tiers.length * PASS_XP.perLevel; if (!P.testFull) { P.xp = Math.max(P.xp, full); P.testFull = true; save(); renderPassBadge(); } }
   if (Store.giftMsg) { const m = Store.giftMsg; Store.giftMsg = null; setTimeout(() => toast(m), 600); }
   if (Store.faMsg) { const m = Store.faMsg; Store.faMsg = null; setTimeout(() => toast(m), 4200); }
   if (Store.dupeMsg) { const m = Store.dupeMsg; Store.dupeMsg = null; setTimeout(() => toast(m), Store.giftMsg === null ? 2400 : 600); }
