@@ -2476,7 +2476,7 @@ html:has(body.in-game){overscroll-behavior:none;}
 <script src="vendor/firebase-auth-compat.js"></script>
 <script src="vendor/firebase-firestore-compat.js"></script>
 <script src="vendor/firebase-database-compat.js"></script>
-<script>window.APP_VERSION = "2026.10.26-1234"; window.APP_BUILD = "2026.10.26-1255";</script>
+<script>window.APP_VERSION = "2026.10.26-1312"; window.APP_BUILD = "2026.10.26-1312";</script>
 <script>// ===== Best of Us – saját szerver (Firebase) =====
 // A játék eredetileg a Claude-os tárolót használta (window.claude.use('db' | 'user' | 'room')).
 // Ez a fájl ugyanazt a felületet adja Firebase-ből, így a játék kódja szinte változatlan maradhat:
@@ -2945,6 +2945,7 @@ const CARDS = [
 CARDS.push({ ...CARDS.find(c => c.id === 'c_piftikiraly'), id:'c_piftikiraly2', variantOf:'c_piftikiraly', shopOnly:true, price:100 });   /* bolti ritka variáns, 2026-10-19 (Tomi) – a Pifti, a király (epikus) változata */
 CARDS.push({ ...CARDS.find(c => c.id === 'c_boros'), id:'c_boros2', variantOf:'c_boros', shopOnly:true, price:50 });   /* bolti ritka variáns, 2026-10-23 (Tomi): Boros virágcsokorral, 50 coin */
 for (const b of ['c_tomiparti', 'c_laszy', 'c_sasi']) CARDS.push({ ...CARDS.find(c => c.id === b), id:b + '2', variantOf:b });   /* 2026-10-18: új packból jövő változatok (Tomi) */
+CARDS.push({ ...CARDS.find(c => c.id === 'a_lambo'), id:'a_lambo_v', variantOf:'a_lambo', passOnly:true, foilOnly:true });   /* mozgó Flaming Lamborghini – 2. Season Pass, 10. szint (Tomi, 2026-10-26) */
 for (const b of ['a_welcome', 'a_hawaiians', 'f_gameover', 'c_pg', 'c_wcneni', 'c_belvedere']) CARDS.push(   /* Peaches arany lapjai: 2026-10-26 (Tomi) */{ ...CARDS.find(c => c.id === b), id:b + '_g', variantOf:b, goldVar:true });
 /* Bong (Amszterdam hősei): minden továbbadáskor 1-gyel drágább token-példány (legfeljebb 10) */
 for (let n = 2; n <= 10; n++) CARDS.push({ ...CARDS.find(c => c.id === 'a_bong'), id:'a_bong' + n, cost:n, bong:n, token:true, rarity:'r' });
@@ -4460,6 +4461,7 @@ const ART = {
   c_wcneni:   { src:'art/pc_wcneni.webp?v=b405356c48107df5', av:'45% 22%', pos:'45% 20%' },
   c_portas:   { src:'art/pc_portas.webp?v=c883be4c309abd6a', av:'52% 16%', pos:'52% 14%' },
   a_lambo:    { src:'art/pc_lambo.webp?v=ad1609a2f4ff541c', pos:'50% 40%' },
+  a_lambo_v:  { src:'art/pc_lambo_v.webp?v=1e9b18f06cbd5d36', pos:'50% 40%', vid:'art/vid/pc_lambo_v.mp4?v=e7818825' },   /* mozgó változat (2. Season Pass) */
   a_bloody:   { src:'art/pc_bloody.webp?v=c780d5f98986de13', pos:'50% 40%' },
   a_jager:    { src:'art/pc_jager.webp?v=6b2bca29375733a6', pos:'45% 45%' },
   i_purple:   { src:'art/pc_purple.webp?v=e5dd4e3fdf326ef8', pos:'50% 50%' },
@@ -6504,6 +6506,8 @@ async function bootProfile() {
   if (TEST_MODE && Store.p && !(Store.p.portraits || []).includes('p_laci_eso')) {   /* teszt (2026-10-26, Tomi): a mozgó Laci portré (2. Season Pass, 25. szint) mindenkinek */
     const p = Store.p; p.portraits = [...(p.portraits || []), 'p_laci_eso']; p.heroSkin = { ...(p.heroSkin || {}), laci: 'p_laci_eso' }; save();
     setTimeout(() => toast('🧪 Teszt: megkaptad a mozgó Laci portrét (Laci már ezt viseli)'), 3400); }
+  if (TEST_MODE && Store.p && !Store.p.coll.a_lambo_v) { const e = Store.p.coll.a_lambo_v = { n: 0, f: 2 }; save();   /* teszt: a mozgó Flaming Lamborghini (2. Season Pass, 10. szint) mindenkinek */
+    setTimeout(() => toast('🧪 Teszt: megkaptad a mozgó Flaming Lamborghinit (2 db) – nagy lapnézetben mozog'), 5200); }
   if (TEST_MODE && Store.p && curSeason() && curSeason().id === TEST_PASS) {   /* teszt: a 2. szezon mind a 30 szintje rögtön átvehető */
     const P = ensurePass(Store.p), full = curSeason().tiers.length * PASS_XP.perLevel; if (!P.testFull) { P.xp = Math.max(P.xp, full); P.testFull = true; save(); renderPassBadge(); } }
   if (Store.giftMsg) { const m = Store.giftMsg; Store.giftMsg = null; setTimeout(() => toast(m), 600); }
@@ -7962,7 +7966,7 @@ const SEASONS = [
   { id: 's3', name: '2. szezon · Éjfél után', start: new Date(2026, 10, 1, 19, 0), end: new Date(2026, 11, 1, 0, 0),
     tiers: [
       { pc: 1 }, { coins: 50 }, { packs: 1 }, { coins: 75 }, { pc: 1 },
-      { coins: 100 }, { shiny: 1 }, { pc: 2 }, { coins: 100 }, { pcShiny: 1 },
+      { coins: 100 }, { shiny: 1 }, { pc: 2 }, { coins: 100 }, { card: 'a_lambo_v' },   /* 10. szint: mozgó Flaming Lamborghini (2 példány) */
       { coins: 100 }, { packs: 2 }, { pc: 2 }, { coins: 150 }, { fa: 1 },
       { pc: 2 }, { coins: 150 }, { shiny: 1 }, { pc: 2 }, { pcShiny: 1 },
       { coins: 150 }, { pc: 3 }, { coins: 200 }, { packs: 3 }, { port: 'p_laci_eso' },   /* 25. szint: mozgó Laci portré (Tomi, 2026-10-26) */
