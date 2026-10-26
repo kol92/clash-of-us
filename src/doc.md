@@ -864,3 +864,6 @@ Hősképesség-ötletek a táblázatban (még nem zöldek, nincsenek beépítve)
 ## Győzelmi képernyő mozgó portréval (2026-10-26, Tomi; teszt)
 - Ha mozgó hős-portréval (most: Gyémánt Barna, Laci, az éjféli zápor) nyersz, a „Nyertél” tábla helyett a portré videója jelenik meg nagyban, arany keretben, forgó sugarakkal és fényvillanással; alul „NYERTÉL” + a portré neve, alatta „Folytatás” gomb (`resultVidArt()` a ui.js-ben, a `resultArt` hívja – bot, ranked és PvP meccsnél is). Előbb az állókép, a videó csak elinduláskor úszik be; a natív ▶ gomb rejtve.
 
+## „Elmúlt ÉJFÉL” jelenet – új kép (2026-10-26, Astra)
+- A CSS-sel rajzolt hold helyett Astra képe (`art/ui/midnight.webp`, 852×1846; a felirat és a „Koppints a folytatáshoz” a képen van). Mozgás: sötétből, enyhe ráközelítésből beúszik, a 0,95. mp-nél villanás + rázkódás, utána a holdon finom pulzáló fény (`.mid-glow`), egy fénycsík fut át rajta és csillagok szikráznak; ~3 mp után (vagy koppintásra) eltűnik. Széles kijelzőn a kép nem vágódik le (`contain`). Élesben a Peaches megjelenéséig nem fut.
+

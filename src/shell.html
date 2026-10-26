@@ -2286,6 +2286,15 @@ html:has(body.in-game){overscroll-behavior:none;}
 .mid-title b{display:block;font-family:var(--display);font-weight:400;font-size:clamp(40px,13vw,72px);line-height:1;text-transform:uppercase;color:#eef3ff;text-shadow:0 0 18px rgba(170,200,255,.95),0 0 46px rgba(120,150,255,.7),0 4px 0 rgba(0,0,20,.6);}
 .mid-title em{display:block;margin-top:8px;font-style:normal;font-weight:700;font-size:15px;color:#cbd5f5;}
 .mid-flash{position:absolute;inset:0;background:#dfe8ff;opacity:0;pointer-events:none;}
+.mid-intro.img{background:#070a22;}
+.mid-intro.img .mid-bg{position:absolute;inset:0;opacity:0;background:url('art/ui/midnight.webp') center/cover no-repeat;}
+@media (min-aspect-ratio:3/5){.mid-intro.img .mid-bg{background-size:contain;}}
+.mid-glow{position:absolute;left:50%;top:28.5%;width:min(97vw,44.7vh);aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;opacity:0;pointer-events:none;
+  background:radial-gradient(circle,rgba(240,244,255,.2) 0,rgba(240,244,255,.08) 50%,rgba(205,218,255,.3) 61%,rgba(170,190,255,0) 66%);mix-blend-mode:screen;}
+.mid-glow.on{animation:midGlow 2.2s ease-in-out infinite alternate;}
+@keyframes midGlow{from{opacity:.25;transform:translate(-50%,-50%) scale(.98);}to{opacity:1;transform:translate(-50%,-50%) scale(1.04);}}
+.mid-intro.img .mid-stars{opacity:0;}
+.mid-sweep{position:absolute;inset:0;pointer-events:none;background:linear-gradient(90deg,transparent 35%,rgba(255,236,190,.28) 50%,transparent 65%);transform:translateX(-130%);mix-blend-mode:screen;}
 .mid-intro .fin-skip{bottom:calc(5% + env(safe-area-inset-bottom));}
 /* több pack vásárlása (2026-10-24) */
 .pb-box{display:grid;justify-items:center;gap:10px;} .pb-pack .pack{--pw:96px;}
