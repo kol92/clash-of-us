@@ -855,3 +855,6 @@ Hősképesség-ötletek a táblázatban (még nem zöldek, nincsenek beépítve)
 - Energiatakarékos módban (vagy ha az iPhone nem engedi az automatikus lejátszást) a videó helyén a natív ▶ gomb látszott (Laci jelezte a „Laci, az éjféli zápor” skinnél). CSS-sel elrejtve (`::-webkit-media-controls-start-playback-button`), ilyenkor az állókép marad.
 - Működés (eddig is): előbb az állókép (webp) tölt be azonnal, a videó láthatatlanul töltődik, és csak amikor ténylegesen elindult (`playing`), akkor úszik be (`.art-vid.on` / `.hport-vid.on`). Az állókép a videó **első képkockája** legyen, hogy az átmenet ne ugorjon.
 
+## Meccs-háttér: Peaches csak a megjelenéstől (2026-10-26, javítás)
+- A teszt ág beolvasztásakor a Peaches meccs-háttér (`art/ui/board-pc.webp`) véletlenül élesbe került az Amsterdam-háttér (`art/ui/board.webp`) helyett. Visszaállítva: alapból az Amsterdam-háttér, a Peaches-háttér csak `html.pc-live` alatt él – ezt a ui.js `pcBg()` teszi fel a megjelenéskor (`setLive('pc')`, 11-01 19:00; ha az app közben nyitva van, akkor is átvált). A teszt oldalon mindig a Peaches-háttér látszik.
+

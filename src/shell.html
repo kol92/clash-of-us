@@ -23,7 +23,7 @@ button:focus-visible,.card:focus-visible{outline:2px solid var(--gold);outline-o
 #app{height:var(--apph,100%);max-width:480px;margin:0 auto;position:relative;box-sizing:border-box;}
 /* Nagy képernyő (tablet fekve, számítógép, 2026-10-13): az oldalsávokban elmosott asztal, a játék oszlopa árnyékkal, finom aranyszegéllyel */
 @media (min-width:560px){
-  body::before{content:'';position:fixed;inset:-40px;z-index:0;pointer-events:none;background:url('art/ui/board-pc.webp') center/cover no-repeat;filter:blur(10px) brightness(.62) saturate(1.15);}
+  body::before{content:'';position:fixed;inset:-40px;z-index:0;pointer-events:none;background:url('art/ui/board.webp') center/cover no-repeat;filter:blur(10px) brightness(.62) saturate(1.15);}
   body::after{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;background:radial-gradient(60% 80% at 50% 50%,transparent 30%,rgba(0,0,0,.55) 100%);}
   #app{z-index:1;box-shadow:0 0 70px rgba(0,0,0,.75),0 0 0 1px rgba(214,180,106,.22);background:radial-gradient(120% 70% at 50% 45%,#123a44 0%,var(--bg) 70%) var(--bg);}
 }
@@ -621,12 +621,12 @@ video.art-vid::-webkit-media-controls,video.hport-vid::-webkit-media-controls,vi
 .hbar .av{position:relative;width:40px;height:40px;margin:0 5px;box-shadow:none;}
 .hbar .av::after{content:"";position:absolute;inset:-9px;background:url('art/ui/ring.webp') center/contain no-repeat;pointer-events:none;}
 .hbar.active .av::after{background-image:url('art/ui/ring-active.webp');inset:-10px;}
-#scr-game{background:#08161c url('art/ui/board-pc.webp') center/100% 100% no-repeat;}
+#scr-game{background:#08161c url('art/ui/board.webp') center/100% 100% no-repeat;}
 .locchip{background:rgba(4,12,17,.72);}
 @media (max-height:700px){.hbar .av{width:34px;height:34px}.hbar .av::after{inset:-8px}}
 
 /* ---------- finomítások (olvashatóság) ---------- */
-#scr-game{background:radial-gradient(ellipse 78% 72% at 50% 50%,rgba(2,8,11,.5),rgba(2,8,11,.32) 70%,rgba(2,8,11,0) 100%),url('art/ui/board-pc.webp') center/100% 100% no-repeat,#08161c;}
+#scr-game{background:radial-gradient(ellipse 78% 72% at 50% 50%,rgba(2,8,11,.5),rgba(2,8,11,.32) 70%,rgba(2,8,11,0) 100%),url('art/ui/board.webp') center/100% 100% no-repeat,#08161c;}
 /* állapotcímkék: keskeny sáv a lap tetején */
 .tags{position:absolute;z-index:4;top:4.4%;left:3.6%;right:3.6%;display:flex;justify-content:center;gap:2px;pointer-events:none;}
 .tags .zz.taunt{background:#b8860b;color:#fff;}
@@ -1706,7 +1706,7 @@ button.rk-row:active{transform:scale(.98);}
     grid-template-rows:auto minmax(0,1fr) auto minmax(0,1fr) auto auto auto;
     grid-template-areas:"left ebar right" "left elane right" "left mid right" "left plane right" "left sel right" "left hand right" "left pbar right";}
   body.in-game #scr-game::before{content:'';grid-column:2;grid-row:1/-1;z-index:-1;margin:0 -8px;border-left:1px solid rgba(214,180,106,.25);border-right:1px solid rgba(214,180,106,.25);
-    background:radial-gradient(ellipse 78% 72% at 50% 50%,rgba(2,8,11,.5),rgba(2,8,11,.32) 70%,rgba(2,8,11,0) 100%),url('art/ui/board-pc.webp') center/100% 100% no-repeat,#08161c;box-shadow:0 0 60px rgba(0,0,0,.7);}
+    background:radial-gradient(ellipse 78% 72% at 50% 50%,rgba(2,8,11,.5),rgba(2,8,11,.32) 70%,rgba(2,8,11,0) 100%),url('art/ui/board.webp') center/100% 100% no-repeat,#08161c;box-shadow:0 0 60px rgba(0,0,0,.7);}
   body.in-game #eBar{grid-area:ebar;margin:0;width:min(100%,560px);justify-self:center;} body.in-game #pBar{grid-area:pbar;margin:0;width:min(100%,560px);justify-self:center;}
   body.in-game #eLane{grid-area:elane;} body.in-game #pLane{grid-area:plane;}
   body.in-game .mid{grid-area:mid;width:min(100%,620px);justify-self:center;} body.in-game #selbar{grid-area:sel;} body.in-game #hand{grid-area:hand;}
@@ -2284,6 +2284,10 @@ html:has(body.in-game){overscroll-behavior:none;}
   -webkit-text-stroke:3px #7a0014;text-shadow:0 0 24px rgba(255,40,80,.95),0 6px 0 #4a000c;}
 .trap-card{position:absolute;left:50%;top:52%;transform:translate(-50%,-50%);opacity:0;} .trap-card .card{--cw:min(230px,56vw);}
 .trap-sub{position:absolute;left:0;right:0;bottom:calc(10% + env(safe-area-inset-bottom));text-align:center;color:#fff;font:800 17px var(--body);opacity:0;text-shadow:0 2px 6px #000;} .trap-sub b{color:#ff9ac0;}
+/* Peaches meccs-háttér: csak a Peaches megjelenésétől (html.pc-live, ui.js – 2026-10-26) */
+html.pc-live body::before{background-image:url('art/ui/board-pc.webp');}
+html.pc-live body.in-game #scr-game::before{background-image:radial-gradient(ellipse 78% 72% at 50% 50%,rgba(2,8,11,.5),rgba(2,8,11,.32) 70%,rgba(2,8,11,0) 100%),url('art/ui/board-pc.webp');}
+html.pc-live #scr-game{background-image:radial-gradient(ellipse 78% 72% at 50% 50%,rgba(2,8,11,.5),rgba(2,8,11,.32) 70%,rgba(2,8,11,0) 100%),url('art/ui/board-pc.webp');}
 </style>
 
 <div id="app">

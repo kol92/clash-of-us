@@ -5,6 +5,8 @@ const TEST_MODE = typeof location !== 'undefined' && location.hostname !== 'best
 const SET_RELEASE = { ah: Date.UTC(2026, 9, 19, 17, 0, 0), pc: Date.UTC(2026, 10, 1, 18, 0, 0) };   /* pc: Peaches and Cream – 2026-11-01 19:00 (budapesti téli idő, UTC+1), Tomi 2026-10-26 */
 const setLive = id => TEST_MODE || !SET_RELEASE[id] || Date.now() >= SET_RELEASE[id];
 const cardOn = c => !c.set || setLive(c.set);
+(function pcBg() { if (typeof document === 'undefined') return; const on = () => document.documentElement.classList.toggle('pc-live', setLive('pc')); on();   /* Peaches meccs-háttér a megjelenéstől */
+  if (!setLive('pc') && SET_RELEASE.pc) setTimeout(on, Math.min(2147483000, SET_RELEASE.pc - Date.now() + 1000)); })();
 const HEROES_ON = () => HEROES.filter(h => !h.set || setLive(h.set));   /* megjelent hősök (Laszy: a Peaches-szel) */
 // ===== Clash of Us – felület =====
 let ME = 0, BOT = 1;   // PvP-ben a vendégnél felcserélődik: mindig te vagy lent
