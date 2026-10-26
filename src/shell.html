@@ -90,6 +90,8 @@ h1,h2,h3{font-family:var(--display);font-weight:400;letter-spacing:.01em;text-wr
 .art.has-art::after{display:none;}
 .art-vid{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .35s;pointer-events:none;}
 .art-vid.on{opacity:1;}
+/* iPhone (energiatakarékos mód / letiltott automatikus lejátszás): a natív ▶ gomb ne látszódjon – ilyenkor az állókép marad (2026-10-26) */
+video.art-vid::-webkit-media-controls,video.hport-vid::-webkit-media-controls,video.art-vid::-webkit-media-controls-start-playback-button,video.hport-vid::-webkit-media-controls-start-playback-button,video.art-vid::-webkit-media-controls-overlay-play-button,video.hport-vid::-webkit-media-controls-overlay-play-button{display:none!important;-webkit-appearance:none;opacity:0!important;}
 @media (prefers-reduced-motion:reduce){.art-vid{display:none;}}
 /* „fit” lapkép: a teljes kép a keret belsejébe kicsinyítve, mögötte ugyanaz elmosva (2026-10-12, gyémánt Best of Us) */
 .art.has-art.fit{background:none!important;}
