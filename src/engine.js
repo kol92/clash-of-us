@@ -168,6 +168,7 @@ const CARDS = [
   { id:'c_pc_gabi', set:'pc', type:'char', name:'Gabi, éjfél után', cost:3, atk:2, hp:4, rarity:'k', mid:true, text:'Éjfél után: Provokáció és +0/+2.' },
   { id:'c_pc_laci', set:'pc', type:'char', name:'Laci, éjfél után', cost:4, atk:3, hp:4, rarity:'r', mid:true, text:'Kijátszáskor húzol egy lapot. Éjfél után kijátszva: kettőt.' },
   { id:'c_pc_bence', set:'pc', type:'char', name:'Bence, éjfél után', cost:6, atk:5, hp:6, rarity:'e', muscle:true, mid:true, text:'Izom. Éjfél után: Lendület, és minden támadása után a hősöd 2 életet gyógyul.' },
+  { id:'c_pc_pifti', set:'pc', type:'char', name:'Pifti, a buli ördöge', cost:3, atk:3, hp:2, rarity:'k', noKick:true, text:'Nem lehet kidobni.' },   /* 2026-10-26 (Tomi) */
   { id:'c_ani', set:'pc', type:'char', name:'Ani', cost:2, atk:2, hp:3, rarity:'r', text:'Kijátszáskor: ha egy Sasi-lap áll mellette, mindketten +1/+1-et kapnak, és Ani Provokációt kap.' },
   { id:'c_noemi', set:'pc', type:'char', name:'Noémi', cost:2, atk:3, hp:2, rarity:'r', sneak:true, text:'Sunyulás. Amikor felfordul, kidobja a vele szemben álló ellenséges karaktert.' },
   { id:'c_pultos', set:'pc', type:'char', name:'A pultos', cost:4, atk:2, hp:3, rarity:'k', text:'Kijátszáskor egy véletlen Ital kerül a kezedbe – ebben a körben ingyen kijátszhatod.' },
@@ -245,6 +246,7 @@ const locOwn = (s, id, pi) => locIs(s, id) && (s.location.owner === pi || isReg(
 function kickOut(s, side, j) {   /* Kidobás: a karakter visszakerül a gazdája kezébe, az eszközei elvesznek */
   const x = s.players[side].board[j]; if (!x) return;
   if (locOwn(s, 'l_vip', side)) { ev(s, { t:'locfx', side, id:'l_vip' }); return; }   /* VIP szoba: a tulajdonosát nem lehet kidobni */
+  if (CARD[x.id].noKick) { ev(s, { t:'nokick', side, i:j, id:x.id }); return; }   /* Pifti: nem lehet kidobni (2026-10-26) */
   if ((x.items || []).includes('i_purple')) { ev(s, { t:'purple', side, i:j }); return; }   /* Peaches Purple Card: nem dobható ki */
   reveal(s, side, j); s.players[side].board[j] = null; ev(s, { t:'kickout', side, i:j, id:x.id }); buryItems(s, side, x);
   if (!CARD[x.id].token && addToHand(s, side, realId(x), x.foil)) { const h = s.players[side].hand[s.players[side].hand.length - 1]; h.kickN = (x.kickN || 0) + 1; ev(s, { t:'kickcost', side, i:-1, id:x.id, n:h.kickN }); }   /* minden kidobás után 1-gyel drágább (2026-10-24, Tomi) */
@@ -259,12 +261,12 @@ function midOn(s, pi, j) {   /* egy „Éjfél után” karakter bekapcsol (egys
   else if (id === 'c_pc_krisz') { u.haste = true; u.muscle = true; if (b) up(b, b); }
   else if (id === 'c_pc_zoli') { u.blast = 3 + b; }
   else if (id === 'c_pc_boros') { up(2 + b, 2 + b);
-    const e = other(pi), c = s.players[e].board.map((x, k) => x && !isFixed(x) && !isEl(x) ? k : -1).filter(k => k >= 0);
+    const e = other(pi), c = s.players[e].board.map((x, k) => x && !isFixed(x) && !isEl(x) && !CARD[x.id].noKick ? k : -1).filter(k => k >= 0);
     if (c.length) kickOut(s, e, c[Math.floor(rnd() * c.length)]); }
   else if (id === 'c_pc_gabi') { u.taunt = true; up(0, 2 + b); }
   else if (id === 'c_pc_bence') { u.haste = true; u.healAtk = 2 + b; }
   else if (id === 'c_idegen') { ev(s, { t:'expire', side:pi, i:j }); u.hp = 0; damageHero(s, pi, 1 + b); cleanup(s); return; }
-  else if (id === 'c_pg') { up(2 + b, 1 + b); const e2 = other(pi), c2 = s.players[e2].board.map((x, k) => x && !isFixed(x) && !isEl(x) ? k : -1).filter(k => k >= 0); if (c2.length) kickOut(s, e2, c2[Math.floor(rnd() * c2.length)]); }
+  else if (id === 'c_pg') { up(2 + b, 1 + b); const e2 = other(pi), c2 = s.players[e2].board.map((x, k) => x && !isFixed(x) && !isEl(x) && !CARD[x.id].noKick ? k : -1).filter(k => k >= 0); if (c2.length) kickOut(s, e2, c2[Math.floor(rnd() * c2.length)]); }
   else if (id === 'c_pc_sasi') { for (const k of [j - 1, j + 1]) { const x = p.board[k]; if (x && !isFixed(x)) { x.atk += 2 + b; x.hp += 2 + b; x.maxHp += 2 + b; ev(s, { t:'buff', side:pi, i:k }); } } }
   else if (id === 'c_pc_tomi') { const k = [j - 1, j + 1].find(k => k >= 0 && k < LANES && !p.board[k] && !closedLane(s, pi, k));
     if (k != null) { const v = makeUnit(s, 'c_belvedere', pi); if (b) { v.hp += b; v.maxHp += b; } p.board[k] = v; ev(s, { t:'summon', side:pi, i:k, id:'c_belvedere' }); } }
@@ -606,8 +608,8 @@ function playCard(s, pi, hi, t) {
     if (c.id === 'c_pultos') { const D = DRINK_POOL(), d = D[Math.floor(rnd() * D.length)]; ev(s, { t:'drinkgift', side:pi, i:t.i, id:d }); if (addToHand(s, pi, d)) p.hand[p.hand.length - 1].freeHalf = s.half; }
     if (c.id === 'c_ani' && p.board[t.i] === u) { const ns = [t.i - 1, t.i + 1].filter(k => p.board[k] && /^Sasi/.test(CARD[p.board[k].id].name));
       if (ns.length) { const sa = p.board[ns[0]]; for (const [x, k] of [[u, t.i], [sa, ns[0]]]) { x.atk += 1; x.hp += 1; x.maxHp += 1; ev(s, { t:'buff', side:pi, i:k }); } u.taunt = true; ev(s, { t:'boon', side:pi, i:t.i, b:'taunt' }); } }
-    if (bid(c.id) === 'c_pg') { const c2 = e.board.map((x, k) => x && !isFixed(x) && !isEl(x) ? k : -1).filter(k => k >= 0); if (c2.length) kickOut(s, ei, c2[Math.floor(rnd() * c2.length)]); }   /* P.G.: kidob */
-    if (c.id === 'c_portas') { const c2 = e.board.map((x, k) => x && !isFixed(x) && !isEl(x) ? k : -1).filter(k => k >= 0);   /* Peaches Portás: kézből kijátszva kidob egy véletlen ellenséget (a WC-s néni által hívott nem) */
+    if (bid(c.id) === 'c_pg') { const c2 = e.board.map((x, k) => x && !isFixed(x) && !isEl(x) && !CARD[x.id].noKick ? k : -1).filter(k => k >= 0); if (c2.length) kickOut(s, ei, c2[Math.floor(rnd() * c2.length)]); }   /* P.G.: kidob */
+    if (c.id === 'c_portas') { const c2 = e.board.map((x, k) => x && !isFixed(x) && !isEl(x) && !CARD[x.id].noKick ? k : -1).filter(k => k >= 0);   /* Peaches Portás: kézből kijátszva kidob egy véletlen ellenséget (a WC-s néni által hívott nem) */
       if (c2.length) kickOut(s, ei, c2[Math.floor(rnd() * c2.length)]); }
     if (c.id === 'c_pc_laszy') { ev(s, { t:'gift', side:pi, i:t.i, id:'a_kalinka' }); addToHand(s, pi, 'a_kalinka'); }
     if (CARD[c.id].mid && isMidnight(s) && p.board[t.i] === u) midOn(s, pi, t.i);   /* Éjfél után kijátszva: rögtön bekapcsol */
@@ -910,8 +912,8 @@ function playCard(s, pi, hi, t) {
         x.atk += 3; x.haste = true; x.royal = true; ev(s, { t:'buff', side:pi, i:t.i, n:3 }); ev(s, { t:'boon', side:pi, i:t.i, b:'haste' }); break; }
       case 'a_utolso': { const x = p.board[t.i]; if (!x) break; x.atk += 2; x.haste = true; ev(s, { t:'buff', side:pi, i:t.i }); if (isMidnight(s)) draw(s, pi); break; }
       case 'a_sor': e.charTax = 2; ev(s, { t:'sortax', side:ei, i:-1 }); break;
-      case 'a_kidobtak': { for (let k = 0; k < 2; k++) { const c2 = e.board.map((x, q) => x && !isFixed(x) && !isEl(x) ? q : -1).filter(q => q >= 0); if (c2.length) kickOut(s, ei, c2[Math.floor(rnd() * c2.length)]); }
-        const c3 = p.board.map((x, q) => x && !isFixed(x) && !isEl(x) ? q : -1).filter(q => q >= 0); if (c3.length) kickOut(s, pi, c3[Math.floor(rnd() * c3.length)]); break; }
+      case 'a_kidobtak': { for (let k = 0; k < 2; k++) { const c2 = e.board.map((x, q) => x && !isFixed(x) && !isEl(x) && !CARD[x.id].noKick ? q : -1).filter(q => q >= 0); if (c2.length) kickOut(s, ei, c2[Math.floor(rnd() * c2.length)]); }
+        const c3 = p.board.map((x, q) => x && !isFixed(x) && !isEl(x) && !CARD[x.id].noKick ? q : -1).filter(q => q >= 0); if (c3.length) kickOut(s, pi, c3[Math.floor(rnd() * c3.length)]); break; }
       case 'a_taxi': { const x = p.board[t.i]; if (!x) break; p.board[t.i] = null; ev(s, { t:'taxi', side:pi, i:t.i, id:x.id }); buryItems(s, pi, x);
         if (!CARD[x.id].token && addToHand(s, pi, realId(x), x.foil) && x.kickN) p.hand[p.hand.length - 1].kickN = x.kickN; draw(s, pi); break; }
       case 'f_korlatlan': { const D = DRINK_POOL(); for (let k = 0; k < 3; k++) { const d = D[Math.floor(rnd() * D.length)]; if (addToHand(s, pi, d)) p.hand[p.hand.length - 1].fix = 1; ev(s, { t:'drinkgift', side:pi, i:-1, id:d }); } break; }

@@ -104,4 +104,7 @@ const B = s => s.players[0].board;
   B(s)[0].hp = 1; B(s)[1].hp = 2; s.players[1].board = [null, null, null, null]; s.active = 0; E.runEndTurn(s); ok(B(s)[1].maxHp === 6 && B(s)[0].hp === 2 && B(s)[1].hp === 3, `Pezsgős vödör: +0/+3, köröd végén ő és a szomszédja +1 (${B(s)[0].hp}, ${B(s)[1].hp})`); }
 { const s = G(); play(s, 1, 'c_vajda', { k: 'slot', side: 1, i: 0 }); play(s, 0, 'c_gyuri', { k: 'slot', side: 0, i: 0 }); play(s, 0, 'i_adoveo', { k: 'unit', side: 0, i: 0 }); B(s)[0].fresh = false; B(s)[0].hp = 9; B(s)[0].maxHp = 9;
   s.active = 0; E.runEndTurn(s); ok(!s.players[1].board[0] && s.players[1].hand.some(h => h.id === 'c_vajda'), 'Portás adóvevő: a túlélő ellenséget kidobják'); }
+{ let ok1 = true; for (let k = 0; k < 30; k++) { const s = G(); play(s, 1, 'c_pc_pifti', { k: 'slot', side: 1, i: 0 }); play(s, 1, 'c_vajda', { k: 'slot', side: 1, i: 1 }); play(s, 0, 'c_portas', { k: 'slot', side: 0, i: 0 });
+    if (!(s.players[1].board[0] && s.players[1].board[0].id === 'c_pc_pifti' && !s.players[1].board[1])) ok1 = false; } ok(ok1, 'Pifti: a véletlen kidobás nem őt választja');
+  const s = G(); play(s, 1, 'c_pc_pifti', { k: 'slot', side: 1, i: 0 }); E.kickOut(s, 1, 0); ok(s.players[1].board[0] && s.players[1].board[0].id === 'c_pc_pifti', 'Pifti: célzott kidobásnál is marad'); }
 console.log(fails ? 'HIBÁK: ' + fails : 'PEACHES 2 OK');

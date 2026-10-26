@@ -270,6 +270,7 @@ const ART = {
   c_pc_bence: { src:'art/pc_bence.webp', av:'42% 25%', pos:'42% 22%' },
   a_royal:    { src:'art/pc_royal.webp', pos:'45% 40%' },
   c_ani:      { src:'art/pc_ani.webp', av:'55% 22%', pos:'55% 20%' },
+  c_pc_pifti: { src:'art/pc_pifti.webp', av:'50% 22%', pos:'50% 20%' },
   c_noemi:    { src:'art/pc_noemi.webp', av:'62% 25%', pos:'60% 22%' },
   c_dj:       { src:'art/pc_dj.webp', av:'50% 15%', pos:'50% 14%' },
   a_sor:      { src:'art/pc_sor.webp', pos:'50% 55%' },
@@ -827,6 +828,7 @@ function logEvents(evs, snap) {
       case 'shield': L(`🛡 ${unitName(e.side, e.i)} pajzsa elnyelte az ütést`); break;
       case 'bounce': L(`↩ ${unitName(e.side, e.i)} visszakerült a kézbe`); break;
       case 'stolen': L(`🫳 ${unitName(e.side, e.i)} átállt a másik oldalra`); break;
+      case 'nokick': L(`😈 ${unitName(e.side, e.i)}: a buli ördögét nem lehet kidobni`); break;
       case 'purple': L(`💜 Peaches Purple Card: ${unitName(e.side, e.i)} nem dobható ki`); break;
       case 'ruhatar': L(e.o === 1 ? `🧥 Ruhatár: <b class="lc" data-lc="${e.id}">${escH(CARD[e.id].name)}</b> kiváltva – vissza a kézbe` : `🧥 Ruhatár: <b class="lc" data-lc="${e.id}">${escH(CARD[e.id].name)}</b> leadva – a kézbe, 1-gyel olcsóbban`); break;
       case 'wcneni': L(`🚽 A WC-s néni elviharzott (vissza a kézbe) – jön a Peaches Portás!`); break;
@@ -1070,6 +1072,7 @@ async function animateEvents(evs) {
       case 'gift': floatAt(anchor, `${e.id === 'i_ing' ? '👔' : e.id === 'i_gomba' ? '🍄' : e.id === 'a_irkave' ? '☕' : '🍗'} ${CARD[e.id].name} a ${e.side === ME ? 'kezedbe' : 'kezébe'}!`, 'info'); hold = Math.max(hold, 700); break;
       case 'drinkgift': floatAt(anchor, e.side === ME ? `🍸 ${CARD[e.id].name} a kezedbe!` : '🍸 Ital a kezébe!', 'info'); hold = Math.max(hold, 700); break;
       case 'deathblast': floatAt(anchor, '💥 Utolsó ütés!', 'dmg'); hold = Math.max(hold, 450); break;
+      case 'nokick': floatAt(anchor, '😈 Nem lehet kidobni!', 'buff'); hold = Math.max(hold, 600); break;
       case 'purple': floatAt(anchor, '💜 VIP – nem dobható ki!', 'buff'); hold = Math.max(hold, 600); break;
       case 'ruhatar': if (e.i >= 0) { fx(el, e.side === ME ? 'fx-bounce-down' : 'fx-bounce-up'); floatAt(anchor, '🧥 Ruhatárba!', 'info'); } hold = Math.max(hold, 600); break;
       case 'wcneni': fx(el, e.side === ME ? 'fx-bounce-down' : 'fx-bounce-up'); floatAt(anchor, '🚽 „Na majd adok én neked!”', 'info'); hold = Math.max(hold, 900); break;
