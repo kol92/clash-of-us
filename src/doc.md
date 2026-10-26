@@ -858,3 +858,6 @@ Hősképesség-ötletek a táblázatban (még nem zöldek, nincsenek beépítve)
 ## Meccs-háttér: Peaches csak a megjelenéstől (2026-10-26, javítás)
 - A teszt ág beolvasztásakor a Peaches meccs-háttér (`art/ui/board-pc.webp`) véletlenül élesbe került az Amsterdam-háttér (`art/ui/board.webp`) helyett. Visszaállítva: alapból az Amsterdam-háttér, a Peaches-háttér csak `html.pc-live` alatt él – ezt a ui.js `pcBg()` teszi fel a megjelenéskor (`setLive('pc')`, 11-01 19:00; ha az app közben nyitva van, akkor is átvált). A teszt oldalon mindig a Peaches-háttér látszik.
 
+## „Elmúlt ÉJFÉL” jelenet – új kép (2026-10-26, Astra)
+- A CSS-sel rajzolt hold helyett Astra képe (`art/ui/midnight.webp`, 852×1846; a felirat és a „Koppints a folytatáshoz” a képen van). Mozgás: sötétből, enyhe ráközelítésből beúszik, a 0,95. mp-nél villanás + rázkódás, utána a holdon finom pulzáló fény (`.mid-glow`), egy fénycsík fut át rajta és csillagok szikráznak; ~3 mp után (vagy koppintásra) eltűnik. Széles kijelzőn a kép nem vágódik le (`contain`). Élesben a Peaches megjelenéséig nem fut.
+
