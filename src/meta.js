@@ -1657,11 +1657,13 @@ const SEASONS = [
       { coins: 100 }, { shiny: 1 }, { pc: 2 }, { coins: 100 }, { pcShiny: 1 },
       { coins: 100 }, { packs: 2 }, { pc: 2 }, { coins: 150 }, { fa: 1 },
       { pc: 2 }, { coins: 150 }, { shiny: 1 }, { pc: 2 }, { pcShiny: 1 },
-      { coins: 150 }, { pc: 3 }, { coins: 200 }, { packs: 3 }, { pcShiny: 1 },
+      { coins: 150 }, { pc: 3 }, { coins: 200 }, { packs: 3 }, { port: 'p_laci_eso' },   /* 25. szint: mozgó Laci portré (Tomi, 2026-10-26) */
       { coins: 200 }, { pc: 3 }, { pcShiny: 1 }, { coins: 250 }, { goldPick: true },
     ] },
 ];
-const curSeason = (d = new Date()) => SEASONS.find(s => d >= s.start && d < s.end) || null;
+const TEST_PASS = 's3';   /* teszt oldalon ez a (még el nem indult) szezon fut már – előnézet (2026-10-26, Tomi) */
+const curSeason = d => { if (!d) { d = new Date(); const nx = TEST_MODE && SEASONS.find(s => s.id === TEST_PASS); if (nx && d < nx.start) d = new Date(+nx.start + 60000); }
+  return SEASONS.find(s => d >= s.start && d < s.end) || null; };
 const passLevel = xp => Math.floor(xp / PASS_XP.perLevel);
 function rewLabel(r) {
   if (r.coins) return `${r.coins} coin`;

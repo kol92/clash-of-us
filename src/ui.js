@@ -171,6 +171,7 @@ const ART = {
   p_sasi_mage:    { src:'art/p_sasi_mage.webp', av:'68% 16%', pos:'64% 18%', port:'68% 14%' },
   p_krisz_doffy:  { src:'art/p_krisz_doffy.webp', av:'52% 30%', pos:'52% 28%', port:'52% 26%' },
   p_barna_fa:     { src:'art/p_barna_fa.webp', av:'70% 14%', pos:'68% 14%', port:'70% 12%' },   /* bolt, 2026-10-25 (Tomi) */
+  p_laci_eso:     { src:'art/p_laci_eso.webp', vid:'art/vid/p_laci_eso.mp4', av:'32% 22%', pos:'32% 22%', port:'32% 18%' },   /* mozgó – 2. Season Pass 25. szint (2026-10-26) */
   p_barna_dia:    { src:'art/p_barna_dia.webp', vid:'art/vid/p_barna_dia.mp4', av:'64% 18%', pos:'62% 20%', port:'64% 16%' },   /* mozgó gyémánt portré – 2. ranked szezon Legenda jutalma (2026-10-25) */
   p_gabi_beton:   { src:'art/p_gabi_beton.webp', av:'58% 26%', pos:'56% 26%', port:'58% 22%' },
   c_nyitinap:     { src:'art/nyitinap.webp', av:'72% 34%', pos:'66% 36%' },
@@ -423,6 +424,7 @@ const PORTRAITS = {
   p_laci_hw:      { hero: 'laci',  name: 'Laci, az éjféli úriember', passOnly: true, ev: 'hw26' },
   p_krisz_doffy:  { hero: 'krisz', name: 'Krisz, Doflamingo style', price: 150, from: '2026-10-19' },
   p_barna_fa:     { hero: 'barna', name: 'Barna, a favágó', price: 100, from: '2026-10-25' },   /* bolt, 2026-10-25 (Tomi) */
+  p_laci_eso:     { hero: 'laci',  name: 'Laci, az éjféli zápor', passOnly: true },   /* mozgó; 2. szezon (Éjfél után), 25. szint */
   p_barna_dia:    { hero: 'barna', name: 'Gyémánt Barna', passOnly: true },   /* mozgó; csak a ranked Legendáért (2. szezon) */
   p_gabi_beton:   { hero: 'gabi',  name: 'Gabi, a Beton', passOnly: true },   /* 2. ranked szezon, Ezüst 5 jutalma (2026-10-23, Tomi) – boltban, ládában nincs */   /* bolt, 2026-10-19 (Tomi) */
   p_sasi_mage:    { hero: 'sasi',  name: 'Sasi, a mágus', price: 250, from: '2026-10-16' },   // bolt: a következő rotációtól (from = ettől a naptól kapható)   // event: a heti ládából is jöhet   // ajándék: Best of Us TCG nap (2026-10-12)
