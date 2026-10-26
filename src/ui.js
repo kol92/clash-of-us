@@ -2,9 +2,10 @@
 const TEST_MODE = typeof location !== 'undefined' && location.hostname !== 'bestofus.pages.dev';
 /* Szettek megjelenése (2026-10-18): az Amszterdam hősei 2026-10-19 (hétfő) 19:00-kor (budapesti idő) jelenik meg élesben – addig minden lapja rejtve.
    A teszt oldalon mindig látszik. setLive(id) / cardOn(lap): ezt nézi a gyűjtemény, a bolt, a szett-szűrő, a bot-paklik és a Halloween-buli lap-készlete. */
-const SET_RELEASE = { ah: Date.UTC(2026, 9, 19, 17, 0, 0) };
+const SET_RELEASE = { ah: Date.UTC(2026, 9, 19, 17, 0, 0), pc: Date.UTC(2026, 10, 1, 18, 0, 0) };   /* pc: Peaches and Cream – 2026-11-01 19:00 (budapesti téli idő, UTC+1), Tomi 2026-10-26 */
 const setLive = id => TEST_MODE || !SET_RELEASE[id] || Date.now() >= SET_RELEASE[id];
 const cardOn = c => !c.set || setLive(c.set);
+const HEROES_ON = () => HEROES.filter(h => !h.set || setLive(h.set));   /* megjelent hősök (Laszy: a Peaches-szel) */
 // ===== Clash of Us – felület =====
 let ME = 0, BOT = 1;   // PvP-ben a vendégnél felcserélődik: mindig te vagy lent
 const $ = q => document.querySelector(q);
@@ -467,9 +468,9 @@ document.addEventListener('touchstart', e => {
 // iOS: csippentéses zoom tiltása (a dupla koppintást a touch-action kezeli)
 ['gesturestart', 'gesturechange'].forEach(t => document.addEventListener(t, e => e.preventDefault(), { passive: false }));
 function renderMenuFan() {
-  const pool = HEROES.filter(h => ART[h.id]).slice();
+  const pool = HEROES_ON().filter(h => ART[h.id]).slice();
   for (let i = pool.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [pool[i], pool[j]] = [pool[j], pool[i]]; }
-  let gold = []; try { if (Store.p) gold = GOLD_HEROES.filter(h => heroSkin(h) === 'gold'); } catch {}   // induláskor még nincs betöltve a profil   // ha van arany hősöd, az is a menüben díszeleg
+  let gold = []; try { if (Store.p) gold = GOLD_HEROES.filter(h => heroSkin(h) === 'gold' && HERO[h] && HEROES_ON().includes(HERO[h])); } catch {}   // induláskor még nincs betöltve a profil   // ha van arany hősöd, az is a menüben díszeleg
   let pick = pool.slice(0, 3);
   if (gold.length) {   // az arany hős középre – de ne szerepeljen kétszer
     const g = HERO[gold[Math.floor(Math.random() * gold.length)]], rest = pool.filter(h => h.id !== g.id);
@@ -566,7 +567,7 @@ function renderCollFilters() {
 function renderColl(bodyOnly) {
   if (!bodyOnly) renderCollFilters();
   const heroQ = h => !CF.q || cfNorm(h.name + ' ' + h.text).includes(cfNorm(CF.q));
-  const heroOk = !(CF.type.size || CF.rar.size || CF.cost.size || CF.own || (CF.set.size && !CF.set.has('base'))) && HEROES.some(heroQ);
+  const heroOk = !(CF.type.size || CF.rar.size || CF.cost.size || CF.own || (CF.set.size && !CF.set.has('base'))) && HEROES_ON().some(heroQ);
   const groups = [['Hősök', null], ['Karakterek', 'char'], ['Eszközök', 'item'], ['Akciók', 'action'], ['Helyszínek', 'loc']]
     .filter(([, type]) => type ? PLAYABLE.some(c => c.type === type && cfMatch(c)) : heroOk);
   const PL = PLAYABLE.filter(cardOn), have = PL.filter(c => owned(c.id) > 0).length, foils = PL.filter(c => ownsFoil(c.id)).length;
@@ -578,7 +579,7 @@ function renderColl(bodyOnly) {
       const n = ui.foil || c.foilOnly ? (Store.p?.coll[c.id]?.f || 0) : (Store.p?.coll[c.id]?.n || 0);
       return `<div class="coll-slot${n ? '' : ' missing'}">${c.diamond ? '<img class="dia-mark" src="art/ui/ic-diamond-small.webp" alt="Gyémánt">' : ''}${cardHTML(c.id, { foil: ui.foil, attrs: `data-card="${c.id}" tabindex="0"` })}<span class="own-n"><i class="rar r-${rarKey(c)}" title="${RAR[rarKey(c)]}" aria-label="${RAR[c.rarity]}"></i>${n ? '×' + n : 'Nincs meg'}</span></div>`;
     }).join('')
-         : HEROES.filter(heroQ).map(h => { const miss = ui.foil && !ownsHeroFa(h.id);
+         : HEROES_ON().filter(heroQ).map(h => { const miss = ui.foil && !ownsHeroFa(h.id);
              const multi = !ui.foil && Store.p && heroSkins(h.id).length > 1, sk = multi ? heroSkin(h.id) : 'base';
              return `<div class="coll-slot${miss ? ' missing' : ''}">${heroCardHTML(h, { foil: ui.foil || sk === 'fa', gold: !ui.foil && sk === 'gold', port: !ui.foil && isPort(sk) ? sk : null, attrs: `data-hcard="${h.id}" tabindex="0"` })}${ui.foil ? `<span class="own-n">${miss ? 'Nincs meg' : '×' + Store.p.heroFa[h.id]}</span>` : multi ? `<span class="own-n skin-n">🎨 ${skinName(sk)}</span>` : ''}</div>`; }).join('')}</div>${type || cfActive() ? '' : `<div class="lbl gold-lbl">✦ Arany hősök – a legritkább lapok</div><div class="coll-grid">${GOLD_HEROES.map(hid => { const has = ownsHeroGold(hid);
              return `<div class="coll-slot${has ? '' : ' missing gold-miss'}">${heroCardHTML(HERO[hid], { gold: true, attrs: `data-hgold="${hid}" tabindex="0"` })}<span class="own-n">${has ? '✦ Megvan' : 'Nincs meg'}</span></div>`; }).join('')}</div>`}`).join('');
@@ -835,7 +836,7 @@ function logEvents(evs, snap) {
       case 'royalno': L(`🗯️ ${unitName(e.side, e.i)}: „Vidd innen ezt a szart!” – a Royal helyett egy Dinnyés Absolute Vodka a kézbe`); break;
       case 'royalbad': L(`🤢 Royal Vodka + Burn: ${unitName(e.side, e.i)} másnap – 2 sebzés és bénult`); break;
       case 'alinatrap': L(`🪤 CSAPDA! A(z) <b class="lc" data-lc="${e.from}">${escH(CARD[e.from].name)}</b> valójában <b class="lc" data-lc="c_alina">Alina</b> volt (5/1)`); break;
-      case 'midnightstart': L('🌙 <b>Elmúlt ÉJFÉL</b> – az „Éjfél után” lapok mostantól élnek'); break;
+      case 'midnightstart': if (!setLive('pc')) break; L('🌙 <b>Elmúlt ÉJFÉL</b> – az „Éjfél után” lapok mostantól élnek'); break;
       case 'belvedere': L(`🍾 Három Literes Belvedere: a mellette állók +1/+1`); break;
       case 'midnight': L(`🌙 Éjfél után: <b class="lc" data-lc="${e.id}">${escH(CARD[e.id].name)}</b> bekapcsolt${e.b ? ' (Laszy: +1)' : ''}`); break;
       case 'sortax': L(`🚶 Sorban állás: ${e.side === ME ? 'a következő karaktered' : 'az ellenfél következő karaktere'} 2-vel drágább`); break;
@@ -1080,7 +1081,7 @@ async function animateEvents(evs) {
       case 'radio': floatAt(anchor, '📻 „Kidobni!”', 'info'); hold = Math.max(hold, 600); break;
       case 'royalno': if (el) sayBubble(el, 'Vidd innen ezt a szart!', e.side); floatAt(anchor, '🍸 Dinnyés a kezedbe', 'info'); hold = Math.max(hold, 1400); break;
       case 'royalbad': floatAt(anchor, '🤢 Royal + Burn: másnap…', 'dmg'); hold = Math.max(hold, 700); break;
-      case 'midnightstart': await midnightIntro(); break;
+      case 'midnightstart': if (setLive('pc')) await midnightIntro(); break;   /* a Peaches megjelenéséig nincs éjféli jelenet */
       case 'zap': await zapFx(e); break;
       case 'party': await partyFx(e); break;
       case 'locgone': floatAt(anchor, `🚫 ${CARD[e.id].name} bezárt`, 'info'); hold = Math.max(hold, 600); break;
@@ -1885,7 +1886,7 @@ function vsIntro() {
 }
 function startMatch(heroId, deckId, opt = {}) {
   if (typeof loanUse === 'function') loanUse(deckId);   /* Amsterdam kölcsönpakli: 3 meccs (2026-10-19) */
-  const others = HEROES.filter(h => h.id !== heroId);
+  const others = HEROES_ON().filter(h => h.id !== heroId);
   const bh = others[Math.floor(Math.random() * others.length)].id;
   const bd = DECK_OF(bh) || Object.keys(DECKS)[0];   // a bot a saját hősének kezdőpaklijával játszik
   const first = Math.random() < .5 ? ME : BOT;
