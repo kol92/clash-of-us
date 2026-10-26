@@ -871,3 +871,6 @@ Hősképesség-ötletek a táblázatban (még nem zöldek, nincsenek beépítve)
 - A képes változat helyett (Tominak nem tetszett) **bulis videó**: `art/vid/midnight.mp4` (Tomi videójának 2,5–8,5 mp-e, 720×1120-ra vágva – az eredeti alján lévő üres keret kimarad –, 540×840, hang nélkül, ~1,1 MB), állókép: `art/ui/midnight-still.webp`. A videó teljes képernyőn megy, kb. 1,2 mp után alulról feljön a felirat egy arany keretes lila táblán: „00:00 / ELMÚLT ÉJFÉL! / Az „Éjfél után” lapok mostantól élnek”, villanás + rázkódás, a tábla pulzálva világít; ~5 mp után (vagy koppintásra) eltűnik.
 - **Peaches főmenü-háttér** (`art/ui/menu-pc.webp`, Tomi képe): `html.pc-live` alatt – a teszt oldalon mindig, élesben csak akkor, ha a teszt ág bekerül a mainbe (a megjelenéstől; a Halloween-háttérnél erősebb).
 
+## Mozgó lap a kézben is mozog (2026-10-26, Tomi; teszt)
+- Ha a kezedben mozgó lap van (most: a mozgó Flaming Lamborghini), a kis lapon is fut a videó, nem csak nagy nézetben (`handVidAttach` a ui.js-ben: lapanként egy megmaradó `<video>`, a kéz újrarajzolásakor csak áttesszük – nem indul újra, nem villan; ha a lap elhagyja a kezet, törlődik). A táblán lévő lapokon (és a gyűjteményben) továbbra csak nagy nézetben mozog.
+
