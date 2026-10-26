@@ -2474,7 +2474,7 @@ html:has(body.in-game){overscroll-behavior:none;}
 <script src="vendor/firebase-auth-compat.js"></script>
 <script src="vendor/firebase-firestore-compat.js"></script>
 <script src="vendor/firebase-database-compat.js"></script>
-<script>window.APP_VERSION = "2026.10.26-1234"; window.APP_BUILD = "2026.10.26-1235";</script>
+<script>window.APP_VERSION = "2026.10.26-1234"; window.APP_BUILD = "2026.10.26-1237";</script>
 <script>// ===== Best of Us – saját szerver (Firebase) =====
 // A játék eredetileg a Claude-os tárolót használta (window.claude.use('db' | 'user' | 'room')).
 // Ez a fájl ugyanazt a felületet adja Firebase-ből, így a játék kódja szinte változatlan maradhat:
@@ -4366,6 +4366,7 @@ const ART = {
   p_sasi_mage:    { src:'art/p_sasi_mage.webp?v=93208683e1286d47', av:'68% 16%', pos:'64% 18%', port:'68% 14%' },
   p_krisz_doffy:  { src:'art/p_krisz_doffy.webp?v=afd6437cba284431', av:'52% 30%', pos:'52% 28%', port:'52% 26%' },
   p_barna_fa:     { src:'art/p_barna_fa.webp?v=f9eca12166f3ebad', av:'70% 14%', pos:'68% 14%', port:'70% 12%' },   /* bolt, 2026-10-25 (Tomi) */
+  p_laci_eso:     { src:'art/p_laci_eso.webp?v=ec53f5c32f393724', vid:'art/vid/p_laci_eso.mp4?v=06740136', av:'32% 22%', pos:'32% 22%', port:'32% 18%' },   /* mozgó – 2. Season Pass 25. szint (2026-10-26) */
   p_barna_dia:    { src:'art/p_barna_dia.webp?v=b86771320c609444', vid:'art/vid/p_barna_dia.mp4?v=4279c903', av:'64% 18%', pos:'62% 20%', port:'64% 16%' },   /* mozgó gyémánt portré – 2. ranked szezon Legenda jutalma (2026-10-25) */
   p_gabi_beton:   { src:'art/p_gabi_beton.webp?v=c59e0018cd6d061c', av:'58% 26%', pos:'56% 26%', port:'58% 22%' },
   c_nyitinap:     { src:'art/nyitinap.webp?v=cdbcc561b41ba1d1', av:'72% 34%', pos:'66% 36%' },
@@ -4618,6 +4619,7 @@ const PORTRAITS = {
   p_laci_hw:      { hero: 'laci',  name: 'Laci, az éjféli úriember', passOnly: true, ev: 'hw26' },
   p_krisz_doffy:  { hero: 'krisz', name: 'Krisz, Doflamingo style', price: 150, from: '2026-10-19' },
   p_barna_fa:     { hero: 'barna', name: 'Barna, a favágó', price: 100, from: '2026-10-25' },   /* bolt, 2026-10-25 (Tomi) */
+  p_laci_eso:     { hero: 'laci',  name: 'Laci, az éjféli zápor', passOnly: true },   /* mozgó; 2. szezon (Éjfél után), 25. szint */
   p_barna_dia:    { hero: 'barna', name: 'Gyémánt Barna', passOnly: true },   /* mozgó; csak a ranked Legendáért (2. szezon) */
   p_gabi_beton:   { hero: 'gabi',  name: 'Gabi, a Beton', passOnly: true },   /* 2. ranked szezon, Ezüst 5 jutalma (2026-10-23, Tomi) – boltban, ládában nincs */   /* bolt, 2026-10-19 (Tomi) */
   p_sasi_mage:    { hero: 'sasi',  name: 'Sasi, a mágus', price: 250, from: '2026-10-16' },   // bolt: a következő rotációtól (from = ettől a naptól kapható)   // event: a heti ládából is jöhet   // ajándék: Best of Us TCG nap (2026-10-12)
@@ -7956,11 +7958,13 @@ const SEASONS = [
       { coins: 100 }, { shiny: 1 }, { pc: 2 }, { coins: 100 }, { pcShiny: 1 },
       { coins: 100 }, { packs: 2 }, { pc: 2 }, { coins: 150 }, { fa: 1 },
       { pc: 2 }, { coins: 150 }, { shiny: 1 }, { pc: 2 }, { pcShiny: 1 },
-      { coins: 150 }, { pc: 3 }, { coins: 200 }, { packs: 3 }, { pcShiny: 1 },
+      { coins: 150 }, { pc: 3 }, { coins: 200 }, { packs: 3 }, { port: 'p_laci_eso' },   /* 25. szint: mozgó Laci portré (Tomi, 2026-10-26) */
       { coins: 200 }, { pc: 3 }, { pcShiny: 1 }, { coins: 250 }, { goldPick: true },
     ] },
 ];
-const curSeason = (d = new Date()) => SEASONS.find(s => d >= s.start && d < s.end) || null;
+const TEST_PASS = 's3';   /* teszt oldalon ez a (még el nem indult) szezon fut már – előnézet (2026-10-26, Tomi) */
+const curSeason = d => { if (!d) { d = new Date(); const nx = TEST_MODE && SEASONS.find(s => s.id === TEST_PASS); if (nx && d < nx.start) d = new Date(+nx.start + 60000); }
+  return SEASONS.find(s => d >= s.start && d < s.end) || null; };
 const passLevel = xp => Math.floor(xp / PASS_XP.perLevel);
 function rewLabel(r) {
   if (r.coins) return `${r.coins} coin`;
