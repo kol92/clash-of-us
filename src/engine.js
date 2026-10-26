@@ -867,11 +867,13 @@ function reveal(s, side, i) {
   const u = s.players[side].board[i];
   if (u && u.hidden) { u.hidden = false; ev(s, { t:'reveal', side, i, id:u.id, u:{ ...u, items:[...u.items] } }); }
 }
-function damageUnit(s, side, i, n) {
+function damageUnit(s, side, i, n, src) {   /* src = [oldal, hely]: a sebzést okozó karakter (hatással ölt vízipipához) */
   const u = s.players[side].board[i]; if (!u || n <= 0) return;
   reveal(s, side, i);
   if (u.shield) { u.shield = false; ev(s, { t:'shield', side, i }); return; }
-  n = boost(s, n, side); u.hp -= n; ev(s, { t:'dmg', side, i, n });
+  const was = u.hp; n = boost(s, n, side); u.hp -= n; ev(s, { t:'dmg', side, i, n });
+  if (src && u.id === 'c_vizipipa' && was > 0 && u.hp <= 0) { const k = s.players[src[0]].board[src[1]];   /* Barna vízipipája: hatással is jár a +2/+2 annak a karakternek, amelyik elpusztította (2026-10-26) */
+    if (k && k !== u && k.hp > 0) { k.atk += 2; k.hp += 2; k.maxHp += 2; ev(s, { t:'pipabuff', side:src[0], i:src[1] }); } }
 }
 function healUnit(s, side, i, n) {
   const u = s.players[side].board[i]; if (!u) return;
@@ -1078,14 +1080,14 @@ function finishTurn(s) {
   p.board.forEach((u, i) => {
     if (!u || u.id !== 'c_jbl' || s.winner != null) return;
     const ei = other(pi); ev(s, { t:'jblwave', side:pi, i });
-    s.players[ei].board.forEach((x, j) => { if (x) { reveal(s, ei, j); damageUnit(s, ei, j, 1); } });
+    s.players[ei].board.forEach((x, j) => { if (x) { reveal(s, ei, j); damageUnit(s, ei, j, 1, [pi, i]); } });
     damageHero(s, ei, 1); cleanup(s);
   });
   // Nyiti, a napszúrás túlélője (2026-10-12): a gazdája körének végén minden más karakter 1 sebzést kap, mindkét oldalon
   p.board.forEach((u, i) => {
     if (!u || bid(u.id) !== 'c_nyitinap' || s.winner != null) return;
     ev(s, { t:'heatwave', side:pi, i });
-    for (const sd of [pi, other(pi)]) s.players[sd].board.forEach((x, j) => { if (x && x !== u && !isFixed(x)) { if (sd !== pi) reveal(s, sd, j); damageUnit(s, sd, j, 1); } });
+    for (const sd of [pi, other(pi)]) s.players[sd].board.forEach((x, j) => { if (x && x !== u && !isFixed(x)) { if (sd !== pi) reveal(s, sd, j); damageUnit(s, sd, j, 1, [pi, i]); } });
     cleanup(s);
   });
   if (locIs(s, 'l_coffeeshop') && s.winner == null) {   /* Coffee Shop: véletlen eszköz a soron lévő játékos paklijába */
