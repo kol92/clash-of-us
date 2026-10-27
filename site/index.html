@@ -2545,7 +2545,7 @@ html.pc-live #scr-game{background-image:radial-gradient(ellipse 78% 72% at 50% 5
 <script src="vendor/firebase-auth-compat.js"></script>
 <script src="vendor/firebase-firestore-compat.js"></script>
 <script src="vendor/firebase-database-compat.js"></script>
-<script>window.APP_VERSION = "2026.10.27-1239"; window.APP_BUILD = "2026.10.27-1245";</script>
+<script>window.APP_VERSION = "2026.10.27-1239"; window.APP_BUILD = "2026.10.27-2236";</script>
 <script>// ===== Best of Us – saját szerver (Firebase) =====
 // A játék eredetileg a Claude-os tárolót használta (window.claude.use('db' | 'user' | 'room')).
 // Ez a fájl ugyanazt a felületet adja Firebase-ből, így a játék kódja szinte változatlan maradhat:
@@ -4453,6 +4453,9 @@ const ART = {
   p_sasi_mage:    { src:'art/p_sasi_mage.webp?v=93208683e1286d47', av:'68% 16%', pos:'64% 18%', port:'68% 14%' },
   p_krisz_doffy:  { src:'art/p_krisz_doffy.webp?v=afd6437cba284431', av:'52% 30%', pos:'52% 28%', port:'52% 26%' },
   p_barna_fa:     { src:'art/p_barna_fa.webp?v=f9eca12166f3ebad', av:'70% 14%', pos:'68% 14%', port:'70% 12%' },   /* bolt, 2026-10-25 (Tomi) */
+  p_barna_neon:   { src:'art/p_barna_neon.webp?v=16af859692ad59f9', av:'55% 26%', pos:'55% 24%', port:'55% 22%' },   /* VIP event 60 (2026-10-27) */
+  p_tomi_neon:    { src:'art/p_tomi_neon.webp?v=3095d70dac48f1ca', av:'44% 18%', pos:'44% 16%', port:'44% 14%' },   /* 2. Season Pass 15. szint (2026-10-27) */
+  p_krisz_baszo:  { src:'art/p_krisz_baszo.webp?v=9610ec9f1d2664ea', vid:'art/vid/p_krisz_baszo.mp4?v=397474b6', av:'50% 20%', pos:'50% 18%', port:'50% 15%' },   /* mozgó – VIP event 90 (2026-10-27) */
   p_laci_eso:     { src:'art/p_laci_eso.webp?v=fe9be9a16c792078', vid:'art/vid/p_laci_eso.mp4?v=06740136', av:'32% 22%', pos:'32% 22%', port:'32% 18%' },   /* mozgó – 2. Season Pass 25. szint (2026-10-26) */
   p_barna_dia:    { src:'art/p_barna_dia.webp?v=b86771320c609444', vid:'art/vid/p_barna_dia.mp4?v=4279c903', av:'64% 18%', pos:'62% 20%', port:'64% 16%' },   /* mozgó gyémánt portré – 2. ranked szezon Legenda jutalma (2026-10-25) */
   p_gabi_beton:   { src:'art/p_gabi_beton.webp?v=c59e0018cd6d061c', av:'58% 26%', pos:'56% 26%', port:'58% 22%' },
@@ -4709,6 +4712,9 @@ const PORTRAITS = {
   p_laci_hw:      { hero: 'laci',  name: 'Laci, az éjféli úriember', passOnly: true, ev: 'hw26' },
   p_krisz_doffy:  { hero: 'krisz', name: 'Krisz, Doflamingo style', price: 150, from: '2026-10-19' },
   p_barna_fa:     { hero: 'barna', name: 'Barna, a favágó', price: 100, from: '2026-10-25' },   /* bolt, 2026-10-25 (Tomi) */
+  p_barna_neon:   { hero: 'barna', name: 'Barna, Neonsztár', passOnly: true, ev: 'vip26' },   /* VIP event, 60 pont */
+  p_tomi_neon:    { hero: 'tomi',  name: 'Tomi, Neonsztár', passOnly: true },   /* 2. szezon, 15. szint */
+  p_krisz_baszo:  { hero: 'krisz', name: 'Krisz, Baszó mode', passOnly: true, ev: 'vip26' },   /* mozgó; VIP event, 90 pont */
   p_laci_eso:     { hero: 'laci',  name: 'Laci, az éjféli zápor', passOnly: true },   /* mozgó; 2. szezon (Éjfél után), 25. szint */
   p_barna_dia:    { hero: 'barna', name: 'Gyémánt Barna', passOnly: true },   /* mozgó; csak a ranked Legendáért (2. szezon) */
   p_gabi_beton:   { hero: 'gabi',  name: 'Gabi, a Beton', passOnly: true },   /* 2. ranked szezon, Ezüst 5 jutalma (2026-10-23, Tomi) – boltban, ládában nincs */   /* bolt, 2026-10-19 (Tomi) */
@@ -6623,6 +6629,9 @@ async function bootProfile() {
   if (TEST_MODE && Store.p && !(Store.p.portraits || []).includes('p_barna_dia')) {   /* teszt (2026-10-25, Tomi): mindenki kipróbálhatja a mozgó Gyémánt Barna portrét */
     const p = Store.p; p.portraits = [...(p.portraits || []), 'p_barna_dia']; p.heroSkin = { ...(p.heroSkin || {}), barna: 'p_barna_dia' }; save();
     setTimeout(() => toast('🧪 Teszt: megkaptad a mozgó Gyémánt Barna portrét (Barna már ezt viseli)'), 1600); }
+  if (TEST_MODE && Store.p && !Store.p.testNeon) { const p = Store.p; p.testNeon = true;   /* teszt (2026-10-27): az új skinek mindenkinek */
+    p.portraits = [...new Set([...(p.portraits || []), 'p_barna_neon', 'p_tomi_neon', 'p_krisz_baszo'])]; p.heroSkin = { ...(p.heroSkin || {}), krisz: 'p_krisz_baszo' }; save();
+    setTimeout(() => toast('🧪 Teszt: megkaptad Barna és Tomi Neonsztár skinjét, és a mozgó Krisz, Baszó mode-ot'), 8800); }
   if (TEST_MODE && Store.p && !(Store.p.portraits || []).includes('p_laci_eso')) {   /* teszt (2026-10-26, Tomi): a mozgó Laci portré (2. Season Pass, 25. szint) mindenkinek */
     const p = Store.p; p.portraits = [...(p.portraits || []), 'p_laci_eso']; p.heroSkin = { ...(p.heroSkin || {}), laci: 'p_laci_eso' }; save();
     setTimeout(() => toast('🧪 Teszt: megkaptad a mozgó Laci portrét (Laci már ezt viseli)'), 3400); }
@@ -8089,7 +8098,7 @@ const SEASONS = [
     tiers: [
       { pc: 1 }, { coins: 50 }, { packs: 1 }, { coins: 75 }, { pc: 1 },
       { coins: 100 }, { shiny: 1 }, { pc: 2 }, { coins: 100 }, { card: 'a_lambo_v' },   /* 10. szint: mozgó Flaming Lamborghini (2 példány) */
-      { coins: 100 }, { packs: 2 }, { pc: 2 }, { coins: 150 }, { fa: 1 },
+      { coins: 100 }, { packs: 2 }, { pc: 2 }, { coins: 150 }, { port: 'p_tomi_neon' },   /* 15. szint: Tomi, Neonsztár (2026-10-27) */
       { pc: 2 }, { coins: 150 }, { shiny: 1 }, { pc: 2 }, { card: 'c_mm_v' },   /* 20. szint: mozgó MM (2 példány, Tomi 2026-10-27) */
       { coins: 150 }, { pc: 3 }, { coins: 200 }, { packs: 3 }, { port: 'p_laci_eso' },   /* 25. szint: mozgó Laci portré (Tomi, 2026-10-26) */
       { coins: 200 }, { pc: 3 }, { pcShiny: 1 }, { coins: 250 }, { goldPick: true },
@@ -8336,7 +8345,7 @@ const EVENTS = [
     ],
     rewards: [
       { at: 10, pc: 2 }, { at: 20, coins: 150 }, { at: 30, pcShiny: 1 }, { at: 40, pc: 3 }, { at: 50, coins: 250 },
-      { at: 60, pcShiny: 1 }, { at: 75, fa: 1 }, { at: 90, pc: 5 }, { at: 100, back: 'vip' },
+      { at: 60, port: 'p_barna_neon' }, { at: 75, fa: 1 }, { at: 90, port: 'p_krisz_baszo' }, { at: 100, back: 'vip' },   /* skinek: Tomi, 2026-10-27 */
     ] },
 ];
 const TEST_EV = 'vip26';   /* a teszt oldalon ez az event fut (előnézet), akkor is, ha még nem indult el */
