@@ -887,3 +887,7 @@ Hősképesség-ötletek a táblázatban (még nem zöldek, nincsenek beépítve)
 - **UI (Astra):** menügomb `ev-vip-btn` (a pontszám a diszkógömbön), fejléc `ev-vip-banner` (a táblán a hátralévő idő), csík `ev-vip-bar` + generált `ev-vip-fill`, rejtett jutalom `ev-vip-myst` (diszkógömb), háttér az event-képernyőn `ev-vip-bg`; lila-arany jutalom-felfedés (`rare-show.vip`). Zene nincs. A téma-függő részek: `#evBody[data-theme="vip"]`, `body.ev-vip`.
 - Teszt oldalon a VIP event már most fut (`TEST_EV`), a Halloween helyett.
 
+## Full Art pack újra (2026-10-27, Tomi; teszt)
+- Hiba volt: a 2. Season Pass és a VIP event `fa` jutalma a 2026-09-28 óta megszűnt Full Art packot adta – a gomb piros volt, de bontáskor sima kék Base pack jelent meg, csak 1 garantált Full Arttal, és újraindításkor a régi átváltás Shiny packká alakította volna.
+- Most: **Full Art pack = 3 lap, mind Full Art** (`openPackRoll` `forceFoil`), bontáskor **piros pack** „Full Art” szalaggal (`.pk.fa`, a tömeges bontásnál is). A Full Art → Shiny átváltás (`migrate`) kikapcsolva.
+

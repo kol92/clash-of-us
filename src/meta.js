@@ -229,7 +229,7 @@ function migrate(p) {
   if ((p.gv || 1) < GRANT_V) p._dirty = true;
   for (const d of p.decks || []) if (d.list && d.list.f_munkahely) { d.list.f_vezetek = (d.list.f_vezetek || 0) + d.list.f_munkahely; delete d.list.f_munkahely; p._dirty = true; }   /* 2026-10-18: a Munkahely megszűnt → Bocsi, de vezetek */
   const g = applyGifts(p); if (g) { p._dirty = true; Store.giftMsg = g.msg; }
-  if (p.faPacks > 0) { p.shinyPacks = (p.shinyPacks || 0) + p.faPacks; Store.faMsg = `A ${p.faPacks} Full Art packod Shiny packká alakult`; p.faPacks = 0; p._dirty = true; }
+  /* 2026-10-27: a Full Art pack visszatért (3 Full Art lap, piros pack) – a régi „Full Art → Shiny” átváltás kikapcsolva */
   const dc = { coins: 0 };   // lapokat már nem váltunk be automatikusan (csere miatt) – csak kézzel, a Gyűjteményben
   // Full Art hősből elég 1: a többi darabonként 10 coint ér
   for (const h of Object.keys(p.heroGold || {})) if (p.heroGold[h] > 1) { const x = p.heroGold[h] - 1; p.heroGold[h] = 1; p.coins += x * ECON.goldDupe; dc.coins += x * ECON.goldDupe; }
@@ -468,7 +468,7 @@ function openPackRoll(setId, forceFoil = false, shiny = false) {
     const vars = CARDS.filter(v => v.variantOf === id && !v.passOnly && !v.shopOnly && !v.wheelOnly && !v.goldVar);
     if (vars.length && Math.random() < VARIANT_CHANCE) id = vars[Math.floor(Math.random() * vars.length)].id;
     if (si === varSlot) id = allVars[Math.floor(Math.random() * allVars.length)].id;
-    const foil = (si === faSlot && si !== varSlot) || Math.random() < ECON.foilChance;
+    const foil = (forceFoil && si !== varSlot) || (si === faSlot && si !== varSlot) || Math.random() < ECON.foilChance;   /* Full Art pack: mind a 3 lap Full Art (2026-10-27, Tomi) */
     const isNew = owned(id) === 0 || (foil && !ownsFoil(id));
     const e = p.coll[id] || (p.coll[id] = { n: 0, f: 0 });
     if (foil) e.f++; else e.n++;
@@ -618,7 +618,7 @@ async function buyPack(setId, free) {
   else { if (p.coins < ECON.packPrice) { toast('Nincs elég coinod'); return; } p.coins -= ECON.packPrice; }
   const { cards, conv, shinyMode } = packRollFull(setId, free);
   await save(); renderProfileBar(); renderShop();
-  await packOpening(setId, cards, { shiny: shinyMode });
+  await packOpening(setId, cards, { shiny: shinyMode, fa: free === 'fa' });
   if (conv.coins) toast(`Fölösleges hős-példány beváltva: +${conv.coins} coin`);
 }
 
@@ -666,7 +666,7 @@ async function bulkOpen(setId, free, n, name) {   /* n pack egyszerre: ajándék
   const o = document.createElement('div'); o.className = 'overlay opening bulk-op';
   o.innerHTML = `<div class="op-stage"><div class="bulk-head"><b>${n} × ${escH(name)}</b><small>${all.length} lap${god ? ` · 🌈 ${god} GOD PACK!` : ''}</small></div></div>`;
   $('#layer').appendChild(o);
-  const packs = document.createElement('div'); packs.className = 'bulk-packs'; packs.innerHTML = Array.from({ length: Math.min(n, 8) }, (_, k) => `<span style="--k:${k}">${packHTML(setId, { shiny })}</span>`).join('');
+  const packs = document.createElement('div'); packs.className = 'bulk-packs'; packs.innerHTML = Array.from({ length: Math.min(n, 8) }, (_, k) => `<span style="--k:${k}">${packHTML(setId, { shiny, fa: free === 'fa' })}</span>`).join('');
   o.querySelector('.op-stage').appendChild(packs);
   await packs.animate([{ opacity: 0, transform: 'translateY(30px) scale(.8)' }, { opacity: 1, transform: 'none' }], { duration: 380, easing: 'cubic-bezier(.2,1.3,.4,1)' }).finished;
   await sleep(350);
@@ -868,8 +868,8 @@ function renderShop() {
   $('#shopBody').querySelectorAll('[data-bulk]').forEach(b => b.onclick = () => openAllPacks(b.dataset.bulk));
 }
 function packHTML(setId, o = {}) {
-  return `<div class="pack pk set-${setId}${o.shiny ? ' shiny' : ''}" role="img" aria-label="Best of Us – ${o.shiny ? 'Shiny ' : ''}${SETS[setId].name} booster pack">
-    <div class="pk-part pk-body"></div><div class="pk-part pk-top"></div><div class="pk-sheen"></div>${o.shiny ? '<div class="pk-holo"></div><span class="pk-ribbon">Shiny</span>' : ''}
+  return `<div class="pack pk set-${setId}${o.shiny ? ' shiny' : ''}${o.fa ? ' fa' : ''}" role="img" aria-label="Best of Us – ${o.fa ? 'Full Art ' : o.shiny ? 'Shiny ' : ''}${SETS[setId].name} booster pack">
+    <div class="pk-part pk-body"></div><div class="pk-part pk-top"></div><div class="pk-sheen"></div>${o.shiny ? '<div class="pk-holo"></div><span class="pk-ribbon">Shiny</span>' : o.fa ? '<span class="pk-ribbon">Full Art</span>' : ''}
     <div class="pk-tear"><i></i><em></em></div><div class="pk-glow"></div></div>`;
 }
 
