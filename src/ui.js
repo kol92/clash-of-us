@@ -175,6 +175,9 @@ const ART = {
   p_sasi_mage:    { src:'art/p_sasi_mage.webp', av:'68% 16%', pos:'64% 18%', port:'68% 14%' },
   p_krisz_doffy:  { src:'art/p_krisz_doffy.webp', av:'52% 30%', pos:'52% 28%', port:'52% 26%' },
   p_barna_fa:     { src:'art/p_barna_fa.webp', av:'70% 14%', pos:'68% 14%', port:'70% 12%' },   /* bolt, 2026-10-25 (Tomi) */
+  p_barna_neon:   { src:'art/p_barna_neon.webp', av:'55% 26%', pos:'55% 24%', port:'55% 22%' },   /* VIP event 60 (2026-10-27) */
+  p_tomi_neon:    { src:'art/p_tomi_neon.webp', av:'44% 18%', pos:'44% 16%', port:'44% 14%' },   /* 2. Season Pass 15. szint (2026-10-27) */
+  p_krisz_baszo:  { src:'art/p_krisz_baszo.webp', vid:'art/vid/p_krisz_baszo.mp4', av:'50% 20%', pos:'50% 18%', port:'50% 15%' },   /* mozgó – VIP event 90 (2026-10-27) */
   p_laci_eso:     { src:'art/p_laci_eso.webp', vid:'art/vid/p_laci_eso.mp4', av:'32% 22%', pos:'32% 22%', port:'32% 18%' },   /* mozgó – 2. Season Pass 25. szint (2026-10-26) */
   p_barna_dia:    { src:'art/p_barna_dia.webp', vid:'art/vid/p_barna_dia.mp4', av:'64% 18%', pos:'62% 20%', port:'64% 16%' },   /* mozgó gyémánt portré – 2. ranked szezon Legenda jutalma (2026-10-25) */
   p_gabi_beton:   { src:'art/p_gabi_beton.webp', av:'58% 26%', pos:'56% 26%', port:'58% 22%' },
@@ -431,6 +434,9 @@ const PORTRAITS = {
   p_laci_hw:      { hero: 'laci',  name: 'Laci, az éjféli úriember', passOnly: true, ev: 'hw26' },
   p_krisz_doffy:  { hero: 'krisz', name: 'Krisz, Doflamingo style', price: 150, from: '2026-10-19' },
   p_barna_fa:     { hero: 'barna', name: 'Barna, a favágó', price: 100, from: '2026-10-25' },   /* bolt, 2026-10-25 (Tomi) */
+  p_barna_neon:   { hero: 'barna', name: 'Barna, Neonsztár', passOnly: true, ev: 'vip26' },   /* VIP event, 60 pont */
+  p_tomi_neon:    { hero: 'tomi',  name: 'Tomi, Neonsztár', passOnly: true },   /* 2. szezon, 15. szint */
+  p_krisz_baszo:  { hero: 'krisz', name: 'Krisz, Baszó mode', passOnly: true, ev: 'vip26' },   /* mozgó; VIP event, 90 pont */
   p_laci_eso:     { hero: 'laci',  name: 'Laci, az éjféli zápor', passOnly: true },   /* mozgó; 2. szezon (Éjfél után), 25. szint */
   p_barna_dia:    { hero: 'barna', name: 'Gyémánt Barna', passOnly: true },   /* mozgó; csak a ranked Legendáért (2. szezon) */
   p_gabi_beton:   { hero: 'gabi',  name: 'Gabi, a Beton', passOnly: true },   /* 2. ranked szezon, Ezüst 5 jutalma (2026-10-23, Tomi) – boltban, ládában nincs */   /* bolt, 2026-10-19 (Tomi) */

@@ -198,6 +198,9 @@ async function bootProfile() {
   if (TEST_MODE && Store.p && !(Store.p.portraits || []).includes('p_barna_dia')) {   /* teszt (2026-10-25, Tomi): mindenki kipróbálhatja a mozgó Gyémánt Barna portrét */
     const p = Store.p; p.portraits = [...(p.portraits || []), 'p_barna_dia']; p.heroSkin = { ...(p.heroSkin || {}), barna: 'p_barna_dia' }; save();
     setTimeout(() => toast('🧪 Teszt: megkaptad a mozgó Gyémánt Barna portrét (Barna már ezt viseli)'), 1600); }
+  if (TEST_MODE && Store.p && !Store.p.testNeon) { const p = Store.p; p.testNeon = true;   /* teszt (2026-10-27): az új skinek mindenkinek */
+    p.portraits = [...new Set([...(p.portraits || []), 'p_barna_neon', 'p_tomi_neon', 'p_krisz_baszo'])]; p.heroSkin = { ...(p.heroSkin || {}), krisz: 'p_krisz_baszo' }; save();
+    setTimeout(() => toast('🧪 Teszt: megkaptad Barna és Tomi Neonsztár skinjét, és a mozgó Krisz, Baszó mode-ot'), 8800); }
   if (TEST_MODE && Store.p && !(Store.p.portraits || []).includes('p_laci_eso')) {   /* teszt (2026-10-26, Tomi): a mozgó Laci portré (2. Season Pass, 25. szint) mindenkinek */
     const p = Store.p; p.portraits = [...(p.portraits || []), 'p_laci_eso']; p.heroSkin = { ...(p.heroSkin || {}), laci: 'p_laci_eso' }; save();
     setTimeout(() => toast('🧪 Teszt: megkaptad a mozgó Laci portrét (Laci már ezt viseli)'), 3400); }
@@ -1664,7 +1667,7 @@ const SEASONS = [
     tiers: [
       { pc: 1 }, { coins: 50 }, { packs: 1 }, { coins: 75 }, { pc: 1 },
       { coins: 100 }, { shiny: 1 }, { pc: 2 }, { coins: 100 }, { card: 'a_lambo_v' },   /* 10. szint: mozgó Flaming Lamborghini (2 példány) */
-      { coins: 100 }, { packs: 2 }, { pc: 2 }, { coins: 150 }, { fa: 1 },
+      { coins: 100 }, { packs: 2 }, { pc: 2 }, { coins: 150 }, { port: 'p_tomi_neon' },   /* 15. szint: Tomi, Neonsztár (2026-10-27) */
       { pc: 2 }, { coins: 150 }, { shiny: 1 }, { pc: 2 }, { card: 'c_mm_v' },   /* 20. szint: mozgó MM (2 példány, Tomi 2026-10-27) */
       { coins: 150 }, { pc: 3 }, { coins: 200 }, { packs: 3 }, { port: 'p_laci_eso' },   /* 25. szint: mozgó Laci portré (Tomi, 2026-10-26) */
       { coins: 200 }, { pc: 3 }, { pcShiny: 1 }, { coins: 250 }, { goldPick: true },
@@ -1911,7 +1914,7 @@ const EVENTS = [
     ],
     rewards: [
       { at: 10, pc: 2 }, { at: 20, coins: 150 }, { at: 30, pcShiny: 1 }, { at: 40, pc: 3 }, { at: 50, coins: 250 },
-      { at: 60, pcShiny: 1 }, { at: 75, fa: 1 }, { at: 90, pc: 5 }, { at: 100, back: 'vip' },
+      { at: 60, port: 'p_barna_neon' }, { at: 75, fa: 1 }, { at: 90, port: 'p_krisz_baszo' }, { at: 100, back: 'vip' },   /* skinek: Tomi, 2026-10-27 */
     ] },
 ];
 const TEST_EV = 'vip26';   /* a teszt oldalon ez az event fut (előnézet), akkor is, ha még nem indult el */

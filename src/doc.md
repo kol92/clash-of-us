@@ -891,3 +891,10 @@ Hősképesség-ötletek a táblázatban (még nem zöldek, nincsenek beépítve)
 - Hiba volt: a 2. Season Pass és a VIP event `fa` jutalma a 2026-09-28 óta megszűnt Full Art packot adta – a gomb piros volt, de bontáskor sima kék Base pack jelent meg, csak 1 garantált Full Arttal, és újraindításkor a régi átváltás Shiny packká alakította volna.
 - Most: **Full Art pack = 3 lap, mind Full Art** (`openPackRoll` `forceFoil`), bontáskor **piros pack** „Full Art” szalaggal (`.pk.fa`, a tömeges bontásnál is). A Full Art → Shiny átváltás (`migrate`) kikapcsolva.
 
+## Új skinek (2026-10-27, Tomi; teszt)
+- **Tomi, Neonsztár** (`p_tomi_neon`) – 2. Season Pass **15. szint** (a Full Art pack helyett).
+- **Barna, Neonsztár** (`p_barna_neon`) – VIP event **60 pont** (a Peaches Shiny helyett).
+- **Krisz, Baszó mode** (`p_krisz_baszo`, **mozgó**, Tomi videója 600×800) – VIP event **90 pont** (az 5 Peaches pack helyett).
+- Mind `passOnly` (nincs boltban, ládában); a VIP-esek `ev:'vip26'`. A teszt oldalon mindenki megkapja mind a hármat (Krisz rögtön ezt viseli).
+- VIP jutalmak most: 10: 2 Peaches pack · 20: 150 coin · 30: Peaches Shiny · 40: 3 Peaches pack · 50: 250 coin · 60: Barna, Neonsztár · 75: Full Art pack · 90: Krisz, Baszó mode · 100: VIP hátlap.
+
