@@ -295,7 +295,7 @@ const ART = {
   c_alina:    { src:'art/pc_alina.webp', av:'52% 22%', pos:'52% 20%' },
   c_pc_laci:  { src:'art/pc_laci.webp', av:'38% 22%', pos:'38% 20%' },
   c_pg:       { src:'art/pc_pg.webp', av:'45% 15%', pos:'45% 14%' },
-  c_mm:       { src:'art/pc_mm.webp', av:'56% 20%', pos:'56% 18%' },
+  c_mm:       { src:'art/pc_mm.webp', av:'57% 20%', pos:'57% 18%' },
   c_idegen:   { src:'art/pc_idegen.webp', av:'45% 30%', pos:'45% 28%' },
   c_pc_gabi:  { src:'art/pc_gabi.webp', av:'45% 12%', pos:'45% 12%' },
   a_kidobtak: { src:'art/pc_kidobtak.webp', av:'50% 30%', pos:'50% 30%' },
