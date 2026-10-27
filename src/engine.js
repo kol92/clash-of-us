@@ -210,6 +210,7 @@ const CARDS = [
 CARDS.push({ ...CARDS.find(c => c.id === 'c_piftikiraly'), id:'c_piftikiraly2', variantOf:'c_piftikiraly', shopOnly:true, price:100 });   /* bolti ritka variáns, 2026-10-19 (Tomi) – a Pifti, a király (epikus) változata */
 CARDS.push({ ...CARDS.find(c => c.id === 'c_boros'), id:'c_boros2', variantOf:'c_boros', shopOnly:true, price:50 });   /* bolti ritka variáns, 2026-10-23 (Tomi): Boros virágcsokorral, 50 coin */
 for (const b of ['c_tomiparti', 'c_laszy', 'c_sasi']) CARDS.push({ ...CARDS.find(c => c.id === b), id:b + '2', variantOf:b });   /* 2026-10-18: új packból jövő változatok (Tomi) */
+CARDS.push({ ...CARDS.find(c => c.id === 'c_mm'), id:'c_mm_v', variantOf:'c_mm', passOnly:true, foilOnly:true });   /* mozgó MM – 2. Season Pass, 20. szint (Tomi, 2026-10-27) */
 CARDS.push({ ...CARDS.find(c => c.id === 'a_lambo'), id:'a_lambo_v', variantOf:'a_lambo', passOnly:true, foilOnly:true });   /* mozgó Flaming Lamborghini – 2. Season Pass, 10. szint (Tomi, 2026-10-26) */
 for (const b of ['a_welcome', 'a_hawaiians', 'f_gameover', 'c_pg', 'c_wcneni', 'c_belvedere']) CARDS.push(   /* Peaches arany lapjai: 2026-10-26 (Tomi) */{ ...CARDS.find(c => c.id === b), id:b + '_g', variantOf:b, goldVar:true });
 /* Bong (Amszterdam hősei): minden továbbadáskor 1-gyel drágább token-példány (legfeljebb 10) */

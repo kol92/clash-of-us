@@ -201,6 +201,8 @@ async function bootProfile() {
   if (TEST_MODE && Store.p && !(Store.p.portraits || []).includes('p_laci_eso')) {   /* teszt (2026-10-26, Tomi): a mozgó Laci portré (2. Season Pass, 25. szint) mindenkinek */
     const p = Store.p; p.portraits = [...(p.portraits || []), 'p_laci_eso']; p.heroSkin = { ...(p.heroSkin || {}), laci: 'p_laci_eso' }; save();
     setTimeout(() => toast('🧪 Teszt: megkaptad a mozgó Laci portrét (Laci már ezt viseli)'), 3400); }
+  if (TEST_MODE && Store.p && !Store.p.coll.c_mm_v) { Store.p.coll.c_mm_v = { n: 0, f: 2 }; save();   /* teszt: a mozgó MM (2. Season Pass, 20. szint) mindenkinek */
+    setTimeout(() => toast('🧪 Teszt: megkaptad a mozgó MM-et (2 db)'), 7000); }
   if (TEST_MODE && Store.p && !Store.p.coll.a_lambo_v) { const e = Store.p.coll.a_lambo_v = { n: 0, f: 2 }; save();   /* teszt: a mozgó Flaming Lamborghini (2. Season Pass, 10. szint) mindenkinek */
     setTimeout(() => toast('🧪 Teszt: megkaptad a mozgó Flaming Lamborghinit (2 db) – nagy lapnézetben mozog'), 5200); }
   if (TEST_MODE && Store.p && curSeason() && curSeason().id === TEST_PASS) {   /* teszt: a 2. szezon mind a 30 szintje rögtön átvehető */
@@ -1663,7 +1665,7 @@ const SEASONS = [
       { pc: 1 }, { coins: 50 }, { packs: 1 }, { coins: 75 }, { pc: 1 },
       { coins: 100 }, { shiny: 1 }, { pc: 2 }, { coins: 100 }, { card: 'a_lambo_v' },   /* 10. szint: mozgó Flaming Lamborghini (2 példány) */
       { coins: 100 }, { packs: 2 }, { pc: 2 }, { coins: 150 }, { fa: 1 },
-      { pc: 2 }, { coins: 150 }, { shiny: 1 }, { pc: 2 }, { pcShiny: 1 },
+      { pc: 2 }, { coins: 150 }, { shiny: 1 }, { pc: 2 }, { card: 'c_mm_v' },   /* 20. szint: mozgó MM (2 példány, Tomi 2026-10-27) */
       { coins: 150 }, { pc: 3 }, { coins: 200 }, { packs: 3 }, { port: 'p_laci_eso' },   /* 25. szint: mozgó Laci portré (Tomi, 2026-10-26) */
       { coins: 200 }, { pc: 3 }, { pcShiny: 1 }, { coins: 250 }, { goldPick: true },
     ] },
