@@ -887,6 +887,32 @@ video.art-vid::-webkit-media-controls,video.hport-vid::-webkit-media-controls,vi
   mask:linear-gradient(180deg,#000 72%,transparent 100%) intersect,linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent);}
 /* Halloween event alatt: Astra háttere a főmenüben és az event-képernyőn (2026-10-15) */
 body.ev-hw #scr-menu,body.ev-hw #scr-event{background:linear-gradient(180deg,rgba(8,4,16,.15),rgba(8,4,16,.35) 40%,rgba(8,4,16,.25)),url('art/ui/ev-hw-bg.webp') center top/cover no-repeat #0b0614;}
+/* VIP event (2026-10-27, Astra UI) */
+body.ev-vip #scr-event{background:linear-gradient(180deg,rgba(14,4,24,.1),rgba(14,4,24,.35) 40%,rgba(14,4,24,.3)),url('art/ui/ev-vip-bg.webp') center top/cover no-repeat #12051c;}
+#evBody[data-theme="vip"] .ev-head{background:radial-gradient(circle at 50% 0%,rgba(230,90,255,.25),transparent 60%),linear-gradient(180deg,rgba(70,14,90,.55),rgba(22,6,30,.6));}
+#evBody[data-theme="vip"] .ev-ban .ev-when{left:30%;right:30%;top:72%;}
+#evBody[data-theme="vip"] .ev-score img{width:40px;filter:drop-shadow(0 0 10px rgba(230,120,255,.75));}
+#evBody[data-theme="vip"] .ev-num{color:#f6cf6a;text-shadow:0 2px 0 #5a2a00,0 0 14px rgba(230,120,255,.55);}
+#evBody[data-theme="vip"] .ev-track{padding-bottom:calc(15% - 1px);background-image:url('art/ui/ev-vip-bar.webp');}
+#evBody[data-theme="vip"] .ev-in{left:10.4%;right:10.5%;top:33%;bottom:31%;}
+#evBody[data-theme="vip"] .ev-fill{top:0;bottom:0;background-image:url('art/ui/ev-vip-fill.webp');}
+#evBody[data-theme="vip"] .ev-myst{background-image:url('art/ui/ev-vip-myst.webp');}
+#evBody[data-theme="vip"] .ev-pts,#evBody[data-theme="vip"] .ev-mark.on b,#evBody[data-theme="vip"] .ev-row .ev-at b{color:#f6cf6a;}
+#evBody[data-theme="vip"] .ev-row .ev-at{border-color:#e07cff;}
+#evBody[data-theme="vip"] .ev-row.ready .ev-at,#evBody[data-theme="vip"] .ev-row.claimed .ev-at{background:linear-gradient(180deg,#ffe39a,#c75bff);}
+#evBody[data-theme="vip"] .ev-row.big{border-color:rgba(224,124,255,.5);}
+#evBody[data-theme="vip"] .ev-back{border-color:#f6cf6a;box-shadow:0 0 12px rgba(224,124,255,.6);}
+.m-event[data-theme="vip"] .ev-circ{left:16.6%;top:50%;width:15.5%;padding-bottom:15.5%;}
+.m-event[data-theme="vip"] .ev-circ>span{border-radius:50%;background:radial-gradient(circle,rgba(30,6,40,.78) 0 52%,rgba(30,6,40,.35) 68%,transparent 72%);color:#f6cf6a;}
+.m-event[data-theme="vip"] img{filter:drop-shadow(0 6px 14px rgba(224,124,255,.35)) drop-shadow(0 6px 10px rgba(0,0,0,.55));}
+.rare-show.vip{background:radial-gradient(circle at 50% 44%,rgba(120,30,140,.6),rgba(14,4,22,.93) 70%);overflow:hidden;}
+.rare-rays.vip{background:repeating-conic-gradient(from 0deg,rgba(246,207,106,.85) 0deg 6deg,transparent 6deg 15deg,rgba(224,124,255,.8) 15deg 21deg,transparent 21deg 30deg);}
+.rare-show.vip .rare-rays.big{opacity:.4!important;}
+.rare-show.vip .rare-banner{color:#f6cf6a;text-shadow:0 3px 0 #4a1a00,0 0 18px rgba(224,124,255,.7);}
+.rare-show.vip .rare-card .card{box-shadow:0 0 40px 10px rgba(224,124,255,.55),0 0 90px 20px rgba(246,207,106,.3),0 20px 40px rgba(0,0,0,.7);}
+.rare-show.vip .var-sub{position:relative;z-index:2;max-width:300px;padding:0 16px;font-size:13px;font-weight:700;color:#f0d8ff;line-height:1.35;text-align:center;}
+.rare-flash.vip{background:radial-gradient(circle,rgba(255,220,150,.9),rgba(224,124,255,.45) 50%,transparent 75%);}
+.ev-pop.vip,.ev-pop:has(img[src*="ev-vip"]){border-color:#e07cff;}
 body.ev-hw #scr-menu .fan{filter:drop-shadow(0 0 22px rgba(255,140,40,.35));}
 #scr-menu .fan{height:196px;margin-top:0;filter:drop-shadow(0 0 22px rgba(90,180,255,.35));}
 #scr-menu .fan .card{--cw:124px;margin:0 -12px;}
