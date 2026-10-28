@@ -357,9 +357,9 @@ const DECKS = {
   pc_milo: { set:'pc', loanMax:5, name:'Utolsó kör a Peachesben', hero:'milo', desc:'Aki kidől, az is sebez: Gál Zoli felrobban, Boros és Barna olcsón jön és hamar elesik, Alina csapdát állít – Milo minden halálért üt.',
     list:{ c_pc_zoli:2, c_pc_boros:2, c_pc_barna:2, c_alina:1, c_ani:2, a_utolso:2, a_royal:2, a_taxi:1, l_tanc:1, f_gepuzem:1, c_portas:2, c_pc_pifti:2 } },
   pc_laci: { set:'pc', loanMax:5, name:'Hajnali tánc', hero:'laci', desc:'Laci húz, és húz: Laci éjfél után, Flaming Lamborghini – a sok lapból pedig mindig jut egy Portás, P.G. vagy Bloody Mary az ellenfélnek.',
-    list:{ c_pc_laci:2, a_lambo:1, a_bloody:2, c_dj:1, c_pc_gabi:2, c_pultos:2, f_jbl:1, c_pc_tomi:1, c_portas:2, c_pc_pifti:2, c_pc_david:1, c_pg:1, c_pc_bence:1, c_wcneni:1 } },
-  pc_sasi: { set:'pc', loanMax:5, name:'Peaches-banda', hero:'sasi', desc:'Minél többen, annál jobb: Sasi és Ani együtt erősebb, Barna, Boros és Noémi olcsón jön, éjfél után Sasi a szomszédait is megnöveli.',
-    list:{ c_pc_sasi:2, c_ani:1, c_pc_barna:2, c_pc_boros:1, c_noemi:1, c_pc_pifti:2, c_pc_gabi:2, l_tanc:1, a_utolso:2, f_gluten:1, c_mm:2, c_idegen:1, a_sor:1, c_pc_david:1 } },
+    list:{ c_pc_laci:2, a_lambo:1, a_bloody:2, c_dj:1, c_pc_gabi:2, c_pultos:1, f_jbl:1, c_portas:2, c_pc_pifti:2, c_pc_david:1, c_pg:1, c_pc_bence:1, c_pc_barna:1, c_pc_tomi:1, c_wcneni:1 } },
+  pc_sasi: { set:'pc', loanMax:5, name:'Peaches-banda', hero:'sasi', desc:'Minél többen, annál jobb: Sasi és Ani együtt erősebb, Boros és Noémi olcsón jön, a pultos itallal tölt, éjfél után Sasi a szomszédait is megnöveli.',
+    list:{ c_pc_sasi:2, c_ani:1, c_pultos:2, c_pc_boros:1, c_noemi:1, c_pc_pifti:2, c_pc_gabi:2, l_tanc:1, a_utolso:2, f_gluten:1, c_pc_zoli:1, c_pc_laci:1, c_idegen:1, a_sor:1, c_pc_david:1 } },
   /* Laszy kezdőpaklija (2026-10-23, teszt) – Base set lapokból + a saját Kánonja (Csövesek és Cigányok) */
   vadbuli: { set:'pc', free:true, name:'Vad buli a Peachesben', hero:'laszy', desc:'Laszy a Peaches-ben kezdte a pályafutását: egy húzásra a Kalinka, Flaming Lamborghini az elején, éjfél után pedig elszabadul a banda – a végén jönnek a Csövesek és Cigányok.',
     list:{ c_pc_barna:2, c_pc_zoli:1, c_pc_sasi:1, c_pc_laszy:1, c_pc_david:1, a_kalinka:2, a_lambo:2, a_jager:1, a_pezsgo:1, c_pifti:2, c_gyuri:2, c_kovacs:2, c_rebi:1, f_csoves:1 } },   /* 2026-10-24 (Tomi): Laszy egyetlen kezdőpaklija Peaches-tematikájú; free: nem kölcsön, nem kell birtokolni a lapokat – 51,6% */

@@ -909,7 +909,7 @@ Hősképesség-ötletek a táblázatban (még nem zöldek, nincsenek beépítve)
 ## Peaches kölcsönpaklik (2026-10-28, Tomi; teszt – élesben a megjelenéstől)
 - Minden régi hősnek egy Peaches-pakli (`DECKS.pc_<hős>`, `set:'pc'`, `loanMax:5`): **5 meccsig** kölcsönben játszható, utána a játék kiírja, hogy **gyűjtsd össze hozzá a lapokat** (a hiányzó lapok listájával). **Ha minden lapja megvan, automatikusan újra játszható, korlátlanul** (`loanOwned`; ilyenkor a meccs nem is számít bele). Ez az Amsterdam kölcsönpaklikra (3 meccs) is érvényes lett. Jelölés a pakliválasztóban: 🍑 „Kölcsön · még N meccs” / „lejárt” / „Megvannak a lapjai – korlátlanul játszható”. Laszy saját paklija (Vad buli) továbbra is ingyenes.
 - Mérés (`node tools/pcsim.js 40 vsbase`, a Peaches-pakli a többi hős alap kezdőpaklija ellen, 3600 meccs; összehasonlításul: alap kezdőpakli az alapok ellen 47–57%):
-  - Sasi       pc_sasi      60.3%
+  - Sasi       pc_sasi      60.3% → hangolva (10-28): **53,1%**
   - Barna      pc_barna     56.9%
   - Milo       pc_milo      55.8%
   - Tomi       pc_tomi      55.6%
@@ -918,7 +918,7 @@ Hősképesség-ötletek a táblázatban (még nem zöldek, nincsenek beépítve)
   - Bence      pc_bence     54.2%
   - Laszy      vadbuli      51.7%
   - Gabi       pc_gabi      50.3%
-  - Laci       pc_laci      49.7%
+  - Laci       pc_laci      49.7% → hangolva (10-28): **55,6%**
 - Hangolás közben: az első változatban Krisz 84–89%, Bence 80%, Sasi 78%, Laci 16%, Gabi 24% volt – főleg a Peaches Portás (célzott kidobás) billentette, most paklinként legfeljebb 1–2.
 - A paklik:
   - **Barna – Éjfél utáni roham** (pc_barna): Barna, éjfél után ×2, Boros, éjfél után ×2, MM, a hívatlan vendég ×2, Részeg idegen, Sasi, éjfél után ×2, Ani ×2, Noémi ×2, Royal Vodka + Burn ×2, 0,2 Kalinka, Gabi, éjfél után, Flaming Lamborghini, Utolsó kör, Hátad mögött, cápa megesz!
@@ -928,5 +928,5 @@ Hősképesség-ötletek a táblázatban (még nem zöldek, nincsenek beépítve)
   - **Dávid – Törzsvendég a Peachesben** (pc_david): Peaches and Cream, Tánctér ×2, Dávid, éjfél után ×2, Barna, éjfél után ×2, Sasi, éjfél után ×2, A pultos ×2, Gabi, éjfél után ×2, Jägermeister ×2, Bloody Mary, Bocsi, de vezetek, Pifti, a buli ördöge, Peaches Portás, Tomi, éjfél után
   - **Bence – Záróra** (pc_bence): Bence, éjfél után ×2, Laci, éjfél után ×2, DJ, Tomi, éjfél után ×2, Dávid, éjfél után ×2, Gabi, éjfél után ×2, Jägermeister, Bloody Mary ×2, Welcome Pezsgő ×2, Bender, A pultos ×2, Pifti, a buli ördöge
   - **Milo – Utolsó kör a Peachesben** (pc_milo): Gál Zoli, éjfél után ×2, Boros, éjfél után ×2, Barna, éjfél után ×2, Alina, Ani ×2, Utolsó kör ×2, Royal Vodka + Burn ×2, Hazafelé taxi, Tánctér, Gépüzemmód, Peaches Portás ×2, Pifti, a buli ördöge ×2
-  - **Laci – Hajnali tánc** (pc_laci): Laci, éjfél után ×2, Flaming Lamborghini, Bloody Mary ×2, DJ, Gabi, éjfél után ×2, A pultos ×2, JBL, Tomi, éjfél után, Peaches Portás ×2, Pifti, a buli ördöge ×2, Dávid, éjfél után, P.G., Bence, éjfél után, WC-s néni
-  - **Sasi – Peaches-banda** (pc_sasi): Sasi, éjfél után ×2, Ani, Barna, éjfél után ×2, Boros, éjfél után, Noémi, Pifti, a buli ördöge ×2, Gabi, éjfél után ×2, Tánctér, Utolsó kör ×2, Gluténbomba, MM, a hívatlan vendég ×2, Részeg idegen, Sorban állás, Dávid, éjfél után
+  - **Laci – Hajnali tánc** (pc_laci): Laci, éjfél után ×2, Flaming Lamborghini, Bloody Mary ×2, DJ, Gabi, éjfél után ×2, A pultos, JBL, Peaches Portás ×2, Pifti, a buli ördöge ×2, Dávid, éjfél után, P.G., Bence, éjfél után, Barna, éjfél után, Tomi, éjfél után, WC-s néni
+  - **Sasi – Peaches-banda** (pc_sasi): Sasi, éjfél után ×2, Ani, A pultos ×2, Boros, éjfél után, Noémi, Pifti, a buli ördöge ×2, Gabi, éjfél után ×2, Tánctér, Utolsó kör ×2, Gluténbomba, Gál Zoli, éjfél után, Laci, éjfél után, Részeg idegen, Sorban állás, Dávid, éjfél után
