@@ -939,3 +939,7 @@ Hősképesség-ötletek a táblázatban (még nem zöldek, nincsenek beépítve)
 ## Javítás: arany Laszy a Gyűjteményben (2026-10-28)
 - A Gyűjtemény „Arany hősök” sora az összes arany hőst kilistázta (`GOLD_HEROES`), így élesben látszott a még meg nem jelent Laszy arany portréja. Most csak a megjelent hősök (`HEROES_ON()`) – Laszy 11-01 19:00-tól.
 
+## Főmenü tableten fekve / gépen (2026-10-28, Tomi – iPad; teszt)
+- Széles kijelzőn (min. 900 px széles, fekvő) a főmenü **két oszlopos**: balra a logó, a hős-legyező, a profilsáv és az alsó linkek, jobbra a gombok; az oszlop legfeljebb 1240 px széles (`#scr-menu` grid, shell.html). Telefonon nem változik.
+- Astrától kérhető hozzá: fekvő (16:9 / 4:3) menü-háttér, hogy széles kijelzőn ne a mobilos álló kép nyúljon.
+
