@@ -861,3 +861,8 @@ Hősképesség-ötletek a táblázatban (még nem zöldek, nincsenek beépítve)
 ## „Elmúlt ÉJFÉL” jelenet – új kép (2026-10-26, Astra)
 - A CSS-sel rajzolt hold helyett Astra képe (`art/ui/midnight.webp`, 852×1846; a felirat és a „Koppints a folytatáshoz” a képen van). Mozgás: sötétből, enyhe ráközelítésből beúszik, a 0,95. mp-nél villanás + rázkódás, utána a holdon finom pulzáló fény (`.mid-glow`), egy fénycsík fut át rajta és csillagok szikráznak; ~3 mp után (vagy koppintásra) eltűnik. Széles kijelzőn a kép nem vágódik le (`contain`). Élesben a Peaches megjelenéséig nem fut.
 
+## Peaches-előzetes + Full Art Limitált booster (2026-10-28, Tomi; élesben)
+- **Hír (`pcNewsCheck`, meta.js):** a főmenüben egyszer felugrik: „November 1-jén (vasárnap) 19:00-kor érkezik … az „Egy Éjszaka a Peaches & Creamben”!” a két Peaches pack képével; a megjelenés után egyszer „Megérkezett …” (egy hétig).
+- **Ajándék:** mindenki kap egy **Full Art Limitált boostert** (`p.faLtdPacks`, profilonként egyszer: `p.gifts` `pc-fa-ltd`), a Boltban „🍑 Full Art Limitált booster” gombbal bontható (piros pack, „Full Art” szalag).
+- **Tartalom (`faLtdRoll`):** 3 lap, **mind Full Art**, bármelyik **megjelent** szettből (alap + Amsterdam; a Peaches lapjai csak 11-01 19:00 után bontva lehetnek benne); legalább egy ritka; **15% eséllyel** az egyik lap helyén egy **arany lap** (a megjelent kiegészítők arany változataiból). Mérés 4000 packon: 14,8% arany.
+
