@@ -869,3 +869,15 @@ Hősképesség-ötletek a táblázatban (még nem zöldek, nincsenek beépítve)
 ## Javítás: arany Laszy a Gyűjteményben (2026-10-28)
 - A Gyűjtemény „Arany hősök” sora az összes arany hőst kilistázta (`GOLD_HEROES`), így élesben látszott a még meg nem jelent Laszy arany portréja. Most csak a megjelent hősök (`HEROES_ON()`) – Laszy 11-01 19:00-tól.
 
+## Főmenü tableten fekve / gépen (2026-10-28, Tomi – iPad; élesben is 10-28)
+- Széles kijelzőn (min. 900 px széles, fekvő) a főmenü **két oszlopos**: balra a logó, a hős-legyező, a profilsáv és az alsó linkek, jobbra a gombok; az oszlop legfeljebb 1240 px széles (`#scr-menu` grid, shell.html). Telefonon nem változik.
+- Javítás (aznap): a két oszlop csak a kiszélesedett tartalommal együtt kapcsol (induláskor is, `body:is(:not([data-scr]),[data-scr="scr-menu"])`); a menü háttere fekve a **teljes képernyőt** kitölti (`body::before`, a téma szerint: alap / Halloween / Peaches), a tartalom-oszlop átlátszó; oszlopok: 320–560 px + 400–560 px, középre rendezve; a gombfeliratok nem törnek szavon belül. Mérve: 1180×820, 1366×1024, 1000×700 fekve két oszlop; 820×1180 állva egy oszlop.
+- Astrától kérhető hozzá: fekvő (16:9 / 4:3) menü-háttér, hogy széles kijelzőn ne a mobilos álló kép nyúljon.
+
+## Reszponzív pakliválasztó és gyűjtemény (2026-10-28, Tomi – iPad; élesben is 10-28)
+- **Töréspont:** `(min-width:900px) and (min-height:560px) and (min-aspect-ratio:5/4)` – fekvő tablet, gép. Alatta (telefon, álló iPad, osztott képernyő) minden egy oszlop. A régi, 1000 px-es gyűjtemény-szabály (ütközött) kivéve. A háttér (elmosott asztal, `body::before`) a teljes képernyőt kitölti, a tartalom egy legfeljebb 1280 px-es, átlátszó, középre rendezett konténer.
+- **Pakliválasztó:** balra a görgethető lista (`minmax(300px,1fr)` – fekvő iPaden 2 oszlop), jobbra külön, ragadós panel (`#pickSel` + bot erősség + „Meccs indítása”): a kiválasztott pakli hős-portréja, neve, a hős teljes képessége, a pakli leírása, a kölcsön-állapot. Telefonon a panel rejtett, minden a régi.
+- **Gyűjtemény:** balra ragadós szűrőpanel (Kiegészítő, Típus, Ritkaság · birtoklás, Energia – csoportcímekkel), jobbra a kereső (arányosan, max. 460 px), alatta a rács: `minmax(150px,1fr)`, lapméret 148 px → 1024 px-en 4, 1180 px-en 5 lap egy sorban. A Hátlap / Beváltás gomb normál szélességű. **Telefonon** a szűrők a „⚙️ Szűrők” gombbal nyitható panelben (a gombon az aktív szűrők száma).
+- **Teszt sáv:** a helye fenntartva (`body.has-tbar`, `--tbar`) – nem takar el semmit.
+- Ellenőrizve: 390×844, 600×820, 1024×768, 1180×820, 1366×1024.
+

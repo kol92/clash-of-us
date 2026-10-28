@@ -1688,10 +1688,8 @@ button.rk-row:active{transform:scale(.98);}
 .g-side{display:none;}
 /* Széles nézet a Gyűjteményben, a Paklik listában és a pakliszerkesztőben is (2026-10-13, Laci kérése) */
 @media (min-width:1000px) and (min-height:600px) and (min-aspect-ratio:5/4){
-  body[data-scr="scr-coll"] #app,body[data-scr="scr-decks"] #app,body[data-scr="scr-edit"] #app{max-width:min(100vw,1280px);}
-  body[data-scr="scr-coll"] .screen,body[data-scr="scr-decks"] .screen,body[data-scr="scr-edit"] .screen{padding-inline:28px;}
-  body[data-scr="scr-coll"] .coll-grid{grid-template-columns:repeat(auto-fill,minmax(138px,1fr));gap:20px 14px;}
-  body[data-scr="scr-coll"] .coll-grid .card{--cw:136px;}
+  body[data-scr="scr-decks"] #app,body[data-scr="scr-edit"] #app{max-width:min(100vw,1280px);}
+  body[data-scr="scr-decks"] .screen,body[data-scr="scr-edit"] .screen{padding-inline:28px;}
   body[data-scr="scr-decks"] .deck-list{grid-template-columns:repeat(auto-fill,minmax(360px,1fr));gap:14px;}
   body[data-scr="scr-decks"] #newDeck,body[data-scr="scr-decks"] #impDeck{max-width:560px;display:block;margin-inline:auto;}
   body[data-scr="scr-edit"] .ed-body{grid-template-columns:1fr 360px;gap:16px;}
@@ -1734,6 +1732,22 @@ button.rk-row:active{transform:scale(.98);}
 .top .back,.top>.back{flex:none;}
 .top h2{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .top .seg{flex:none;}
+/* Főmenü tableten fekve / gépen (2026-10-28, Tomi – iPad): széles, középre rendezett két oszlop – balra a logó, a hősök és a profil, jobbra a gombok.
+   A háttér a teljes képernyőt kitölti (body::before), a tartalom-oszlop átlátszó. Induláskor még nincs data-scr – ezért a :not([data-scr]) is.
+   Keskeny ablakban / állva (a feltétel nem teljesül) marad az egy oszlop. */
+@media (min-width:900px) and (min-height:560px) and (min-aspect-ratio:5/4){
+  body:is(:not([data-scr]),[data-scr="scr-menu"]) #app{max-width:min(100vw,1280px);background:none;box-shadow:none;}
+  body:is(:not([data-scr]),[data-scr="scr-menu"])::before{inset:0;filter:none;background:radial-gradient(ellipse 70% 50% at 30% 20%,rgba(40,140,200,.28),transparent 70%),linear-gradient(180deg,#041422,#021019 60%,#010a10);}
+  body.ev-hw:is(:not([data-scr]),[data-scr="scr-menu"])::before{background:linear-gradient(180deg,rgba(8,4,16,.15),rgba(8,4,16,.35) 40%,rgba(8,4,16,.25)),url('art/ui/ev-hw-bg.webp') center/cover no-repeat #0b0614;}
+  html.pc-live body:is(:not([data-scr]),[data-scr="scr-menu"])::before{background:linear-gradient(180deg,rgba(10,4,24,.15),rgba(10,4,24,.42) 38%,rgba(10,4,24,.6)),url('art/ui/menu-pc.webp') center/cover no-repeat #0a0418;}
+  html body:is(:not([data-scr]),[data-scr="scr-menu"]) #scr-menu{background:none;display:grid;grid-template-columns:minmax(320px,560px) minmax(400px,560px);grid-template-rows:auto auto auto 1fr;justify-content:center;column-gap:clamp(28px,4vw,64px);align-content:start;padding:0 clamp(20px,3vw,40px) 16px;}
+  body:is(:not([data-scr]),[data-scr="scr-menu"]) #scr-menu>.m-logo{grid-column:1;grid-row:1;margin:0 0 -34px;}
+  body:is(:not([data-scr]),[data-scr="scr-menu"]) #scr-menu>.fan{grid-column:1;grid-row:2;}
+  body:is(:not([data-scr]),[data-scr="scr-menu"]) #scr-menu>.profile-bar{grid-column:1;grid-row:3;align-self:start;}
+  body:is(:not([data-scr]),[data-scr="scr-menu"]) #scr-menu>.menu-btns{grid-column:2;grid-row:1/5;align-self:start;padding-top:clamp(16px,4vh,48px);}
+  body:is(:not([data-scr]),[data-scr="scr-menu"]) #scr-menu>.m-foot{grid-column:1;grid-row:4;align-self:start;margin-top:14px;}
+  body:is(:not([data-scr]),[data-scr="scr-menu"]) #scr-menu .menu-btns *{word-break:normal;overflow-wrap:normal;hyphens:manual;}
+}
 @media (max-width:440px){#scr-coll .top{flex-wrap:wrap;row-gap:8px;} #scr-coll .top .seg{flex:1 1 100%;display:grid;grid-template-columns:1fr 1fr;}}
 .logbox .lc,#gRight .lc{color:#ffe08a;text-decoration:underline dotted rgba(255,224,138,.6);text-underline-offset:2px;cursor:pointer;}
 .ko-line{display:block;margin:2px -4px;padding:2px 4px;border-radius:6px;background:rgba(220,40,40,.28);border-left:3px solid #ff5a5a;font-weight:800;color:#fff;}
@@ -2298,6 +2312,62 @@ html:has(body.in-game){overscroll-behavior:none;}
 html.pc-live body::before{background-image:url('art/ui/board-pc.webp');}
 html.pc-live body.in-game #scr-game::before{background-image:radial-gradient(ellipse 78% 72% at 50% 50%,rgba(2,8,11,.5),rgba(2,8,11,.32) 70%,rgba(2,8,11,0) 100%),url('art/ui/board-pc.webp');}
 html.pc-live #scr-game{background-image:radial-gradient(ellipse 78% 72% at 50% 50%,rgba(2,8,11,.5),rgba(2,8,11,.32) 70%,rgba(2,8,11,0) 100%),url('art/ui/board-pc.webp');}
+
+/* ===== Reszponzív pakliválasztó és gyűjtemény (2026-10-28, Tomi – iPad) =====
+   Mobilon (és keskeny / osztott ablakban) minden a régi egy oszlop. Széles, fekvő nézetben:
+   a háttér a teljes képernyőt kitölti (body::before), a tartalom egy átlátszó, legfeljebb 1280 px-es, középre rendezett konténer. */
+.pick-sel{display:none;}
+.cf-h{display:block;margin:2px 2px 0;font:900 10.5px var(--body);letter-spacing:.08em;text-transform:uppercase;color:var(--gold);}
+.cf-panel{display:grid;grid-template-columns:minmax(0,1fr);gap:6px;}
+.cf-panel>*{min-width:0;}
+.cf-toggle{display:flex;align-items:center;justify-content:center;gap:6px;min-height:36px;padding:0 14px;border-radius:12px;border:1px solid rgba(214,180,106,.45);background:rgba(10,28,40,.85);color:#e8f1f7;font:800 13px var(--body);cursor:pointer;}
+.cf-toggle b{min-width:20px;padding:1px 6px;border-radius:999px;background:var(--gold);color:#2a1b00;font-size:11px;}
+.cf-toggle[aria-expanded="true"]{border-color:var(--gold);}
+.coll-filters:not(.open) .cf-panel{display:none;}
+.coll-filters .cf-top{display:grid;grid-template-columns:minmax(0,1fr);gap:8px;align-items:center;}
+.coll-filters .cf-toggle{justify-self:start;}
+.cf-panel .cf-row.r-set{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));}
+body.has-tbar #app{height:calc(var(--apph,100%) - var(--tbar,0px));}   /* teszt sáv: ne takarjon el semmit */
+@media (min-width:900px) and (min-height:560px) and (min-aspect-ratio:5/4){
+  body[data-scr="scr-pick"] #app,body[data-scr="scr-coll"] #app{max-width:min(100vw,1280px);background:none;box-shadow:none;}
+  body[data-scr="scr-pick"] .top,body[data-scr="scr-coll"] .top{background:linear-gradient(180deg,rgba(9,30,36,.97) 75%,rgba(9,30,36,0));}
+  /* -- pakliválasztó: balra a lista (helytől függően 1–2 oszlop), jobbra a kiválasztott pakli panelje -- */
+  body[data-scr="scr-pick"] #scr-pick{display:grid;grid-template-columns:minmax(0,1fr) clamp(300px,30vw,380px);grid-template-areas:"top top" "note side" "list side";column-gap:clamp(18px,2.4vw,32px);align-content:start;padding-inline:clamp(16px,2.6vw,32px);}
+  body[data-scr="scr-pick"] #scr-pick>.top{grid-area:top;} body[data-scr="scr-pick"] #scr-pick>.pick-note{grid-area:note;}
+  body[data-scr="scr-pick"] #scr-pick>.deck-pick{grid-area:list;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));gap:10px 16px;align-content:start;padding-bottom:24px;}
+  body[data-scr="scr-pick"] #scr-pick>.pick-go{grid-area:side;position:sticky;top:76px;bottom:auto;align-self:start;margin:0 0 20px;padding:16px;border-radius:18px;
+    background:linear-gradient(170deg,rgba(22,64,75,.96),rgba(8,24,30,.96));border:1px solid rgba(214,180,106,.4);box-shadow:0 12px 30px rgba(0,0,0,.45);
+    max-height:calc(var(--apph,100vh) - var(--tbar,0px) - 96px);overflow-y:auto;}
+  body[data-scr="scr-pick"] .pick-sel{display:grid;grid-template-columns:96px minmax(0,1fr);gap:4px 12px;align-items:start;margin-bottom:12px;}
+  body[data-scr="scr-pick"] .pick-sel .ps-hero{grid-row:1/4;width:96px;height:128px;border-radius:10px;background-size:cover;background-position:50% 15%;box-shadow:0 0 0 2px rgba(214,180,106,.6),0 6px 14px rgba(0,0,0,.5);}
+  body[data-scr="scr-pick"] .pick-sel b{font:400 21px/1.15 var(--display);color:#fff;}
+  body[data-scr="scr-pick"] .pick-sel em{font-style:normal;font-weight:900;color:var(--gold);font-size:14px;}
+  body[data-scr="scr-pick"] .pick-sel .ps-tag{font-size:12px;font-weight:800;color:#ffe08a;}
+  body[data-scr="scr-pick"] .pick-sel p{grid-column:1/-1;margin:6px 0 0;font-size:13.5px;line-height:1.45;color:#d7e6ee;}
+  body[data-scr="scr-pick"] .pick-sel p.ps-desc{color:var(--mute);font-size:13px;}
+  body[data-scr="scr-pick"] .pick-sel p.ps-bad{color:#ff9a8a;font-weight:800;}
+  body[data-scr="scr-pick"] .deck-opt.dp b{font-size:19px;} body[data-scr="scr-pick"] .deck-opt.dp small{font-size:12px;}
+  /* -- gyűjtemény: balra a szűrőpanel, jobbra a kereső és a kártyarács -- */
+  body[data-scr="scr-coll"] #scr-coll{display:grid;grid-template-columns:clamp(250px,24vw,300px) minmax(0,1fr);grid-template-areas:"top top" "filt srch" "filt body";column-gap:clamp(18px,2.4vw,32px);align-content:start;padding-inline:clamp(16px,2.6vw,32px);}
+  body[data-scr="scr-coll"] #scr-coll>.top{grid-area:top;}
+  body[data-scr="scr-coll"] #collFilters{display:contents;}
+  body[data-scr="scr-coll"] .coll-filters .cf-top{grid-area:srch;grid-template-columns:minmax(0,460px);margin:4px 0 6px;}
+  body[data-scr="scr-coll"] .cf-search{max-height:none;}
+  body[data-scr="scr-coll"] .cf-toggle{display:none;}
+  body[data-scr="scr-coll"] .coll-filters .cf-panel{display:grid;grid-area:filt;align-self:start;position:sticky;top:76px;gap:7px;padding:14px 12px;border-radius:16px;
+    background:linear-gradient(170deg,rgba(22,64,75,.92),rgba(8,24,30,.92));border:1px solid rgba(214,180,106,.35);max-height:calc(var(--apph,100vh) - var(--tbar,0px) - 96px);overflow-y:auto;}
+  body[data-scr="scr-coll"] .cf-panel .cf-row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px;}
+  body[data-scr="scr-coll"] .cf-panel .cf-row.r-set{grid-template-columns:minmax(0,1fr);}
+  body[data-scr="scr-coll"] .cf-panel .cf-row.r-rar{grid-template-columns:repeat(4,minmax(0,1fr));}
+  body[data-scr="scr-coll"] .cf-panel .cf-row.r-cost{grid-template-columns:repeat(3,minmax(0,1fr));}
+  body[data-scr="scr-coll"] .cf-panel .cf-chip{height:34px;font-size:12px;}
+  body[data-scr="scr-coll"] .cf-panel .cf-clear{justify-self:start;margin-top:4px;}
+  body[data-scr="scr-coll"] #collBody{grid-area:body;min-width:0;}
+  body[data-scr="scr-coll"] #collBody .bk-btn,body[data-scr="scr-coll"] #collBody .dupe-btn{display:inline-flex;width:auto;max-width:100%;margin:8px 10px 4px 0;vertical-align:middle;white-space:nowrap;}
+  body[data-scr="scr-coll"] .coll-grid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:22px 14px;}
+  body[data-scr="scr-coll"] .coll-grid .card{--cw:148px;}
+  body[data-scr="scr-pick"] .pick-note,body[data-scr="scr-coll"] .coll-sum{color:#c9dbe4;text-shadow:0 1px 3px #000;}
+}
 </style>
 
 <div id="app">
@@ -2328,7 +2398,7 @@ html.pc-live #scr-game{background-image:radial-gradient(ellipse 78% 72% at 50% 5
     <div class="top"><button class="back" data-back aria-label="Vissza">‹</button><h2>Válassz paklit</h2></div>
     <p class="pick-note">A hőst a pakli határozza meg. Saját paklit és hőst a Paklik menüben állíthatsz össze.</p>
     <div class="deck-pick" id="deckPick"></div>
-    <div class="pick-go"><div class="bot-lv" id="botLvRow" hidden><span class="bl-lbl">🤖 Bot erőssége</span><div class="seg" role="group" aria-label="Bot erőssége"><button data-lv="1">😊 Könnyű</button><button data-lv="2">Normál</button><button data-lv="3">😈 Nehéz</button></div><small></small></div><label class="rk-botrow" id="rkBotRow" hidden><input type="checkbox" checked><span><b>🤖 Bot ellen is mehet</b><small></small></span></label><button class="btn primary" id="startBtn" style="width:100%">Meccs indítása</button></div>
+    <div class="pick-go"><div class="pick-sel" id="pickSel" aria-live="polite"></div><div class="bot-lv" id="botLvRow" hidden><span class="bl-lbl">🤖 Bot erőssége</span><div class="seg" role="group" aria-label="Bot erőssége"><button data-lv="1">😊 Könnyű</button><button data-lv="2">Normál</button><button data-lv="3">😈 Nehéz</button></div><small></small></div><label class="rk-botrow" id="rkBotRow" hidden><input type="checkbox" checked><span><b>🤖 Bot ellen is mehet</b><small></small></span></label><button class="btn primary" id="startBtn" style="width:100%">Meccs indítása</button></div>
   </section>
 
   <section class="screen" id="scr-coll" hidden>
