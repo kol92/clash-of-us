@@ -1218,7 +1218,7 @@ function botDeckFor(hero, lv, rnd = Math.random) {
 }
 // [DECKHELP-END]
 function allDecks() {
-  const starters = Object.entries(DECKS).filter(([, d]) => !d.set || setLive(d.set)).map(([id, d]) => ({ id, name: d.name, desc: d.desc, hero: d.hero, list: upgradeList(d.list), starter: true, set: d.set, free: !!d.free }));   /* szett-kezdőpakli csak a megjelenéstől */
+  const starters = Object.entries(DECKS).filter(([, d]) => !d.set || setLive(d.set)).map(([id, d]) => ({ id, name: d.name, desc: d.desc, hero: d.hero, list: upgradeList(d.list), starter: true, set: d.set, free: !!d.free, loanMax: d.loanMax }));   /* szett-kezdőpakli csak a megjelenéstől */
   return starters.concat(Store.p ? Store.p.decks : []);
 }
 const deckCount = list => Object.values(list).reduce((a, b) => a + b, 0);
@@ -1232,19 +1232,27 @@ function deckProblem(list, hero, loan) {   /* loan: szett-kezdőpakli – kölcs
   return null;
 }
 /* Kölcsönpakli (szett-kezdőpakli, 2026-10-19, Tomi): paklinként 3 meccs, utána lejár */
-const LOAN_MAX = 3;
+const LOAN_MAX = 3;   /* Amsterdam: 3 meccs; Peaches: 5 (d.loanMax, 2026-10-28) */
 const isLoan = d => !!(d && d.starter && d.set && !d.free);   /* free: a hős saját kezdőpaklija (pl. Laszy) – nem kölcsön */
-const loanLeft = d => LOAN_MAX - ((Store.p?.loan || {})[d.id] || 0);
-const deckIssue = d => isLoan(d) && loanLeft(d) <= 0 ? 'lejárt a kölcsönpakli' : deckProblem(d.list, d.hero || null, isLoan(d) || !!(d.starter && d.free));
+const loanMaxOf = d => (d && d.loanMax) || LOAN_MAX;
+const loanLeft = d => loanMaxOf(d) - ((Store.p?.loan || {})[d.id] || 0);
+const loanOwned = d => isLoan(d) && !deckProblem(d.list, d.hero || null, false);   /* ha minden lapja megvan: korlátlanul játszható (2026-10-28, Tomi) */
+const loanOut = d => isLoan(d) && loanLeft(d) <= 0 && !loanOwned(d);
+const SET_ICON = { ah: '🌷', pc: '🍑' };
+const loanTag = d => `${SET_ICON[d.set] || '🎴'} ${loanOwned(d) ? 'Megvannak a lapjai – korlátlanul játszható' : loanOut(d) ? 'Kölcsön · lejárt' : `Kölcsön · még ${loanLeft(d)} meccs`}`;
+const deckIssue = d => loanOut(d) ? 'lejárt a kölcsönpakli' : deckProblem(d.list, d.hero || null, isLoan(d) || !!(d.starter && d.free));
 function loanUse(deckId, matchKey) {   /* meccs indulásakor számol (kilépéssel sem lehet megúszni); matchKey: PvP-ben meccsenként egyszer */
-  const p = Store.p, d = allDecks().find(x => x.id === deckId); if (!p || !isLoan(d)) return;
+  const p = Store.p, d = allDecks().find(x => x.id === deckId); if (!p || !isLoan(d) || loanOwned(d)) return;
   if (matchKey) { p.loanM = p.loanM || []; if (p.loanM.includes(matchKey)) return; p.loanM = [...p.loanM.slice(-20), matchKey]; }
   p.loan = { ...(p.loan || {}), [d.id]: ((p.loan || {})[d.id] || 0) + 1 }; save();
   const left = loanLeft(d);
-  setTimeout(() => toast(left > 0 ? `🌷 Kölcsönpakli: még ${left} meccs ezzel a paklival` : '🌷 Ez az utolsó kölcsönmeccs ezzel a paklival!'), 1200);
+  const ic = SET_ICON[d.set] || '🎴'; setTimeout(() => toast(left > 0 ? `${ic} Kölcsönpakli: még ${left} meccs ezzel a paklival` : `${ic} Ez az utolsó kölcsönmeccs ezzel a paklival – utána gyűjtsd össze a lapjait!`), 1200);
 }
-function loanOutModal() {
+function loanOutModal(d) {
   const o = document.createElement('div'); o.className = 'overlay';
+  if (d && d.set !== 'ah') { const miss = Object.entries(d.list).filter(([id, k]) => k > owned(id)).map(([id, k]) => `${CARD[id].name}${k - owned(id) > 1 ? ` ×${k - owned(id)}` : ''}`);
+    o.innerHTML = `<div class="modal"><h3>${SET_ICON[d.set] || '🎴'} Lejárt a kölcsönpakli</h3><p class="live">A(z) <b>${escH(d.name)}</b> paklit ${loanMaxOf(d)} meccsig próbálhattad ki. Gyűjtsd össze hozzá a lapokat${d.set === 'pc' ? ' <b>Peaches packokból</b>' : ''} – ha mind megvan, a pakli <b>automatikusan újra játszható</b>, korlátlanul.</p>${miss.length ? `<p class="q-note">Még hiányzik: ${miss.map(escH).join(', ')}</p>` : ''}<button class="btn primary" data-x>Értem</button></div>`;
+    o.onclick = e => { if (e.target.closest('[data-x]') || e.target === o) o.remove(); }; $('#layer').appendChild(o); return; }
   o.innerHTML = `<div class="modal"><h3>🌷 Ezek csak kölcsön paklik voltak!</h3><p class="live">Az Amsterdam Hősei kezdőpaklikat ${LOAN_MAX}-${LOAN_MAX} meccsig próbálhattad ki. Gyűjtsd össze a lapjaikat <b>Amsterdam packokból</b>, és rakd össze a saját változatodat a <b>Paklik</b> menüben (a kölcsönpaklit megnyitva a <b>Másolat</b> gombbal ki is indulhatsz belőle).</p><button class="btn primary" data-x>Értem</button></div>`;
   o.onclick = e => { if (e.target.closest('[data-x]') || e.target === o) o.remove(); };
   $('#layer').appendChild(o);
@@ -1262,7 +1270,7 @@ function renderDecks() {
       const prob = deckIssue(d), h = HERO[d.hero];
       return `<button class="deck-card" data-deck="${d.id}">
         ${heroPortrait(d.hero, 'dc-hero')}
-        <span class="dc-txt"><b></b><em>${h ? h.name : 'Nincs hős'}</em><small>${isLoan(d) ? (loanLeft(d) > 0 ? `🌷 Kölcsönpakli · még ${loanLeft(d)} meccs` : '🌷 Kölcsönpakli · lejárt') : d.starter ? 'Kezdőpakli · nem szerkeszthető' : prob ? prob : 'Játékra kész'}</small></span>
+        <span class="dc-txt"><b></b><em>${h ? h.name : 'Nincs hős'}</em><small>${isLoan(d) ? loanTag(d) : d.starter ? 'Kezdőpakli · nem szerkeszthető' : prob ? prob : 'Játékra kész'}</small></span>
         <span class="dc-go">${d.starter ? 'Megnéz' : 'Szerkeszt'}</span></button>`;
     }).join('')}</div>`;
   $('#decksBody').querySelectorAll('.deck-card').forEach((b, i) => b.querySelector('b').textContent = ds[i].name);

@@ -525,14 +525,14 @@ function renderPick() {
   if (!ds.some(d => d.id === ui.deck && !deckIssue(d))) ui.deck = 'roham';
   ui.deckOpen = ui.deckOpen || null;
   $('#deckPick').innerHTML = ds.map(d => { const prob = deckIssue(d), h = HERO[d.hero], sel = ui.deck === d.id, open = ui.deckOpen === d.id;
-    const lo = isLoan(d) && loanLeft(d) <= 0;
+    const lo = loanOut(d);
     return `<div class="deck-wrap${sel ? ' sel' : ''}${lo ? ' loan-out' : ''}"><button class="deck-opt dp${sel ? ' on' : ''}" data-d="${d.id}" ${lo ? 'data-loanout="1"' : ''} aria-pressed="${sel}" ${prob && !lo ? 'disabled' : ''}>${heroPortrait(d.hero, 'do-hero')}
-      <span class="do-txt"><b></b><em>${h ? h.name : 'Nincs hős'}${d.set === 'ah' ? ` <i class="do-set">🌷 Kölcsön · ${lo ? 'lejárt' : `még ${loanLeft(d)} meccs`}</i>` : ''}</em><small>${prob ? 'Nem játszható: ' + prob : h ? h.text : ''}</small></span></button>
+      <span class="do-txt"><b></b><em>${h ? h.name : 'Nincs hős'}${isLoan(d) ? ` <i class="do-set">${loanTag(d)}</i>` : ''}</em><small>${prob ? 'Nem játszható: ' + prob : h ? h.text : ''}</small></span></button>
       <button class="dp-more${open ? ' open' : ''}" data-more="${d.id}" aria-expanded="${open}" aria-label="Részletek: ${escH(d.name)}"></button>
       ${open ? `<div class="dp-detail"><p><b>${h ? h.name : ''}:</b> ${h ? h.text : ''}</p><p>${d.starter ? d.desc : 'Saját pakli.'}</p></div>` : ''}</div>`; }).join('');
   $('#deckPick').querySelectorAll('.deck-opt b').forEach((b, i) => b.textContent = ds[i].name);
 }
-$('#deckPick').onclick = e => { const m = e.target.closest('[data-more]'); if (m) { ui.deckOpen = ui.deckOpen === m.dataset.more ? null : m.dataset.more; renderPick(); return; } const b = e.target.closest('[data-d]'); if (b && b.dataset.loanout) { loanOutModal(); return; } if (b) { ui.deck = b.dataset.d; renderPick(); } };
+$('#deckPick').onclick = e => { const m = e.target.closest('[data-more]'); if (m) { ui.deckOpen = ui.deckOpen === m.dataset.more ? null : m.dataset.more; renderPick(); return; } const b = e.target.closest('[data-d]'); if (b && b.dataset.loanout) { loanOutModal(allDecks().find(x => x.id === b.dataset.d)); return; } if (b) { ui.deck = b.dataset.d; renderPick(); } };
 $('#startBtn').onclick = () => { const d = allDecks().find(x => x.id === ui.deck); if (!d || deckIssue(d)) return;
   if (ui.pick?.done) { const P = ui.pick; ui.pick = null; show(P.back || 'scr-menu'); if (P.back === 'scr-ranked') renderRanked(); P.done(d); return; }
   startMatch(d.hero, ui.deck); };
