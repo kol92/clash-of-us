@@ -2462,6 +2462,19 @@ body.has-tbar #app{height:calc(var(--apph,100%) - var(--tbar,0px));}   /* teszt 
   body[data-scr="scr-shop"] #shopBody .wallet{position:sticky;top:70px;z-index:4;justify-self:end;margin-left:auto;width:max-content;padding:4px 14px;border-radius:999px;background:rgba(6,20,26,.85);border:1px solid rgba(214,180,106,.45);}
   body[data-scr="scr-shop"] #shopBody .lim-jump,body[data-scr="scr-shop"] #shopBody .shop-gifts,body[data-scr="scr-shop"] #shopBody .chest-card,body[data-scr="scr-shop"] #shopBody .pack-info-more{max-width:640px;margin-inline:auto;}
 }
+
+/* Season Pass – széles nézet (2026-10-28): balra ragadós fejléc (szezon, szint, XP, Mind átveszem) + XP-leírás, jobbra a 30 szint két oszlopban */
+@media (min-width:900px) and (min-height:500px){
+  body[data-scr="scr-pass"] #app{max-width:min(100vw,1200px);background:none;box-shadow:none;}
+  body[data-scr="scr-pass"] .screen{padding-inline:clamp(16px,2.6vw,32px);}
+  body[data-scr="scr-pass"] .top{background:linear-gradient(180deg,rgba(9,30,36,.97) 75%,rgba(9,30,36,0));}
+  body[data-scr="scr-pass"] #passBody{display:grid;grid-template-columns:clamp(280px,30vw,360px) minmax(0,1fr);grid-template-rows:auto auto;gap:0 clamp(20px,3vw,40px);align-items:start;padding-bottom:24px;}
+  body[data-scr="scr-pass"] #passBody>.sp-head{grid-column:1;grid-row:1;position:sticky;top:76px;margin:6px 0 10px;}
+  body[data-scr="scr-pass"] #passBody>.q-note{grid-column:2;grid-row:2;margin-top:12px;}
+  body[data-scr="scr-pass"] #passBody>.sp-list{grid-column:2;grid-row:1;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:8px 12px;margin-top:6px;}
+  body[data-scr="scr-pass"] #passBody>.sp-list::before{display:none;}
+  body[data-scr="scr-pass"] .sp-row .sp-name b{overflow-wrap:normal;word-break:normal;}
+}
 </style>
 
 <div id="app">
