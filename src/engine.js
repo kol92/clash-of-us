@@ -173,6 +173,7 @@ const CARDS = [
   { id:'c_ani', set:'pc', type:'char', name:'Ani', cost:2, atk:2, hp:3, rarity:'r', text:'Kijátszáskor: ha egy Sasi-lap áll mellette, mindketten +1/+1-et kapnak, és Ani Provokációt kap.' },
   { id:'c_noemi', set:'pc', type:'char', name:'Noémi', cost:2, atk:3, hp:2, rarity:'r', sneak:true, text:'Sunyulás. Amikor felfordul, kidobja a vele szemben álló ellenséges karaktert.' },
   { id:'c_pultos', set:'pc', type:'char', name:'A pultos', cost:4, atk:2, hp:3, rarity:'k', text:'Kijátszáskor egy véletlen Ital kerül a kezedbe – ebben a körben ingyen kijátszhatod.' },
+  { id:'a_hagyd', set:'pc', type:'action', name:'Kérlek, hagyd el a szórakozóhelyet', cost:3, tgt:'kick', rarity:'r', text:'Kidob egy általad választott karaktert (vissza a gazdája kezébe) – akár a sajátodat is.' },   /* 2026-10-28 (Tomi) */
   { id:'c_mm', set:'pc', type:'char', name:'MM, a hívatlan vendég', cost:1, atk:1, hp:3, rarity:'k', enemySide:true, noAttack:true, maxPosts:3, text:'Az ellenfélhez kerül, nem támad. Elzavarja a szomszédait. A köröd végén beszámolót ír: 1 sebzés az ellenfél hősének. 3 után lelép.', help:'Kijátszáskor a mellette álló ellenséges karakterek visszakerülnek a gazdájuk kezébe (mint a kidobásnál: 1-gyel drágábban). A te köröd végén beszámolót ír a netre: felfedi az ellenfél rejtett (Sunyulós) karaktereit, és az ellenfél hőse 1 sebzést kap. A harmadik beszámoló után lelép a tábláról.' },   /* 2026-10-26 (Tomi) */
   { id:'c_idegen', set:'pc', type:'char', name:'Részeg idegen', cost:1, atk:1, hp:1, rarity:'k', enemySide:true, noAttack:true, mid:true, text:'Az ellenfél oldalára teszed le. Nem támad. Éjfél után: kidől, és 1 sebzést okoz a gazdájának (annak, akinek az oldalán áll).' },
   { id:'c_dj', set:'pc', type:'char', name:'DJ', cost:4, atk:2, hp:5, rarity:'e', mid:true, text:'Amíg él, a karaktereid +1 támadással ütnek. Éjfél után: +2-vel.' },
@@ -523,6 +524,7 @@ function targetsFor(s, pi, id) {
       if (c.tgt === 'enemy') foeA();
       else if (c.tgt === 'enemyOrHero') { foeA(); T.push({ k:'hero', side:ei, i:-1 }); }
       else if (c.tgt === 'anyOrHero') { foeA(); p.board.forEach((u, i) => { if (u && !isEl(u)) T.push({ k:'unit', side:pi, i }); }); T.push({ k:'hero', side:ei, i:-1 }); }   // Sasi ütése: a saját térfeleden bárki (a nálad úszó Cápa is)
+      else if (c.tgt === 'kick') { for (const sd of [pi, ei]) s.players[sd].board.forEach((u, i) => { if (u && !isFixed(u) && !isEl(u) && !CARD[u.id].noKick) T.push({ k:'unit', side:sd, i }); }); }   /* kidobás: bármelyik oldal (2026-10-28) */
       else if (c.tgt === 'enemyEmpty') e.board.forEach((u, i) => { if (!u) T.push({ k:'eslot', side:ei, i }); });
       else if (c.tgt === 'own') { ownA(); if (c.opts) { const b = T.splice(0); for (const x of b) c.opts.forEach((_, o) => T.push({ ...x, o })); } }   /* Végtelen trip: célpont × választás */
       else if (c.tgt === 'ownOrHero') { ownA(); T.push({ k:'hero', side:pi, i:-1 }); }
@@ -925,6 +927,7 @@ function playCard(s, pi, hi, t) {
         x.atk += 3; x.haste = true; x.royal = true; ev(s, { t:'buff', side:pi, i:t.i, n:3 }); ev(s, { t:'boon', side:pi, i:t.i, b:'haste' }); break; }
       case 'a_utolso': { const x = p.board[t.i]; if (!x) break; x.atk += 2; x.haste = true; ev(s, { t:'buff', side:pi, i:t.i }); if (isMidnight(s)) draw(s, pi); break; }
       case 'a_sor': e.charTax = 2; ev(s, { t:'sortax', side:ei, i:-1 }); break;
+      case 'a_hagyd': { const x = s.players[t.side] && s.players[t.side].board[t.i]; if (x && !isFixed(x) && !isEl(x)) kickOut(s, t.side, t.i); break; }   /* Kérlek, hagyd el a szórakozóhelyet */
       case 'a_kidobtak': { for (let k = 0; k < 2; k++) { const c2 = e.board.map((x, q) => x && !isFixed(x) && !isEl(x) && !CARD[x.id].noKick ? q : -1).filter(q => q >= 0); if (c2.length) kickOut(s, ei, c2[Math.floor(rnd() * c2.length)]); }
         const c3 = p.board.map((x, q) => x && !isFixed(x) && !isEl(x) && !CARD[x.id].noKick ? q : -1).filter(q => q >= 0); if (c3.length) kickOut(s, pi, c3[Math.floor(rnd() * c3.length)]); break; }
       case 'a_taxi': { const x = p.board[t.i]; if (!x) break; p.board[t.i] = null; ev(s, { t:'taxi', side:pi, i:t.i, id:x.id }); buryItems(s, pi, x);

@@ -902,3 +902,7 @@ Hősképesség-ötletek a táblázatban (még nem zöldek, nincsenek beépítve)
 - **2026-10-28 (Tomi):** **Krisz, éjfél után** új értékek: **3 energia, 3/3** (5 · 5/2 helyett); **ha kidobják, Baszóként kerül vissza a kézbe** (`kickTo:'c_baszo'`) – a Baszó új lapként érkezik, **nem drágul** (5 energia); éjfél után **+1/+1, Izom, Lendület**. Új, nem gyűjthető lap: **Baszó** (`c_baszo`, epikus, 5 energia, 6/5, `token` + `kickBack` – kidobáskor / visszavételkor is visszajön a kézbe; Tomi képe); éjfél után **Izom, Lendület, Igézhetetlen**.
 - **Kidobás célzása (2026-10-28):** a **Peaches Portás** (kézből) és a **P.G.** (kijátszáskor) már nem véletlen ellenséget dob ki, hanem **te választod ki – akár a saját karakteredet is** (`playTgt:'kick'`; Pifti, igézhetetlen és rögzített nem célozható). Így pl. a saját Krisz, éjfél utánodat kidobva Baszót kapsz. A P.G. éjfél utáni második kidobása, Boros, a Kidobtak minket! továbbra is véletlen ellenség.
 - Mérés (bot): Krisz é.u. 3-as helyen 56,2% (régi 52,1%); Portás 4–6-os helyen 59,5% (régi 56,5%), P.G. 64,8% (régi 62,0%) – a célzás erősít rajtuk, a Peaches-egyensúly még hátravan.
+
+## Új Peaches lap: Kérlek, hagyd el a szórakozóhelyet (2026-10-28, Tomi; teszt)
+- `a_hagyd`, ritka akció, 3 energia (`tgt:'kick'`): kidob egy általad választott karaktert – ellenségest vagy a sajátodat is (vissza a gazdája kezébe, a szokásos +1 költséggel; Pifti, igézhetetlen, rögzített nem célozható). A saját Krisz, éjfél utánodon Baszót ad. Tomi képe. Teszt: pc_test.
+

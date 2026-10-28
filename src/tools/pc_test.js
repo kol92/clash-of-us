@@ -121,4 +121,8 @@ const B = s => s.players[0].board;
 { const s = G(); play(s, 0, 'c_pc_krisz', { k: 'slot', side: 0, i: 0 }); ok(B(s)[0].atk === 4 && B(s)[0].hp === 4 && B(s)[0].haste && B(s)[0].muscle, 'Krisz é.u. éjfél után: 4/4, Lendület, Izom');
   play(s, 0, 'c_baszo', { k: 'slot', side: 0, i: 1 }); ok(B(s)[1].atk === 6 && B(s)[1].muscle && B(s)[1].haste && B(s)[1].elusive, 'Baszó éjfél után: Izom, Lendület, Igézhetetlen');
   play(s, 1, 'c_portas', { k: 'slot', side: 1, i: 0, t2: { side: 0, i: 1 } }); ok(B(s)[1], 'Baszó igézhetetlen: nem célozható kidobással'); }
+{ const s = G(); play(s, 1, 'c_vajda', { k: 'slot', side: 1, i: 1 }); play(s, 0, 'c_pc_krisz', { k: 'slot', side: 0, i: 0 });
+  ok(E.targetsFor(s, 0, 'a_hagyd').some(t => t.side === 0) && E.targetsFor(s, 0, 'a_hagyd').some(t => t.side === 1), 'Hagyd el: saját és ellenséges célpont is');
+  play(s, 0, 'a_hagyd', { k: 'unit', side: 1, i: 1 }); ok(!s.players[1].board[1] && s.players[1].hand.some(h => h.id === 'c_vajda' && h.kickN === 1), 'Hagyd el: az ellenséget kidobja (drágul)');
+  play(s, 0, 'a_hagyd', { k: 'unit', side: 0, i: 0 }); ok(!B(s)[0] && s.players[0].hand.some(h => h.id === 'c_baszo'), 'Hagyd el a saját Kriszen: Baszó a kézbe'); }
 console.log(fails ? 'HIBÁK: ' + fails : 'PEACHES 2 OK');
