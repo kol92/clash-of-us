@@ -2612,7 +2612,7 @@ body.has-tbar #app{height:calc(var(--apph,100%) - var(--tbar,0px));}   /* teszt 
 <script src="vendor/firebase-auth-compat.js"></script>
 <script src="vendor/firebase-firestore-compat.js"></script>
 <script src="vendor/firebase-database-compat.js"></script>
-<script>window.APP_VERSION = "2026.10.28-1106"; window.APP_BUILD = "2026.10.28-1724";</script>
+<script>window.APP_VERSION = "2026.10.28-2156"; window.APP_BUILD = "2026.10.28-2156";</script>
 <script>// ===== Best of Us – saját szerver (Firebase) =====
 // A játék eredetileg a Claude-os tárolót használta (window.claude.use('db' | 'user' | 'room')).
 // Ez a fájl ugyanazt a felületet adja Firebase-ből, így a játék kódja szinte változatlan maradhat:
@@ -3104,6 +3104,7 @@ const HERO = Object.fromEntries(HEROES.map(h => [h.id, h]));
 const PASSIVE = { firstCharAtk:'barna', endHeal:'gabi', firstTwo:'krisz', itemHp:'tomi', regular:'david', bigHp:'bence', deathPing:'milo', extraDraw:'laci', teamPing:'sasi', wildParty:'laszy', midnightPlus:'laszy' };
 /* Laszy: az „Éjfél után” hatások +1-gyel erősebbek (+1/+1, +1 sebzés vagy +1 gyógyítás) – a Peaches lapok ezt használják: midBonus(p) */
 const midBonus = p => has(p, 'midnightPlus') ? 1 : 0;
+const setOk = x => !(x.set && typeof setLive === 'function' && !setLive(x.set));   /* véletlen lap-készletek: még meg nem jelent szett lapja nem jöhet (2026-10-28, Peaches Jäger a parti lelkénél élesben) */
 const ALINA_POOL = () => CARDS.filter(c => c.type === 'char' && c.cost === 1 && !c.token && !c.hero && !c.variantOf && !c.off && !c.enemySide && !c.mid && !c.sneak && !c.invis && (!c.set || c.set === 'ah' || c.set === 'pc')).map(c => c.id);   /* Láthatatlan álca nem: azt nem lehetne megütni */
 const realId = u => u && u.alina && !u.alinaOn ? 'c_alina' : u && u.id;   /* Alina álcában: a valódi lap */
 function alinaTrap(s, side, i) {   /* CSAPDA: az álca lehull – 5/1-es Alina (a rajta lévő eszközök bónusza megmarad) */
@@ -3113,7 +3114,7 @@ function alinaTrap(s, side, i) {   /* CSAPDA: az álca lehull – 5/1-es Alina (
 }
 const MIDNIGHT = 6;   /* „Éjfél után”: a 6. kör elejétől (mindkét játékosnál ugyanakkor) – 2026-10-24, Tomi (eredetileg 8) */
 const isMidnight = s => Math.ceil(s.half / 2) >= MIDNIGHT;
-const DRINK_POOL = () => CARDS.filter(x => x.drink && x.type !== 'char' && !x.variantOf && !x.token && !x.off).map(x => x.id);   /* Peaches helyszín, Korlátlan italfogyasztás */
+const DRINK_POOL = () => CARDS.filter(x => x.drink && x.type !== 'char' && !x.variantOf && !x.token && !x.off && setOk(x)).map(x => x.id);   /* Peaches helyszín, Korlátlan italfogyasztás */
 const locOwn = (s, id, pi) => locIs(s, id) && (s.location.owner === pi || isReg(s, pi));
 function kickOut(s, side, j) {   /* Kidobás: a karakter visszakerül a gazdája kezébe, az eszközei elvesznek */
   const x = s.players[side].board[j]; if (!x) return;
@@ -3469,7 +3470,7 @@ function playCard(s, pi, hi, t) {
       if (j >= 0) { p.board[j] = makeUnit(s, 'c_query', pi); ev(s, { t:'summon', side:pi, i:j, id:'c_query' }); }
     }
     if (bid(c.id) === 'c_kristof') {   // véletlen Ital lap a kézbe (nem kell birtokolni, csak erre a meccsre)
-      const pool = CARDS.filter(x => x.drink && !x.variantOf && !x.token);
+      const pool = CARDS.filter(x => x.drink && !x.variantOf && !x.token && !x.off && setOk(x));
       const d = pool[Math.floor(rnd() * pool.length)].id;
       ev(s, { t:'drinkgift', side:pi, i:t.i, id:d });
       addToHand(s, pi, d);
@@ -3817,7 +3818,7 @@ function playCard(s, pi, hi, t) {
 }
 
 // Tomi, a parti lelke: véletlen Ital véletlen ellenséges karakterre – minden ital a célpontra hat
-const PARTY_POOL = () => CARDS.filter(x => x.drink && !x.variantOf && !x.token && !x.noParty).map(x => x.id);   // noParty: nincs értelme ellenséges karakterre (pl. Espresso Martini)
+const PARTY_POOL = () => CARDS.filter(x => x.drink && !x.variantOf && !x.token && !x.noParty && !x.off && setOk(x)).map(x => x.id);   // noParty: nincs értelme ellenséges karakterre (pl. Espresso Martini)
 /* 2026-10-18 (Tomi): a gyógyító / erősítő italokat a saját oldal kapja, a pusztítókat az ellenség.
    Gyógyításnál a legkevesebb életű SÉRÜLT saját karakter vagy a saját hős kapja (ha senki sem sérült: a hős). */
 const PARTY_GOOD = { i_energiaital:1, i_vodkakancso:1, i_vodkasa:1, a_mangos:'heal', a_rehab:'heal', a_jager:1 };
@@ -4152,7 +4153,7 @@ function finishTurn(s) {
     cleanup(s);
   });
   if (locIs(s, 'l_coffeeshop') && s.winner == null) {   /* Coffee Shop: véletlen eszköz a soron lévő játékos paklijába */
-    const pool = CARDS.filter(x => x.type === 'item' && !x.token && !x.variantOf && !x.off && !x.shopOnly && !x.passOnly && !x.eventOnly).map(x => x.id);
+    const pool = CARDS.filter(x => x.type === 'item' && !x.token && !x.variantOf && !x.off && !x.shopOnly && !x.passOnly && !x.eventOnly && setOk(x)).map(x => x.id);
     const id = pool[Math.floor(rnd() * pool.length)]; p.deck.push(id); shuffle(p.deck); ev(s, { t:'coffee', side:pi, i:-1, id });
   }
   for (let k = p.hand.length - 1; k >= 0 && s.winner == null; k--) {   /* Bong: akinél a köre végén a kezében maradt, eldobja és sebződik */

@@ -891,3 +891,6 @@ Hősképesség-ötletek a táblázatban (még nem zöldek, nincsenek beépítve)
 - Ellenőrizve: 390×844, 760×1000, 1024×768, 1180×820; üres listák és hosszú nevek is.
 - **Season Pass:** balra ragadós fejléc (szezon, szint, XP-csík, Mind átveszem), jobbra a szintek `minmax(340px,1fr)` rácsban (1180 px-en 2 oszlop, 1024 px-en 1 széles oszlop – így a hosszú jutalomnevek nem törnek össze), alattuk az XP-leírás; a függőleges összekötő vonal széles nézetben rejtve.
 
+## Javítás: Peaches italok idő előtt (2026-10-28 este)
+- Élesben Tomi, a parti lelke Jägermeistert (Peaches ital) osztott ki – a véletlen lap-készletek a még meg nem jelent szettet nem szűrték. Most `setOk(x)` (engine.js) minden véletlen készletben: parti lelke, Kristóf itala, Peaches helyszín / pultos / Korlátlan italfogyasztás, Coffee Shop eszköz – a szett csak a megjelenésétől (`setLive`) jöhet.
+
