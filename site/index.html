@@ -7680,7 +7680,7 @@ function botDeckFor(hero, lv, rnd = Math.random) {
 }
 // [DECKHELP-END]
 function allDecks() {
-  const starters = Object.entries(DECKS).filter(([, d]) => !d.set || setLive(d.set)).map(([id, d]) => ({ id, name: d.name, desc: d.desc, hero: d.hero, list: upgradeList(d.list), starter: true, set: d.set, free: !!d.free, loanMax: d.loanMax }));   /* szett-kezdőpakli csak a megjelenéstől */
+  const starters = Object.entries(DECKS).filter(([, d]) => (!d.set || setLive(d.set)) && !(d.set === 'ah' && setLive('pc')))   /* a Peaches megjelenésétől az Amsterdam kölcsönpaklik eltűnnek (Tomi, 2026-10-28) */.map(([id, d]) => ({ id, name: d.name, desc: d.desc, hero: d.hero, list: upgradeList(d.list), starter: true, set: d.set, free: !!d.free, loanMax: d.loanMax }));   /* szett-kezdőpakli csak a megjelenéstől */
   return starters.concat(Store.p ? Store.p.decks : []);
 }
 /* pakli-sorrend (2026-10-28): saját paklik → a legújabb szett kölcsönpaklijai (Peaches) → Laszy → Amsterdam → alap kezdőpaklik; a sorrenden belül stabil */
