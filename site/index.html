@@ -1729,10 +1729,8 @@ button.rk-row:active{transform:scale(.98);}
 .g-side{display:none;}
 /* Széles nézet a Gyűjteményben, a Paklik listában és a pakliszerkesztőben is (2026-10-13, Laci kérése) */
 @media (min-width:1000px) and (min-height:600px) and (min-aspect-ratio:5/4){
-  body[data-scr="scr-coll"] #app,body[data-scr="scr-decks"] #app,body[data-scr="scr-edit"] #app{max-width:min(100vw,1280px);}
-  body[data-scr="scr-coll"] .screen,body[data-scr="scr-decks"] .screen,body[data-scr="scr-edit"] .screen{padding-inline:28px;}
-  body[data-scr="scr-coll"] .coll-grid{grid-template-columns:repeat(auto-fill,minmax(138px,1fr));gap:20px 14px;}
-  body[data-scr="scr-coll"] .coll-grid .card{--cw:136px;}
+  body[data-scr="scr-decks"] #app,body[data-scr="scr-edit"] #app{max-width:min(100vw,1280px);}
+  body[data-scr="scr-decks"] .screen,body[data-scr="scr-edit"] .screen{padding-inline:28px;}
   body[data-scr="scr-decks"] .deck-list{grid-template-columns:repeat(auto-fill,minmax(360px,1fr));gap:14px;}
   body[data-scr="scr-decks"] #newDeck,body[data-scr="scr-decks"] #impDeck{max-width:560px;display:block;margin-inline:auto;}
   body[data-scr="scr-edit"] .ed-body{grid-template-columns:1fr 360px;gap:16px;}
@@ -2384,6 +2382,62 @@ html.pc-live body #scr-menu{background:linear-gradient(180deg,rgba(10,4,24,.15),
 html.pc-live body::before{background-image:url('art/ui/board-pc.webp?v=dd54e0e9');}
 html.pc-live body.in-game #scr-game::before{background-image:radial-gradient(ellipse 78% 72% at 50% 50%,rgba(2,8,11,.5),rgba(2,8,11,.32) 70%,rgba(2,8,11,0) 100%),url('art/ui/board-pc.webp?v=dd54e0e9');}
 html.pc-live #scr-game{background-image:radial-gradient(ellipse 78% 72% at 50% 50%,rgba(2,8,11,.5),rgba(2,8,11,.32) 70%,rgba(2,8,11,0) 100%),url('art/ui/board-pc.webp?v=dd54e0e9');}
+
+/* ===== Reszponzív pakliválasztó és gyűjtemény (2026-10-28, Tomi – iPad) =====
+   Mobilon (és keskeny / osztott ablakban) minden a régi egy oszlop. Széles, fekvő nézetben:
+   a háttér a teljes képernyőt kitölti (body::before), a tartalom egy átlátszó, legfeljebb 1280 px-es, középre rendezett konténer. */
+.pick-sel{display:none;}
+.cf-h{display:block;margin:2px 2px 0;font:900 10.5px var(--body);letter-spacing:.08em;text-transform:uppercase;color:var(--gold);}
+.cf-panel{display:grid;grid-template-columns:minmax(0,1fr);gap:6px;}
+.cf-panel>*{min-width:0;}
+.cf-toggle{display:flex;align-items:center;justify-content:center;gap:6px;min-height:36px;padding:0 14px;border-radius:12px;border:1px solid rgba(214,180,106,.45);background:rgba(10,28,40,.85);color:#e8f1f7;font:800 13px var(--body);cursor:pointer;}
+.cf-toggle b{min-width:20px;padding:1px 6px;border-radius:999px;background:var(--gold);color:#2a1b00;font-size:11px;}
+.cf-toggle[aria-expanded="true"]{border-color:var(--gold);}
+.coll-filters:not(.open) .cf-panel{display:none;}
+.coll-filters .cf-top{display:grid;grid-template-columns:minmax(0,1fr);gap:8px;align-items:center;}
+.coll-filters .cf-toggle{justify-self:start;}
+.cf-panel .cf-row.r-set{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));}
+body.has-tbar #app{height:calc(var(--apph,100%) - var(--tbar,0px));}   /* teszt sáv: ne takarjon el semmit */
+@media (min-width:900px) and (min-height:560px) and (min-aspect-ratio:5/4){
+  body[data-scr="scr-pick"] #app,body[data-scr="scr-coll"] #app{max-width:min(100vw,1280px);background:none;box-shadow:none;}
+  body[data-scr="scr-pick"] .top,body[data-scr="scr-coll"] .top{background:linear-gradient(180deg,rgba(9,30,36,.97) 75%,rgba(9,30,36,0));}
+  /* -- pakliválasztó: balra a lista (helytől függően 1–2 oszlop), jobbra a kiválasztott pakli panelje -- */
+  body[data-scr="scr-pick"] #scr-pick{display:grid;grid-template-columns:minmax(0,1fr) clamp(300px,30vw,380px);grid-template-areas:"top top" "note side" "list side";column-gap:clamp(18px,2.4vw,32px);align-content:start;padding-inline:clamp(16px,2.6vw,32px);}
+  body[data-scr="scr-pick"] #scr-pick>.top{grid-area:top;} body[data-scr="scr-pick"] #scr-pick>.pick-note{grid-area:note;}
+  body[data-scr="scr-pick"] #scr-pick>.deck-pick{grid-area:list;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));gap:10px 16px;align-content:start;padding-bottom:24px;}
+  body[data-scr="scr-pick"] #scr-pick>.pick-go{grid-area:side;position:sticky;top:76px;bottom:auto;align-self:start;margin:0 0 20px;padding:16px;border-radius:18px;
+    background:linear-gradient(170deg,rgba(22,64,75,.96),rgba(8,24,30,.96));border:1px solid rgba(214,180,106,.4);box-shadow:0 12px 30px rgba(0,0,0,.45);
+    max-height:calc(var(--apph,100vh) - var(--tbar,0px) - 96px);overflow-y:auto;}
+  body[data-scr="scr-pick"] .pick-sel{display:grid;grid-template-columns:96px minmax(0,1fr);gap:4px 12px;align-items:start;margin-bottom:12px;}
+  body[data-scr="scr-pick"] .pick-sel .ps-hero{grid-row:1/4;width:96px;height:128px;border-radius:10px;background-size:cover;background-position:50% 15%;box-shadow:0 0 0 2px rgba(214,180,106,.6),0 6px 14px rgba(0,0,0,.5);}
+  body[data-scr="scr-pick"] .pick-sel b{font:400 21px/1.15 var(--display);color:#fff;}
+  body[data-scr="scr-pick"] .pick-sel em{font-style:normal;font-weight:900;color:var(--gold);font-size:14px;}
+  body[data-scr="scr-pick"] .pick-sel .ps-tag{font-size:12px;font-weight:800;color:#ffe08a;}
+  body[data-scr="scr-pick"] .pick-sel p{grid-column:1/-1;margin:6px 0 0;font-size:13.5px;line-height:1.45;color:#d7e6ee;}
+  body[data-scr="scr-pick"] .pick-sel p.ps-desc{color:var(--mute);font-size:13px;}
+  body[data-scr="scr-pick"] .pick-sel p.ps-bad{color:#ff9a8a;font-weight:800;}
+  body[data-scr="scr-pick"] .deck-opt.dp b{font-size:19px;} body[data-scr="scr-pick"] .deck-opt.dp small{font-size:12px;}
+  /* -- gyűjtemény: balra a szűrőpanel, jobbra a kereső és a kártyarács -- */
+  body[data-scr="scr-coll"] #scr-coll{display:grid;grid-template-columns:clamp(250px,24vw,300px) minmax(0,1fr);grid-template-areas:"top top" "filt srch" "filt body";column-gap:clamp(18px,2.4vw,32px);align-content:start;padding-inline:clamp(16px,2.6vw,32px);}
+  body[data-scr="scr-coll"] #scr-coll>.top{grid-area:top;}
+  body[data-scr="scr-coll"] #collFilters{display:contents;}
+  body[data-scr="scr-coll"] .coll-filters .cf-top{grid-area:srch;grid-template-columns:minmax(0,460px);margin:4px 0 6px;}
+  body[data-scr="scr-coll"] .cf-search{max-height:none;}
+  body[data-scr="scr-coll"] .cf-toggle{display:none;}
+  body[data-scr="scr-coll"] .coll-filters .cf-panel{display:grid;grid-area:filt;align-self:start;position:sticky;top:76px;gap:7px;padding:14px 12px;border-radius:16px;
+    background:linear-gradient(170deg,rgba(22,64,75,.92),rgba(8,24,30,.92));border:1px solid rgba(214,180,106,.35);max-height:calc(var(--apph,100vh) - var(--tbar,0px) - 96px);overflow-y:auto;}
+  body[data-scr="scr-coll"] .cf-panel .cf-row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px;}
+  body[data-scr="scr-coll"] .cf-panel .cf-row.r-set{grid-template-columns:minmax(0,1fr);}
+  body[data-scr="scr-coll"] .cf-panel .cf-row.r-rar{grid-template-columns:repeat(4,minmax(0,1fr));}
+  body[data-scr="scr-coll"] .cf-panel .cf-row.r-cost{grid-template-columns:repeat(3,minmax(0,1fr));}
+  body[data-scr="scr-coll"] .cf-panel .cf-chip{height:34px;font-size:12px;}
+  body[data-scr="scr-coll"] .cf-panel .cf-clear{justify-self:start;margin-top:4px;}
+  body[data-scr="scr-coll"] #collBody{grid-area:body;min-width:0;}
+  body[data-scr="scr-coll"] #collBody .bk-btn,body[data-scr="scr-coll"] #collBody .dupe-btn{display:inline-flex;width:auto;max-width:100%;margin:8px 10px 4px 0;vertical-align:middle;white-space:nowrap;}
+  body[data-scr="scr-coll"] .coll-grid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:22px 14px;}
+  body[data-scr="scr-coll"] .coll-grid .card{--cw:148px;}
+  body[data-scr="scr-pick"] .pick-note,body[data-scr="scr-coll"] .coll-sum{color:#c9dbe4;text-shadow:0 1px 3px #000;}
+}
 </style>
 </head>
 <body>
@@ -2417,7 +2471,7 @@ html.pc-live #scr-game{background-image:radial-gradient(ellipse 78% 72% at 50% 5
     <div class="top"><button class="back" data-back aria-label="Vissza">‹</button><h2>Válassz paklit</h2></div>
     <p class="pick-note">A hőst a pakli határozza meg. Saját paklit és hőst a Paklik menüben állíthatsz össze.</p>
     <div class="deck-pick" id="deckPick"></div>
-    <div class="pick-go"><div class="bot-lv" id="botLvRow" hidden><span class="bl-lbl">🤖 Bot erőssége</span><div class="seg" role="group" aria-label="Bot erőssége"><button data-lv="1">😊 Könnyű</button><button data-lv="2">Normál</button><button data-lv="3">😈 Nehéz</button></div><small></small></div><label class="rk-botrow" id="rkBotRow" hidden><input type="checkbox" checked><span><b>🤖 Bot ellen is mehet</b><small></small></span></label><button class="btn primary" id="startBtn" style="width:100%">Meccs indítása</button></div>
+    <div class="pick-go"><div class="pick-sel" id="pickSel" aria-live="polite"></div><div class="bot-lv" id="botLvRow" hidden><span class="bl-lbl">🤖 Bot erőssége</span><div class="seg" role="group" aria-label="Bot erőssége"><button data-lv="1">😊 Könnyű</button><button data-lv="2">Normál</button><button data-lv="3">😈 Nehéz</button></div><small></small></div><label class="rk-botrow" id="rkBotRow" hidden><input type="checkbox" checked><span><b>🤖 Bot ellen is mehet</b><small></small></span></label><button class="btn primary" id="startBtn" style="width:100%">Meccs indítása</button></div>
   </section>
 
   <section class="screen" id="scr-coll" hidden>
@@ -2561,7 +2615,7 @@ html.pc-live #scr-game{background-image:radial-gradient(ellipse 78% 72% at 50% 5
 <script src="vendor/firebase-auth-compat.js"></script>
 <script src="vendor/firebase-firestore-compat.js"></script>
 <script src="vendor/firebase-database-compat.js"></script>
-<script>window.APP_VERSION = "2026.10.28-0750"; window.APP_BUILD = "2026.10.28-1623";</script>
+<script>window.APP_VERSION = "2026.10.28-0750"; window.APP_BUILD = "2026.10.28-1646";</script>
 <script>// ===== Best of Us – saját szerver (Firebase) =====
 // A játék eredetileg a Claude-os tárolót használta (window.claude.use('db' | 'user' | 'room')).
 // Ez a fájl ugyanazt a felületet adja Firebase-ből, így a játék kódja szinte változatlan maradhat:
@@ -4854,6 +4908,11 @@ function renderPick() {
       <button class="dp-more${open ? ' open' : ''}" data-more="${d.id}" aria-expanded="${open}" aria-label="Részletek: ${escH(d.name)}"></button>
       ${open ? `<div class="dp-detail"><p><b>${h ? h.name : ''}:</b> ${h ? h.text : ''}</p><p>${d.starter ? d.desc : 'Saját pakli.'}</p></div>` : ''}</div>`; }).join('');
   $('#deckPick').querySelectorAll('.deck-opt b').forEach((b, i) => b.textContent = ds[i].name);
+  { const d = ds.find(x => x.id === ui.deck), ps = $('#pickSel');   /* széles nézet: a kiválasztott pakli panelje (2026-10-28) */
+    if (ps) { const h = d && HERO[d.hero], prob = d && deckIssue(d);
+      ps.innerHTML = d ? `${heroPortrait(d.hero, 'ps-hero')}<b></b><em>${h ? h.name : 'Nincs hős'}</em>${isLoan(d) ? `<span class="ps-tag">${loanTag(d)}</span>` : '<span></span>'}
+        ${h ? `<p>${h.text}</p>` : ''}<p class="ps-desc"></p>${prob ? `<p class="ps-bad">Nem játszható: ${escH(prob)}</p>` : ''}` : '';
+      if (d) { ps.querySelector('b').textContent = d.name; ps.querySelector('.ps-desc').textContent = d.starter ? d.desc : 'Saját pakli.'; } } }
 }
 $('#deckPick').onclick = e => { const m = e.target.closest('[data-more]'); if (m) { ui.deckOpen = ui.deckOpen === m.dataset.more ? null : m.dataset.more; renderPick(); return; } const b = e.target.closest('[data-d]'); if (b && b.dataset.loanout) { loanOutModal(allDecks().find(x => x.id === b.dataset.d)); return; } if (b) { ui.deck = b.dataset.d; renderPick(); } };
 $('#startBtn').onclick = () => { const d = allDecks().find(x => x.id === ui.deck); if (!d || deckIssue(d)) return;
@@ -4888,15 +4947,20 @@ function cfMatch(c) {
 function renderCollFilters() {
   const el = $('#collFilters'); if (!el) return;
   const chip = (grp, val, inner, on, label) => `<button class="cf-chip${on ? ' on' : ''}" data-cf="${grp}" data-v="${val}" aria-pressed="${on}" aria-label="${label}">${inner}</button>`;
-  el.innerHTML = `<label class="cf-search"><span class="sr-only">Keresés</span><input id="cfQ" type="search" placeholder="Keresés…" value="${escH(CF.q)}" autocomplete="off"></label>
-    <div class="cf-row">${cfSets().map(([k, n]) => chip('set', k, `<span class="lbl-t">${k === 'hw' ? '🎃 ' : k === 'ah' ? '🌷 ' : k === 'pc' ? '🍑 ' : ''}${n}</span>`, CF.set.has(k), n + ' szett')).join('')}</div>
-    <div class="cf-row">${CF_TYPES.map(([k, n]) => chip('type', k, `<img src="art/ui/ic-type-${k}.webp" alt=""><span class="lbl-t">${n}</span>`, CF.type.has(k), n)).join('')}</div>
-    <div class="cf-row">${CF_RARS.map(([k, n]) => chip('rar', k, `<i class="rar r-${k}"></i>`, CF.rar.has(k), n)).join('')}
+  const nAct = CF.type.size + CF.rar.size + CF.cost.size + CF.set.size + (CF.own ? 1 : 0);
+  el.classList.toggle('open', !!ui.cfOpen);
+  el.innerHTML = `<div class="cf-top"><label class="cf-search"><span class="sr-only">Keresés</span><input id="cfQ" type="search" placeholder="Keresés…" value="${escH(CF.q)}" autocomplete="off"></label>
+    <button class="cf-toggle" data-cftoggle aria-expanded="${!!ui.cfOpen}">⚙️ Szűrők${nAct ? ` <b>${nAct}</b>` : ''}</button></div>
+    <div class="cf-panel"><span class="cf-h">Kiegészítő</span>
+    <div class="cf-row r-set">${cfSets().map(([k, n]) => chip('set', k, `<span class="lbl-t">${k === 'hw' ? '🎃 ' : k === 'ah' ? '🌷 ' : k === 'pc' ? '🍑 ' : ''}${n}</span>`, CF.set.has(k), n + ' szett')).join('')}</div>
+    <span class="cf-h">Típus</span><div class="cf-row">${CF_TYPES.map(([k, n]) => chip('type', k, `<img src="art/ui/ic-type-${k}.webp" alt=""><span class="lbl-t">${n}</span>`, CF.type.has(k), n)).join('')}</div>
+    <span class="cf-h">Ritkaság · birtoklás</span><div class="cf-row r-rar">${CF_RARS.map(([k, n]) => chip('rar', k, `<i class="rar r-${k}"></i>`, CF.rar.has(k), n)).join('')}
       ${chip('own', 'have', '<img src="art/ui/ic-owned.webp?v=db13b2f4" alt="">', CF.own === 'have', 'Megvan')}${chip('own', 'miss', '<img src="art/ui/ic-missing.webp?v=a815545d" alt="">', CF.own === 'miss', 'Hiányzik')}</div>
-    <div class="cf-row">${CF_COSTS.map(k => chip('cost', k, `<span class="lbl-t">⚡${k}</span>`, CF.cost.has(k), k + ' energia')).join('')}</div>
-    ${cfActive() ? '<button class="cf-clear" data-cfclear>✕ Szűrők törlése</button>' : ''}`;
+    <span class="cf-h">Energia</span><div class="cf-row r-cost">${CF_COSTS.map(k => chip('cost', k, `<span class="lbl-t">⚡${k}</span>`, CF.cost.has(k), k + ' energia')).join('')}</div>
+    ${cfActive() ? '<button class="cf-clear" data-cfclear>✕ Szűrők törlése</button>' : ''}</div>`;
   const q = $('#cfQ'); q.oninput = () => { CF.q = q.value.trim(); renderColl(true); const cl = el.querySelector('[data-cfclear]'); if (!!cl !== !!cfActive()) { renderCollFilters(); $('#cfQ').focus(); } };
   el.onclick = e => {
+    if (e.target.closest('[data-cftoggle]')) { ui.cfOpen = !ui.cfOpen; renderCollFilters(); return; }
     if (e.target.closest('[data-cfclear]')) { CF.q = ''; CF.type.clear(); CF.rar.clear(); CF.cost.clear(); CF.set.clear(); CF.own = ''; renderCollFilters(); renderColl(true); return; }
     const b = e.target.closest('[data-cf]'); if (!b) return;
     const g = b.dataset.cf, v = b.dataset.v;
@@ -6642,6 +6706,7 @@ function testBanner() {   /* teszt oldal jelzése + profil újramásolása */
   b.querySelector('[data-reset]').onclick = () => { if (!confirm('Visszaállítod a teszt profilt az éles profilod mostani másolatára? A teszten szerzett dolgok elvesznek.')) return;
     try { localStorage.removeItem(LS_KEY); } catch {} location.reload(); };
   document.body.appendChild(b);
+  document.body.classList.add('has-tbar'); const fit = () => document.documentElement.style.setProperty('--tbar', b.offsetHeight + 'px'); fit(); addEventListener('resize', fit);   /* a sáv helye fenntartva (2026-10-28) */
 }
 /* TESZT OLDAL (2026-10-16, Tomi kérése): ezek a profilok (név szerint, kisbetűvel) a teszt oldalon minden gyűjthető lapot megkapnak
    (legendásból 1, a többiből 2 példány; bolti, Pass-, event- és változat-lapokkal együtt). Minden betöltéskor lefut, így az új lapokat is megkapják.
