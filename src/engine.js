@@ -254,7 +254,7 @@ function kickOut(s, side, j) {   /* Kidobás: a karakter visszakerül a gazdája
   if ((x.items || []).includes('i_purple')) { ev(s, { t:'purple', side, i:j }); return; }   /* Peaches Purple Card: nem dobható ki */
   reveal(s, side, j); s.players[side].board[j] = null; ev(s, { t:'kickout', side, i:j, id:x.id }); buryItems(s, side, x);
   const back = CARD[bid(x.id)].kickTo || realId(x);   /* Krisz, éjfél után → Baszó (2026-10-28) */
-  if ((!CARD[x.id].token || CARD[x.id].kickBack) && addToHand(s, side, back, x.foil)) { const h = s.players[side].hand[s.players[side].hand.length - 1]; h.kickN = (x.kickN || 0) + 1; ev(s, { t:'kickcost', side, i:-1, id:x.id, n:h.kickN }); }   /* minden kidobás után 1-gyel drágább (2026-10-24, Tomi) */
+  if ((!CARD[x.id].token || CARD[x.id].kickBack) && addToHand(s, side, back, x.foil) && !CARD[bid(x.id)].kickTo) { const h = s.players[side].hand[s.players[side].hand.length - 1]; h.kickN = (x.kickN || 0) + 1; ev(s, { t:'kickcost', side, i:-1, id:x.id, n:h.kickN }); }   /* a Krisz helyett érkező Baszó új lap: nem drágul (2026-10-28) */   /* minden kidobás után 1-gyel drágább (2026-10-24, Tomi) */
 }
 function midOn(s, pi, j) {   /* egy „Éjfél után” karakter bekapcsol (egyszer); Laszy hősnél +1-gyel erősebb */
   const p = s.players[pi], u = p.board[j]; if (!u || !CARD[u.id].mid || u.midOn) return; u.midOn = true;

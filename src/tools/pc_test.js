@@ -117,7 +117,7 @@ const B = s => s.players[0].board;
   ok(!B(s)[1] && s.players[0].hand.some(h => h.id === 'c_gyuri'), 'Portás: a saját karakteredet is kidobhatod'); }
 { const s = G('tomi', 3); play(s, 0, 'c_pc_krisz', { k: 'slot', side: 0, i: 0 }); ok(B(s)[0].atk === 3 && B(s)[0].hp === 3, 'Krisz é.u. éjfél előtt 3/3');
   play(s, 0, 'c_portas', { k: 'slot', side: 0, i: 1, t2: { side: 0, i: 0 } }); ok(!B(s)[0] && s.players[0].hand.some(h => h.id === 'c_baszo'), 'Krisz é.u. kidobva → Baszó a kézbe');
-  const h = s.players[0].hand.find(h => h.id === 'c_baszo'); ok(E.cardCost(s, 0, 'c_baszo', h) === 6, `Baszó: 5 + 1 (kidobás) energia (${E.cardCost(s, 0, 'c_baszo', h)})`); }
+  const h = s.players[0].hand.find(h => h.id === 'c_baszo'); ok(E.cardCost(s, 0, 'c_baszo', h) === 5, `Baszó új lapként: 5 energia, nem drágul (${E.cardCost(s, 0, 'c_baszo', h)})`); }
 { const s = G(); play(s, 0, 'c_pc_krisz', { k: 'slot', side: 0, i: 0 }); ok(B(s)[0].atk === 4 && B(s)[0].hp === 4 && B(s)[0].haste && B(s)[0].muscle, 'Krisz é.u. éjfél után: 4/4, Lendület, Izom');
   play(s, 0, 'c_baszo', { k: 'slot', side: 0, i: 1 }); ok(B(s)[1].atk === 6 && B(s)[1].muscle && B(s)[1].haste && B(s)[1].elusive, 'Baszó éjfél után: Izom, Lendület, Igézhetetlen');
   play(s, 1, 'c_portas', { k: 'slot', side: 1, i: 0, t2: { side: 0, i: 1 } }); ok(B(s)[1], 'Baszó igézhetetlen: nem célozható kidobással'); }
