@@ -930,3 +930,5 @@ Hősképesség-ötletek a táblázatban (még nem zöldek, nincsenek beépítve)
   - **Milo – Utolsó kör a Peachesben** (pc_milo): Gál Zoli, éjfél után ×2, Boros, éjfél után ×2, Barna, éjfél után ×2, Alina, Ani ×2, Utolsó kör ×2, Royal Vodka + Burn ×2, Hazafelé taxi, Tánctér, Gépüzemmód, Peaches Portás ×2, Pifti, a buli ördöge ×2
   - **Laci – Hajnali tánc** (pc_laci): Laci, éjfél után ×2, Flaming Lamborghini, Bloody Mary ×2, DJ, Gabi, éjfél után ×2, A pultos, JBL, Peaches Portás ×2, Pifti, a buli ördöge ×2, Dávid, éjfél után, P.G., Bence, éjfél után, Barna, éjfél után, Tomi, éjfél után, WC-s néni
   - **Sasi – Peaches-banda** (pc_sasi): Sasi, éjfél után ×2, Ani, A pultos ×2, Boros, éjfél után, Noémi, Pifti, a buli ördöge ×2, Gabi, éjfél után ×2, Tánctér, Utolsó kör ×2, Gluténbomba, Gál Zoli, éjfél után, Laci, éjfél után, Részeg idegen, Sorban állás, Dávid, éjfél után
+- **Pakliválasztó (2026-10-28):** sorrend: saját paklik → Peaches kölcsönpaklik → Laszy → (Amsterdam) → alap kezdőpaklik (`deckRank`). **A Peaches megjelenésétől az Amsterdam kölcsönpaklik eltűnnek** a választóból (`allDecks`, Tomi kérése) – a saját, Amsterdam-lapokból épített paklik maradnak.
+
