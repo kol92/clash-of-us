@@ -951,3 +951,12 @@ Hősképesség-ötletek a táblázatban (még nem zöldek, nincsenek beépítve)
 - **Teszt sáv:** a helye fenntartva (`body.has-tbar`, `--tbar`) – nem takar el semmit.
 - Ellenőrizve: 390×844, 600×820, 1024×768, 1180×820, 1366×1024.
 
+## Ranked, PvP, Barátok, Küldetések, Bolt – széles nézet (2026-10-28, Tomi – iPad; teszt)
+- A közös korlát a `#app{max-width:480px}` volt. `(min-width:900px) and (min-height:500px)` felett ezek az oldalak legfeljebb 1200 px-es, középre rendezett területet kapnak, egységes oldalmargóval; a háttér az elmosott asztal teljes képernyőn. Alatta (telefon, álló iPad, osztott képernyő, keskeny ablak) a régi mobilnézet.
+- **Ranked:** balra ragadós összefoglaló panel (jelvény 120 px, rang, csillagok, szezon, Ranked meccs gomb max. 300 px, tájékoztató), jobbra a jutalmak 2 oszlopban, alattuk a ranglista és a szabályok (`.rk-side` / `.rk-main`).
+- **PvP:** fent a két fő gomb egymás mellett (`.pv-acts`), alatta balra a futó meccsek + nyitott kihívások, jobbra a legutóbbi meccsek és a leírás (`.pv-cols`); kompakt üres állapotok.
+- **Barátok:** balra ragadós panel (kód, másolás, meghívó, jelölés – `.fr-side`), jobbra a lista; hosszú név kipontozva, a gombok 64×44 px-esek, jobbra igazítva.
+- **Küldetések:** a kategóriák (címmel és időzítéssel) külön, a kártyák kategórián belül 2 oszlopban (`#questBody` grid, a címek a teljes sort kapják).
+- **Bolt:** a csomagrács `minmax(240px,1fr)` (1024 px-en 3, 1180 px-en 4 oszlop, eredeti 3:4 arány), az egyenleg fent ragadós, az ajándék- és napi ingyen pack gombok, a heti láda és a „Limitált – lejjebb” gomb max. 640 px, középen.
+- Ellenőrizve: 390×844, 760×1000, 1024×768, 1180×820; üres listák és hosszú nevek is.
+

@@ -2578,20 +2578,20 @@ function renderPvp() {
     return `<div class="pv-row${pvpMyTurn(d) ? ' hot' : ''}">${heroOf(opP)}<div class="pv-txt"><b>${pvpWho(d, op)}</b><small>${sub}</small></div>${btn}</div>`; };
   const online = pvpOnline();
   body.innerHTML = `
-    <button class="btn primary pv-live" id="pvpQuick">⚡ Élő meccs keresése</button>
+    <div class="pv-acts"><div class="pv-sec"><button class="btn primary pv-live" id="pvpQuick">⚡ Élő meccs keresése</button>
     <p class="pv-online">${online === null ? '' : online.length ? `🟢 Most a PvP-ben: <b>${online.map(escH).join(', ')}</b>` : 'Most rajtad kívül senki sincs a PvP-ben – indíts keresést, és szólj a haveroknak!'}</p>
-    <button class="btn" id="pvpNew" ${myOpen.some(d => !d.live) ? 'disabled' : ''}>📨 Ráérős kihívás</button>
+    </div><div class="pv-sec"><button class="btn" id="pvpNew" ${myOpen.some(d => !d.live) ? 'disabled' : ''}>📨 Ráérős kihívás</button>
     ${myOpen.filter(d => !d.live).map(d => `<div class="pv-row mine">${heroOf(d.host)}<div class="pv-txt"><b>A kihívásod nyitva van</b><small>${HERO[d.host.hero]?.name} · ${escH(d.host.deckName || '')} · várja, hogy valaki elfogadja</small></div><button class="btn ghost" data-cancel="${d.id}">Visszavonom</button></div>`).join('')}
-    <div class="lbl">Folyamatban lévő meccseid</div>
+    </div></div><div class="pv-cols"><div class="pv-sec pv-left"><div class="lbl">Folyamatban lévő meccseid</div>
     ${mine.length ? mine.map(d => row(d, `<button class="btn ${pvpMyTurn(d) ? 'primary' : ''}" data-go="${d.id}">${pvpMyTurn(d) ? 'Te jössz!' : 'Megnézem'}</button>`,
         d.status === 'mull' ? 'Kezdő kéz választása' : `${Math.ceil((d.state?.half || 1) / 2)}. kör · te ${d.state?.players[pvpSideOf(d)].hp} ❤ · ő ${d.state?.players[1 - pvpSideOf(d)].hp} ❤ · ${ago(d.updated)}`)).join('')
       : '<p class="q-note">Nincs futó meccsed.</p>'}
     <div class="lbl">Nyitott kihívások</div>
     ${others.length ? others.map(d => `<div class="pv-row">${heroOf(d.host)}<div class="pv-txt"><b>${pvpWho(d, 0)}</b><small>${d.live ? '⚡ Élő meccsre vár · ' : ''}${HERO[d.host.hero]?.name} · ${ago(d.created)}</small></div><button class="btn primary" data-join="${d.id}">Elfogadom</button></div>`).join('')
       : '<p class="q-note">Most senki nem hív ki. Hozz létre egy kihívást, és szólj a haveroknak!</p>'}
-    ${done.length ? `<div class="lbl">Legutóbbi meccsek</div>${done.map(d => row(d, `<span class="pv-res ${d.winner === pvpSideOf(d) ? 'w' : d.winner === 'draw' ? 'd' : 'l'}">${d.winner === pvpSideOf(d) ? 'Nyertél' : d.winner === 'draw' ? 'Döntetlen' : 'Vesztettél'}</span>`, ago(d.updated))).join('')}` : ''}
+    </div><div class="pv-sec pv-right">${done.length ? `<div class="lbl">Legutóbbi meccsek</div>${done.map(d => row(d, `<span class="pv-res ${d.winner === pvpSideOf(d) ? 'w' : d.winner === 'draw' ? 'd' : 'l'}">${d.winner === pvpSideOf(d) ? 'Nyertél' : d.winner === 'draw' ? 'Döntetlen' : 'Vesztettél'}</span>`, ago(d.updated))).join('')}` : ''}
     <p class="q-note"><b>Élő meccs:</b> mint a Hearthstone – egyszerre vagytok bent, ${TURN_SEC} mp egy kör, a Kör vége gomb alatt fogy az idő. Ha valakinek kétszer lejár az ideje úgy, hogy nincs ott, elveszti a meccset. Menet közben gyors üzeneteket (💬) is küldhettek.</p>
-    <p class="q-note"><b>Ráérős kihívás:</b> nem kell egyszerre fent lennetek. Lépj, aztán a barátod akkor folytatja, amikor ráér – a menüben jelezzük, ha te jössz. A PvP-meccs is ad coint, küldetés-haladást és Season Pass XP-t.</p>`;
+    <p class="q-note"><b>Ráérős kihívás:</b> nem kell egyszerre fent lennetek. Lépj, aztán a barátod akkor folytatja, amikor ráér – a menüben jelezzük, ha te jössz. A PvP-meccs is ad coint, küldetés-haladást és Season Pass XP-t.</p></div></div>`;
   body.onclick = e => {
     const b = e.target.closest('button'); if (!b) return;
     if (b.id === 'pvpNew') return pvpPickDeck('Melyik paklival hívod ki őket?', pvpCreate);
@@ -3242,10 +3242,10 @@ function renderFriends() {
   const av = n => `<span class="fr-av">${escH((n || '?').trim().charAt(0).toUpperCase())}</span>`;
   const mini = c => `<span class="fr-mini">${cardHTML(c.id, { foil: c.foil })}</span>`;
   body.innerHTML = `
-    <div class="fr-code"><div><small>A te barátkódod</small><b>${frCode(me)}</b></div><button class="btn" data-copy>Másolás</button></div>
+    <div class="fr-side"><div class="fr-code"><div><small>A te barátkódod</small><b>${frCode(me)}</b></div><button class="btn" data-copy>Másolás</button></div>
     <button class="btn primary fr-share" data-share>📤 Meghívó küldése</button>
     <p class="q-note fr-share-note">Aki a linkeddel regisztrál, automatikusan a barátod lesz.</p>
-    <form class="fr-add" autocomplete="off"><input id="frIn" maxlength="7" placeholder="Barát kódja" autocapitalize="characters" spellcheck="false"><button class="btn primary">Jelölés</button></form>
+    <form class="fr-add" autocomplete="off"><input id="frIn" maxlength="7" placeholder="Barát kódja" autocapitalize="characters" spellcheck="false"><button class="btn primary">Jelölés</button></form></div><div class="fr-main">
     ${chIn.length ? `<div class="lbl">⚔️ Kihívtak</div>${chIn.map(d => `<div class="pv-row hot">${av(d.host?.name)}<div class="pv-txt"><b>${escH(d.host?.name || '')}</b><small>Élő meccsre vár · ${escH(HERO[d.host?.hero]?.name || '')}</small></div><button class="btn primary" data-chacc="${d.id}">Elfogadom</button></div>`).join('')}` : ''}
     ${trIn.length ? `<div class="lbl">🔄 Cserejavaslatok</div>${trIn.map(t => `<div class="tr-row"><div class="tr-who"><b>${escH(t.names?.[t.from] || 'Barát')}</b> cserélne veled</div>
       <div class="tr-pair sm"><div>${mini(t.give)}<small>Kapod</small></div><span class="tr-arrow">⇄</span><div>${mini(t.want)}<small>Adod${owned(t.want.id) ? ` (van ${owned(t.want.id)})` : ' – nincs meg!'}</small></div></div>
@@ -3260,7 +3260,7 @@ function renderFriends() {
     ${trOut.length ? `<div class="lbl">Elküldött csere</div>${trOut.map(t => `<div class="tr-row mine"><div class="tr-who">Várjuk <b>${escH(t.names?.[t.to] || 'a barátod')}</b> válaszát</div>
       <div class="tr-pair sm"><div>${mini(t.give)}<small>Adod</small></div><span class="tr-arrow">⇄</span><div>${mini(t.want)}<small>Kapod</small></div></div><div class="tr-btns"><button class="btn ghost" data-tcan="${t.id}">Visszavonom</button></div></div>`).join('')}` : ''}
     <div class="lbl">Csere-előzmények</div>${(Store.p.tradeHist || []).length ? `<div class="tr-hist">${Store.p.tradeHist.slice(0, FR.histAll ? 40 : 5).map(h => `<div class="th-row"><span class="fr-mini">${cardHTML(h.gave.id, { foil: h.gave.foil })}</span><span class="th-mid"><b>${escH(h.with)}</b><small>${new Date(h.at).toLocaleDateString('hu-HU', { month: 'short', day: 'numeric' })}</small><span class="tr-arrow">⇄</span><small>adtad · kaptad</small></span><span class="fr-mini">${cardHTML(h.got.id, { foil: h.got.foil })}</span></div>`).join('')}</div>${Store.p.tradeHist.length > 5 && !FR.histAll ? '<button class="btn ghost" data-histall>Összes előzmény</button>' : ''}` : '<p class="q-note">Még nincs rögzített cseréd – a következő cserédtől itt látod, kivel mit mire cseréltél.</p>'}
-    <p class="q-note">🔄 <b>Csere:</b> azonos ritkaságú lapok, Full Art csak Full Artért, naponta egy. ${tradeDoneToday() ? '<b>Ma már cseréltél</b> – holnap újra.' : 'Mai cseréd még elérhető.'}</p>`;
+    <p class="q-note">🔄 <b>Csere:</b> azonos ritkaságú lapok, Full Art csak Full Artért, naponta egy. ${tradeDoneToday() ? '<b>Ma már cseréltél</b> – holnap újra.' : 'Mai cseréd még elérhető.'}</p></div>`;
   const nm = body.querySelectorAll('.pv-txt b'); // (a nevek már escapelve)
   body.querySelector('.fr-add').onsubmit = e => { e.preventDefault(); frAdd($('#frIn').value); $('#frIn').value = ''; };
   body.onclick = async e => {
@@ -3609,13 +3609,13 @@ function renderRanked() {
   const myPos = board.indexOf(me), shown = board.slice(0, 50);
   if (myPos >= 50) shown.push(me);
   const frSet = new Set(frIds), pend = new Set((typeof frOn === 'function' && frOn()) ? FR.list.filter(d => d.status === 'pending').map(frOther) : []);
-  body.innerHTML = `
+  body.innerHTML = `<div class="rk-side">
     <div class="rk-hero">${rkEmblem(r.t, 'xl')}<div class="rk-name">${rkName(r.t)}</div>
       ${r.t >= rkLeg() ? `<div class="rk-lp">${r.lp} Legenda-pont</div>` : rkStars(r.t, r.st)}
       <small class="rk-sea">${escH(se.name)} · még ${days} nap · ${r.w} győzelem, ${r.l} vereség${r.streak >= 2 ? ` · 🔥 ${r.streak} győzelem sorozat` : ''}</small></div>
     <button class="rk-playimg" id="rkPlay" aria-label="Ranked meccs"></button>
     <p class="q-note rk-how">${Store.p.rkBot !== false ? `Élő ellenfelet keresünk; ha 20 mp alatt nincs senki, egy bot ellen játszol – a rangod mindkét esetben számít. A bot a ranggal erősödik (most: ${BOT_LV_NAME[rkBotLv()]}).` : 'Csak élő ellenfél ellen játszol: addig vársz, amíg valaki nem jön.'} (A pakliválasztásnál állíthatod.)</p>
-    <div class="lbl">Jutalmak – a lépcső elérésekor azonnal járnak</div>
+    </div><div class="rk-main"><div class="lbl">Jutalmak – a lépcső elérésekor azonnal járnak</div>
     <div class="rk-rews">${rkRewTable(se.id).map(x => `<div class="rk-rew${r.best >= x.min ? ' got' : ''}">${rkEmblem(x.min, 'xs')}<span><b>${x.name}</b><small>${rkRewText(x.rew)}${rkLaterFor(se.id, x.min).map(l => ` + ${l.name}${l.grant ? '' : ' <em class="rk-soon">hamarosan</em>'}`).join('')}</small></span>${r.best >= x.min ? '<em>elérve</em>' : ''}</div>`).join('')}</div>
     <div class="lbl rk-lbhead"><span>Ranglista</span><span class="seg rk-tabs" role="group"><button data-rkt="all" aria-pressed="${RKB.tab !== 'fr'}">Mindenki</button><button data-rkt="fr" aria-pressed="${RKB.tab === 'fr'}">Barátok</button></span></div>
     <div class="rk-board">${shown.map(x => `<${x.me ? 'div' : 'button'} class="rk-row${x.me ? ' me' : ''}"${x.me ? '' : ` data-rkp="${x.uid}"`}><span class="rk-pos">${board.indexOf(x) + 1}.</span>${rkEmblem(x.t, 'xs')}<b>${crownHTML(x.crown, 'cr-inl')}${escH(x.name || 'Játékos')}${!x.me && frSet.has(x.uid) ? ' <i class="rk-fr" title="Barátod">🤝</i>' : !x.me && pend.has(x.uid) ? ' <i class="rk-fr" title="Jelölés folyamatban">⏳</i>' : ''}</b><small>${x.t >= rkLeg() ? `Legenda · ${x.lp || 0} pont` : `${rkName(x.t)} · ${x.st}★`}</small></${x.me ? 'div' : 'button'}>`).join('')}
@@ -3632,7 +3632,7 @@ function renderRanked() {
       <li>Legendában Legenda-pontokat gyűjtesz, onnan már nem esel vissza.</li>
       <li>A lépcsők jutalma (${rkRewTable(se.id).map(x => x.name).join(', ')}) azonnal jár, amikor eléred – szezononként egyszer.</li>
       <li>👑 A szezon végén a ranglista első három helyezettje koronát kap (arany, ezüst, bronz) a hőse portréjára – a következő szezon végéig mindenki látja: meccsen, a VS képernyőn és a ranglistán.</li>
-      <li>A szezon vége: ${se.end.toLocaleDateString('hu-HU', { month: 'long', day: 'numeric' })} – utána mindenki Bronz 5-ről kezd, és az első három helyezett külön jutalmat kap.</li></ul></details>`;
+      <li>A szezon vége: ${se.end.toLocaleDateString('hu-HU', { month: 'long', day: 'numeric' })} – utána mindenki Bronz 5-ről kezd, és az első három helyezett külön jutalmat kap.</li></ul></details></div>`;
   $('#rkPlay').onclick = () => pvpPickDeck('Ranked pakli', dk => rankedSearch(dk), { ranked: true, btn: '🏆 Ranked meccs indítása', note: 'Válaszd ki, melyik paklival mész rankedbe.' });
 }
 // ranked keresés: élő ellenfél (20 mp), különben bot
