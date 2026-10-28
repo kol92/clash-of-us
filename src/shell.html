@@ -1284,7 +1284,9 @@ body.ev-hw #scr-menu .fan{filter:drop-shadow(0 0 22px rgba(255,140,40,.35));}
 .m-pvp{grid-template-columns:48px 1fr auto auto;min-height:70px;border-color:rgba(255,120,120,.6);}
 .m-ic.pvp{font-size:32px;line-height:1;text-align:center;filter:drop-shadow(0 2px 4px rgba(0,0,0,.6));}
 #pvpBody{display:grid;gap:8px;padding-bottom:24px;}
-#pvpBody > .btn{margin-top:6px;}
+#pvpBody > .btn,#pvpBody .pv-sec > .btn:first-child{margin-top:6px;}
+.pv-acts,.pv-cols,.pv-sec,.fr-side,.fr-main{display:grid;grid-template-columns:minmax(0,1fr);gap:8px;align-content:start;}
+.pv-sec:empty{display:none;}
 .pv-row{display:grid;grid-template-columns:48px 1fr auto;gap:10px;align-items:center;padding:10px 12px;border-radius:14px;background:linear-gradient(160deg,#16283f,#0e1a2a 70%);border:1px solid rgba(255,255,255,.1);}
 .pv-row.hot{border-color:var(--green);box-shadow:0 0 14px rgba(79,224,166,.35);}
 .pv-row.mine{border-style:dashed;border-color:rgba(255,201,74,.6);}
@@ -2367,6 +2369,56 @@ body.has-tbar #app{height:calc(var(--apph,100%) - var(--tbar,0px));}   /* teszt 
   body[data-scr="scr-coll"] .coll-grid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:22px 14px;}
   body[data-scr="scr-coll"] .coll-grid .card{--cw:148px;}
   body[data-scr="scr-pick"] .pick-note,body[data-scr="scr-coll"] .coll-sum{color:#c9dbe4;text-shadow:0 1px 3px #000;}
+}
+
+/* ===== Ranked, PvP, Barátok, Küldetések, Bolt – széles nézet (2026-10-28, Tomi – iPad) =====
+   A közös korlát a #app max-width:480px volt (minden képernyőre). Ha az ablak legalább 900 px széles, ezek az oldalak
+   legfeljebb 1200 px-es, középre rendezett tartalomterületet kapnak (a háttér az elmosott asztal, teljes képernyőn); alatta a régi mobilnézet. */
+@media (min-width:900px) and (min-height:500px){
+  body[data-scr="scr-ranked"] #app,body[data-scr="scr-pvp"] #app,body[data-scr="scr-friends"] #app,body[data-scr="scr-quests"] #app,body[data-scr="scr-shop"] #app{max-width:min(100vw,1200px);background:none;box-shadow:none;}
+  body[data-scr="scr-ranked"] .screen,body[data-scr="scr-pvp"] .screen,body[data-scr="scr-friends"] .screen,body[data-scr="scr-quests"] .screen,body[data-scr="scr-shop"] .screen{padding-inline:clamp(16px,2.6vw,32px);}
+  body[data-scr="scr-ranked"] .top,body[data-scr="scr-pvp"] .top,body[data-scr="scr-friends"] .top,body[data-scr="scr-quests"] .top,body[data-scr="scr-shop"] .top{background:linear-gradient(180deg,rgba(9,30,36,.97) 75%,rgba(9,30,36,0));}
+  /* Ranked: balra kompakt összefoglaló, jobbra jutalmak + ranglista */
+  body[data-scr="scr-ranked"] #rankBody{display:grid;grid-template-columns:clamp(280px,30vw,360px) minmax(0,1fr);gap:0 clamp(20px,3vw,40px);align-items:start;padding-bottom:24px;}
+  body[data-scr="scr-ranked"] .rk-side{position:sticky;top:76px;padding:6px 16px 16px;background:linear-gradient(170deg,rgba(22,64,75,.92),rgba(8,24,30,.92));border:1px solid rgba(214,180,106,.35);border-radius:18px;box-shadow:0 12px 30px rgba(0,0,0,.4);}
+  body[data-scr="scr-ranked"] .rk-side .rk-emb.xl{width:120px;height:120px;} body[data-scr="scr-ranked"] .rk-side .rk-emb.xl i{font-size:50px;}
+  body[data-scr="scr-ranked"] .rk-side .rk-playimg{max-width:300px;}
+  body[data-scr="scr-ranked"] .rk-main .rk-rews{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 10px;}
+  body[data-scr="scr-ranked"] .rk-main .rk-board{max-width:720px;}
+  /* PvP: fent a két fő művelet egymás mellett, alatta balra a futó meccsek + kihívások, jobbra az előzmények */
+  body[data-scr="scr-pvp"] .pv-acts,body[data-scr="scr-pvp"] .pv-cols{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px clamp(20px,3vw,40px);align-items:start;}
+  body[data-scr="scr-pvp"] .pv-acts .pv-online{margin:0;}
+  body[data-scr="scr-pvp"] .pv-cols .lbl{margin-top:10px;}
+  body[data-scr="scr-pvp"] .pv-cols .q-note{margin:2px 0 6px;}
+  /* Barátok: balra a kód / meghívás / jelölés panel, jobbra a lista */
+  body[data-scr="scr-friends"] #frBody{grid-template-columns:clamp(280px,32vw,380px) minmax(0,1fr);gap:0 clamp(20px,3vw,40px);align-items:start;}
+  body[data-scr="scr-friends"] .fr-side{position:sticky;top:76px;padding:14px;background:linear-gradient(170deg,rgba(22,64,75,.92),rgba(8,24,30,.92));border:1px solid rgba(214,180,106,.35);border-radius:18px;box-shadow:0 12px 30px rgba(0,0,0,.4);}
+  body[data-scr="scr-friends"] .fr-side .fr-add input{letter-spacing:.06em;font-size:16px;min-width:0;}
+  body[data-scr="scr-friends"] .fr-row{grid-template-columns:48px minmax(0,1fr) auto;}
+  body[data-scr="scr-friends"] .fr-row .pv-txt b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  body[data-scr="scr-friends"] .fr-row .fr-btns .btn{min-width:64px;min-height:44px;}
+  /* Küldetések: a kategóriák külön szekciók, a kártyák kategórián belül 2 oszlopban */
+  body[data-scr="scr-quests"] #questBody{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 16px;align-items:stretch;padding-bottom:24px;}
+  body[data-scr="scr-quests"] #questBody>.lbl,body[data-scr="scr-quests"] #questBody>.q-note,body[data-scr="scr-quests"] #questBody>p,body[data-scr="scr-quests"] #questBody>details{grid-column:1/-1;}
+  body[data-scr="scr-quests"] #questBody>.lbl{margin-top:8px;}
+  body[data-scr="scr-quests"] #questBody>.q-row{margin:0;}
+  /* Bolt: 3–4 oszlopos rács, a csomagok aránya marad; az egyenleg fent, a gombok korlátozott szélességűek */
+  body[data-scr="scr-shop"] #shopBody .shop-grid{grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px;}
+  body[data-scr="scr-shop"] #shopBody .wallet{position:sticky;top:70px;z-index:4;justify-self:end;margin-left:auto;width:max-content;padding:4px 14px;border-radius:999px;background:rgba(6,20,26,.85);border:1px solid rgba(214,180,106,.45);}
+  body[data-scr="scr-shop"] #shopBody .lim-jump,body[data-scr="scr-shop"] #shopBody .shop-gifts,body[data-scr="scr-shop"] #shopBody .chest-card,body[data-scr="scr-shop"] #shopBody .pack-info-more{max-width:640px;margin-inline:auto;}
+}
+
+/* Season Pass – széles nézet (2026-10-28): balra ragadós fejléc (szezon, szint, XP, Mind átveszem) + XP-leírás, jobbra a 30 szint két oszlopban */
+@media (min-width:900px) and (min-height:500px){
+  body[data-scr="scr-pass"] #app{max-width:min(100vw,1200px);background:none;box-shadow:none;}
+  body[data-scr="scr-pass"] .screen{padding-inline:clamp(16px,2.6vw,32px);}
+  body[data-scr="scr-pass"] .top{background:linear-gradient(180deg,rgba(9,30,36,.97) 75%,rgba(9,30,36,0));}
+  body[data-scr="scr-pass"] #passBody{display:grid;grid-template-columns:clamp(280px,30vw,360px) minmax(0,1fr);grid-template-rows:auto auto;gap:0 clamp(20px,3vw,40px);align-items:start;padding-bottom:24px;}
+  body[data-scr="scr-pass"] #passBody>.sp-head{grid-column:1;grid-row:1;position:sticky;top:76px;margin:6px 0 10px;}
+  body[data-scr="scr-pass"] #passBody>.q-note{grid-column:2;grid-row:2;margin-top:12px;}
+  body[data-scr="scr-pass"] #passBody>.sp-list{grid-column:2;grid-row:1;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:8px 12px;margin-top:6px;}
+  body[data-scr="scr-pass"] #passBody>.sp-list::before{display:none;}
+  body[data-scr="scr-pass"] .sp-row .sp-name b{overflow-wrap:normal;word-break:normal;}
 }
 </style>
 
