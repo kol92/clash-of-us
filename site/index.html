@@ -2545,7 +2545,7 @@ html.pc-live #scr-game{background-image:radial-gradient(ellipse 78% 72% at 50% 5
 <script src="vendor/firebase-auth-compat.js"></script>
 <script src="vendor/firebase-firestore-compat.js"></script>
 <script src="vendor/firebase-database-compat.js"></script>
-<script>window.APP_VERSION = "2026.10.28-0750"; window.APP_BUILD = "2026.10.28-0750";</script>
+<script>window.APP_VERSION = "2026.10.28-0750"; window.APP_BUILD = "2026.10.28-0754";</script>
 <script>// ===== Best of Us – saját szerver (Firebase) =====
 // A játék eredetileg a Claude-os tárolót használta (window.claude.use('db' | 'user' | 'room')).
 // Ez a fájl ugyanazt a felületet adja Firebase-ből, így a játék kódja szinte változatlan maradhat:
@@ -4828,7 +4828,7 @@ function renderPick() {
   const rb = $('#rkBotRow');
   if (rb) { rb.hidden = !P?.ranked; if (P?.ranked) { const on = Store.p?.rkBot !== false; rb.querySelector('input').checked = on;
     rb.querySelector('small').textContent = on ? 'Ha 20 mp alatt nincs élő ellenfél, bot ellen játszol (a rangod így is számít).' : 'Addig vársz, amíg egy élő ellenfél nem jön – bármeddig.'; } }
-  const ds = allDecks().sort((a, b) => (a.starter ? 1 : 0) - (b.starter ? 1 : 0));   /* 2026-10-24 (Tomi): a saját paklik mindig legfelül */
+  const ds = allDecks().sort((a, b) => deckRank(a) - deckRank(b));   /* 2026-10-24 (Tomi): a saját paklik mindig legfelül */
   if (!ds.some(d => d.id === ui.deck && !deckIssue(d))) ui.deck = 'roham';
   ui.deckOpen = ui.deckOpen || null;
   $('#deckPick').innerHTML = ds.map(d => { const prob = deckIssue(d), h = HERO[d.hero], sel = ui.deck === d.id, open = ui.deckOpen === d.id;
@@ -7683,6 +7683,8 @@ function allDecks() {
   const starters = Object.entries(DECKS).filter(([, d]) => !d.set || setLive(d.set)).map(([id, d]) => ({ id, name: d.name, desc: d.desc, hero: d.hero, list: upgradeList(d.list), starter: true, set: d.set, free: !!d.free, loanMax: d.loanMax }));   /* szett-kezdőpakli csak a megjelenéstől */
   return starters.concat(Store.p ? Store.p.decks : []);
 }
+/* pakli-sorrend (2026-10-28): saját paklik → a legújabb szett kölcsönpaklijai (Peaches) → Laszy → Amsterdam → alap kezdőpaklik; a sorrenden belül stabil */
+const deckRank = d => !d.starter ? 0 : d.set === 'pc' && !d.free ? 1 : d.free ? 2 : d.set === 'ah' ? 3 : 4;
 const deckCount = list => Object.values(list).reduce((a, b) => a + b, 0);
 function deckProblem(list, hero, loan) {   /* loan: szett-kezdőpakli – kölcsönpakli, a lapjait nem kell birtokolni (2026-10-18) */
   if (hero !== undefined && !HERO[hero]) return 'Válassz hőst';
@@ -7726,7 +7728,7 @@ function heroPortrait(hid, cls = '') {
   return `<span class="hp-img ${cls}${aid !== hid ? ' gold' : ''}" style="--h:${h.hue};${ART[aid] ? `background-image:url('${artSrc(aid, false)}')` : ''}">${ART[aid] ? '' : initials(h.name)}</span>`;
 }
 function renderDecks() {
-  const ds = allDecks().sort((a, b) => (a.starter ? 1 : 0) - (b.starter ? 1 : 0));   /* a saját paklik legfelül (2026-10-24) */
+  const ds = allDecks().sort((a, b) => deckRank(a) - deckRank(b));   /* a saját paklik legfelül (2026-10-24) */
   $('#decksBody').innerHTML = `<button class="btn primary" id="newDeck">+ Új pakli</button><button class="btn" id="impDeck">📥 Pakli beillesztése</button>
     <div class="deck-list">${ds.map(d => {
       const prob = deckIssue(d), h = HERO[d.hero];
