@@ -164,6 +164,7 @@ function testBanner() {   /* teszt oldal jelzése + profil újramásolása */
   b.querySelector('[data-reset]').onclick = () => { if (!confirm('Visszaállítod a teszt profilt az éles profilod mostani másolatára? A teszten szerzett dolgok elvesznek.')) return;
     try { localStorage.removeItem(LS_KEY); } catch {} location.reload(); };
   document.body.appendChild(b);
+  document.body.classList.add('has-tbar'); const fit = () => document.documentElement.style.setProperty('--tbar', b.offsetHeight + 'px'); fit(); addEventListener('resize', fit);   /* a sáv helye fenntartva (2026-10-28) */
 }
 /* TESZT OLDAL (2026-10-16, Tomi kérése): ezek a profilok (név szerint, kisbetűvel) a teszt oldalon minden gyűjthető lapot megkapnak
    (legendásból 1, a többiből 2 példány; bolti, Pass-, event- és változat-lapokkal együtt). Minden betöltéskor lefut, így az új lapokat is megkapják.

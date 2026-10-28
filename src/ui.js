@@ -531,6 +531,11 @@ function renderPick() {
       <button class="dp-more${open ? ' open' : ''}" data-more="${d.id}" aria-expanded="${open}" aria-label="Részletek: ${escH(d.name)}"></button>
       ${open ? `<div class="dp-detail"><p><b>${h ? h.name : ''}:</b> ${h ? h.text : ''}</p><p>${d.starter ? d.desc : 'Saját pakli.'}</p></div>` : ''}</div>`; }).join('');
   $('#deckPick').querySelectorAll('.deck-opt b').forEach((b, i) => b.textContent = ds[i].name);
+  { const d = ds.find(x => x.id === ui.deck), ps = $('#pickSel');   /* széles nézet: a kiválasztott pakli panelje (2026-10-28) */
+    if (ps) { const h = d && HERO[d.hero], prob = d && deckIssue(d);
+      ps.innerHTML = d ? `${heroPortrait(d.hero, 'ps-hero')}<b></b><em>${h ? h.name : 'Nincs hős'}</em>${isLoan(d) ? `<span class="ps-tag">${loanTag(d)}</span>` : '<span></span>'}
+        ${h ? `<p>${h.text}</p>` : ''}<p class="ps-desc"></p>${prob ? `<p class="ps-bad">Nem játszható: ${escH(prob)}</p>` : ''}` : '';
+      if (d) { ps.querySelector('b').textContent = d.name; ps.querySelector('.ps-desc').textContent = d.starter ? d.desc : 'Saját pakli.'; } } }
 }
 $('#deckPick').onclick = e => { const m = e.target.closest('[data-more]'); if (m) { ui.deckOpen = ui.deckOpen === m.dataset.more ? null : m.dataset.more; renderPick(); return; } const b = e.target.closest('[data-d]'); if (b && b.dataset.loanout) { loanOutModal(allDecks().find(x => x.id === b.dataset.d)); return; } if (b) { ui.deck = b.dataset.d; renderPick(); } };
 $('#startBtn').onclick = () => { const d = allDecks().find(x => x.id === ui.deck); if (!d || deckIssue(d)) return;
@@ -565,15 +570,20 @@ function cfMatch(c) {
 function renderCollFilters() {
   const el = $('#collFilters'); if (!el) return;
   const chip = (grp, val, inner, on, label) => `<button class="cf-chip${on ? ' on' : ''}" data-cf="${grp}" data-v="${val}" aria-pressed="${on}" aria-label="${label}">${inner}</button>`;
-  el.innerHTML = `<label class="cf-search"><span class="sr-only">Keresés</span><input id="cfQ" type="search" placeholder="Keresés…" value="${escH(CF.q)}" autocomplete="off"></label>
-    <div class="cf-row">${cfSets().map(([k, n]) => chip('set', k, `<span class="lbl-t">${k === 'hw' ? '🎃 ' : k === 'ah' ? '🌷 ' : k === 'pc' ? '🍑 ' : ''}${n}</span>`, CF.set.has(k), n + ' szett')).join('')}</div>
-    <div class="cf-row">${CF_TYPES.map(([k, n]) => chip('type', k, `<img src="art/ui/ic-type-${k}.webp" alt=""><span class="lbl-t">${n}</span>`, CF.type.has(k), n)).join('')}</div>
-    <div class="cf-row">${CF_RARS.map(([k, n]) => chip('rar', k, `<i class="rar r-${k}"></i>`, CF.rar.has(k), n)).join('')}
+  const nAct = CF.type.size + CF.rar.size + CF.cost.size + CF.set.size + (CF.own ? 1 : 0);
+  el.classList.toggle('open', !!ui.cfOpen);
+  el.innerHTML = `<div class="cf-top"><label class="cf-search"><span class="sr-only">Keresés</span><input id="cfQ" type="search" placeholder="Keresés…" value="${escH(CF.q)}" autocomplete="off"></label>
+    <button class="cf-toggle" data-cftoggle aria-expanded="${!!ui.cfOpen}">⚙️ Szűrők${nAct ? ` <b>${nAct}</b>` : ''}</button></div>
+    <div class="cf-panel"><span class="cf-h">Kiegészítő</span>
+    <div class="cf-row r-set">${cfSets().map(([k, n]) => chip('set', k, `<span class="lbl-t">${k === 'hw' ? '🎃 ' : k === 'ah' ? '🌷 ' : k === 'pc' ? '🍑 ' : ''}${n}</span>`, CF.set.has(k), n + ' szett')).join('')}</div>
+    <span class="cf-h">Típus</span><div class="cf-row">${CF_TYPES.map(([k, n]) => chip('type', k, `<img src="art/ui/ic-type-${k}.webp" alt=""><span class="lbl-t">${n}</span>`, CF.type.has(k), n)).join('')}</div>
+    <span class="cf-h">Ritkaság · birtoklás</span><div class="cf-row r-rar">${CF_RARS.map(([k, n]) => chip('rar', k, `<i class="rar r-${k}"></i>`, CF.rar.has(k), n)).join('')}
       ${chip('own', 'have', '<img src="art/ui/ic-owned.webp" alt="">', CF.own === 'have', 'Megvan')}${chip('own', 'miss', '<img src="art/ui/ic-missing.webp" alt="">', CF.own === 'miss', 'Hiányzik')}</div>
-    <div class="cf-row">${CF_COSTS.map(k => chip('cost', k, `<span class="lbl-t">⚡${k}</span>`, CF.cost.has(k), k + ' energia')).join('')}</div>
-    ${cfActive() ? '<button class="cf-clear" data-cfclear>✕ Szűrők törlése</button>' : ''}`;
+    <span class="cf-h">Energia</span><div class="cf-row r-cost">${CF_COSTS.map(k => chip('cost', k, `<span class="lbl-t">⚡${k}</span>`, CF.cost.has(k), k + ' energia')).join('')}</div>
+    ${cfActive() ? '<button class="cf-clear" data-cfclear>✕ Szűrők törlése</button>' : ''}</div>`;
   const q = $('#cfQ'); q.oninput = () => { CF.q = q.value.trim(); renderColl(true); const cl = el.querySelector('[data-cfclear]'); if (!!cl !== !!cfActive()) { renderCollFilters(); $('#cfQ').focus(); } };
   el.onclick = e => {
+    if (e.target.closest('[data-cftoggle]')) { ui.cfOpen = !ui.cfOpen; renderCollFilters(); return; }
     if (e.target.closest('[data-cfclear]')) { CF.q = ''; CF.type.clear(); CF.rar.clear(); CF.cost.clear(); CF.set.clear(); CF.own = ''; renderCollFilters(); renderColl(true); return; }
     const b = e.target.closest('[data-cf]'); if (!b) return;
     const g = b.dataset.cf, v = b.dataset.v;
