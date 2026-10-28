@@ -1760,16 +1760,21 @@ button.rk-row:active{transform:scale(.98);}
 .top .back,.top>.back{flex:none;}
 .top h2{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .top .seg{flex:none;}
-/* Főmenü tableten fekve / gépen (2026-10-28, Tomi – iPad): két oszlop – balra a logó, a hősök és a profil, jobbra a gombok.
-   Csak akkor, ha a menü látszik ÉS az oszlop ki is szélesedett (induláskor még nincs data-scr – ezért a :not([data-scr]) is) */
+/* Főmenü tableten fekve / gépen (2026-10-28, Tomi – iPad): széles, középre rendezett két oszlop – balra a logó, a hősök és a profil, jobbra a gombok.
+   A háttér a teljes képernyőt kitölti (body::before), a tartalom-oszlop átlátszó. Induláskor még nincs data-scr – ezért a :not([data-scr]) is.
+   Keskeny ablakban / állva (a feltétel nem teljesül) marad az egy oszlop. */
 @media (min-width:900px) and (min-height:560px) and (min-aspect-ratio:5/4){
-  body:is(:not([data-scr]),[data-scr="scr-menu"]) #app{max-width:min(100vw,1240px);}
-  body:is(:not([data-scr]),[data-scr="scr-menu"]) #scr-menu{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-rows:auto auto auto 1fr;column-gap:clamp(24px,4vw,56px);align-content:start;padding:0 clamp(20px,3vw,40px) 16px;}
+  body:is(:not([data-scr]),[data-scr="scr-menu"]) #app{max-width:min(100vw,1280px);background:none;box-shadow:none;}
+  body:is(:not([data-scr]),[data-scr="scr-menu"])::before{inset:0;filter:none;background:radial-gradient(ellipse 70% 50% at 30% 20%,rgba(40,140,200,.28),transparent 70%),linear-gradient(180deg,#041422,#021019 60%,#010a10);}
+  body.ev-hw:is(:not([data-scr]),[data-scr="scr-menu"])::before{background:linear-gradient(180deg,rgba(8,4,16,.15),rgba(8,4,16,.35) 40%,rgba(8,4,16,.25)),url('art/ui/ev-hw-bg.webp') center/cover no-repeat #0b0614;}
+  html.pc-live body:is(:not([data-scr]),[data-scr="scr-menu"])::before{background:linear-gradient(180deg,rgba(10,4,24,.15),rgba(10,4,24,.42) 38%,rgba(10,4,24,.6)),url('art/ui/menu-pc.webp') center/cover no-repeat #0a0418;}
+  html body:is(:not([data-scr]),[data-scr="scr-menu"]) #scr-menu{background:none;display:grid;grid-template-columns:minmax(320px,560px) minmax(400px,560px);grid-template-rows:auto auto auto 1fr;justify-content:center;column-gap:clamp(28px,4vw,64px);align-content:start;padding:0 clamp(20px,3vw,40px) 16px;}
   body:is(:not([data-scr]),[data-scr="scr-menu"]) #scr-menu>.m-logo{grid-column:1;grid-row:1;margin:0 0 -34px;}
   body:is(:not([data-scr]),[data-scr="scr-menu"]) #scr-menu>.fan{grid-column:1;grid-row:2;}
   body:is(:not([data-scr]),[data-scr="scr-menu"]) #scr-menu>.profile-bar{grid-column:1;grid-row:3;align-self:start;}
   body:is(:not([data-scr]),[data-scr="scr-menu"]) #scr-menu>.menu-btns{grid-column:2;grid-row:1/5;align-self:start;padding-top:clamp(16px,4vh,48px);}
   body:is(:not([data-scr]),[data-scr="scr-menu"]) #scr-menu>.m-foot{grid-column:1;grid-row:4;align-self:start;margin-top:14px;}
+  body:is(:not([data-scr]),[data-scr="scr-menu"]) #scr-menu .menu-btns *{word-break:normal;overflow-wrap:normal;hyphens:manual;}
 }
 @media (max-width:440px){#scr-coll .top{flex-wrap:wrap;row-gap:8px;} #scr-coll .top .seg{flex:1 1 100%;display:grid;grid-template-columns:1fr 1fr;}}
 .logbox .lc,#gRight .lc{color:#ffe08a;text-decoration:underline dotted rgba(255,224,138,.6);text-underline-offset:2px;cursor:pointer;}

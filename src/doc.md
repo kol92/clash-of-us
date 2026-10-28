@@ -941,5 +941,6 @@ Hősképesség-ötletek a táblázatban (még nem zöldek, nincsenek beépítve)
 
 ## Főmenü tableten fekve / gépen (2026-10-28, Tomi – iPad; teszt)
 - Széles kijelzőn (min. 900 px széles, fekvő) a főmenü **két oszlopos**: balra a logó, a hős-legyező, a profilsáv és az alsó linkek, jobbra a gombok; az oszlop legfeljebb 1240 px széles (`#scr-menu` grid, shell.html). Telefonon nem változik.
+- Javítás (aznap): a két oszlop csak a kiszélesedett tartalommal együtt kapcsol (induláskor is, `body:is(:not([data-scr]),[data-scr="scr-menu"])`); a menü háttere fekve a **teljes képernyőt** kitölti (`body::before`, a téma szerint: alap / Halloween / Peaches), a tartalom-oszlop átlátszó; oszlopok: 320–560 px + 400–560 px, középre rendezve; a gombfeliratok nem törnek szavon belül. Mérve: 1180×820, 1366×1024, 1000×700 fekve két oszlop; 820×1180 állva egy oszlop.
 - Astrától kérhető hozzá: fekvő (16:9 / 4:3) menü-háttér, hogy széles kijelzőn ne a mobilos álló kép nyúljon.
 
