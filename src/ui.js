@@ -298,6 +298,7 @@ const ART = {
   c_alina:    { src:'art/pc_alina.webp', av:'52% 22%', pos:'52% 20%' },
   c_pc_laci:  { src:'art/pc_laci.webp', av:'38% 22%', pos:'38% 20%' },
   c_pg:       { src:'art/pc_pg.webp', av:'45% 15%', pos:'45% 14%' },
+  c_baszo:    { src:'art/pc_baszo.webp', av:'43% 16%', pos:'43% 14%' },
   c_mm:       { src:'art/pc_mm.webp', av:'57% 20%', pos:'57% 18%' },
   c_mm_v:     { src:'art/pc_mm_v.webp', av:'57% 20%', pos:'57% 18%', vid:'art/vid/pc_mm_v.mp4' },   /* mozgó változat (2. Season Pass) */
   c_idegen:   { src:'art/pc_idegen.webp', av:'45% 30%', pos:'45% 28%' },
