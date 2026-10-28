@@ -931,4 +931,8 @@ Hősképesség-ötletek a táblázatban (még nem zöldek, nincsenek beépítve)
   - **Laci – Hajnali tánc** (pc_laci): Laci, éjfél után ×2, Flaming Lamborghini, Bloody Mary ×2, DJ, Gabi, éjfél után ×2, A pultos, JBL, Peaches Portás ×2, Pifti, a buli ördöge ×2, Dávid, éjfél után, P.G., Bence, éjfél után, Barna, éjfél után, Tomi, éjfél után, WC-s néni
   - **Sasi – Peaches-banda** (pc_sasi): Sasi, éjfél után ×2, Ani, A pultos ×2, Boros, éjfél után, Noémi, Pifti, a buli ördöge ×2, Gabi, éjfél után ×2, Tánctér, Utolsó kör ×2, Gluténbomba, Gál Zoli, éjfél után, Laci, éjfél után, Részeg idegen, Sorban állás, Dávid, éjfél után
 - **Pakliválasztó (2026-10-28):** sorrend: saját paklik → Peaches kölcsönpaklik → Laszy → (Amsterdam) → alap kezdőpaklik (`deckRank`). **A Peaches megjelenésétől az Amsterdam kölcsönpaklik eltűnnek** a választóból (`allDecks`, Tomi kérése) – a saját, Amsterdam-lapokból épített paklik maradnak.
+## Peaches-előzetes + Full Art Limitált booster (2026-10-28, Tomi; élesben)
+- **Hír (`pcNewsCheck`, meta.js):** a főmenüben egyszer felugrik: „November 1-jén (vasárnap) 19:00-kor érkezik … az „Egy Éjszaka a Peaches & Creamben”!” a két Peaches pack képével; a megjelenés után egyszer „Megérkezett …” (egy hétig).
+- **Ajándék:** mindenki kap egy **Full Art Limitált boostert** (`p.faLtdPacks`, profilonként egyszer: `p.gifts` `pc-fa-ltd`), a Boltban „🍑 Full Art Limitált booster” gombbal bontható (piros pack, „Full Art” szalag).
+- **Tartalom (`faLtdRoll`):** 3 lap, **mind Full Art**, bármelyik **megjelent** szettből (alap + Amsterdam; a Peaches lapjai csak 11-01 19:00 után bontva lehetnek benne); legalább egy ritka; **15% eséllyel** az egyik lap helyén egy **arany lap** (a megjelent kiegészítők arany változataiból). Mérés 4000 packon: 14,8% arany.
 

@@ -385,7 +385,7 @@ function renderProfileBar() {
   try { applyBack(); } catch (e) {}
   renderQuestBadge(); renderPassBadge(); try { renderRankTile(); } catch (e) {} try { renderEventTile(); } catch (e) {} try { if (chestWeeklyCheck()) Store.p.chestNew = true; } catch (e) {} try { ahLaunchGift(); } catch (e) {} try { if (!$('#scr-menu').hidden) { dayGiftCheck(); backAwardCheck(); deckLinkCheck(); evGiftCheck(); ahNewsCheck(); chestPopup(); } } catch (e) {}
   const wb = $('#wheelBadge'); if (wb) wb.hidden = !wheelReady();
-  const badge = $('#shopBadge'); if (badge) badge.hidden = !freePackReady() && !(p.giftPacks > 0) && !(p.faPacks > 0) && !(p.shinyPacks > 0) && !(p.ahPacks > 0) && !(p.ahShinyPacks > 0) && !(p.pcPacks > 0) && !(p.pcShinyPacks > 0) && !(p.chests > 0);
+  const badge = $('#shopBadge'); if (badge) badge.hidden = !freePackReady() && !(p.giftPacks > 0) && !(p.faPacks > 0) && !(p.shinyPacks > 0) && !(p.ahPacks > 0) && !(p.ahShinyPacks > 0) && !(p.pcPacks > 0) && !(p.pcShinyPacks > 0) && !(p.faLtdPacks > 0) && !(p.chests > 0);
 }
 
 // ---- jutalom meccs végén ----
@@ -478,6 +478,22 @@ function openPackRoll(setId, forceFoil = false, shiny = false) {
     return { id, foil, isNew };
   });
 }
+/* Full Art Limitált booster (2026-10-28, Tomi): a Peaches-előzetes ajándéka – 3 lap, mind Full Art, bármelyik megjelent szettből (alap + kiegészítők);
+   15% eséllyel az egyik helyen egy arany lap (a megjelent kiegészítők arany változataiból). Legalább egy ritka. */
+const FA_LTD = { gold: 0.15 };
+function faLtdRoll(p) {
+  const pool = Object.keys(SETS).filter(k => setLive(k)).flatMap(k => SETS[k].cards).filter(id => CARD[id] && !CARD[id].token);
+  const golds = CARDS.filter(v => v.goldVar && v.set && setLive(v.set) && !v.off).map(v => v.id);
+  const slots = [rollRarity(), rollRarity(), rollRarity()]; if (slots.every(x => x === 'k')) slots[2] = 'r';
+  const order = { k: 0, r: 1, e: 2, l: 3 }; slots.sort((a, b) => order[a] - order[b]);
+  const goldSlot = golds.length && Math.random() < FA_LTD.gold ? 2 : -1;
+  return slots.map((rar, si) => {
+    if (si === goldSlot) { const id = golds[Math.floor(Math.random() * golds.length)], isNew = owned(id) === 0; const e = p.coll[id] || (p.coll[id] = { n: 0, f: 0 }); e.n++; return { id, foil: false, gold: true, isNew }; }
+    let ids = pool.filter(id => CARD[id].rarity === rar); if (!ids.length) ids = pool;
+    const id = ids[Math.floor(Math.random() * ids.length)], isNew = !ownsFoil(id); const e = p.coll[id] || (p.coll[id] = { n: 0, f: 0 }); e.f++;
+    return { id, foil: true, isNew };
+  });
+}
 // ---- Heti láda (2026-10-14): minden hétfőn 0:01-kor mindenki kap egyet ----
 // 10 lap: 1 biztos epikus vagy legendás, 1 biztos Full Art, 8 véletlen (mint a packban); 0,5% eséllyel egy hős-portré is (bolti vagy eseményes)
 const CHEST = { cards: 10, portChance: 0.005, price: 500 };
@@ -524,6 +540,7 @@ function chestWeeklyCheck() {
   return true;
 }
 function chestPopup() {
+  try { if (pcNewsCheck()) return; } catch (e) {}   /* Peaches-hír + ajándék (2026-10-28) */
   try { if (ahNewsCheck()) return; } catch (e) {}   /* előbb az Amszterdam-hír (ha még nem látta), utána a láda */
   const p = Store.p; if (!p || !(p.chestNew) || $('#layer .overlay') || (typeof S !== 'undefined' && S)) return;
   const o = document.createElement('div'); o.className = 'overlay';
@@ -616,12 +633,13 @@ async function buyPack(setId, free) {
   else if (free === 'ahShinyGift') { if (!(p.ahShinyPacks > 0)) return; p.ahShinyPacks--; }
   else if (free === 'pcGift') { if (!(p.pcPacks > 0)) return; p.pcPacks--; }   /* Peaches ajándék (Season Pass, 2026-11-01) */
   else if (free === 'pcShinyGift') { if (!(p.pcShinyPacks > 0)) return; p.pcShinyPacks--; }
+  else if (free === 'faLtd') { if (!(p.faLtdPacks > 0)) return; p.faLtdPacks--; }   /* Full Art Limitált booster (Peaches-előzetes ajándék, 2026-10-28) */
   else if (free === 'shiny') { if (p.coins < ECON.shinyPrice) { toast('Nincs elég coinod'); return; } p.coins -= ECON.shinyPrice; }
   else if (free) { if (!freePackReady()) return; p.freeDate = today(); }
   else { if (p.coins < ECON.packPrice) { toast('Nincs elég coinod'); return; } p.coins -= ECON.packPrice; }
   const { cards, conv, shinyMode } = packRollFull(setId, free);
   await save(); renderProfileBar(); renderShop();
-  await packOpening(setId, cards, { shiny: shinyMode, fa: free === 'fa' });
+  await packOpening(setId, cards, { shiny: shinyMode, fa: free === 'fa' || free === 'faLtd' });
   if (conv.coins) toast(`Fölösleges hős-példány beváltva: +${conv.coins} coin`);
 }
 
@@ -646,7 +664,7 @@ function packBuyModal(k) {
 function packRollFull(setId, free) {   /* egy pack lapjai + a fölösleges hős-példányok beváltása (buyPack és a tömeges bontás közös része) */
   const p = Store.p; p.packs++;
   const shinyMode = free === 'shiny' || free === 'shinyGift' || free === 'ahShinyGift' || free === 'pcShinyGift';
-  const cards = openPackRoll(setId, free === 'fa', shinyMode);
+  const cards = free === 'faLtd' ? faLtdRoll(p) : openPackRoll(setId, free === 'fa', shinyMode);
   const conv = { coins: 0 };   // a lapok duplikátumai megmaradnak (cserélhetők, vagy a Gyűjteményben kézzel beválthatók)
   for (const c of cards) if (!c.hero && !c.isNew) c.have = owned(c.id);
   for (const c of cards) if (c.gold && c.hero && (p.heroGold || {})[c.hero] > 1) {   /* csak arany HŐS (az arany lap sima gyűjteményi lap) – 2026-10-18 javítás */ p.heroGold[c.hero]--; p.coins += ECON.goldDupe; conv.coins += ECON.goldDupe; c.dupe = ECON.goldDupe; }
@@ -657,7 +675,7 @@ function packRollFull(setId, free) {   /* egy pack lapjai + a fölösleges hős-
    legendás, Full Art, arany (és változat) lapnál megáll a sor, amíg meg nem nézed ---- */
 const BULK = { faPack: ['base', 'fa', 'faPacks', 'Full Art ajándék pack'], giftPack: ['base', 'gift', 'giftPacks', 'Ajándék pack'], giftAh: ['ah', 'ahGift', 'ahPacks', 'Amsterdam pack'],
                giftAhShiny: ['ah', 'ahShinyGift', 'ahShinyPacks', 'Amsterdam Shiny pack'], giftShiny: ['base', 'shinyGift', 'shinyPacks', 'Ajándék Shiny pack'],
-               giftPc: ['pc', 'pcGift', 'pcPacks', 'Peaches pack'], giftPcShiny: ['pc', 'pcShinyGift', 'pcShinyPacks', 'Peaches Shiny pack'] };
+               giftPc: ['pc', 'pcGift', 'pcPacks', 'Peaches pack'], giftPcShiny: ['pc', 'pcShinyGift', 'pcShinyPacks', 'Peaches Shiny pack'], faLtd: ['base', 'faLtd', 'faLtdPacks', 'Full Art Limitált booster'] };
 async function openAllPacks(kind) {
   const p = Store.p, B = BULK[kind]; if (!p || !B) return; const [setId, free, key, name] = B, n = p[key] || 0; if (n < 2) return;
   p[key] = 0; return bulkOpen(setId, free, n, name);
@@ -669,7 +687,7 @@ async function bulkOpen(setId, free, n, name) {   /* n pack egyszerre: ajándék
   const o = document.createElement('div'); o.className = 'overlay opening bulk-op';
   o.innerHTML = `<div class="op-stage"><div class="bulk-head"><b>${n} × ${escH(name)}</b><small>${all.length} lap${god ? ` · 🌈 ${god} GOD PACK!` : ''}</small></div></div>`;
   $('#layer').appendChild(o);
-  const packs = document.createElement('div'); packs.className = 'bulk-packs'; packs.innerHTML = Array.from({ length: Math.min(n, 8) }, (_, k) => `<span style="--k:${k}">${packHTML(setId, { shiny, fa: free === 'fa' })}</span>`).join('');
+  const packs = document.createElement('div'); packs.className = 'bulk-packs'; packs.innerHTML = Array.from({ length: Math.min(n, 8) }, (_, k) => `<span style="--k:${k}">${packHTML(setId, { shiny, fa: free === 'fa' || free === 'faLtd' })}</span>`).join('');
   o.querySelector('.op-stage').appendChild(packs);
   await packs.animate([{ opacity: 0, transform: 'translateY(30px) scale(.8)' }, { opacity: 1, transform: 'none' }], { duration: 380, easing: 'cubic-bezier(.2,1.3,.4,1)' }).finished;
   await sleep(350);
@@ -820,6 +838,7 @@ function renderShop() {
       <div class="shop-grid">${items.map(shopOfferHTML).join('')}${ports.map(portOfferHTML).join('')}</div>
     </section>` : '';
   const gifts = [
+    p.faLtdPacks > 0 ? `<div class="gift-row">${`<button class="btn primary gift fa" id="faLtdPack">🍑 Full Art Limitált booster${p.faLtdPacks > 1 ? ` (${p.faLtdPacks})` : ''}</button>`}${p.faLtdPacks > 1 ? `<button class="bulk-btn" data-bulk="faLtd" title="Mindet egyszerre">⚡ Mind (${p.faLtdPacks})</button>` : ''}</div>` : '',
     p.faPacks > 0 ? `<div class="gift-row">${`<button class="btn primary gift fa" id="faPack">✨ Full Art ajándék pack${p.faPacks > 1 ? ` (${p.faPacks})` : ''}</button>`}${p.faPacks > 1 ? `<button class="bulk-btn" data-bulk="faPack" title="Mindet egyszerre">⚡ Mind (${p.faPacks})</button>` : ''}</div>` : '',
     p.giftPacks > 0 ? `<div class="gift-row">${`<button class="btn primary gift" id="giftPack">🎁 Ajándék pack bontása${p.giftPacks > 1 ? ` (${p.giftPacks})` : ''}</button>`}${p.giftPacks > 1 ? `<button class="bulk-btn" data-bulk="giftPack" title="Mindet egyszerre">⚡ Mind (${p.giftPacks})</button>` : ''}</div>` : '',
     p.pcPacks > 0 ? `<div class="gift-row">${`<button class="btn primary gift" id="giftPc">🍑 Peaches pack bontása${p.pcPacks > 1 ? ` (${p.pcPacks})` : ''}</button>`}${p.pcPacks > 1 ? `<button class="bulk-btn" data-bulk="giftPc" title="Mindet egyszerre">⚡ Mind (${p.pcPacks})</button>` : ''}</div>` : '',
@@ -866,6 +885,7 @@ function renderShop() {
   if ($('#giftShiny')) $('#giftShiny').onclick = () => buyPack('base', 'shinyGift');
   if ($('#giftAh')) $('#giftAh').onclick = () => buyPack('ah', 'ahGift');
   if ($('#giftPc')) $('#giftPc').onclick = () => buyPack('pc', 'pcGift');
+  if ($('#faLtdPack')) $('#faLtdPack').onclick = () => buyPack('base', 'faLtd');
   if ($('#giftPcShiny')) $('#giftPcShiny').onclick = () => buyPack('pc', 'pcShinyGift');
   if ($('#giftAhShiny')) $('#giftAhShiny').onclick = () => buyPack('ah', 'ahShinyGift');
   $('#shopBody').querySelectorAll('[data-bulk]').forEach(b => b.onclick = () => openAllPacks(b.dataset.bulk));
@@ -2157,6 +2177,27 @@ function evTeaserModal(e, gift) {
 /* Amszterdam hősei (2026-10-18): előzetes naponta egyszer a megjelenésig, utána egyszeri „megérkezett” ablak */
 /* Amsterdam Hősei megjelenés (2026-10-19 19:00, Tomi): mindenki kap 3 ingyen Amsterdam boostert, profilonként egyszer */
 const AH_LAUNCH_PACKS = 3;
+/* Peaches & Cream előzetes (2026-10-28, Tomi): egyszeri hír + ajándék Full Art Limitált booster; a megjelenéskor (11-01 19:00) egy „megérkezett” hír */
+function pcNewsCheck() {
+  const p = Store.p; if (!p || p.onboard || (typeof S !== 'undefined' && S) || $('#layer .overlay') || $('#scr-menu').hidden) return false;
+  p.gifts = p.gifts || []; let gift = false;
+  if (!p.gifts.includes('pc-fa-ltd')) { p.gifts.push('pc-fa-ltd'); p.faLtdPacks = (p.faLtdPacks || 0) + 1; gift = true; save(); renderProfileBar(); }
+  const live = setLive('pc'), key = live ? 'pc-launch' : 'pc-teaser';
+  p.news = p.news || []; if (p.news.includes(key) && !gift) return false;
+  if (live && Date.now() > SET_RELEASE.pc + 7 * 864e5 && !gift) return false;
+  if (!p.news.includes(key)) p.news.push(key); save();
+  const o = document.createElement('div'); o.className = 'overlay';
+  o.innerHTML = `<div class="modal acct-box ah-news pc-news">
+    <p class="ah-news-t">${live ? 'Megérkezett a Best of Us TCG új kiegészítője: az „Egy Éjszaka a Peaches &amp; Creamben”!' : '<b>November 1-jén (vasárnap) 19:00-kor</b> érkezik a Best of Us TCG új kiegészítője: az „Egy Éjszaka a Peaches &amp; Creamben”!'}</p>
+    <div class="ah-news-packs"><img src="art/ui/pack-pc.webp" alt="Peaches and Cream booster"><img src="art/ui/pack-pcshiny.webp" alt="Peaches Shiny booster"></div>
+    ${live ? '<p class="live">Új lapok, éjfél utáni hatások, Laszy az új hős, új Season Pass és a VIP event – irány a Bolt!</p>' : ''}
+    ${gift || p.faLtdPacks > 0 ? `<p class="live">🎁 Ennek örömére <b>ajándékba kaptál egy Full Art Limitált boostert</b> – a Boltban bonthatod ki! Mind a 3 lapja Full Art, bármelyik szettből jöhet, és <b>15% eséllyel arany lap</b> is lapul benne. Nagyon limitált, csak most jár!</p>` : ''}
+    <button class="btn primary" data-shop>Irány a Bolt</button><button class="btn ghost" data-x>Később</button></div>`;
+  o.onclick = ev => { if (ev.target.closest('[data-shop]')) { o.remove(); renderShop(); show('scr-shop'); return; }
+    if (ev.target.closest('[data-x]') || ev.target === o) { o.remove(); setTimeout(() => { try { chestPopup(); } catch (er) {} }, 200); } };
+  $('#layer').appendChild(o);
+  return true;
+}
 function ahLaunchGift() {
   const p = Store.p; if (!p || p.onboard || !setLive('ah') || TEST_MODE) return;
   p.gifts = p.gifts || []; if (p.gifts.includes('ah-launch-packs')) return;
