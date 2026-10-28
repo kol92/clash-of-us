@@ -1221,6 +1221,8 @@ function allDecks() {
   const starters = Object.entries(DECKS).filter(([, d]) => !d.set || setLive(d.set)).map(([id, d]) => ({ id, name: d.name, desc: d.desc, hero: d.hero, list: upgradeList(d.list), starter: true, set: d.set, free: !!d.free, loanMax: d.loanMax }));   /* szett-kezdőpakli csak a megjelenéstől */
   return starters.concat(Store.p ? Store.p.decks : []);
 }
+/* pakli-sorrend (2026-10-28): saját paklik → a legújabb szett kölcsönpaklijai (Peaches) → Laszy → Amsterdam → alap kezdőpaklik; a sorrenden belül stabil */
+const deckRank = d => !d.starter ? 0 : d.set === 'pc' && !d.free ? 1 : d.free ? 2 : d.set === 'ah' ? 3 : 4;
 const deckCount = list => Object.values(list).reduce((a, b) => a + b, 0);
 function deckProblem(list, hero, loan) {   /* loan: szett-kezdőpakli – kölcsönpakli, a lapjait nem kell birtokolni (2026-10-18) */
   if (hero !== undefined && !HERO[hero]) return 'Válassz hőst';
@@ -1264,7 +1266,7 @@ function heroPortrait(hid, cls = '') {
   return `<span class="hp-img ${cls}${aid !== hid ? ' gold' : ''}" style="--h:${h.hue};${ART[aid] ? `background-image:url('${artSrc(aid, false)}')` : ''}">${ART[aid] ? '' : initials(h.name)}</span>`;
 }
 function renderDecks() {
-  const ds = allDecks().sort((a, b) => (a.starter ? 1 : 0) - (b.starter ? 1 : 0));   /* a saját paklik legfelül (2026-10-24) */
+  const ds = allDecks().sort((a, b) => deckRank(a) - deckRank(b));   /* a saját paklik legfelül (2026-10-24) */
   $('#decksBody').innerHTML = `<button class="btn primary" id="newDeck">+ Új pakli</button><button class="btn" id="impDeck">📥 Pakli beillesztése</button>
     <div class="deck-list">${ds.map(d => {
       const prob = deckIssue(d), h = HERO[d.hero];

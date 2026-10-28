@@ -521,7 +521,7 @@ function renderPick() {
   const rb = $('#rkBotRow');
   if (rb) { rb.hidden = !P?.ranked; if (P?.ranked) { const on = Store.p?.rkBot !== false; rb.querySelector('input').checked = on;
     rb.querySelector('small').textContent = on ? 'Ha 20 mp alatt nincs élő ellenfél, bot ellen játszol (a rangod így is számít).' : 'Addig vársz, amíg egy élő ellenfél nem jön – bármeddig.'; } }
-  const ds = allDecks().sort((a, b) => (a.starter ? 1 : 0) - (b.starter ? 1 : 0));   /* 2026-10-24 (Tomi): a saját paklik mindig legfelül */
+  const ds = allDecks().sort((a, b) => deckRank(a) - deckRank(b));   /* 2026-10-24 (Tomi): a saját paklik mindig legfelül */
   if (!ds.some(d => d.id === ui.deck && !deckIssue(d))) ui.deck = 'roham';
   ui.deckOpen = ui.deckOpen || null;
   $('#deckPick').innerHTML = ds.map(d => { const prob = deckIssue(d), h = HERO[d.hero], sel = ui.deck === d.id, open = ui.deckOpen === d.id;
