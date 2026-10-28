@@ -1760,15 +1760,16 @@ button.rk-row:active{transform:scale(.98);}
 .top .back,.top>.back{flex:none;}
 .top h2{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .top .seg{flex:none;}
-/* Főmenü tableten fekve / gépen (2026-10-28, Tomi – iPad): két oszlop – balra a logó, a hősök és a profil, jobbra a gombok */
+/* Főmenü tableten fekve / gépen (2026-10-28, Tomi – iPad): két oszlop – balra a logó, a hősök és a profil, jobbra a gombok.
+   Csak akkor, ha a menü látszik ÉS az oszlop ki is szélesedett (induláskor még nincs data-scr – ezért a :not([data-scr]) is) */
 @media (min-width:900px) and (min-height:560px) and (min-aspect-ratio:5/4){
-  body[data-scr="scr-menu"] #app{max-width:min(100vw,1240px);}
-  #scr-menu{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-rows:auto auto auto 1fr;column-gap:clamp(24px,4vw,56px);align-content:start;padding:0 clamp(20px,3vw,40px) 16px;}
-  #scr-menu>.m-logo{grid-column:1;grid-row:1;margin:0 0 -34px;}
-  #scr-menu>.fan{grid-column:1;grid-row:2;}
-  #scr-menu>.profile-bar{grid-column:1;grid-row:3;align-self:start;}
-  #scr-menu>.menu-btns{grid-column:2;grid-row:1/5;align-self:start;padding-top:clamp(16px,4vh,48px);}
-  #scr-menu>.m-foot{grid-column:1;grid-row:4;align-self:start;margin-top:14px;}
+  body:is(:not([data-scr]),[data-scr="scr-menu"]) #app{max-width:min(100vw,1240px);}
+  body:is(:not([data-scr]),[data-scr="scr-menu"]) #scr-menu{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-rows:auto auto auto 1fr;column-gap:clamp(24px,4vw,56px);align-content:start;padding:0 clamp(20px,3vw,40px) 16px;}
+  body:is(:not([data-scr]),[data-scr="scr-menu"]) #scr-menu>.m-logo{grid-column:1;grid-row:1;margin:0 0 -34px;}
+  body:is(:not([data-scr]),[data-scr="scr-menu"]) #scr-menu>.fan{grid-column:1;grid-row:2;}
+  body:is(:not([data-scr]),[data-scr="scr-menu"]) #scr-menu>.profile-bar{grid-column:1;grid-row:3;align-self:start;}
+  body:is(:not([data-scr]),[data-scr="scr-menu"]) #scr-menu>.menu-btns{grid-column:2;grid-row:1/5;align-self:start;padding-top:clamp(16px,4vh,48px);}
+  body:is(:not([data-scr]),[data-scr="scr-menu"]) #scr-menu>.m-foot{grid-column:1;grid-row:4;align-self:start;margin-top:14px;}
 }
 @media (max-width:440px){#scr-coll .top{flex-wrap:wrap;row-gap:8px;} #scr-coll .top .seg{flex:1 1 100%;display:grid;grid-template-columns:1fr 1fr;}}
 .logbox .lc,#gRight .lc{color:#ffe08a;text-decoration:underline dotted rgba(255,224,138,.6);text-underline-offset:2px;cursor:pointer;}
