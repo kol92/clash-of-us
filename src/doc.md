@@ -936,3 +936,6 @@ Hősképesség-ötletek a táblázatban (még nem zöldek, nincsenek beépítve)
 - **Ajándék:** mindenki kap egy **Full Art Limitált boostert** (`p.faLtdPacks`, profilonként egyszer: `p.gifts` `pc-fa-ltd`), a Boltban „🍑 Full Art Limitált booster” gombbal bontható (piros pack, „Full Art” szalag).
 - **Tartalom (`faLtdRoll`):** 3 lap, **mind Full Art**, bármelyik **megjelent** szettből (alap + Amsterdam; a Peaches lapjai csak 11-01 19:00 után bontva lehetnek benne); legalább egy ritka; **15% eséllyel** az egyik lap helyén egy **arany lap** (a megjelent kiegészítők arany változataiból). Mérés 4000 packon: 14,8% arany.
 
+## Javítás: arany Laszy a Gyűjteményben (2026-10-28)
+- A Gyűjtemény „Arany hősök” sora az összes arany hőst kilistázta (`GOLD_HEROES`), így élesben látszott a még meg nem jelent Laszy arany portréja. Most csak a megjelent hősök (`HEROES_ON()`) – Laszy 11-01 19:00-tól.
+
