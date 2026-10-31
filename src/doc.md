@@ -969,3 +969,8 @@ Hősképesség-ötletek a táblázatban (még nem zöldek, nincsenek beépítve)
 - Ellenőrizve az éles címet szimulálva: most (10-31) semmi Peaches nem látszik (9 hős, Halloween, 1. szezon, Amsterdam paklik, a parti lelkénél nincs Peaches ital); 11-01 18:05 UTC-re állított órával minden bekapcsol (10 hős, VIP, 2. szezon, Peaches paklik és bolt).
 - **Előzetes értesítő (`pc-eve`):** belépéskor mindenkinek egyszer: „November 1-jén (vasárnap) / Ma 19:00-kor érkezik…”; a megjelenés után egyszer „Megérkezett…”.
 
+## Peaches packok a jutalmakban + limitált Peaches küldetések (2026-10-31, Tomi)
+- **11-01 19:00-tól** (`setLive('pc')`): a **napi ingyen pack** Peaches pack (`freePackSet`), a **napi küldetés** Peaches packot, a **heti** Peaches Shiny packot ad, a **szerencsekerék** pack / Shiny mezője Peaches boostert (`GIFT_SET()` / `giveSetPack`, a legújabb megjelent szett).
+- **Limitált Peaches küldetések** (`PCQ`, `p.pcq`, mint az Amsterdamnál): a megjelenéstől 2 hétig (`PCQ_END`, 11-15 19:00), 8 feladat (nyerj 1; játssz / nyerj legalább 3, játssz legalább 10 Peaches lappal; 100 hős-sebzés; ranked győzelem; PvP egy barát ellen; a végén „mind”), egyenként 2 Peaches booster, az utolsó 5 – összesen 19. A menüben 🍑 jelzés. Az Amsterdam limitált küldetések 11-02 19:00-ig mellette maradnak. Season Pass XP-t nem adnak (mint az Amsterdam-küldetések).
+- Ellenőrizve: 11-01 18:05 UTC-re állított órával (Peaches packok mindenhol) és a mostani idővel (még Amsterdam).
+

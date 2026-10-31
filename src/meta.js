@@ -127,7 +127,13 @@ const owned = id => { const e = Store.p?.coll[id]; return e ? e.n + e.f : 0; };
 const ownsFoil = id => (Store.p?.coll[id]?.f || 0) > 0;
 const earnedToday = () => Store.p && Store.p.earned.date === today() ? Store.p.earned.amt : 0;
 const AH_FREE_FROM = Date.UTC(2026, 9, 19, 22, 0, 0);   /* kedd 2026-10-20 0:00 (Budapest) – a napi ingyen pack innentől Amsterdam Hősei */
-const freePackSet = () => (setLive('ah') && Date.now() >= AH_FREE_FROM) ? 'ah' : 'base';
+const freePackSet = () => setLive('pc') ? 'pc' : (setLive('ah') && Date.now() >= AH_FREE_FROM) ? 'ah' : 'base';   /* 2026-11-01 19:00-tól Peaches (Tomi) */
+/* a legújabb megjelent szett ajándék-packja (napi küldetés, heti küldetés, szerencsekerék) – 2026-10-31, Tomi */
+const GIFT_SET = () => setLive('pc') ? 'pc' : setLive('ah') ? 'ah' : 'base';
+const GIFT_INFO = { pc: { key: 'pcPacks', skey: 'pcShinyPacks', n: 'Peaches', ic: '🍑', cls: 'pc' }, ah: { key: 'ahPacks', skey: 'ahShinyPacks', n: 'Amsterdam', ic: '🌷', cls: 'ah' }, base: { key: 'giftPacks', skey: 'shinyPacks', n: '', ic: '🎁', cls: '' } };
+function giveSetPack(p, shiny, n = 1) { const g = GIFT_INFO[GIFT_SET()], k = shiny ? g.skey : g.key; p[k] = (p[k] || 0) + n; return g; }
+const setPackName = shiny => { const g = GIFT_INFO[GIFT_SET()]; return g.n ? `${g.n}${shiny ? ' Shiny' : ''} pack` : (shiny ? 'Shiny pack' : 'pack'); };
+const setPackIcon = shiny => { const g = GIFT_INFO[GIFT_SET()]; return `<span class="q-pack${shiny ? ' shiny' : ''}${g.cls ? ' ' + g.cls : ''}"></span>`; };
 const freePackReady = () => !!Store.p && Store.p.freeDate !== today();
 
 // ---- mentés: felhő (Claude-fiók) vagy ez az eszköz ----
@@ -723,8 +729,9 @@ function wheelApply(p, seg) {   // a nyeremény jóváírása; visszaadja a szö
   const k = WHEEL[seg].k;
   if (k[0] === 'c') { const n = +k.slice(1); p.coins += n; return { txt: `+${n} coin`, ic: 'coin' }; }
   /* 2026-10-19 (Tomi): az Amsterdam Hősei megjelenésétől a kerék Amsterdam boostert ad */
-  if (k === 'pack') { if (setLive('ah')) { p.ahPacks = (p.ahPacks || 0) + 1; return { txt: '1 Amsterdam booster – a Boltban bonthatod ki', ic: 'pack' }; } p.giftPacks = (p.giftPacks || 0) + 1; return { txt: '1 booster pack – a Boltban bonthatod ki', ic: 'pack' }; }
-  if (k === 'shiny') { if (setLive('ah')) { p.ahShinyPacks = (p.ahShinyPacks || 0) + 1; return { txt: '1 Amsterdam Shiny pack – a Boltban bonthatod ki', ic: 'shiny' }; } p.shinyPacks = (p.shinyPacks || 0) + 1; return { txt: '1 Shiny pack – a Boltban bonthatod ki', ic: 'shiny' }; }
+  /* 2026-11-01 19:00-tól (Tomi): Peaches booster */
+  if (k === 'pack') { const g = giveSetPack(p, false); return { txt: `1 ${g.n ? g.n + ' ' : ''}booster – a Boltban bonthatod ki`, ic: 'pack' }; }
+  if (k === 'shiny') { const g = giveSetPack(p, true); return { txt: `1 ${g.n ? g.n + ' ' : ''}Shiny pack – a Boltban bonthatod ki`, ic: 'shiny' }; }
   if (k === 'again') { p.wheel.extra = (p.wheel.extra || 0) + 1; return { txt: 'Még egy pörgetés!', ic: 'again' }; }
   if (k === 'shard') {
     p.wheel.shards = (p.wheel.shards || 0) + 1;
@@ -847,7 +854,7 @@ function renderShop() {
     p.ahPacks > 0 ? `<div class="gift-row">${`<button class="btn primary gift" id="giftAh">🌷 Amsterdam pack bontása${p.ahPacks > 1 ? ` (${p.ahPacks})` : ''}</button>`}${p.ahPacks > 1 ? `<button class="bulk-btn" data-bulk="giftAh" title="Mindet egyszerre">⚡ Mind (${p.ahPacks})</button>` : ''}</div>` : '',
     p.ahShinyPacks > 0 ? `<div class="gift-row">${`<button class="btn primary shiny-btn" id="giftAhShiny">🌷 Amsterdam Shiny pack${p.ahShinyPacks > 1 ? ` (${p.ahShinyPacks})` : ''}</button>`}${p.ahShinyPacks > 1 ? `<button class="bulk-btn" data-bulk="giftAhShiny" title="Mindet egyszerre">⚡ Mind (${p.ahShinyPacks})</button>` : ''}</div>` : '',
     p.shinyPacks > 0 ? `<div class="gift-row">${`<button class="btn primary shiny-btn" id="giftShiny">🎁 Ajándék Shiny pack${p.shinyPacks > 1 ? ` (${p.shinyPacks})` : ''}</button>`}${p.shinyPacks > 1 ? `<button class="bulk-btn" data-bulk="giftShiny" title="Mindet egyszerre">⚡ Mind (${p.shinyPacks})</button>` : ''}</div>` : '',
-    `<button class="btn primary" id="freePack" ${free ? '' : 'disabled'}>${free ? (freePackSet() === 'ah' ? '🌷 Napi ingyen Amsterdam pack' : '🎁 Napi ingyen pack') : 'Mai ingyen pack elhasználva'}</button>`].join('');
+    `<button class="btn primary" id="freePack" ${free ? '' : 'disabled'}>${free ? (freePackSet() === 'pc' ? '🍑 Napi ingyen Peaches pack' : freePackSet() === 'ah' ? '🌷 Napi ingyen Amsterdam pack' : '🎁 Napi ingyen pack') : 'Mai ingyen pack elhasználva'}</button>`].join('');
   $('#shopBody').innerHTML = `
     <div class="wallet"><span class="coin" aria-hidden="true"></span><b>${p.coins}</b><small>coin</small></div>
     ${limited ? '<button class="lim-jump" data-jump><img src="art/ui/ic-timer.webp" alt="" aria-hidden="true"> Limitált lapok és portrék – lejjebb ↓</button>' : ''}
@@ -1609,7 +1616,31 @@ const AHQ = [
   { id: 'play10', t: 'Játssz 1 meccset legalább 10 Amsterdam Hősei lappal a paklidban', goal: 1, f: m => m.ah >= 10 ? 1 : 0 },
   { id: 'all',    t: 'Teljesítsd az összes Amsterdam Hősei küldetést', goal: 7, all: true, rew: 5 },
 ];
-const ahqLive = () => setLive('ah') && Date.now() < AHQ_END;
+const ahqLive = () => setLive('ah') && Date.now() < AHQ_END;   /* 11-02 19:00-ig – a Peaches-küldetésekkel egy napig együtt fut */
+/* Peaches limitált küldetések (2026-10-31, Tomi): ugyanaz, mint az Amsterdamnál – a megjelenéstől 2 hétig, egyenként 2 Peaches booster, az utolsó 5 */
+const PCQ_END = SET_RELEASE.pc + 14 * 864e5;
+const PCQ = [
+  { id: 'win1',   t: 'Nyerj 1 meccset', goal: 1, f: m => m.win ? 1 : 0 },
+  { id: 'play3',  t: 'Játssz 1 meccset legalább 3 Peaches and Cream lappal a paklidban', goal: 1, f: m => m.pc >= 3 ? 1 : 0 },
+  { id: 'dmg100', t: 'Okozz összesen 100 sebzést az ellenfél hősének', goal: 100, f: m => m.heroDmg || 0 },
+  { id: 'win3',   t: 'Nyerj 1 meccset legalább 3 Peaches and Cream lappal a paklidban', goal: 1, f: m => m.win && m.pc >= 3 ? 1 : 0 },
+  { id: 'rk',     t: 'Nyerj 1 ranked meccset', goal: 1, f: m => m.win && m.ranked ? 1 : 0 },
+  { id: 'fr',     t: 'Játssz egy PvP meccset egy barátod ellen', goal: 1, f: m => m.friend ? 1 : 0 },
+  { id: 'play10', t: 'Játssz 1 meccset legalább 10 Peaches and Cream lappal a paklidban', goal: 1, f: m => m.pc >= 10 ? 1 : 0 },
+  { id: 'all',    t: 'Teljesítsd az összes Peaches and Cream küldetést', goal: 7, all: true, rew: 5 },
+];
+const pcqLive = () => setLive('pc') && Date.now() < PCQ_END;
+const pcCount = list => Object.entries(list || {}).reduce((a, [id, n]) => a + (CARD[id]?.set === 'pc' ? n : 0), 0);
+function pcqState(p) { p.pcq = p.pcq || { prog: {}, done: [] }; return p.pcq; }
+function pcqOnMatch(m, got) {
+  const p = Store.p; if (!p || !pcqLive()) return;
+  const st = pcqState(p);
+  const finish = q => { st.done.push(q.id); const n = q.rew || 2; p.pcPacks = (p.pcPacks || 0) + n; got.push({ txt: q.t, rew: `${n} Peaches booster`, ah: true }); };
+  for (const q of PCQ) { if (q.all || st.done.includes(q.id)) continue;
+    st.prog[q.id] = Math.min(q.goal, (st.prog[q.id] || 0) + (q.f(m) || 0)); if (st.prog[q.id] >= q.goal) finish(q); }
+  const fin = PCQ.find(q => q.all); st.prog.all = PCQ.filter(q => !q.all && st.done.includes(q.id)).length;
+  if (!st.done.includes(fin.id) && st.prog.all >= fin.goal) finish(fin);
+}
 const ahCount = list => Object.entries(list || {}).reduce((a, [id, n]) => a + (CARD[id]?.set === 'ah' ? n : 0), 0);
 function ahqState(p) { p.ahq = p.ahq || { prog: {}, done: [] }; return p.ahq; }
 function ahqOnMatch(m, got) {   /* a meccs végén: haladás + jutalom (azonnal jóváírva, mint a napi küldetésnél) */
@@ -1627,12 +1658,13 @@ function questsOnMatch(m) {
   const step = (pool, q, reward) => {
     if (q.done) return;
     q.prog = Math.min(qDef(pool, q.id).goal, q.prog + (qDef(pool, q.id).f(m, q) || 0));
-    if (q.prog >= qDef(pool, q.id).goal) { q.done = true; reward(); got.push({ txt: qText(pool, q), rew: setLive('ah') ? (pool === Q_WEEKLY ? '1 Amsterdam Shiny pack' : '1 Amsterdam pack') : (pool === Q_WEEKLY ? '1 Shiny pack' : '1 pack'), weekly: pool === Q_WEEKLY }); }
+    if (q.prog >= qDef(pool, q.id).goal) { q.done = true; reward(); got.push({ txt: qText(pool, q), rew: '1 ' + setPackName(pool === Q_WEEKLY), weekly: pool === Q_WEEKLY }); }
   };
   /* 2026-10-19 19:00-tól (Tomi): a napi küldetés Amsterdam packot, a heti Amsterdam Shiny packot ad */
-  for (const q of Q.daily) step(Q_DAILY, q, () => { if (setLive('ah')) p.ahPacks = (p.ahPacks || 0) + 1; else p.giftPacks = (p.giftPacks || 0) + 1; });
-  step(Q_WEEKLY, Q.weekly, () => { if (setLive('ah')) p.ahShinyPacks = (p.ahShinyPacks || 0) + 1; else p.shinyPacks = (p.shinyPacks || 0) + 1; });
+  for (const q of Q.daily) step(Q_DAILY, q, () => giveSetPack(p, false));   /* 2026-11-01 19:00-tól Peaches pack */
+  step(Q_WEEKLY, Q.weekly, () => giveSetPack(p, true));
   try { ahqOnMatch(m, got); } catch (e) {}
+  try { pcqOnMatch(m, got); } catch (e) {}
   save(); renderQuestBadge();
   return got;
 }
@@ -1642,9 +1674,10 @@ function renderQuestBadge() {
   b.textContent = `${n}/4`;
   /* Amsterdam limitált küldetések jelzése a menüben (2026-10-19, Tomi) */
   const tile = $('#goQuests'), sm = tile?.querySelector('.m-txt small'); if (!tile || !sm) return;
-  const st = ahqState(Store.p), nd = AHQ.filter(q => st.done.includes(q.id)).length, on = ahqLive() && nd < AHQ.length;
-  tile.classList.toggle('ah-hot', on); tile.classList.toggle('ah-new', on && !Store.p.ahqSeen);
-  sm.innerHTML = on ? `🌷 <span class="ah-q">Limitált Amsterdam küldetések</span> · ${nd}/${AHQ.length} kész` : '3 napi + 1 heti feladat';
+  const pcOn = pcqLive(), L = pcOn ? PCQ : AHQ, st = pcOn ? pcqState(Store.p) : ahqState(Store.p), nd = L.filter(q => st.done.includes(q.id)).length, on = (pcOn || ahqLive()) && nd < L.length;
+  const seen = pcOn ? Store.p.pcqSeen : Store.p.ahqSeen;
+  tile.classList.toggle('ah-hot', on); tile.classList.toggle('ah-new', on && !seen);
+  sm.innerHTML = on ? `${pcOn ? '🍑' : '🌷'} <span class="ah-q">Limitált ${pcOn ? 'Peaches' : 'Amsterdam'} küldetések</span> · ${nd}/${L.length} kész` : '3 napi + 1 heti feladat';
 }
 function renderQuests() {
   const p = Store.p; if (!p) return;
@@ -1660,12 +1693,17 @@ function renderQuests() {
       <div class="q-bar"><i style="width:${Math.min(100, pr / q.goal * 100)}%"></i><span>${Math.min(pr, q.goal)}/${q.goal}</span></div></div>
       <div class="q-rew">${dn ? '<span class="q-ok">✓</span>' : ''}<span class="q-pack ah"></span><em>${q.rew || 2} Amsterdam</em></div></div>`; };
   const ahBlock = ahqLive() ? `<div class="lbl">🌷 Amsterdam Hősei – limitált küldetések <small>· még ${hrs(AHQ_END - now)}</small></div>${AHQ.map(ahRow).join('')}` : '';
-  $('#questBody').innerHTML = `${ahBlock}
+  const pst = pcqState(p), pcRow = q => { const pr = pst.prog[q.id] || 0, dn = pst.done.includes(q.id);
+    return `<div class="q-row ah pcq${q.all ? ' weekly' : ' daily'}${dn ? ' done' : ''}"><div class="q-main"><b>${q.t}</b>
+      <div class="q-bar"><i style="width:${Math.min(100, pr / q.goal * 100)}%"></i><span>${Math.min(pr, q.goal)}/${q.goal}</span></div></div>
+      <div class="q-rew">${dn ? '<span class="q-ok">✓</span>' : ''}<span class="q-pack pc"></span><em>${q.rew || 2} Peaches</em></div></div>`; };
+  const pcBlock = pcqLive() ? `<div class="lbl">🍑 Peaches and Cream – limitált küldetések <small>· még ${hrs(PCQ_END - now)}</small></div>${PCQ.map(pcRow).join('')}` : '';
+  $('#questBody').innerHTML = `${pcBlock}${ahBlock}
     <div class="lbl">Napi küldetések <small>· új feladatok ${hrs(mid - now)} múlva</small></div>
-    ${Q.daily.map(q => row(Q_DAILY, q, setLive('ah') ? '<span class="q-pack ah"></span><em>1 Amsterdam</em>' : '<span class="q-pack"></span><em>1 pack</em>', 'daily')).join('')}
+    ${Q.daily.map(q => row(Q_DAILY, q, `${setPackIcon(false)}<em>1 ${GIFT_INFO[GIFT_SET()].n || 'pack'}</em>`, 'daily')).join('')}
     <div class="lbl">Heti küldetés <small>· hétfő 0:01-kor frissül (${hrs(weekEnds() - now)})</small></div>
-    ${row(Q_WEEKLY, Q.weekly, setLive('ah') ? '<span class="q-pack shiny ah"></span><em>1 Amsterdam Shiny</em>' : '<span class="q-pack shiny"></span><em>1 Shiny</em>', 'weekly')}
-    <p class="q-note">A haladás meccs végén számít${ahqLive() ? ' (az Amsterdam-küldetéseknél a PvP és a ranked meccs is)' : ' (a bot elleni meccseken)'}. A jutalom teljesítéskor azonnal jóváíródik, a Boosterek menüben bonthatod ki.</p>`;
+    ${row(Q_WEEKLY, Q.weekly, `${setPackIcon(true)}<em>1 ${GIFT_INFO[GIFT_SET()].n ? GIFT_INFO[GIFT_SET()].n + ' Shiny' : 'Shiny'}</em>`, 'weekly')}
+    <p class="q-note">A haladás meccs végén számít${pcqLive() ? ' (a Peaches-küldetéseknél a PvP és a ranked meccs is)' : ahqLive() ? ' (az Amsterdam-küldetéseknél a PvP és a ranked meccs is)' : ' (a bot elleni meccseken)'}. A jutalom teljesítéskor azonnal jóváíródik, a Boosterek menüben bonthatod ki.</p>`;
 }
 
 // ---- Season Pass (ingyenes) ----
@@ -2772,7 +2810,7 @@ function pvpEndMatch() {
     p.pvpSeen = [...p.pvpSeen.slice(-40), id];
     const aw = awardMatch(draw ? 'draw' : win ? 'win' : 'loss');
     const fr = (typeof frOn === 'function' && frOn()) && FR.list.some(d => d.status === 'accepted' && frOther(d) === S.pvp.opp);
-    const qd = questsOnMatch({ win, hero: S.players[ME].heroId, ah: ahCount(S.pvp.list), ranked: !!S.pvp.ranked, friend: !!fr, ...(S.qs || { actions: 0, items: 0, chars: 0, locs: 0, big: 0, heroDmg: 0, kills: 0 }) });
+    const qd = questsOnMatch({ win, hero: S.players[ME].heroId, ah: ahCount(S.pvp.list), pc: pcCount(S.pvp.list), ranked: !!S.pvp.ranked, friend: !!fr, ...(S.qs || { actions: 0, items: 0, chars: 0, locs: 0, big: 0, heroDmg: 0, kills: 0 }) });
     const px = passOnMatch(draw ? 'draw' : win ? 'win' : 'loss', qd);
     try { S.evRes = eventOnMatch({ win, pvp: true, ranked: !!S.pvp.ranked, lv: S.pvp.ranked ? 3 : 0, hero: S.players[ME].heroId, ...(S.qs || { actions: 0, items: 0, chars: 0, locs: 0, big: 0, heroDmg: 0, kills: 0 }) }); } catch (e) {}
     p.pvp = p.pvp || { w: 0, l: 0, d: 0 }; p.pvp[win ? 'w' : draw ? 'd' : 'l']++; save();
@@ -2964,7 +3002,7 @@ $('#goPvp').onclick = () => { if (needProfile()) return; if (TEST_MODE) return t
 $('#goShop').onclick = () => { if (needProfile()) return; renderShop(); show('scr-shop'); };
 $('#goDecks').onclick = () => { if (needProfile()) return; renderDecks(); show('scr-decks'); };
 $('#goWheel').onclick = () => { if (needProfile()) return; openWheel(); };
-$('#goQuests').onclick = () => { if (needProfile()) return; if (ahqLive() && !Store.p.ahqSeen) { Store.p.ahqSeen = true; save(); renderQuestBadge(); } renderQuests(); show('scr-quests'); };
+$('#goQuests').onclick = () => { if (needProfile()) return; if (pcqLive() && !Store.p.pcqSeen) { Store.p.pcqSeen = true; save(); renderQuestBadge(); } else if (ahqLive() && !Store.p.ahqSeen) { Store.p.ahqSeen = true; save(); renderQuestBadge(); } renderQuests(); show('scr-quests'); };
 
 bootProfile();
 
