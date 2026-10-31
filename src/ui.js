@@ -2039,7 +2039,7 @@ function endMatch() {
   const kill = S.killShot && S.reason !== 'time' ? `<span class="ko-why">🏁 Döntő csapás: ${S.killShot}</span>` : '';
   const aw = awardMatch(draw ? 'draw' : win ? 'win' : 'loss');
   if (S.ranked && !S.rkDone) { S.rkDone = true; S.rkRes = rankOnMatch(draw ? 'draw' : win ? 'win' : 'loss'); }
-  const qd = S.qDone ? [] : questsOnMatch({ win, hero: S.players[ME].heroId, ah: ahCount(S.myList), ranked: !!S.ranked, ...(S.qs || { actions: 0, items: 0, chars: 0, locs: 0, big: 0, heroDmg: 0, kills: 0 }) });
+  const qd = S.qDone ? [] : questsOnMatch({ win, hero: S.players[ME].heroId, ah: ahCount(S.myList), pc: pcCount(S.myList), ranked: !!S.ranked, ...(S.qs || { actions: 0, items: 0, chars: 0, locs: 0, big: 0, heroDmg: 0, kills: 0 }) });
   const px = S.qDone ? null : passOnMatch(draw ? 'draw' : win ? 'win' : 'loss', qd);
   if (!S.qDone) try { S.evRes = eventOnMatch({ win, ranked: !!S.ranked, lv: S.botLv || 2, hero: S.players[ME].heroId, ...(S.qs || { actions: 0, items: 0, chars: 0, locs: 0, big: 0, heroDmg: 0, kills: 0 }) }); } catch (e) {}
   S.qDone = true;
