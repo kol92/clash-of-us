@@ -964,3 +964,8 @@ Hősképesség-ötletek a táblázatban (még nem zöldek, nincsenek beépítve)
 ## Javítás: Peaches italok idő előtt (2026-10-28 este)
 - Élesben Tomi, a parti lelke Jägermeistert (Peaches ital) osztott ki – a véletlen lap-készletek a még meg nem jelent szettet nem szűrték. Most `setOk(x)` (engine.js) minden véletlen készletben: parti lelke, Kristóf itala, Peaches helyszín / pultos / Korlátlan italfogyasztás, Coffee Shop eszköz – a szett csak a megjelenésétől (`setLive`) jöhet.
 
+## A teljes Peaches-csomag élesben, időzárral (2026-10-31)
+- A `teszt` ág beolvadt a `main`-be. **2026-11-01 19:00-kor (budapesti idő, UTC 18:00) magától indul:** a Peaches szett (lapok, packok, Laszy, kölcsönpaklik – az Amsterdam kölcsönpaklik eltűnnek), a 2. Season Pass („Éjfél után”, `s3`), a VIP event (a Halloween ekkor zár, jutalmai 11-10-ig átvehetők), a Peaches menü- és meccs-háttér, az éjféli videó. Az időpontok mostantól mind a `SET_RELEASE.pc`-ből jönnek, a játékos óra-zónájától függetlenül.
+- Ellenőrizve az éles címet szimulálva: most (10-31) semmi Peaches nem látszik (9 hős, Halloween, 1. szezon, Amsterdam paklik, a parti lelkénél nincs Peaches ital); 11-01 18:05 UTC-re állított órával minden bekapcsol (10 hős, VIP, 2. szezon, Peaches paklik és bolt).
+- **Előzetes értesítő (`pc-eve`):** belépéskor mindenkinek egyszer: „November 1-jén (vasárnap) / Ma 19:00-kor érkezik…”; a megjelenés után egyszer „Megérkezett…”.
+

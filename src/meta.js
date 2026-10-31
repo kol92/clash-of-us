@@ -1684,7 +1684,7 @@ const SEASONS = [
       { coins: 200 }, { packs: 3 }, { shiny: 1 }, { coins: 250 }, { heroPick: true },
     ] },
   // 2026-10-12: a játék indulása – 30 napos szezon, a ranked első szezonja is
-  { id: 's2', name: '1. szezon · Nyitókör', start: new Date(2026, 9, 12, 0, 0), end: new Date(2026, 10, 1, 19, 0),   /* 2026-10-26 (Tomi): 11-11 helyett 11-01 19:00-kor zár, a Peaches megjelenésével */
+  { id: 's2', name: '1. szezon · Nyitókör', start: new Date(2026, 9, 12, 0, 0), end: new Date(SET_RELEASE.pc),   /* 2026-10-26 (Tomi): 11-11 helyett 11-01 19:00-kor zár, a Peaches megjelenésével */
     tiers: [
       { coins: 50 }, { packs: 1 }, { coins: 75 }, { card: 'c_pifti2', had: 250 }, { shiny: 1 },
       { coins: 100 }, { packs: 2 }, { card: 'c_tzs2', had: 250 }, { packs: 1 }, { port: 'p_laci_kave' },
@@ -1694,7 +1694,7 @@ const SEASONS = [
       { coins: 200 }, { packs: 3 }, { shiny: 1 }, { coins: 250 }, { goldPick: true },
     ] },
   // 2026-11-01 19:00: a Peaches and Cream megjelenésével indul (Tomi, 2026-10-26) – december 1-ig
-  { id: 's3', name: '2. szezon · Éjfél után', start: new Date(2026, 10, 1, 19, 0), end: new Date(2026, 11, 1, 0, 0),
+  { id: 's3', name: '2. szezon · Éjfél után', start: new Date(SET_RELEASE.pc), end: new Date(2026, 11, 1, 0, 0),
     tiers: [
       { pc: 1 }, { coins: 50 }, { packs: 1 }, { coins: 75 }, { pc: 1 },
       { coins: 100 }, { shiny: 1 }, { pc: 2 }, { coins: 100 }, { card: 'a_lambo_v' },   /* 10. szint: mozgó Flaming Lamborghini (2 példány) */
@@ -1903,7 +1903,7 @@ try { const q = new URLSearchParams(location.search); if (q.has('ev')) { localSt
 const evTest = () => { if (typeof TEST_MODE !== 'undefined' && TEST_MODE) return true; try { return localStorage.getItem('bou_evtest') === '1'; } catch { return false; } };
 const EVENTS = [
   // draft: true → csak teszt módban látszik (?ev=test). Élesítve: 2026-10-15 19:00 (Tomi)
-  { id: 'hw26', name: 'Halloween', icon: '🎃', theme: 'hw', music: 'art/snd/halloween.m4a', img: { btn: 'art/ui/ev-hw-btn.webp', banner: 'art/ui/ev-hw-banner.webp', pt: 'art/ui/ev-pumpkin.webp' }, teaser: new Date(2026, 9, 15, 0, 0), start: new Date(2026, 9, 15, 19, 0), end: new Date(2026, 10, 1, 19, 0) /* 2026-10-27 (Tomi): a VIP event váltja – eredetileg 11-03 0:00 */, claimUntil: new Date(2026, 10, 10, 0, 0), goal: 100,
+  { id: 'hw26', name: 'Halloween', icon: '🎃', theme: 'hw', music: 'art/snd/halloween.m4a', img: { btn: 'art/ui/ev-hw-btn.webp', banner: 'art/ui/ev-hw-banner.webp', pt: 'art/ui/ev-pumpkin.webp' }, teaser: new Date(2026, 9, 15, 0, 0), start: new Date(2026, 9, 15, 19, 0), end: new Date(SET_RELEASE.pc) /* 2026-10-27 (Tomi): a VIP event váltja – eredetileg 11-03 0:00 */, claimUntil: new Date(2026, 10, 10, 0, 0), goal: 100,
     sub: 'Gyűjts tökpontokat, és vidd haza a Halloween skineket és lapokat!',
     pts: 'tökpont',
     daily: [
@@ -1926,7 +1926,7 @@ const EVENTS = [
     ] },
   // VIP event (2026-10-27, Tomi): a Peaches and Cream megjelenésével indul, a Halloween helyett. Astra UI-jai: art/ui/ev-vip-*.webp, hátlap: art/back_vip.webp
   { id: 'vip26', name: 'VIP', icon: '🪩', theme: 'vip', img: { btn: 'art/ui/ev-vip-btn.webp', banner: 'art/ui/ev-vip-banner.webp', pt: 'art/ui/ev-vip-ball.webp', myst: 'art/ui/ev-vip-myst.webp' },
-    start: new Date(2026, 10, 1, 19, 0), end: new Date(2026, 10, 23, 0, 0), claimUntil: new Date(2026, 10, 30, 0, 0), goal: 100,
+    start: new Date(SET_RELEASE.pc), end: new Date(2026, 10, 23, 0, 0), claimUntil: new Date(2026, 10, 30, 0, 0), goal: 100,
     sub: 'Gyűjts diszkógömböket, és juss be a VIP-be: Peaches boosterek és a VIP hátlap vár!',
     pts: 'diszkógömb',
     teaserTxt: 'Gyűjts diszkógömböket napi küldetésekkel és kihívásokkal: <b>Peaches boosterek</b>, <b>Peaches Shiny packok</b> és a <b>VIP hátlap</b> vár rád.',
@@ -2183,13 +2183,13 @@ function pcNewsCheck() {
   const p = Store.p; if (!p || p.onboard || (typeof S !== 'undefined' && S) || $('#layer .overlay') || $('#scr-menu').hidden) return false;
   p.gifts = p.gifts || []; let gift = false;
   if (!p.gifts.includes('pc-fa-ltd')) { p.gifts.push('pc-fa-ltd'); p.faLtdPacks = (p.faLtdPacks || 0) + 1; gift = true; save(); renderProfileBar(); }
-  const live = setLive('pc'), key = live ? 'pc-launch' : 'pc-teaser';
+  const live = setLive('pc'), key = live ? 'pc-launch' : 'pc-eve';   /* 2026-10-31 (Tomi): az előzetes még egyszer, belépéskor mindenkinek */
   p.news = p.news || []; if (p.news.includes(key) && !gift) return false;
   if (live && Date.now() > SET_RELEASE.pc + 7 * 864e5 && !gift) return false;
   if (!p.news.includes(key)) p.news.push(key); save();
   const o = document.createElement('div'); o.className = 'overlay';
   o.innerHTML = `<div class="modal acct-box ah-news pc-news">
-    <p class="ah-news-t">${live ? 'Megérkezett a Best of Us TCG új kiegészítője: az „Egy Éjszaka a Peaches &amp; Creamben”!' : '<b>November 1-jén (vasárnap) 19:00-kor</b> érkezik a Best of Us TCG új kiegészítője: az „Egy Éjszaka a Peaches &amp; Creamben”!'}</p>
+    <p class="ah-news-t">${live ? 'Megérkezett a Best of Us TCG új kiegészítője: az „Egy Éjszaka a Peaches &amp; Creamben”!' : `<b>${new Date().toDateString() === new Date(SET_RELEASE.pc).toDateString() ? 'Ma' : 'November 1-jén (vasárnap)'} 19:00-kor</b> érkezik a Best of Us TCG új kiegészítője: az „Egy Éjszaka a Peaches &amp; Creamben”!`}</p>
     <div class="ah-news-packs"><img src="art/ui/pack-pc.webp" alt="Peaches and Cream booster"><img src="art/ui/pack-pcshiny.webp" alt="Peaches Shiny booster"></div>
     ${live ? '<p class="live">Új lapok, éjfél utáni hatások, Laszy az új hős, új Season Pass és a VIP event – irány a Bolt!</p>' : ''}
     ${gift || p.faLtdPacks > 0 ? `<p class="live">🎁 Ennek örömére <b>ajándékba kaptál egy Full Art Limitált boostert</b> – a Boltban bonthatod ki! Mind a 3 lapja Full Art, bármelyik szettből jöhet, és <b>15% eséllyel arany lap</b> is lapul benne. Nagyon limitált, csak most jár!</p>` : ''}
