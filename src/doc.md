@@ -977,4 +977,5 @@ Hősképesség-ötletek a táblázatban (még nem zöldek, nincsenek beépítve)
 ## Új mechanikák magyarázata (2026-11-01, Tomi)
 - A megjelenéskor felugró „Megérkezett…” ablak (`pcNewsCheck`) két dobozban elmagyarázza az **Éjfél után** (6. körtől; a lent lévő lap éjfélkor bekapcsol, a később lerakott rögtön erősebb; Laszynál +1) és a **Kidobás** (vissza a gazdája kezébe, eszközök elvesznek, +1 költség; Portás / P.G. / „Kérlek, hagyd el…” célzott, a saját is; védett: Pifti, Purple Card, VIP szoba) szabályát.
 - A lapok alatti súgóban is megjelenik a két kulcsszó (`KW_HELP.mid`, `KW_HELP.kick`): minden éjfél utáni lapnál, és ahol a lap szövege kidobást / elzavarást említ.
+- **Halloween zene (2026-11-01):** a Halloween event 19:00-kor zár, így a zene (és a Halloween menü-háttér) ekkor leáll; a VIP eventnek nincs zenéje. Ha az app 19:00-kor épp nyitva van, egy időzítő vált át (`renderEventTile` + `Music.sync`).
 

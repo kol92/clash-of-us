@@ -2674,7 +2674,7 @@ body.has-tbar #app{height:calc(var(--apph,100%) - var(--tbar,0px));}   /* teszt 
 <script src="vendor/firebase-auth-compat.js"></script>
 <script src="vendor/firebase-firestore-compat.js"></script>
 <script src="vendor/firebase-database-compat.js"></script>
-<script>window.APP_VERSION = "2026.10.31-2307"; window.APP_BUILD = "2026.11.01-1511";</script>
+<script>window.APP_VERSION = "2026.10.31-2307"; window.APP_BUILD = "2026.11.01-1515";</script>
 <script>// ===== Best of Us – saját szerver (Firebase) =====
 // A játék eredetileg a Claude-os tárolót használta (window.claude.use('db' | 'user' | 'room')).
 // Ez a fájl ugyanazt a felületet adja Firebase-ből, így a játék kódja szinte változatlan maradhat:
@@ -8800,6 +8800,8 @@ const Music = { el: null, src: null, ctx: null, gain: null,
 document.addEventListener('pointerdown', () => { try { Music.sync(); } catch (e) {} }, { capture: true, passive: true });
 document.addEventListener('visibilitychange', () => { try { Music.sync(); } catch (e) {} });
 { const _sh = show; show = function (id) { _sh(id); try { Music.sync(); } catch (e) {} }; }
+/* a Peaches megjelenésekor (19:00) a nyitva hagyott appban is váltson: a Halloween zene leáll, a VIP event és a háttér bekapcsol (2026-11-01, Tomi) */
+if (SET_RELEASE.pc > Date.now()) setTimeout(() => { try { renderEventTile(); Music.sync(); renderShop(); renderQuestBadge(); } catch (e) {} }, Math.min(2147483000, SET_RELEASE.pc - Date.now() + 1500));
 $('#musicBtn').onclick = () => { Music.set(!Music.pref()); toast(Music.pref() ? '🔊 Zene bekapcsolva' : '🔇 Zene kikapcsolva'); };
 $('#goEvent').onclick = () => { if (needProfile()) return; const e = curEvent();
   if (evPre(e)) return evTeaserModal(e, false);
