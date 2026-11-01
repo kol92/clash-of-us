@@ -2475,6 +2475,13 @@ body.has-tbar #app{height:calc(var(--apph,100%) - var(--tbar,0px));}   /* teszt 
   body[data-scr="scr-pass"] #passBody>.sp-list::before{display:none;}
   body[data-scr="scr-pass"] .sp-row .sp-name b{overflow-wrap:normal;word-break:normal;}
 }
+.pc-mech{display:grid;gap:8px;margin:4px 0 8px;text-align:left;}
+.pc-mech>div{padding:10px 12px;border-radius:12px;background:rgba(40,10,60,.55);border:1px solid rgba(224,124,255,.45);}
+.pc-mech>div>b{display:block;margin-bottom:3px;font-size:15px;color:#f6cf6a;}
+.pc-mech span{display:block;font-size:13px;line-height:1.45;color:#eedcff;}
+.pc-mech span b{color:#fff;}
+.pc-news .ah-news-packs img{max-height:150px;width:auto;}
+.pc-news{max-height:calc(var(--apph,100vh) - 40px);overflow-y:auto;}
 </style>
 
 <div id="app">

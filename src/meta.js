@@ -2229,7 +2229,10 @@ function pcNewsCheck() {
   o.innerHTML = `<div class="modal acct-box ah-news pc-news">
     <p class="ah-news-t">${live ? 'Megérkezett a Best of Us TCG új kiegészítője: az „Egy Éjszaka a Peaches &amp; Creamben”!' : `<b>${new Date().toDateString() === new Date(SET_RELEASE.pc).toDateString() ? 'Ma' : 'November 1-jén (vasárnap)'} 19:00-kor</b> érkezik a Best of Us TCG új kiegészítője: az „Egy Éjszaka a Peaches &amp; Creamben”!`}</p>
     <div class="ah-news-packs"><img src="art/ui/pack-pc.webp" alt="Peaches and Cream booster"><img src="art/ui/pack-pcshiny.webp" alt="Peaches Shiny booster"></div>
-    ${live ? '<p class="live">Új lapok, éjfél utáni hatások, Laszy az új hős, új Season Pass és a VIP event – irány a Bolt!</p>' : ''}
+    ${live ? `<p class="live">Új lapok, Laszy az új hős, új Season Pass és a VIP event – és két új mechanika:</p>
+    <div class="pc-mech"><div><b>🌙 Éjfél után</b><span>A meccs <b>6. körétől</b> „elmúlt éjfél” (egy rövid jelenet jelzi). Az „Éjfél után” lapok ettől kezdve plusz hatást kapnak: ami már lent van, az éjfélkor egyszer bekapcsol, ami ezután kerül le, az rögtön az erősebb formájában érkezik. <b>Laszy</b> hősnél minden éjfél utáni hatás +1-gyel erősebb.</span></div>
+    <div><b>🚪 Kidobás</b><span>A kidobott karakter <b>visszakerül a gazdája kezébe</b> (az eszközei elvesznek), és minden kidobás után <b>1-gyel drágább</b> lesz. A Portás, a P.G. és a „Kérlek, hagyd el…” lappal te választod ki, kit dobsz ki – <b>akár a sajátodat is</b> (pl. Krisz, éjfél után így lesz Baszó). Nem dobható ki: Pifti, a buli ördöge, akin Peaches Purple Card van, és a VIP szoba gazdájának karakterei.</span></div></div>
+    <p class="live">Új limitált Peaches küldetések is várnak – irány a Bolt!</p>` : ''}
     ${gift || p.faLtdPacks > 0 ? `<p class="live">🎁 Ennek örömére <b>ajándékba kaptál egy Full Art Limitált boostert</b> – a Boltban bonthatod ki! Mind a 3 lapja Full Art, bármelyik szettből jöhet, és <b>15% eséllyel arany lap</b> is lapul benne. Nagyon limitált, csak most jár!</p>` : ''}
     <button class="btn primary" data-shop>Irány a Bolt</button><button class="btn ghost" data-x>Később</button></div>`;
   o.onclick = ev => { if (ev.target.closest('[data-shop]')) { o.remove(); renderShop(); show('scr-shop'); return; }
