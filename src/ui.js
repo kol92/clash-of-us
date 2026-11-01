@@ -59,6 +59,8 @@ const TYPE_HELP = {
 /* kulcsszó-szalagok (Astra UI, 2026-10-21): ha van kép, a súgóban a cím helyén az jelenik meg */
 const KW_IMG = { 'Igézhetetlen': 'art/ui/kw-elusive.webp' };
 const KW_HELP = {
+  mid:   ['Éjfél után', 'A meccs 6. körétől „elmúlt éjfél”: ettől kezdve hat a lap éjfél utáni képessége. Ha már lent van, éjfélkor egyszer bekapcsol; ha később kerül le, rögtön az erősebb formájában érkezik. Laszy hősnél +1-gyel erősebb.'],
+  kick:  ['Kidobás', 'A kidobott karakter visszakerül a gazdája kezébe (az eszközei elvesznek), és minden kidobás után 1-gyel drágább lesz. Nem dobható ki: Pifti, a buli ördöge, a Peaches Purple Card viselője és a VIP szoba gazdájának karakterei.'],
   drink: ['Ital', 'Az akciók és eszközök között vannak italok. Kristóf kijátszáskor ezek közül ad egyet véletlenszerűen a kezedbe.'],
   muscle:['Izom', 'Ha a támadása megöli a vele szemben álló karaktert, a maradék sebzés az ellenfél hősét éri (Pajzs esetén nincs átütés).'],
   taunt: ['Provokáció', 'Amíg él, az ellenfél karakterei mindig őt támadják, bárhol is áll a táblán (Nyiti is).'],
@@ -83,6 +85,8 @@ function cardHelpHTML(id, u) {
   if (c.taunt || u?.taunt) add('taunt');
   if (c.drink || ['c_kristof', 'c_miloivo', 'c_laczko'].includes(c.id)) add('drink');
   if (c.muscle || u?.muscle) add('muscle');
+  if (c.mid) add('mid');
+  if (/kidob|elzavar|Kidob/.test(c.text || '') || c.noKick) add('kick');
   if (c.haste || u?.haste) add('haste');
   if (c.sneak || u?.hidden) add('sneak');
   if (c.stun || u?.stun || /bén/i.test(c.text)) add('stun');

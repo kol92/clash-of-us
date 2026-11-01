@@ -974,3 +974,7 @@ Hősképesség-ötletek a táblázatban (még nem zöldek, nincsenek beépítve)
 - **Limitált Peaches küldetések** (`PCQ`, `p.pcq`, mint az Amsterdamnál): a megjelenéstől 2 hétig (`PCQ_END`, 11-15 19:00), 8 feladat (nyerj 1; játssz / nyerj legalább 3, játssz legalább 10 Peaches lappal; 100 hős-sebzés; ranked győzelem; PvP egy barát ellen; a végén „mind”), egyenként 2 Peaches booster, az utolsó 5 – összesen 19. A menüben 🍑 jelzés. Az Amsterdam limitált küldetések 11-02 19:00-ig mellette maradnak. Season Pass XP-t nem adnak (mint az Amsterdam-küldetések).
 - Ellenőrizve: 11-01 18:05 UTC-re állított órával (Peaches packok mindenhol) és a mostani idővel (még Amsterdam).
 
+## Új mechanikák magyarázata (2026-11-01, Tomi)
+- A megjelenéskor felugró „Megérkezett…” ablak (`pcNewsCheck`) két dobozban elmagyarázza az **Éjfél után** (6. körtől; a lent lévő lap éjfélkor bekapcsol, a később lerakott rögtön erősebb; Laszynál +1) és a **Kidobás** (vissza a gazdája kezébe, eszközök elvesznek, +1 költség; Portás / P.G. / „Kérlek, hagyd el…” célzott, a saját is; védett: Pifti, Purple Card, VIP szoba) szabályát.
+- A lapok alatti súgóban is megjelenik a két kulcsszó (`KW_HELP.mid`, `KW_HELP.kick`): minden éjfél utáni lapnál, és ahol a lap szövege kidobást / elzavarást említ.
+

@@ -2490,6 +2490,13 @@ body.has-tbar #app{height:calc(var(--apph,100%) - var(--tbar,0px));}   /* teszt 
   body[data-scr="scr-pass"] #passBody>.sp-list::before{display:none;}
   body[data-scr="scr-pass"] .sp-row .sp-name b{overflow-wrap:normal;word-break:normal;}
 }
+.pc-mech{display:grid;gap:8px;margin:4px 0 8px;text-align:left;}
+.pc-mech>div{padding:10px 12px;border-radius:12px;background:rgba(40,10,60,.55);border:1px solid rgba(224,124,255,.45);}
+.pc-mech>div>b{display:block;margin-bottom:3px;font-size:15px;color:#f6cf6a;}
+.pc-mech span{display:block;font-size:13px;line-height:1.45;color:#eedcff;}
+.pc-mech span b{color:#fff;}
+.pc-news .ah-news-packs img{max-height:150px;width:auto;}
+.pc-news{max-height:calc(var(--apph,100vh) - 40px);overflow-y:auto;}
 </style>
 </head>
 <body>
@@ -2667,7 +2674,7 @@ body.has-tbar #app{height:calc(var(--apph,100%) - var(--tbar,0px));}   /* teszt 
 <script src="vendor/firebase-auth-compat.js"></script>
 <script src="vendor/firebase-firestore-compat.js"></script>
 <script src="vendor/firebase-database-compat.js"></script>
-<script>window.APP_VERSION = "2026.10.31-2307"; window.APP_BUILD = "2026.11.01-0003";</script>
+<script>window.APP_VERSION = "2026.10.31-2307"; window.APP_BUILD = "2026.11.01-1511";</script>
 <script>// ===== Best of Us – saját szerver (Firebase) =====
 // A játék eredetileg a Claude-os tárolót használta (window.claude.use('db' | 'user' | 'room')).
 // Ez a fájl ugyanazt a felületet adja Firebase-ből, így a játék kódja szinte változatlan maradhat:
@@ -4489,6 +4496,8 @@ const TYPE_HELP = {
 /* kulcsszó-szalagok (Astra UI, 2026-10-21): ha van kép, a súgóban a cím helyén az jelenik meg */
 const KW_IMG = { 'Igézhetetlen': 'art/ui/kw-elusive.webp?v=aa1bf694' };
 const KW_HELP = {
+  mid:   ['Éjfél után', 'A meccs 6. körétől „elmúlt éjfél”: ettől kezdve hat a lap éjfél utáni képessége. Ha már lent van, éjfélkor egyszer bekapcsol; ha később kerül le, rögtön az erősebb formájában érkezik. Laszy hősnél +1-gyel erősebb.'],
+  kick:  ['Kidobás', 'A kidobott karakter visszakerül a gazdája kezébe (az eszközei elvesznek), és minden kidobás után 1-gyel drágább lesz. Nem dobható ki: Pifti, a buli ördöge, a Peaches Purple Card viselője és a VIP szoba gazdájának karakterei.'],
   drink: ['Ital', 'Az akciók és eszközök között vannak italok. Kristóf kijátszáskor ezek közül ad egyet véletlenszerűen a kezedbe.'],
   muscle:['Izom', 'Ha a támadása megöli a vele szemben álló karaktert, a maradék sebzés az ellenfél hősét éri (Pajzs esetén nincs átütés).'],
   taunt: ['Provokáció', 'Amíg él, az ellenfél karakterei mindig őt támadják, bárhol is áll a táblán (Nyiti is).'],
@@ -4513,6 +4522,8 @@ function cardHelpHTML(id, u) {
   if (c.taunt || u?.taunt) add('taunt');
   if (c.drink || ['c_kristof', 'c_miloivo', 'c_laczko'].includes(c.id)) add('drink');
   if (c.muscle || u?.muscle) add('muscle');
+  if (c.mid) add('mid');
+  if (/kidob|elzavar|Kidob/.test(c.text || '') || c.noKick) add('kick');
   if (c.haste || u?.haste) add('haste');
   if (c.sneak || u?.hidden) add('sneak');
   if (c.stun || u?.stun || /bén/i.test(c.text)) add('stun');
@@ -8824,7 +8835,10 @@ function pcNewsCheck() {
   o.innerHTML = `<div class="modal acct-box ah-news pc-news">
     <p class="ah-news-t">${live ? 'Megérkezett a Best of Us TCG új kiegészítője: az „Egy Éjszaka a Peaches &amp; Creamben”!' : `<b>${new Date().toDateString() === new Date(SET_RELEASE.pc).toDateString() ? 'Ma' : 'November 1-jén (vasárnap)'} 19:00-kor</b> érkezik a Best of Us TCG új kiegészítője: az „Egy Éjszaka a Peaches &amp; Creamben”!`}</p>
     <div class="ah-news-packs"><img src="art/ui/pack-pc.webp?v=2455e50f" alt="Peaches and Cream booster"><img src="art/ui/pack-pcshiny.webp?v=27d92741" alt="Peaches Shiny booster"></div>
-    ${live ? '<p class="live">Új lapok, éjfél utáni hatások, Laszy az új hős, új Season Pass és a VIP event – irány a Bolt!</p>' : ''}
+    ${live ? `<p class="live">Új lapok, Laszy az új hős, új Season Pass és a VIP event – és két új mechanika:</p>
+    <div class="pc-mech"><div><b>🌙 Éjfél után</b><span>A meccs <b>6. körétől</b> „elmúlt éjfél” (egy rövid jelenet jelzi). Az „Éjfél után” lapok ettől kezdve plusz hatást kapnak: ami már lent van, az éjfélkor egyszer bekapcsol, ami ezután kerül le, az rögtön az erősebb formájában érkezik. <b>Laszy</b> hősnél minden éjfél utáni hatás +1-gyel erősebb.</span></div>
+    <div><b>🚪 Kidobás</b><span>A kidobott karakter <b>visszakerül a gazdája kezébe</b> (az eszközei elvesznek), és minden kidobás után <b>1-gyel drágább</b> lesz. A Portás, a P.G. és a „Kérlek, hagyd el…” lappal te választod ki, kit dobsz ki – <b>akár a sajátodat is</b> (pl. Krisz, éjfél után így lesz Baszó). Nem dobható ki: Pifti, a buli ördöge, akin Peaches Purple Card van, és a VIP szoba gazdájának karakterei.</span></div></div>
+    <p class="live">Új limitált Peaches küldetések is várnak – irány a Bolt!</p>` : ''}
     ${gift || p.faLtdPacks > 0 ? `<p class="live">🎁 Ennek örömére <b>ajándékba kaptál egy Full Art Limitált boostert</b> – a Boltban bonthatod ki! Mind a 3 lapja Full Art, bármelyik szettből jöhet, és <b>15% eséllyel arany lap</b> is lapul benne. Nagyon limitált, csak most jár!</p>` : ''}
     <button class="btn primary" data-shop>Irány a Bolt</button><button class="btn ghost" data-x>Később</button></div>`;
   o.onclick = ev => { if (ev.target.closest('[data-shop]')) { o.remove(); renderShop(); show('scr-shop'); return; }
