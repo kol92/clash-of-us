@@ -2194,6 +2194,8 @@ const Music = { el: null, src: null, ctx: null, gain: null,
 document.addEventListener('pointerdown', () => { try { Music.sync(); } catch (e) {} }, { capture: true, passive: true });
 document.addEventListener('visibilitychange', () => { try { Music.sync(); } catch (e) {} });
 { const _sh = show; show = function (id) { _sh(id); try { Music.sync(); } catch (e) {} }; }
+/* a Peaches megjelenésekor (19:00) a nyitva hagyott appban is váltson: a Halloween zene leáll, a VIP event és a háttér bekapcsol (2026-11-01, Tomi) */
+if (SET_RELEASE.pc > Date.now()) setTimeout(() => { try { renderEventTile(); Music.sync(); renderShop(); renderQuestBadge(); } catch (e) {} }, Math.min(2147483000, SET_RELEASE.pc - Date.now() + 1500));
 $('#musicBtn').onclick = () => { Music.set(!Music.pref()); toast(Music.pref() ? '🔊 Zene bekapcsolva' : '🔇 Zene kikapcsolva'); };
 $('#goEvent').onclick = () => { if (needProfile()) return; const e = curEvent();
   if (evPre(e)) return evTeaserModal(e, false);
