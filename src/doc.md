@@ -979,3 +979,6 @@ Hősképesség-ötletek a táblázatban (még nem zöldek, nincsenek beépítve)
 - A lapok alatti súgóban is megjelenik a két kulcsszó (`KW_HELP.mid`, `KW_HELP.kick`): minden éjfél utáni lapnál, és ahol a lap szövege kidobást / elzavarást említ.
 - **Halloween zene (2026-11-01):** a Halloween event 19:00-kor zár, így a zene (és a Halloween menü-háttér) ekkor leáll; a VIP eventnek nincs zenéje. Ha az app 19:00-kor épp nyitva van, egy időzítő vált át (`renderEventTile` + `Music.sync`).
 
+## Javítás: Alina egy pillanatra lelepleződött (2026-11-02)
+- Az ellenfél kijátszásakor felugró nagy lap („X kijátszotta”) a kézben lévő valódi lapot (Alina) mutatta, és csak utána jelent meg a táblán az álca. Most az álcát a kijátszás előtt sorsoljuk (`alinaPick`, engine.js – a lapon tárolva, a `playCard` ugyanezt használja, így a PvP véletlenszám-sorrendje nem változik), és a felugró lap is az álcát mutatja (bot és PvP).
+

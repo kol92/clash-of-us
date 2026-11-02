@@ -1833,7 +1833,7 @@ async function botTurn() {
   const nextMove = () => { if (!plan) return botChoose(S, S.botLv || 2); const m = plan.shift(); if (!m) return null;
     const hi = S.players[BOT].hand.findIndex(c => c.id === m[0]); return hi < 0 ? null : { hi, t: { ...m[1], side: BOT } }; };
   while (S.winner == null && (ch = nextMove())) {
-    await showPlayed(S.players[BOT].hand[ch.hi].id, ch.t, !!S.players[BOT].hand[ch.hi].foil);
+    await showPlayed(alinaPick(S, BOT, ch.hi) || S.players[BOT].hand[ch.hi].id, ch.t, !!S.players[BOT].hand[ch.hi].foil);   /* Alina: az álcát mutatja */
     await runFx(() => playCard(S, BOT, ch.hi, ch.t));
     await sleep(350);
   }

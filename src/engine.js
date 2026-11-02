@@ -239,6 +239,10 @@ const PASSIVE = { firstCharAtk:'barna', endHeal:'gabi', firstTwo:'krisz', itemHp
 const midBonus = p => has(p, 'midnightPlus') ? 1 : 0;
 const setOk = x => !(x.set && typeof setLive === 'function' && !setLive(x.set));   /* véletlen lap-készletek: még meg nem jelent szett lapja nem jöhet (2026-10-28, Peaches Jäger a parti lelkénél élesben) */
 const ALINA_POOL = () => CARDS.filter(c => c.type === 'char' && c.cost === 1 && !c.token && !c.hero && !c.variantOf && !c.off && !c.enemySide && !c.mid && !c.sneak && !c.invis && (!c.set || c.set === 'ah' || c.set === 'pc')).map(c => c.id);   /* Láthatatlan álca nem: azt nem lehetne megütni */
+/* Alina álcájának kisorsolása – a kijátszás ELŐTT is lekérhető (a felület ezt mutatja az ellenfélnek, 2026-11-02: eddig egy pillanatra Alina látszott);
+   a playCard ugyanezt használja, így a véletlenszám-sorrend (PvP) nem változik */
+function alinaPick(s, pi, hi, h) { h = h || s.players[pi].hand[hi]; if (!h || h.id !== 'c_alina') return null;
+  if (!h.disg) { const P = ALINA_POOL(); h.disg = P[Math.floor(rnd() * P.length)]; } return h.disg; }
 const realId = u => u && u.alina && !u.alinaOn ? 'c_alina' : u && u.id;   /* Alina álcában: a valódi lap */
 function alinaTrap(s, side, i) {   /* CSAPDA: az álca lehull – 5/1-es Alina (a rajta lévő eszközök bónusza megmarad) */
   const u = s.players[side].board[i], dc = CARD[u.id];
@@ -608,7 +612,7 @@ function playCard(s, pi, hi, t) {
   if (c.type === 'char' && p.charTax) p.charTax = 0;
   if (has(p, 'firstTwo') && c.cost > 0 && (p.cheap || 0) < 2) p.cheap = (p.cheap || 0) + 1;
   p.hand.splice(hi, 1);
-  const disg = c.id === 'c_alina' ? (() => { const P = ALINA_POOL(); return P[Math.floor(rnd() * P.length)]; })() : null;   /* Alina: az ellenfél az álcát látja */
+  const disg = c.id === 'c_alina' ? alinaPick(s, pi, hi, h) : null;   /* Alina: az ellenfél az álcát látja */
   ev(s, { t:'play', side:pi, id:disg || c.id, alina: !!disg || undefined, foil:!!h.foil, tg: t && (t.k === 'unit' || t.k === 'hero') ? { k:t.k, side:t.side, i:t.i } : undefined, at: c.type === 'char' && t && t.k === 'slot' ? t.i : null, o: t && t.o != null ? t.o : undefined });
   if (c.drink) {   // Italos szinergiák: Milo, az örökivó erősödik, Laczkó Tomi húzat (körönként egyszer)
     p.board.forEach((x, j) => { if (x && x.id === 'c_miloivo') { x.atk += 1; ev(s, { t:'buff', side:pi, i:j, n:1 }); } });
@@ -1500,4 +1504,4 @@ function botChoose(real, lvl = 2) {
   return best && { hi: best.hi, t: best.t };
 }
 
-if (typeof module !== 'undefined') module.exports = { midBonus, isMidnight, midOn, kickOut, whyNot, preAttack, isEl, canMove, moveTargets, moveUnit, BOT_LV, baszoStrike, sharkSwim, atiFlee, openSlots, closedLane, CARDS_ALL: CARDS, DECK_OF, LANES, MAX_HALF, mulligan, botMulligan, beginGame, CARDS, CARD, HEROES, HERO, DECKS, newGame, playCard, canPlay, targetsFor, cardCost, attackLane, finishTurn, runEndTurn, botChoose, canAttack, effAtk };
+if (typeof module !== 'undefined') module.exports = { alinaPick, midBonus, isMidnight, midOn, kickOut, whyNot, preAttack, isEl, canMove, moveTargets, moveUnit, BOT_LV, baszoStrike, sharkSwim, atiFlee, openSlots, closedLane, CARDS_ALL: CARDS, DECK_OF, LANES, MAX_HALF, mulligan, botMulligan, beginGame, CARDS, CARD, HEROES, HERO, DECKS, newGame, playCard, canPlay, targetsFor, cardCost, attackLane, finishTurn, runEndTurn, botChoose, canAttack, effAtk };
