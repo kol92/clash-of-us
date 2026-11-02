@@ -2777,7 +2777,7 @@ async function pvpDrain() {
         try {
           if (L.kind === 'play') {
             const hi = S.players[BOT].hand.findIndex((c, i) => i === L.hi && c.id === L.id);
-            if (hi >= 0) { await showPlayed(L.id, L.t, !!S.players[BOT].hand[hi].foil); await runFx(() => playCard(S, BOT, hi, L.t)); }
+            if (hi >= 0) { await showPlayed(alinaPick(S, BOT, hi) || L.id, L.t, !!S.players[BOT].hand[hi].foil); await runFx(() => playCard(S, BOT, hi, L.t)); }
           } else if (L.kind === 'move') await runFx(() => moveUnit(S, BOT, L.a, L.b));
           else await resolveEnd();
         } catch {}
