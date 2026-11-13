@@ -547,6 +547,7 @@ function chestWeeklyCheck() {
   return true;
 }
 function chestPopup() {
+  try { if (bdayCheck()) return; } catch (e) {}   /* Bence szülinapja (2026-11-13) */
   try { if (pcNewsCheck()) return; } catch (e) {}   /* Peaches-hír + ajándék (2026-10-28) */
   try { if (ahNewsCheck()) return; } catch (e) {}   /* előbb az Amszterdam-hír (ha még nem látta), utána a láda */
   const p = Store.p; if (!p || !(p.chestNew) || $('#layer .overlay') || (typeof S !== 'undefined' && S)) return;
@@ -2219,6 +2220,21 @@ function evTeaserModal(e, gift) {
 /* Amsterdam Hősei megjelenés (2026-10-19 19:00, Tomi): mindenki kap 3 ingyen Amsterdam boostert, profilonként egyszer */
 const AH_LAUNCH_PACKS = 3;
 /* Peaches & Cream előzetes (2026-10-28, Tomi): egyszeri hír + ajándék Full Art Limitált booster; a megjelenéskor (11-01 19:00) egy „megérkezett” hír */
+/* Bence szülinapja (2026-11-13, Tomi): aki aznap belép (budapesti idő szerint), megkapja a mozgó „Bence, a szülinapos” portrét + üdvözlő ablak */
+const BDAY = { id: 'bday-bence-2026', port: 'p_bence_bday', from: Date.UTC(2026, 10, 12, 23, 0), to: Date.UTC(2026, 10, 13, 23, 0) };
+function bdayCheck() {
+  const p = Store.p, now = Date.now(); if (!p || p.onboard || now < BDAY.from || now >= BDAY.to || (typeof S !== 'undefined' && S) || $('#layer .overlay') || $('#scr-menu').hidden) return false;
+  p.gifts = p.gifts || []; if (p.gifts.includes(BDAY.id)) return false;
+  p.gifts.push(BDAY.id); p.portraits = [...new Set([...(p.portraits || []), BDAY.port])]; p.heroSkin = { ...(p.heroSkin || {}), bence: BDAY.port }; p._dirty = true; save();
+  const A = ART[BDAY.port], o = document.createElement('div'); o.className = 'overlay';
+  o.innerHTML = `<div class="modal bday-box"><h3>🎂 Boldog szülinapot, Bence! 🎉</h3>
+    <div class="bday-port"><img src="${artSrc(BDAY.port, true)}" alt=""><video src="${A.vid}" muted loop autoplay playsinline disablepictureinpicture preload="auto" aria-hidden="true" oncanplay="this.muted=true;this.play().catch(()=>{})" onplaying="this.classList.add('on')"></video></div>
+    <p class="live">Ma van Bence szülinapja! Ennek örömére <b>ajándékba kaptad a mozgó „Bence, a szülinapos” hős-portrét</b> – Bencén már ez van, a Gyűjteményben bármikor átállíthatod.</p>
+    <button class="btn primary" data-x>Isten éltessen, Bence! 🥂</button></div>`;
+  o.onclick = e => { if (e.target.closest('[data-x]') || e.target === o) o.remove(); };
+  $('#layer').appendChild(o); try { renderMenuFan && renderMenuFan(); } catch (e) {}
+  return true;
+}
 function pcNewsCheck() {
   const p = Store.p; if (!p || p.onboard || (typeof S !== 'undefined' && S) || $('#layer .overlay') || $('#scr-menu').hidden) return false;
   p.gifts = p.gifts || []; let gift = false;

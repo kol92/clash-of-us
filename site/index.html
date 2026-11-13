@@ -2497,6 +2497,11 @@ body.has-tbar #app{height:calc(var(--apph,100%) - var(--tbar,0px));}   /* teszt 
 .pc-mech span b{color:#fff;}
 .pc-news .ah-news-packs img{max-height:150px;width:auto;}
 .pc-news{max-height:calc(var(--apph,100vh) - 40px);overflow-y:auto;}
+.bday-box{text-align:center;}
+.bday-port{position:relative;width:min(230px,60vw);aspect-ratio:3/4;margin:6px auto 10px;border-radius:16px;overflow:hidden;border:3px solid #f1c75b;box-shadow:0 0 0 2px #6b4a10,0 0 26px rgba(255,200,90,.45);}
+.bday-port img,.bday-port video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
+.bday-port video{opacity:0;transition:opacity .45s;} .bday-port video.on{opacity:1;}
+.bday-port video::-webkit-media-controls-start-playback-button{display:none!important;-webkit-appearance:none;}
 </style>
 </head>
 <body>
@@ -2674,7 +2679,7 @@ body.has-tbar #app{height:calc(var(--apph,100%) - var(--tbar,0px));}   /* teszt 
 <script src="vendor/firebase-auth-compat.js"></script>
 <script src="vendor/firebase-firestore-compat.js"></script>
 <script src="vendor/firebase-database-compat.js"></script>
-<script>window.APP_VERSION = "2026.11.02-1630"; window.APP_BUILD = "2026.11.02-1630";</script>
+<script>window.APP_VERSION = "2026.11.13-1604"; window.APP_BUILD = "2026.11.13-1604";</script>
 <script>// ===== Best of Us – saját szerver (Firebase) =====
 // A játék eredetileg a Claude-os tárolót használta (window.claude.use('db' | 'user' | 'room')).
 // Ez a fájl ugyanazt a felületet adja Firebase-ből, így a játék kódja szinte változatlan maradhat:
@@ -4623,6 +4628,7 @@ const ART = {
   p_barna_neon:   { src:'art/p_barna_neon.webp?v=16af859692ad59f9', av:'55% 26%', pos:'55% 24%', port:'55% 22%' },   /* VIP event 60 (2026-10-27) */
   p_tomi_neon:    { src:'art/p_tomi_neon.webp?v=3095d70dac48f1ca', av:'44% 18%', pos:'44% 16%', port:'44% 14%' },   /* 2. Season Pass 15. szint (2026-10-27) */
   p_krisz_baszo:  { src:'art/p_krisz_baszo.webp?v=9610ec9f1d2664ea', vid:'art/vid/p_krisz_baszo.mp4?v=397474b6', av:'50% 20%', pos:'50% 18%', port:'50% 15%' },   /* mozgó – VIP event 90 (2026-10-27) */
+  p_bence_bday:   { src:'art/p_bence_bday.webp?v=a06f984aa23f6b3e', vid:'art/vid/p_bence_bday.mp4?v=87e12f59', av:'50% 20%', pos:'50% 18%', port:'50% 15%' },   /* mozgó – Bence szülinapja (2026-11-13) */
   p_laci_eso:     { src:'art/p_laci_eso.webp?v=fe9be9a16c792078', vid:'art/vid/p_laci_eso.mp4?v=06740136', av:'32% 22%', pos:'32% 22%', port:'32% 18%' },   /* mozgó – 2. Season Pass 25. szint (2026-10-26) */
   p_barna_dia:    { src:'art/p_barna_dia.webp?v=b86771320c609444', vid:'art/vid/p_barna_dia.mp4?v=4279c903', av:'64% 18%', pos:'62% 20%', port:'64% 16%' },   /* mozgó gyémánt portré – 2. ranked szezon Legenda jutalma (2026-10-25) */
   p_gabi_beton:   { src:'art/p_gabi_beton.webp?v=c59e0018cd6d061c', av:'58% 26%', pos:'56% 26%', port:'58% 22%' },
@@ -4884,6 +4890,7 @@ const PORTRAITS = {
   p_barna_neon:   { hero: 'barna', name: 'Barna, Neonsztár', passOnly: true, ev: 'vip26' },   /* VIP event, 60 pont */
   p_tomi_neon:    { hero: 'tomi',  name: 'Tomi, Neonsztár', passOnly: true },   /* 2. szezon, 15. szint */
   p_krisz_baszo:  { hero: 'krisz', name: 'Krisz, Baszó mode', passOnly: true, ev: 'vip26' },   /* mozgó; VIP event, 90 pont */
+  p_bence_bday:   { hero: 'bence', name: 'Bence, a szülinapos', passOnly: true },   /* mozgó; ajándék 2026-11-13-án belépőknek */
   p_laci_eso:     { hero: 'laci',  name: 'Laci, az éjféli zápor', passOnly: true },   /* mozgó; 2. szezon (Éjfél után), 25. szint */
   p_barna_dia:    { hero: 'barna', name: 'Gyémánt Barna', passOnly: true },   /* mozgó; csak a ranked Legendáért (2. szezon) */
   p_gabi_beton:   { hero: 'gabi',  name: 'Gabi, a Beton', passOnly: true },   /* 2. ranked szezon, Ezüst 5 jutalma (2026-10-23, Tomi) – boltban, ládában nincs */   /* bolt, 2026-10-19 (Tomi) */
@@ -7157,6 +7164,7 @@ function chestWeeklyCheck() {
   return true;
 }
 function chestPopup() {
+  try { if (bdayCheck()) return; } catch (e) {}   /* Bence szülinapja (2026-11-13) */
   try { if (pcNewsCheck()) return; } catch (e) {}   /* Peaches-hír + ajándék (2026-10-28) */
   try { if (ahNewsCheck()) return; } catch (e) {}   /* előbb az Amszterdam-hír (ha még nem látta), utána a láda */
   const p = Store.p; if (!p || !(p.chestNew) || $('#layer .overlay') || (typeof S !== 'undefined' && S)) return;
@@ -8829,6 +8837,21 @@ function evTeaserModal(e, gift) {
 /* Amsterdam Hősei megjelenés (2026-10-19 19:00, Tomi): mindenki kap 3 ingyen Amsterdam boostert, profilonként egyszer */
 const AH_LAUNCH_PACKS = 3;
 /* Peaches & Cream előzetes (2026-10-28, Tomi): egyszeri hír + ajándék Full Art Limitált booster; a megjelenéskor (11-01 19:00) egy „megérkezett” hír */
+/* Bence szülinapja (2026-11-13, Tomi): aki aznap belép (budapesti idő szerint), megkapja a mozgó „Bence, a szülinapos” portrét + üdvözlő ablak */
+const BDAY = { id: 'bday-bence-2026', port: 'p_bence_bday', from: Date.UTC(2026, 10, 12, 23, 0), to: Date.UTC(2026, 10, 13, 23, 0) };
+function bdayCheck() {
+  const p = Store.p, now = Date.now(); if (!p || p.onboard || now < BDAY.from || now >= BDAY.to || (typeof S !== 'undefined' && S) || $('#layer .overlay') || $('#scr-menu').hidden) return false;
+  p.gifts = p.gifts || []; if (p.gifts.includes(BDAY.id)) return false;
+  p.gifts.push(BDAY.id); p.portraits = [...new Set([...(p.portraits || []), BDAY.port])]; p.heroSkin = { ...(p.heroSkin || {}), bence: BDAY.port }; p._dirty = true; save();
+  const A = ART[BDAY.port], o = document.createElement('div'); o.className = 'overlay';
+  o.innerHTML = `<div class="modal bday-box"><h3>🎂 Boldog szülinapot, Bence! 🎉</h3>
+    <div class="bday-port"><img src="${artSrc(BDAY.port, true)}" alt=""><video src="${A.vid}" muted loop autoplay playsinline disablepictureinpicture preload="auto" aria-hidden="true" oncanplay="this.muted=true;this.play().catch(()=>{})" onplaying="this.classList.add('on')"></video></div>
+    <p class="live">Ma van Bence szülinapja! Ennek örömére <b>ajándékba kaptad a mozgó „Bence, a szülinapos” hős-portrét</b> – Bencén már ez van, a Gyűjteményben bármikor átállíthatod.</p>
+    <button class="btn primary" data-x>Isten éltessen, Bence! 🥂</button></div>`;
+  o.onclick = e => { if (e.target.closest('[data-x]') || e.target === o) o.remove(); };
+  $('#layer').appendChild(o); try { renderMenuFan && renderMenuFan(); } catch (e) {}
+  return true;
+}
 function pcNewsCheck() {
   const p = Store.p; if (!p || p.onboard || (typeof S !== 'undefined' && S) || $('#layer .overlay') || $('#scr-menu').hidden) return false;
   p.gifts = p.gifts || []; let gift = false;

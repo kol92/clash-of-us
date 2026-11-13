@@ -2482,6 +2482,11 @@ body.has-tbar #app{height:calc(var(--apph,100%) - var(--tbar,0px));}   /* teszt 
 .pc-mech span b{color:#fff;}
 .pc-news .ah-news-packs img{max-height:150px;width:auto;}
 .pc-news{max-height:calc(var(--apph,100vh) - 40px);overflow-y:auto;}
+.bday-box{text-align:center;}
+.bday-port{position:relative;width:min(230px,60vw);aspect-ratio:3/4;margin:6px auto 10px;border-radius:16px;overflow:hidden;border:3px solid #f1c75b;box-shadow:0 0 0 2px #6b4a10,0 0 26px rgba(255,200,90,.45);}
+.bday-port img,.bday-port video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
+.bday-port video{opacity:0;transition:opacity .45s;} .bday-port video.on{opacity:1;}
+.bday-port video::-webkit-media-controls-start-playback-button{display:none!important;-webkit-appearance:none;}
 </style>
 
 <div id="app">

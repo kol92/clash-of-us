@@ -982,3 +982,6 @@ Hősképesség-ötletek a táblázatban (még nem zöldek, nincsenek beépítve)
 ## Javítás: Alina egy pillanatra lelepleződött (2026-11-02)
 - Az ellenfél kijátszásakor felugró nagy lap („X kijátszotta”) a kézben lévő valódi lapot (Alina) mutatta, és csak utána jelent meg a táblán az álca. Most az álcát a kijátszás előtt sorsoljuk (`alinaPick`, engine.js – a lapon tárolva, a `playCard` ugyanezt használja, így a PvP véletlenszám-sorrendje nem változik), és a felugró lap is az álcát mutatja (bot és PvP).
 
+## Bence szülinapja (2026-11-13, Tomi)
+- Mozgó hős-portré **„Bence, a szülinapos”** (`p_bence_bday`, Tomi videója, 600×800, `passOnly`). Aki 2026-11-13-án (budapesti idő, 0:00–24:00) belép, megkapja, Bencén rögtön ez lesz, és felugrik egy „🎂 Boldog szülinapot, Bence! 🎉” ablak a mozgó portréval (`BDAY`, `bdayCheck`, profilonként egyszer: `p.gifts` `bday-bence-2026`). Utána nem szerezhető meg.
+
