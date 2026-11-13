@@ -182,6 +182,7 @@ const ART = {
   p_barna_neon:   { src:'art/p_barna_neon.webp', av:'55% 26%', pos:'55% 24%', port:'55% 22%' },   /* VIP event 60 (2026-10-27) */
   p_tomi_neon:    { src:'art/p_tomi_neon.webp', av:'44% 18%', pos:'44% 16%', port:'44% 14%' },   /* 2. Season Pass 15. szint (2026-10-27) */
   p_krisz_baszo:  { src:'art/p_krisz_baszo.webp', vid:'art/vid/p_krisz_baszo.mp4', av:'50% 20%', pos:'50% 18%', port:'50% 15%' },   /* mozgó – VIP event 90 (2026-10-27) */
+  p_bence_bday:   { src:'art/p_bence_bday.webp', vid:'art/vid/p_bence_bday.mp4', av:'50% 20%', pos:'50% 18%', port:'50% 15%' },   /* mozgó – Bence szülinapja (2026-11-13) */
   p_laci_eso:     { src:'art/p_laci_eso.webp', vid:'art/vid/p_laci_eso.mp4', av:'32% 22%', pos:'32% 22%', port:'32% 18%' },   /* mozgó – 2. Season Pass 25. szint (2026-10-26) */
   p_barna_dia:    { src:'art/p_barna_dia.webp', vid:'art/vid/p_barna_dia.mp4', av:'64% 18%', pos:'62% 20%', port:'64% 16%' },   /* mozgó gyémánt portré – 2. ranked szezon Legenda jutalma (2026-10-25) */
   p_gabi_beton:   { src:'art/p_gabi_beton.webp', av:'58% 26%', pos:'56% 26%', port:'58% 22%' },
@@ -443,6 +444,7 @@ const PORTRAITS = {
   p_barna_neon:   { hero: 'barna', name: 'Barna, Neonsztár', passOnly: true, ev: 'vip26' },   /* VIP event, 60 pont */
   p_tomi_neon:    { hero: 'tomi',  name: 'Tomi, Neonsztár', passOnly: true },   /* 2. szezon, 15. szint */
   p_krisz_baszo:  { hero: 'krisz', name: 'Krisz, Baszó mode', passOnly: true, ev: 'vip26' },   /* mozgó; VIP event, 90 pont */
+  p_bence_bday:   { hero: 'bence', name: 'Bence, a szülinapos', passOnly: true },   /* mozgó; ajándék 2026-11-13-án belépőknek */
   p_laci_eso:     { hero: 'laci',  name: 'Laci, az éjféli zápor', passOnly: true },   /* mozgó; 2. szezon (Éjfél után), 25. szint */
   p_barna_dia:    { hero: 'barna', name: 'Gyémánt Barna', passOnly: true },   /* mozgó; csak a ranked Legendáért (2. szezon) */
   p_gabi_beton:   { hero: 'gabi',  name: 'Gabi, a Beton', passOnly: true },   /* 2. ranked szezon, Ezüst 5 jutalma (2026-10-23, Tomi) – boltban, ládában nincs */   /* bolt, 2026-10-19 (Tomi) */
